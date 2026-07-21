@@ -1,0 +1,11 @@
+/* Design tokens. Define CSS variables in the @theme block below and Tailwind v4
+   generates matching utilities (e.g. --color-brand → bg-brand, text-brand).
+   Replace these examples with your own scale on a per-project basis. */
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand: #4f46e5;
+}
