@@ -50,3 +50,17 @@ routes resolve to the app instead of 404ing — keep it if you add a router.
 
 This started from a bare shell: no router, no global state library, no design system.
 Add those per project as needed; keep this file updated when you do.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live as markdown files under `.scratch/<feature>/` in this repo. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical triage roles, using default label strings. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context — one `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
