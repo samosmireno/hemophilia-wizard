@@ -14,17 +14,18 @@ file it came from** so it can be re-verified and updated.
   source tag. If a fact spans multiple sources that disagree, record both and note which
   one we treat as authoritative (see [Data quality & conflicts](#data-quality--conflicts)).
 - **Source tags:**
-  | Tag | File | Notes |
-  |-----|------|-------|
-  | `[XLSX]` | `documents/Treatment wizard grid.xlsx` | 5 sheets; refer to sheets as **S1–S5** (see below) |
-  | `[PDF]` | `documents/HM-85L Hemophilia Treatment Wizard_V2.pdf` | Raster blueprint (one large canvas) |
+  | Tag       | File                                                         | Notes                                                                                                       |
+  | --------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+  | `[XLSX]`  | `documents/Treatment wizard grid.xlsx`                       | 5 sheets; refer to sheets as **S1–S5** (see below)                                                          |
+  | `[PDF]`   | `documents/HM-85L Hemophilia Treatment Wizard_V2.pdf`        | Raster blueprint (one large canvas)                                                                         |
   | `[PDF-V]` | `documents/HM-85L Hemophilia Treatment Wizard_V2_Vector.pdf` | **Vector** version of the same blueprint — selectable text, highest fidelity; prefer this for exact wording |
-  | `[PPTX]` | `documents/HM-85L treatment wizard slides.pptx` | 7 slides; slide 7 = same master diagram, slides 1–6 = scenario/education slides |
-  | `[BUILD]` | code in `src/data/` + `treatment-wizard-demo.html` | What we've implemented from the above |
+  | `[PPTX]`  | `documents/HM-85L treatment wizard slides.pptx`              | 7 slides; slide 7 = same master diagram, slides 1–6 = scenario/education slides                             |
+  | `[BUILD]` | code in `src/data/` + `treatment-wizard-demo.html`           | What we've implemented from the above                                                                       |
 
 `[PDF]` and `[PDF-V]` are the **same blueprint**; cite `[PDF-V]` for exact text.
 
 ### XLSX sheet map `[XLSX]`
+
 S1 = "All treatments for HA and HB" (all rows visible — **source of truth**);
 S2 = "FVIII mimetics"; S3 = "Hemostatic Rebalancing Agents"; S4 = "Clotting factor replacement";
 S5 = "Gene Therapy". **S2–S5 are S1 with out-of-class rows _hidden_** — i.e. saved
@@ -67,15 +68,15 @@ Left → right on one canvas:
 
 Visible annotations left by the author for the developer (verbatim):
 
-- 🟡 (near "Explore therapy options for HA/HB", above a table image) — *"Nicole: should
+- 🟡 (near "Explore therapy options for HA/HB", above a table image) — _"Nicole: should
   these be displayed as separate p[op-ups]… **Is there a way that we can launch the table
-  from the app so users can filter on each column?**"* → **This is the origin of `Treatment
-  wizard grid.xlsx`**: the grid is the example of the filterable table.
-- 🟣 — *"These pop up information sheets can be displayed however you determine is best —
+  from the app so users can filter on each column?**"_ → **This is the origin of `Treatment
+wizard grid.xlsx`**: the grid is the example of the filterable table.
+- 🟣 — _"These pop up information sheets can be displayed however you determine is best —
   ideas include separate pop ups from the buttons in the dark green boxes or as tabs such
-  as in the example below."*
-- Repeated on each wizard leaf: *"Note: Please add a button for each drug which will pop up
-  to an information sheet."*
+  as in the example below."_
+- Repeated on each wizard leaf: _"Note: Please add a button for each drug which will pop up
+  to an information sheet."_
 
 ---
 
@@ -103,20 +104,21 @@ Hemophilia A** (recovered from text coordinates). `[PDF-V]`
 **Authored lookup — NOT a computed filter.** Lists are hand-picked in the source and are
 intentionally not derivable by filtering.
 
-| Reason ↓ / Scenario → | A, no inhib | A, inhib | B, no inhib | B, inhib |
-|---|---|---|---|---|
-| **Improving bleeding control** | Emi, Dene, Conci, Mars, Fitu | Emi, Dene, Conci, Mars, Fitu | Conci, Mars, Fitu | Conci, Mars, Fitu |
-| **Increased adherence** | Emi, Dene, Conci, Mars, Fitu | Emi, Dene, Conci, Mars, Fitu | Conci, Mars, Fitu, **Gene** | Conci, Mars, Fitu |
-| **Reduced treatment burden** | Emi, Dene, Conci, Mars, Fitu | Emi, Dene, Conci, Mars, Fitu | Conci, Mars, Fitu, **Gene** | Conci, Mars, Fitu |
-| **Reduced monitoring requirement** | Emi, Dene | Emi, Dene | Conci, Mars, Fitu | Conci, Mars, Fitu |
+| Reason ↓ / Scenario →              | A, no inhib                  | A, inhib                     | B, no inhib                 | B, inhib          |
+| ---------------------------------- | ---------------------------- | ---------------------------- | --------------------------- | ----------------- |
+| **Improving bleeding control**     | Emi, Dene, Conci, Mars, Fitu | Emi, Dene, Conci, Mars, Fitu | Conci, Mars, Fitu           | Conci, Mars, Fitu |
+| **Increased adherence**            | Emi, Dene, Conci, Mars, Fitu | Emi, Dene, Conci, Mars, Fitu | Conci, Mars, Fitu, **Gene** | Conci, Mars, Fitu |
+| **Reduced treatment burden**       | Emi, Dene, Conci, Mars, Fitu | Emi, Dene, Conci, Mars, Fitu | Conci, Mars, Fitu, **Gene** | Conci, Mars, Fitu |
+| **Reduced monitoring requirement** | Emi, Dene                    | Emi, Dene                    | Conci, Mars, Fitu           | Conci, Mars, Fitu |
 
 Abbreviations: Emi = Emicizumab, Dene = Denecimig, Conci = Concizumab, Mars = Marstacimab,
 Fitu = Fitusiran, Gene = Etranacogene dezaparvovec-drlb (gene therapy).
 
 **Authored nuances (why it's not a filter):**
-- Hemophilia A + *reduced monitoring* → **only the two FVIIIa mimetics** (rebalancing agents
+
+- Hemophilia A + _reduced monitoring_ → **only the two FVIIIa mimetics** (rebalancing agents
   need AT/plasma monitoring).
-- **Gene therapy** appears **only** for Hemophilia B *without* inhibitors, under adherence &
+- **Gene therapy** appears **only** for Hemophilia B _without_ inhibitors, under adherence &
   treatment burden (Etranacogene is HB, no-inhibitor, adults only).
 - FVIIIa mimetics (Emi, Dene) never appear in Hemophilia B branches (they are HA-only).
 
@@ -148,17 +150,17 @@ Indicated with inhibitors (Yes / No). "A + B" means eligible for both.
 
 ### 5.1 Treatment roster (9 rows, S1 verbatim) `[XLSX]`
 
-| Agent | Class | MOA | Type | Inhib | Age | Route | Schedule |
-|---|---|---|:--:|:--:|:--:|---|---|
-| SHL | Clotting factor replacement | Standard half-life | A + B | No | 0+ | IV | 3X/week |
-| EHL | Clotting factor replacement | Extended half-life | A + B | No | 0+ | IV | ~2X/week |
-| Efanesoctocog alfa | Clotting factor replacement | Ultralong half-life | A | No | 0+ | IV | Weekly |
-| Emicizumab | Factor VIIIa mimetic | FVIIIa-mimetic BsAb | A | Yes | 0+ | SC (vial/syringe) | Monthly, bimonthly, weekly |
-| Denecimig | Factor VIIIa mimetic (emerging/investigational) | FVIIIa-mimetic BsAb | A | Yes | TBD (>1 yr) | SC (prefilled pen) | Monthly, weekly |
-| Concizumab | Hemostatic rebalancing agent | TFPI mAB | A + B | Yes | 12+ | SC (prefilled pen) | Daily |
-| Marstacimab | Hemostatic rebalancing agent | TFPI mAB | A + B | Yes | 6+ | SC (prefilled pen) | Weekly |
-| Fitusiran | Hemostatic rebalancing agent | AT-directed siRNA | A + B | Yes | 12+ | SC (prefilled pen or vial/syringe)ᴬ | Every 1-2 months |
-| Etranacogene dezaparvovec-drlb | Gene therapy | AAV vector | B | No | Adults | IV | Single infusion |
+| Agent                          | Class                                           | MOA                 | Type  | Inhib |     Age     | Route                               | Schedule                   |
+| ------------------------------ | ----------------------------------------------- | ------------------- | :---: | :---: | :---------: | ----------------------------------- | -------------------------- |
+| SHL                            | Clotting factor replacement                     | Standard half-life  | A + B |  No   |     0+      | IV                                  | 3X/week                    |
+| EHL                            | Clotting factor replacement                     | Extended half-life  | A + B |  No   |     0+      | IV                                  | ~2X/week                   |
+| Efanesoctocog alfa             | Clotting factor replacement                     | Ultralong half-life |   A   |  No   |     0+      | IV                                  | Weekly                     |
+| Emicizumab                     | Factor VIIIa mimetic                            | FVIIIa-mimetic BsAb |   A   |  Yes  |     0+      | SC (vial/syringe)                   | Monthly, bimonthly, weekly |
+| Denecimig                      | Factor VIIIa mimetic (emerging/investigational) | FVIIIa-mimetic BsAb |   A   |  Yes  | TBD (>1 yr) | SC (prefilled pen)                  | Monthly, weekly            |
+| Concizumab                     | Hemostatic rebalancing agent                    | TFPI mAB            | A + B |  Yes  |     12+     | SC (prefilled pen)                  | Daily                      |
+| Marstacimab                    | Hemostatic rebalancing agent                    | TFPI mAB            | A + B |  Yes  |     6+      | SC (prefilled pen)                  | Weekly                     |
+| Fitusiran                      | Hemostatic rebalancing agent                    | AT-directed siRNA   | A + B |  Yes  |     12+     | SC (prefilled pen or vial/syringe)ᴬ | Every 1-2 months           |
+| Etranacogene dezaparvovec-drlb | Gene therapy                                    | AAV vector          |   B   |  No   |   Adults    | IV                                  | Single infusion            |
 
 ᴬ Fitusiran route: enriched from S3 / `[PDF-V]` (`…pen or vial/syringe`); S1 had `…pen` only —
 the one deliberate departure from S1 (see [Data quality](#data-quality--conflicts)).
@@ -177,53 +179,54 @@ the one deliberate departure from S1 (see [Data quality](#data-quality--conflict
 Per-drug pop-up content (fields: Class/Target · Indication · Dosage & Administration ·
 Monitoring · Clinical Trials). **Not yet in a data file** — candidate `src/data/drugSheets.ts` `[BUILD-TODO]`.
 
-**Efanesoctocog alfa** — *Class:* clotting factor replacement, ultralong half-life.
-*Indications:* adults & pediatric HA; routine prophylaxis; on-demand bleed control;
-perioperative management. *Dosage:* IV, 50 IU/kg once weekly; optimize via plasma FVIII
-(aPTT one-stage assay). *Monitoring:* hypersensitivity/anaphylaxis; neutralizing antibodies
-(inhibitors); ADAs. *Trials:* Study 1 (NCT04161495), Study 2 (NCT04759193).
+**Efanesoctocog alfa** — _Class:_ clotting factor replacement, ultralong half-life.
+_Indications:_ adults & pediatric HA; routine prophylaxis; on-demand bleed control;
+perioperative management. _Dosage:_ IV, 50 IU/kg once weekly; optimize via plasma FVIII
+(aPTT one-stage assay). _Monitoring:_ hypersensitivity/anaphylaxis; neutralizing antibodies
+(inhibitors); ADAs. _Trials:_ Study 1 (NCT04161495), Study 2 (NCT04759193).
 
-**Emicizumab** — *Class/Target:* FVIIIa-mimetic, FIXa×FX BsAb. *Indication:* HA ±inhibitors,
-newborn & older. *Dosage:* SC (vial & syringe); load 3 mg/kg weekly ×4 wks; maintenance
-1.5 mg/kg weekly, 3 mg/kg q2wks, or 6 mg/kg monthly. *Monitoring:* injection-site reactions;
+**Emicizumab** — _Class/Target:_ FVIIIa-mimetic, FIXa×FX BsAb. _Indication:_ HA ±inhibitors,
+newborn & older. _Dosage:_ SC (vial & syringe); load 3 mg/kg weekly ×4 wks; maintenance
+1.5 mg/kg weekly, 3 mg/kg q2wks, or 6 mg/kg monthly. _Monitoring:_ injection-site reactions;
 lab coagulation test interference (don't use intrinsic-pathway clotting tests — ACT, Bethesda,
 aPTT-based — for FVIII inhibitor titers); thrombotic microangiopathy/thrombotic events; aPCC
-interaction; ADAs. *Trials:* HAVEN 3 (NCT02847637), HAVEN 4 (NCT03020160), HAVEN 2 (NCT02795767).
+interaction; ADAs. _Trials:_ HAVEN 3 (NCT02847637), HAVEN 4 (NCT03020160), HAVEN 2 (NCT02795767).
 
-**Denecimig (emerging/investigational)** — *Class/Target:* FVIIIa-mimetic BsAb, FIXa×FX.
-*Indication:* TBD (FDA); trials in HA ±inhibitors, patients >1 yr. *Dosage:* SC prefilled pen
-w/ attachable syringe; no washout when switching from emicizumab. *Monitoring:* TBD (phase 3):
+**Denecimig (emerging/investigational)** — _Class/Target:_ FVIIIa-mimetic BsAb, FIXa×FX.
+_Indication:_ TBD (FDA); trials in HA ±inhibitors, patients >1 yr. _Dosage:_ SC prefilled pen
+w/ attachable syringe; no washout when switching from emicizumab. _Monitoring:_ TBD (phase 3):
 mostly mild transient injection-site reactions; no thromboembolic/TMA events; no
-hypersensitivity; no clinically relevant lab findings. *Trials:* FRONTIER2 (NCT05053139),
+hypersensitivity; no clinically relevant lab findings. _Trials:_ FRONTIER2 (NCT05053139),
 FRONTIER3 (NCT05306418), FRONTIER4 (NCT05685238), FRONTEIR5 (NCT05878938).
 
-**Concizumab** — *Class/Target:* hemostatic rebalancing agent, TFPI mAB. *Indication:* routine
-prophylaxis, ≥12 yrs, HA/HB ±inhibitors. *Dosage:* SC prefilled pen; D1 load 1 mg/kg; D2 daily
+**Concizumab** — _Class/Target:_ hemostatic rebalancing agent, TFPI mAB. _Indication:_ routine
+prophylaxis, ≥12 yrs, HA/HB ±inhibitors. _Dosage:_ SC prefilled pen; D1 load 1 mg/kg; D2 daily
 0.2 mg/kg until individualized maintenance; optimize after 4 wks via concizumab plasma
-concentration (ELISA). *Monitoring:* hypersensitivity; routine plasma concentrations;
-thromboembolic events; ↑ fibrin D-dimer & prothrombin fragment; ADAs. *Trials:* Explorer7
+concentration (ELISA). _Monitoring:_ hypersensitivity; routine plasma concentrations;
+thromboembolic events; ↑ fibrin D-dimer & prothrombin fragment; ADAs. _Trials:_ Explorer7
 (NCT04083781), Explorer8 (NCT04082429).
 
-**Marstacimab** — *Class/Target:* hemostatic rebalancing agent, TFPI mAB. *Indication:* routine
-prophylaxis, ≥6 yrs, HA/HB ±inhibitors. *Dosage:* SC (prefilled pen or syringe); load 300 mg
+**Marstacimab** — _Class/Target:_ hemostatic rebalancing agent, TFPI mAB. _Indication:_ routine
+prophylaxis, ≥6 yrs, HA/HB ±inhibitors. _Dosage:_ SC (prefilled pen or syringe); load 300 mg
 (two 150 mg); maintenance 150 mg weekly (start 1 wk after load); consider 300 mg weekly if
->50 kg. *Monitoring:* hypersensitivity; thromboembolic events; ↑ fibrin D-dimer & prothrombin
-fragment; ADAs. *Trials:* BASIS (NCT03938792), BASIS KIDS (NCT05611801).
 
-**Fitusiran** — *Class/Target:* hemostatic rebalancing agent, AT-directed siRNA. *Indication:*
-routine prophylaxis, ≥12 yrs, HA/HB ±inhibitors. *Dosage:* SC (prefilled pen, or syringe & vial
+> 50 kg. _Monitoring:_ hypersensitivity; thromboembolic events; ↑ fibrin D-dimer & prothrombin
+> fragment; ADAs. _Trials:_ BASIS (NCT03938792), BASIS KIDS (NCT05611801).
+
+**Fitusiran** — _Class/Target:_ hemostatic rebalancing agent, AT-directed siRNA. _Indication:_
+routine prophylaxis, ≥12 yrs, HA/HB ±inhibitors. _Dosage:_ SC (prefilled pen, or syringe & vial
 for lower dose); start 50 mg once every 2 months; monitor AT activity (FDA-cleared test),
-maintain AT 15–35% by adjusting dose/frequency. *Monitoring:* thrombotic events; AT levels;
+maintain AT 15–35% by adjusting dose/frequency. _Monitoring:_ thrombotic events; AT levels;
 acute/recurrent gallbladder disease; hepatotoxicity (LFTs baseline, monthly >6 mo, after dose
-↑, periodically); ADAs. *Trials:* ATLAS-INH (NCT03417102), ATLAS-A/B (NCT03417245), ATLAS-OLE
+↑, periodically); ADAs. _Trials:_ ATLAS-INH (NCT03417102), ATLAS-A/B (NCT03417245), ATLAS-OLE
 (NCT03754790).
 
-**Etranacogene dezaparvovec-drlb** — *Class/Target:* AAV vector-based gene therapy.
-*Indication:* adults with HB **without** FIX inhibitors. *Dosage:* single IV infusion,
-2×10¹³ genome copies/kg. *Monitoring:* eligibility (LFTs, hepatic ultrasound/elastography,
+**Etranacogene dezaparvovec-drlb** — _Class/Target:_ AAV vector-based gene therapy.
+_Indication:_ adults with HB **without** FIX inhibitors. _Dosage:_ single IV infusion,
+2×10¹³ genome copies/kg. _Monitoring:_ eligibility (LFTs, hepatic ultrasound/elastography,
 hepatitis B/C, hepatologist consult); hypersensitivity; hepatotoxicity (LFTs weekly ×3 mo then
 monthly ×1 yr); immune-mediated neutralizing antibodies to AAV5 capsid; FIX inhibitor
-observation; plasma FIX activity (e.g. weekly ×3 mo, aPTT one-stage assay). *Trial:*
+observation; plasma FIX activity (e.g. weekly ×3 mo, aPTT one-stage assay). _Trial:_
 prospective open-label study (NCT03569891).
 
 ---
@@ -234,9 +237,9 @@ prospective open-label study (NCT03569891).
   adds decision-making complexity.
 - **Hemophilia disease background & severity** `[PPTX]` slide 6: severity by FVIII/IX level —
   Mild >5–<40%, Moderate 1–5%, Severe <1%; bleeding manifestations by severity.
-- **Non-factor replacement therapies (NFTs)** — *Benefits:* SC administration, stable thrombin
+- **Non-factor replacement therapies (NFTs)** — _Benefits:_ SC administration, stable thrombin
   generation, long half-life, shifts disease severe→mild, effective regardless of inhibitor
-  status. *Challenges:* thrombotic risk, ADA development, complex MOA, no standardized lab
+  status. _Challenges:_ thrombotic risk, ADA development, complex MOA, no standardized lab
   monitoring, major-surgery management, use in older populations.
 - **Hemostatic rebalancing agents** — enhance thrombin generation by targeting endogenous
   anticoagulant pathways (TFPI, AT, APC/protein S). Anti-TFPI mAbs (concizumab, marstacimab)
@@ -264,6 +267,7 @@ Use this vocabulary in issues/ADRs/tests. Definitions (abridged from source):
 - **Nonfactor therapy (NFT)** — improves hemostasis without directly replacing FVIII/FIX (mimetics, rebalancing agents).
 
 ### Acronyms `[PDF-V]`
+
 AAV adeno-associated virus · ADA anti-drug antibody · aPCC activated prothrombin complex
 concentrate · APC activated protein C · aPTT activated partial thromboplastin time ·
 AT antithrombin · BLA Biologics License Application · BsAb bispecific antibody · D day ·
@@ -285,15 +289,15 @@ Validated Hemophilia Regimen Treatment Adherence Scale–Prophylaxis · VWD von 
   guidelines, clinical-trial publications) sits in the bottom-left teal block of the blueprint.
   Transcribe from `[PDF-V]` when a specific citation is needed.
 - **Curated "Resources" panel** (far right), categorized:
-  - *Clinical guidelines & recommendations:* NBDF MASAC Document 267; WFH AAV Gene Therapy
+  - _Clinical guidelines & recommendations:_ NBDF MASAC Document 267; WFH AAV Gene Therapy
     Guidelines (Haemophilia 2026;32:20-54); ISTH treatment guideline (J Thromb Haemost
     2024;22:2629-2652); Young et al. "Deconstructing the ISTH Hemophilia Guidelines"; Srivastava
     et al. (Res Pract Thromb Haemost 2025;9:102879).
-  - *Review articles:* Mehta & Reddivari (StatPearls); AJMC treatment-landscape; Eduarda Alves de
+  - _Review articles:_ Mehta & Reddivari (StatPearls); AJMC treatment-landscape; Eduarda Alves de
     Jesus et al. (Expert Rev Clin Pharmacol 2026); Lim et al. (J Thromb Haemost 2026;24:2341-2354);
     Lewandowska et al. (J Blood Med 2025;16:95-115); Makris & O'Mahony "Paradox of Choice"; Ozelo
     et al.; Young "Nonfactor Therapies for Hemophilia."
-  - *Tools for clinical practice:* Coffin et al. WFH Shared Decision-Making Tool development;
+  - _Tools for clinical practice:_ Coffin et al. WFH Shared Decision-Making Tool development;
     Duncan et al. VERITAS-Pro adherence measure; Molinari et al. Delphi monitoring tool; WFH SDM
     Tool & Workbook (https://sdm.wfh.org/).
   - **URLs accessed July 14, 2026.**
@@ -308,11 +312,11 @@ Validated Hemophilia Regimen Treatment Adherence Scale–Prophylaxis · VWD von 
 
 Post-use survey (note: source labels two items "Question 2" — likely a typo for Q2/Q3):
 
-1. *"This tool helped me better understand novel and emerging prophylaxis options for
-   hemophilia."* — Strongly agree / Agree / Neutral / Disagree / Strongly disagree.
-2. *"This tool helped me compare treatment options based on hemophilia type, inhibitor status,
-   treatment goals, monitoring requirements, and treatment burden."* — same 5-point scale.
-3. *"How do you plan to use this tool?"* — For general education / To assist with treatment
+1. _"This tool helped me better understand novel and emerging prophylaxis options for
+   hemophilia."_ — Strongly agree / Agree / Neutral / Disagree / Strongly disagree.
+2. _"This tool helped me compare treatment options based on hemophilia type, inhibitor status,
+   treatment goals, monitoring requirements, and treatment burden."_ — same 5-point scale.
+3. _"How do you plan to use this tool?"_ — For general education / To assist with treatment
    decisions / During discussion with a patient / I do not plan to use this tool.
 
 ---
@@ -333,15 +337,16 @@ Post-use survey (note: source labels two items "Question 2" — likely a typo fo
 
 ## 12. Implementation status `[BUILD]`
 
-| Piece | File | Status |
-|---|---|---|
-| Comparison-table data + filter engine | `src/data/treatments.ts` | ✅ built, type-checks |
-| Wizard branching model + notes | `src/data/wizard.ts` | ✅ built, type-checks |
-| Interactive demo (both engines) | `treatment-wizard-demo.html` (repo root) | ✅ standalone; logic mirrors the TS modules |
-| Per-drug info sheets data | `src/data/drugSheets.ts` | ⬜ not built (content ready in [§6](#6-drug-information-sheets)) |
-| React UI (wizard + table + sheets) | — | ⬜ not built |
+| Piece                                 | File                                     | Status                                                           |
+| ------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------- |
+| Comparison-table data + filter engine | `src/data/treatments.ts`                 | ✅ built, type-checks                                            |
+| Wizard branching model + notes        | `src/data/wizard.ts`                     | ✅ built, type-checks                                            |
+| Interactive demo (both engines)       | `treatment-wizard-demo.html` (repo root) | ✅ standalone; logic mirrors the TS modules                      |
+| Per-drug info sheets data             | `src/data/drugSheets.ts`                 | ⬜ not built (content ready in [§6](#6-drug-information-sheets)) |
+| React UI (wizard + table + sheets)    | —                                        | ⬜ not built                                                     |
 
 **Open decisions:**
+
 - Denecimig age is "TBD (>1 yr)" → parsed to provisional min-age 1 → currently counts as eligible.
   Confirm whether TBD-age agents should be eligible, flagged, or excluded.
 - Confirm the top=B / bottom=A scenario mapping reads correctly against clinical intent.

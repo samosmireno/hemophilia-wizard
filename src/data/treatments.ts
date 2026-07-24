@@ -67,8 +67,7 @@ export const TREATMENTS: readonly Treatment[] = [
     age: "0+",
     route: "IV",
     schedule: "3X/week",
-    monitoring:
-      " FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed",
+    monitoring: " FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed",
   },
   {
     row: 3,
@@ -80,8 +79,7 @@ export const TREATMENTS: readonly Treatment[] = [
     age: "0+",
     route: "IV",
     schedule: "~2X/week",
-    monitoring:
-      " FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed",
+    monitoring: " FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed",
   },
   {
     row: 4,
@@ -157,8 +155,7 @@ export const TREATMENTS: readonly Treatment[] = [
     // Richer value taken from S3 (see note above); S1 had "SC (single-use prefilled pen)".
     route: "SC (single-use prefilled pen or vial/syringe)",
     schedule: "Every 1-2 months",
-    monitoring:
-      "Thrombotic events; liver enzymes, gall bladder disease, Anti-thrombin monitoring",
+    monitoring: "Thrombotic events; liver enzymes, gall bladder disease, Anti-thrombin monitoring",
   },
   {
     row: 10,

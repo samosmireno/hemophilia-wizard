@@ -25,11 +25,7 @@ import { TREATMENTS, type Treatment } from "./treatments";
 export type WizardHemophiliaType = "A" | "B";
 
 /** The wizard's third question — the primary reason for switching therapy. */
-export type SwitchReason =
-  | "bleeding-control"
-  | "adherence"
-  | "treatment-burden"
-  | "monitoring";
+export type SwitchReason = "bleeding-control" | "adherence" | "treatment-burden" | "monitoring";
 
 export const SWITCH_REASONS: { id: SwitchReason; label: string }[] = [
   { id: "bleeding-control", label: "Improving bleeding control" },
