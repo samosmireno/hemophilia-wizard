@@ -3,6 +3,8 @@
    Replace these examples with your own scale on a per-project basis. */
 
 @import "tailwindcss";
+@import "@samosmireno/mlg-components/tokens.css";
+@source "@samosmireno/mlg-components/dist";
 
 @theme {
   --font-sans: ui-sans-serif, system-ui, sans-serif;

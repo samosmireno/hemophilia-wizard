@@ -14,6 +14,7 @@
     "upgrade": "npx npm-check-updates -u && npm install"
   },
   "dependencies": {
+    "@samosmireno/mlg-components": "^0.1.3",
     "@tailwindcss/vite": "^4.2.4",
     "clsx": "^2.1.1",
     "react": "^19.2.5",
