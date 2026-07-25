@@ -12,9 +12,6 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: read
     steps:
       - uses: actions/checkout@v4
 
@@ -22,12 +19,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          registry-url: https://npm.pkg.github.com
-          scope: "@samosmireno"
 
       - run: npm ci # respects the committed lockfile — reproducible
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: npm run format:check
       - run: npm run lint
       - run: npm run build # tsc -b (type-check) + vite build
