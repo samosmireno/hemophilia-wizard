@@ -9,20 +9,20 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-07-22
+- **Last reviewed:** 2026-07-25
 - **How to update:** when a source file changes, update the affected section and keep its
   source tag. If a fact spans multiple sources that disagree, record both and note which
   one we treat as authoritative (see [Data quality & conflicts](#data-quality--conflicts)).
 - **Source tags:**
   | Tag       | File                                                         | Notes                                                                                                       |
   | --------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-  | `[XLSX]`  | `documents/Treatment wizard grid.xlsx`                       | 5 sheets; refer to sheets as **S1–S5** (see below)                                                          |
-  | `[PDF]`   | `documents/HM-85L Hemophilia Treatment Wizard_V2.pdf`        | Raster blueprint (one large canvas)                                                                         |
-  | `[PDF-V]` | `documents/HM-85L Hemophilia Treatment Wizard_V2_Vector.pdf` | **Vector** version of the same blueprint — selectable text, highest fidelity; prefer this for exact wording |
+  | `[XLSX]`  | `documents/Treatment wizard grid_V2.xlsx`                    | 5 sheets; refer to sheets as **S1–S5** (see below)                                                          |
+  | `[PDF]`   | _(removed)_ — was `HM-85L Hemophilia Treatment Wizard_V2.pdf` | Raster blueprint; deleted with the V2 files. Same blueprint as `[PDF-V]`; historical facts tagged `[PDF]` now live in the vector |
+  | `[PDF-V]` | `documents/HM-85L Hemophilia Treatment Wizard_V3_Vector.pdf` | **Vector** blueprint (current, only surviving PDF) — selectable text, highest fidelity; prefer this for wording |
   | `[PPTX]`  | `documents/HM-85L treatment wizard slides.pptx`              | 7 slides; slide 7 = same master diagram, slides 1–6 = scenario/education slides                             |
   | `[BUILD]` | code in `src/data/` + `treatment-wizard-demo.html`           | What we've implemented from the above                                                                       |
 
-`[PDF]` and `[PDF-V]` are the **same blueprint**; cite `[PDF-V]` for exact text.
+`[PDF]` (raster, now removed) and `[PDF-V]` are the **same blueprint**; the vector `[PDF-V]` is the sole surviving copy — cite it for exact text.
 
 ### XLSX sheet map `[XLSX]`
 
@@ -77,6 +77,24 @@ wizard grid.xlsx`**: the grid is the example of the filterable table.
   as in the example below."_
 - Repeated on each wizard leaf: _"Note: Please add a button for each drug which will pop up
   to an information sheet."_
+
+**New annotations added in V3 (2026-07-25):** `[PDF-V]`
+
+- **Considerations/Strategies tabs** — _"For each of the 4 boxes (Improve bleeding control,
+  Reduce monitoring requirement, Increase adherence, Reduce treatment burden) in each section
+  (2 green and 2 pink) add 2 buttons or tabs called 'Considerations' and 'Strategies' to launch
+  the text in the light blue boxes to the right."_ → each reason box has **two** blocks in the
+  source light-blue boxes: a "Considerations for …" list **and** a "Strategies for …" list.
+  Our [§4.2](#42-reason-specific-considerations-notes) `REASON_NOTES` currently encodes only the
+  **Considerations** bullets; the **Strategies** bullets exist verbatim in `[PDF-V]` but are
+  **not yet extracted** into the data model.
+- **Reference list overhaul** — _"Updated the entire reference list — please superscript all
+  trademarks (ie, ®)."_ The bibliography was reformatted (abbreviated author lists/journals,
+  "PI" for Prescribing Information, `®`/`™` superscripted). Content/citations are essentially
+  unchanged; see [§9](#9-references--resources).
+- **Image updated** — _"Note: Image has been updated from the previous version."_
+- **Table updated** — _"Table updated: FVIII mimetic / Denecimig"_ → the comparison table's
+  Denecimig row changed schedule to `Monthly, bimonthly, weekly` (already applied `[XLSX]`/`[BUILD]`).
 
 ---
 
@@ -133,7 +151,8 @@ Full text in `[BUILD]` `src/data/wizard.ts` → `REASON_NOTES`. Titles:
 - **Bleeding control:** "Considerations for Improving Bleeding Control"
 - **Adherence:** "Considerations for Improving Treatment Adherence"
 - **Treatment burden:** "Considerations for Reducing Treatment Burden and Improving QoL"
-- **Monitoring:** "Considerations and Strategies for Reducing Monitoring Requirement"
+- **Monitoring:** "Considerations for Reducing Monitoring Requirement" (V3 dropped "and Strategies"
+  from the title; see the new Considerations/Strategies tab split in [§3](#3-client--developer-notes-on-the-blueprint))
 
 ---
 
@@ -156,7 +175,7 @@ Indicated with inhibitors (Yes / No). "A + B" means eligible for both.
 | EHL                            | Clotting factor replacement                     | Extended half-life  | A + B |  No   |     0+      | IV                                  | ~2X/week                   |
 | Efanesoctocog alfa             | Clotting factor replacement                     | Ultralong half-life |   A   |  No   |     0+      | IV                                  | Weekly                     |
 | Emicizumab                     | Factor VIIIa mimetic                            | FVIIIa-mimetic BsAb |   A   |  Yes  |     0+      | SC (vial/syringe)                   | Monthly, bimonthly, weekly |
-| Denecimig                      | Factor VIIIa mimetic (emerging/investigational) | FVIIIa-mimetic BsAb |   A   |  Yes  | TBD (>1 yr) | SC (prefilled pen)                  | Monthly, weekly            |
+| Denecimig                      | Factor VIIIa mimetic (emerging/investigational) | FVIIIa-mimetic BsAb |   A   |  Yes  | TBD (>1 yr) | SC (prefilled pen)                  | Monthly, bimonthly, weekly |
 | Concizumab                     | Hemostatic rebalancing agent                    | TFPI mAB            | A + B |  Yes  |     12+     | SC (prefilled pen)                  | Daily                      |
 | Marstacimab                    | Hemostatic rebalancing agent                    | TFPI mAB            | A + B |  Yes  |     6+      | SC (prefilled pen)                  | Weekly                     |
 | Fitusiran                      | Hemostatic rebalancing agent                    | AT-directed siRNA   | A + B |  Yes  |     12+     | SC (prefilled pen or vial/syringe)ᴬ | Every 1-2 months           |

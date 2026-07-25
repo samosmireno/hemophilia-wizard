@@ -115,7 +115,7 @@ export const TREATMENTS: readonly Treatment[] = [
     inhibitors: "Yes",
     age: "TBD (studied in pts >1 year of age)",
     route: "SC (single-use prefilled pen)",
-    schedule: "Monthy, weekly",
+    schedule: "Monthly, bimonthly, weekly",
     monitoring: "TBD",
   },
   {

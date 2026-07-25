@@ -2,7 +2,7 @@
  * Treatment Wizard — the branching decision model (the MAIN engine).
  *
  * Source of truth: the blueprint in `documents/HM-85L Hemophilia Treatment
- * Wizard_V2_Vector.pdf`. Extracted with text coordinates so each recommendation
+ * Wizard_V3_Vector.pdf`. Extracted with text coordinates so each recommendation
  * list is tied to the correct scenario branch.
  *
  * This is distinct from `treatments.ts`:
@@ -128,7 +128,7 @@ export const REASON_NOTES: Record<SwitchReason, { title: string; points: string[
     ],
   },
   monitoring: {
-    title: "Considerations and Strategies for Reducing Monitoring Requirement",
+    title: "Considerations for Reducing Monitoring Requirement",
     points: [
       "NFTs avoid the need for routine FVIII/FIX peak/trough monitoring and PK-guided dose optimization.",
       "Monitoring patients on NFTs presents unique challenges; traditional tests, such as aPTT, do not accurately measure bleeding risk.",
