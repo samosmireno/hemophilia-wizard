@@ -8,8 +8,8 @@ import { router } from "./routes/router.tsx";
 // Self-hosted brand fonts. DM Sans (variable, body/UI) + Barlow Condensed
 // (static; display only needs the 600/700 weights the type scale uses).
 import "@fontsource-variable/dm-sans";
-import "@fontsource/barlow-condensed/600.css";
-import "@fontsource/barlow-condensed/700.css";
+import "@fontsource/barlow-condensed/latin-600.css";
+import "@fontsource/barlow-condensed/latin-700.css";
 import "./styles/tokens.css";
 
 // Analytics is optional: only initialize when the measurement ID is present at
