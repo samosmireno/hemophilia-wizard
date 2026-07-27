@@ -1,6 +1,6 @@
 # 01 — Router + app shell / navigation
 
-Status: ready-for-agent
+Status: done (2026-07-27)
 Phase: 0
 Blocked by: —
 
