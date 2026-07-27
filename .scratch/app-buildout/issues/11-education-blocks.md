@@ -34,7 +34,7 @@ Build the multi-chapter background/education module as `/education/:section` sub
 ## Acceptance
 
 - Each of the four `/education/:section` subroutes resolves and renders its chapter;
-  bare `/education` lands on the first chapter; unknown section → sensible fallback.
+  bare `/education` lands on the first chapter; unknown section → first chapter (no not-found page).
 - All education content from CONTEXT.md present and correctly sourced.
 - Cross-links to glossary (issue 12) resolve; wizard deep-links to `rebalancing-agents`
   and `fviiia-mimetics` resolve.

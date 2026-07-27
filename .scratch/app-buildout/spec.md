@@ -65,7 +65,7 @@ the line, each reachable anytime from its own sidebar button.
 2–5. `/education/:section` — Education is a **multi-chapter module**; chapters in order:
   `disease-background`, `treatment-landscape`, `rebalancing-agents`, `fviiia-mimetics`
   (last two are wizard cross-link targets, so their URLs must be stable). Bare `/education`
-  redirects to `disease-background`; unknown `:section` → NotFound.
+  redirects to `disease-background`; unknown `:section` → `disease-background` (first chapter).
 6. `/wizard` — branching decision tree (Q1 type → Q2 inhibitors → Q3 reason → leaf).
   **Single route** — all step state computed in-page, no per-step subroutes.
 7. `/explore` — filterable comparison table (3 dropdowns).
@@ -83,7 +83,8 @@ the line, each reachable anytime from its own sidebar button.
 - Drug info sheets — **modal overlay via `?drug=<id>`** on the current route (e.g.
   `/explore?drug=marstacimab`); **no** standalone `/drugs/:id` page.
 
-Unknown route → `NotFound` (`*` fallback).
+No not-found page: an unknown path under a section resolves to that section (nested `*`
+under `/education` → `disease-background`); any other unknown route redirects to `/` (landing).
 
 ## Phases
 

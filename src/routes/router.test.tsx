@@ -46,14 +46,22 @@ describe("router", () => {
     expect(router.state.location.pathname).toBe("/education/disease-background");
   });
 
-  it("falls through to NotFound for an unknown education section", () => {
-    renderAt("/education/not-a-real-section");
-    expect(heading()).toHaveTextContent(/Page not found/);
+  it("redirects an unknown education section to the first chapter", async () => {
+    const router = renderAt("/education/not-a-real-section");
+    expect(await screen.findByText("Education — disease-background")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/education/disease-background");
   });
 
-  it("falls through to NotFound for an unknown top-level route", () => {
-    renderAt("/nope");
-    expect(heading()).toHaveTextContent(/Page not found/);
+  it("redirects a deeper unknown path under a section to that section", async () => {
+    const router = renderAt("/education/foo/bar");
+    expect(await screen.findByText("Education — disease-background")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/education/disease-background");
+  });
+
+  it("redirects an unknown top-level route to the landing page", async () => {
+    const router = renderAt("/nope");
+    expect(await screen.findByRole("heading", { level: 1, name: /^Home$/ })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/");
   });
 
   it("navigates via the placeholder nav without a full reload", async () => {

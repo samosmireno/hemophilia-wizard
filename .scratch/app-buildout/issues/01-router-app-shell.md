@@ -30,20 +30,22 @@ semantic landmarks so routes are navigable for testing.
   - `router.tsx` — `createBrowserRouter` config.
   - Section stubs: `Landing.tsx` (issue 17), `Education.tsx` (issue 11, reads `:section`),
     `Wizard.tsx` (08), `Explore.tsx` (09), `Resources.tsx` (12), `Survey.tsx` (13),
-    `Glossary.tsx` (12), `Acronyms.tsx` (12), `References.tsx` (12), `NotFound.tsx`.
+    `Glossary.tsx` (12), `Acronyms.tsx` (12), `References.tsx` (12).
 - **Routes** (10 + fallback):
   - **In the linear flow:** `/` · `/education/:section` · `/wizard` · `/explore` ·
     `/resources` · `/survey`
   - **Off the line** (own route, own sidebar button, not in Prev/Next):
     `/glossary` · `/acronyms` · `/references`
-  - **Fallback:** `*` → `NotFound`
+  - **Fallback (no not-found page):** an unknown path under a section resolves to that
+    section (nested `*` under `education` → `/education/disease-background`); any other
+    unknown path `*` → `/` (landing).
 - `/` renders a standalone **landing page** stub (design/build is issue 17) — **not** a
   redirect to `/education`.
 - **`/education`** is a multi-chapter module with subroutes `/education/:section`, sections
   `disease-background`, `treatment-landscape`, `rebalancing-agents`, `fviiia-mimetics`
   (the last two are wizard cross-link targets, so their URLs must be stable). Bare
   `/education` **redirects to `/education/disease-background`** (no overview page). An
-  **unknown `:section`** falls through to the global `NotFound` (one fallback everywhere).
+  **unknown `:section`** redirects to `/education/disease-background` (no not-found page).
 - **`/wizard`** is intentionally a single route — all wizard state (type → inhibitor →
   reason → recommendation) is computed in-page, no per-step subroutes.
 - **`src/data/sectionOrder.ts`** — the canonical linear order as an array, plus `prevOf(path)`
@@ -56,7 +58,7 @@ semantic landmarks so routes are navigable for testing.
 
 - All 10 routes plus `/education/:section` resolve and render a placeholder stub.
 - Bare `/education` redirects to `/education/disease-background`; unknown `:section` →
-  `NotFound`; unknown top-level route → `NotFound`.
+  `/education/disease-background`; unknown top-level route → `/` (landing). No not-found page.
 - Placeholder nav links navigate without full reload.
 - `sectionOrder.ts` exports the order array + `prevOf`/`nextOf`; covered by a unit test
   (e.g. `nextOf("/wizard") === "/explore"`, `prevOf("/") === undefined`, off-line paths
