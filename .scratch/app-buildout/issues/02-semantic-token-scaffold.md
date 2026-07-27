@@ -27,3 +27,16 @@ the client palette/type with near-zero markup churn.
 ## Notes
 
 This is the styling seam. Phase 3 should be "fill token values," not "rewrite markup."
+
+**Raw palette already landed (2026-07-27).** The client color palette exists in
+`tokens.css` `@theme` as raw scales — `--color-brand-<name>-<step>` for five families
+(teal/crimson/slate/lagoon/sand, steps 0/25/50/75/100), namespaced `brand-` to avoid
+colliding with Tailwind's built-in `teal`/`slate`. The semantic tokens this issue defines
+should reference those raw values (e.g. `--color-brand: var(--color-brand-teal-50)`),
+not new hex literals. Raw tokens are intentionally **not** wired to any UI yet.
+
+**Typography also landed (2026-07-27).** `tokens.css` now defines the type layer:
+`--font-sans` → DM Sans (app default), `--font-display` → Barlow Condensed, and a
+bundled `--text-*` scale (`h1`/`h2`/`h3`/`h4`/`body`/`small`, each carrying
+`--font-weight` + `--line-height`). Fonts are self-hosted via `@fontsource` (imported
+in `src/main.tsx`). Semantic type slots should reference these `text-*` steps.

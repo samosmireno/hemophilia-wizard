@@ -1,13 +1,83 @@
 /* Design tokens. Define CSS variables in the @theme block below and Tailwind v4
-   generates matching utilities (e.g. --color-brand → bg-brand, text-brand).
-   Replace these examples with your own scale on a per-project basis. */
+   generates matching utilities (e.g. --color-brand-teal-50 → bg-brand-teal-50,
+   text-brand-teal-50). The raw brand palette lives here; the semantic layer
+   (bg-surface, text-heading, …) is defined per issue 02. */
 
 @import "tailwindcss";
 @import "mlg-components/tokens.css";
 @source "@mlg-components/dist";
 
 @theme {
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  /* ─── Typography ──────────────────────────────────────────────────────────
+     DM Sans is the app default (body/UI); Barlow Condensed is the display face
+     (font-display utility). Fonts are self-hosted via @fontsource, imported in
+     main.tsx. The type scale bundles size + weight + line-height per step, so a
+     single utility (e.g. text-h1) sets all three. Line-heights for h1–h4/body
+     are house defaults; small is from the source spec (12px/500/19.8px). */
+  --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand: #4f46e5;
+  --text-h1: 52px;
+  --text-h1--font-weight: 700;
+  --text-h1--line-height: 1.05;
+
+  --text-h2: 36px;
+  --text-h2--font-weight: 700;
+  --text-h2--line-height: 1.1;
+
+  --text-h3: 26px;
+  --text-h3--font-weight: 600;
+  --text-h3--line-height: 1.2;
+
+  --text-h4: 20px;
+  --text-h4--font-weight: 600;
+  --text-h4--line-height: 1.25;
+
+  --text-body: 16px;
+  --text-body--font-weight: 400;
+  --text-body--line-height: 1.6;
+
+  --text-small: 12px;
+  --text-small--font-weight: 500;
+  --text-small--line-height: 19.8px;
+
+  /* ─── Palette tokens (raw scales, not yet wired to any UI) ─────────────────
+     Namespaced `--color-brand-<name>-<step>` so they never collide with
+     Tailwind's built-in `teal`/`slate` scales. Steps run 0→100 (lightest→
+     darkest), matching the design source. No semantic aliases yet. */
+
+  /* TEAL — PRIMARY */
+  --color-brand-teal-0: #eef8f6;
+  --color-brand-teal-25: #7ec5b6;
+  --color-brand-teal-50: #2d8a78;
+  --color-brand-teal-75: #1a5a4c;
+  --color-brand-teal-100: #0d2e26;
+
+  /* CRIMSON — ACCENT */
+  --color-brand-crimson-0: #fef0f2;
+  --color-brand-crimson-25: #f4a0ab;
+  --color-brand-crimson-50: #d63a52;
+  --color-brand-crimson-75: #8f1a2e;
+  --color-brand-crimson-100: #4a0a14;
+
+  /* SLATE — NEUTRAL COOL */
+  --color-brand-slate-0: #f2f5f9;
+  --color-brand-slate-25: #9eadc4;
+  --color-brand-slate-50: #5a6f8a;
+  --color-brand-slate-75: #2e4056;
+  --color-brand-slate-100: #111d2e;
+
+  /* LAGOON — BRIGHT BLUE */
+  --color-brand-lagoon-0: #e6f7f9;
+  --color-brand-lagoon-25: #4abfd4;
+  --color-brand-lagoon-50: #0a94ae;
+  --color-brand-lagoon-75: #076278;
+  --color-brand-lagoon-100: #052a32;
+
+  /* SAND — WARM NEUTRAL */
+  --color-brand-sand-0: #fdf8f2;
+  --color-brand-sand-25: #e0ccb0;
+  --color-brand-sand-50: #b8956a;
+  --color-brand-sand-75: #7a5c38;
+  --color-brand-sand-100: #3a2810;
 }
