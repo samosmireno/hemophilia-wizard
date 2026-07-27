@@ -11,7 +11,7 @@ npm run lint          # ESLint across all files (flat config)
 npm run format        # Prettier write
 npm test              # Vitest suite (jsdom + Testing Library)
 
-npx vitest run src/App.test.tsx   # single test file
+npx vitest run src/routes/router.test.tsx   # single test file
 npx vitest -t "renders"           # tests matching a name
 npx vitest                        # watch mode
 ```

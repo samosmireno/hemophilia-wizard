@@ -1,8 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import ReactGA from "react-ga4";
+import { RouterProvider } from "react-router";
 
-import App from "./App.tsx";
+import { router } from "./routes/router.tsx";
+import "./styles/tokens.css";
 
 // Analytics is optional: only initialize when the measurement ID is present at
 // build time. A missing VITE_GA_MEASUREMENT_ID (e.g. on preview deploys where
@@ -15,6 +17,6 @@ if (gaMeasurementId) {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <RouterProvider router={router} />
   </StrictMode>,
 );
