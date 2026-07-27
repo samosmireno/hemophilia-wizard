@@ -64,6 +64,20 @@ Left → right on one canvas:
 4. **"Explore therapy options for HA/HB"** button → the filterable table. See [§5](#5-explore-therapy-options-table-secondary-engine).
 5. **Resources, References, Glossary, Survey.** See [§7](#7-education-content)–[§10](#10-outcomes-survey).
 
+> **Not in the blueprint:** the app adds a **landing page at `/`** (net-new — the blueprint
+> canvas has no home/landing screen; title only so far, reusing the §7.1 framing line). See
+> `.scratch/app-buildout/spec.md` and issue 17. The per-drug sheets (item 3 above) are built as
+> a `?drug=<id>` **modal overlay on the current route**, not a standalone `/drugs/:id` page
+> (see [§6](#6-drug-information-sheets) / issue 10).
+>
+> **App navigation & the Resources/References/Glossary split:** the app is a **linear
+> walkthrough** (sidebar Prev/Next through a fixed section order), and the blueprint's single
+> "Resources / References / Glossary" block (items 4–5 above) is split into **four** app
+> routes — `/resources` (curated panel, in the linear flow) plus **off-line** always-accessible
+> pages `/references`, `/glossary`, and `/acronyms` (the latter pulled out of the [§8](#8-glossary)
+> acronym list). This is an app-structure decision, not a change to the source content; rationale
+> in `docs/adr/0001-linear-walkthrough-navigation.md`.
+
 ---
 
 ## 3. Client / developer notes on the blueprint `[PDF-V]`
@@ -328,6 +342,21 @@ The left third of the blueprint is a set of **education blocks**, mostly authore
 **"Click here:" click-through pop-ups** (see [§7.7](#77-click-through-pop-up-index)). Full verbatim
 text is in `documents/out_raw.txt` (LEFT band). Fields below feed issue 11 (education-blocks).
 Content is `[PDF-V]` unless tagged `[PPTX]`.
+
+**Architecture (per issue 01 / issue 11):** education is a **multi-chapter module** built as
+`/education/:section` subroutes, **not** a single page. The §7.x content below maps to four
+chapters:
+
+| Chapter subroute       | Source subsections           |
+| ---------------------- | ---------------------------- |
+| `disease-background`   | §7.2                         |
+| `treatment-landscape`  | §7.1, §7.3, §7.4             |
+| `rebalancing-agents`   | §7.6 (wizard cross-link target) |
+| `fviiia-mimetics`      | §7.5 (wizard cross-link target) |
+
+The §7.7 "Click here:" figures are **in-chapter local-state pop-ups** — not routes, and not the
+`?drug=<id>` overlay (that param is reserved for drug sheets, [§6](#6-drug-information-sheets) /
+issue 10). Glossary ([§8](#8-glossary)) is a separate entry point (issue 12).
 
 ### 7.1 The evolving landscape / personalized therapy
 

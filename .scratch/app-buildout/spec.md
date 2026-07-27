@@ -32,6 +32,18 @@ within the palette), not a find-and-replace skin.
 2. **Survey destination = not yet defined.** Build submission as a pluggable adapter
    with a stub now; swap the real target later in one file. Off the critical path.
 3. **Palette + typography only, no hi-fi comps.** Styling pass is design-inclusive.
+4. **`/` = dedicated landing page** (net-new, not in the blueprint), not a redirect to
+   `/education`.
+5. **Drug sheets = `?drug=<id>` modal overlay** on the current route; no standalone
+   `/drugs/:id` page.
+6. **`/education` = multi-chapter `/education/:section` subroutes; `/wizard` = single
+   route** with all state computed in-page.
+7. **Navigation = linear walkthrough**, not a section portal. A persistent sidebar with
+   **Prev/Next** steps through a fixed nine-step section order; **Glossary, Acronyms, and
+   References are standalone always-accessible routes off that line** (each its own sidebar
+   button). This splits the blueprint's combined "Resources/References/Glossary" block into
+   four routes. See `docs/adr/0001-linear-walkthrough-navigation.md`. The canonical order
+   lives in `src/data/sectionOrder.ts` (issue 01); the styled sidebar is issue 18.
 
 ## Governing principle
 
@@ -41,14 +53,37 @@ Build so **structure/behavior and styling are separable passes**. `tokens.css`
 with the client palette/type with near-zero markup churn. Do NOT hand-code
 `bg-white text-slate-900` like the current placeholder `App.tsx`.
 
-## Routes (top-level sections)
+## Routes
 
-- `/` or `/education` — Education blocks (background, MOA, glossary entry)
-- `/wizard` — branching decision tree (Q1 type → Q2 inhibitors → Q3 reason → leaf)
-- `/explore` — filterable comparison table (3 dropdowns)
-- `/drugs/:id` — per-drug info sheet (renders as modal over a real, deep-linkable route)
-- `/resources` — Resources / References / Glossary
-- `/survey` — 3 Likert/usage questions
+Navigation is a **linear walkthrough** (ADR-0001). Steps 1–9 below form the Prev/Next
+spine (order encoded in `src/data/sectionOrder.ts`); the three reference pages sit **off**
+the line, each reachable anytime from its own sidebar button.
+
+**In the linear flow (Prev/Next order):**
+
+1. `/` — **Landing page** (net-new; not in the blueprint). Dedicated page, not a redirect.
+2–5. `/education/:section` — Education is a **multi-chapter module**; chapters in order:
+  `disease-background`, `treatment-landscape`, `rebalancing-agents`, `fviiia-mimetics`
+  (last two are wizard cross-link targets, so their URLs must be stable). Bare `/education`
+  redirects to `disease-background`; unknown `:section` → NotFound.
+6. `/wizard` — branching decision tree (Q1 type → Q2 inhibitors → Q3 reason → leaf).
+  **Single route** — all step state computed in-page, no per-step subroutes.
+7. `/explore` — filterable comparison table (3 dropdowns).
+8. `/resources` — curated **Resources** panel only.
+9. `/survey` — 3 Likert/usage questions.
+
+**Off the line (standalone, always-accessible, not in Prev/Next):**
+
+- `/references` — full bibliography (~40 citations).
+- `/glossary` — domain-term definitions.
+- `/acronyms` — abbreviation expansions (split out of `CONTEXT.md §8`).
+
+**Overlay (not a route):**
+
+- Drug info sheets — **modal overlay via `?drug=<id>`** on the current route (e.g.
+  `/explore?drug=marstacimab`); **no** standalone `/drugs/:id` page.
+
+Unknown route → `NotFound` (`*` fallback).
 
 ## Phases
 
@@ -79,10 +114,12 @@ both engines already exist.
 | 07  | 0     | Analytics: per-route pageviews                    | —      |
 | 08  | 1     | Wizard section                                    | Gate 1 |
 | 09  | 1     | Explore comparison table                          | Gate 1 |
-| 10  | 1     | Drug info sheets (modal-over-route)               | Gate 1 |
+| 10  | 1     | Drug info sheets (modal overlay via `?drug=`)     | Gate 1 |
 | 11  | 1     | Education blocks                                  | Gate 1 |
-| 12  | 1     | Resources / References / Glossary                 | Gate 1 |
+| 12  | 1     | Resources / References / Glossary / Acronyms (4 routes) | Gate 1 |
 | 13  | 1     | Survey UI                                         | Gate 1 |
+| 17  | 1     | Landing page (`/`)                                | Gate 1 |
+| 18  | 1     | Navigation sidebar (Prev/Next + jump buttons)     | Gate 1 |
 | 14  | 3     | Styling: fill tokens + reference route            | Gate 2 |
 | 15  | 3     | Styling: propagate + states / motion / responsive | Gate 2 |
 | 16  | 4     | Hardening: a11y · QA · content proof · deploy     | —      |

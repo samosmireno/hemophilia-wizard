@@ -16,7 +16,8 @@ feature).
   inhibitors (Yes/No) — `FilterSelect` primitive (issue 03).
 - Result grid driven by `filterTreatments()` / `evaluateTreatments()` in
   `src/data/treatments.ts`; columns: Agent, MOA, Age, Route, Schedule, Monitoring.
-- Empty/no-match state; agent names link to drug sheets (issue 10).
+- Empty/no-match state; agent names open the drug-sheet overlay by appending
+  `?drug=<id>` to `/explore` (issue 10) — overlay, not a page navigation.
 - Structural + semantic tokens only.
 
 ## Acceptance

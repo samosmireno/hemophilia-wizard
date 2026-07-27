@@ -28,7 +28,8 @@ screen.
 
 - All 4 scenarios (HA/HB × ±inhibitors) reach correct curated leaf, verified against
   `wizard.ts`.
-- Back/reset work; drug names in the leaf can open drug sheets (link to issue 10).
+- Back/reset work; drug names in the leaf open the drug-sheet overlay by appending
+  `?drug=<id>` to `/wizard` (issue 10) — no navigation away from the wizard.
 - Tests cover the branch → recommendation mapping.
 
 ## Notes
