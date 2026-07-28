@@ -182,15 +182,15 @@ stops being empty and that token silently falls back to the package's emerald.
 All component issues are closed. **Two things remain**: the all-five visual
 review below (not done), and issue 06's package debts.
 
-| Issue | Component        | Status                                           |
-| ----- | ---------------- | ------------------------------------------------ |
-| 00    | `NavArrowButton` | done (2026-07-28)                                |
-| 01    | `Button`         | done (2026-07-28)                                |
-| 02    | `NavBarButton`   | done (2026-07-28) — raised, resolved by 04       |
-| 03    | `PopupButton`    | done (2026-07-28) — **2 raised, still open**     |
-| 04    | `Sidebar`        | done (2026-07-28) — no export; inferred          |
-| 05    | base ramp → teal | **moot, closed unrun** — coverage check empty    |
-| 06    | package debts    | ready-for-human — 3 gaps found building issue 18 |
+| Issue | Component        | Status                                        |
+| ----- | ---------------- | --------------------------------------------- |
+| 00    | `NavArrowButton` | done (2026-07-28)                             |
+| 01    | `Button`         | done (2026-07-28)                             |
+| 02    | `NavBarButton`   | done (2026-07-28) — raised, resolved by 04    |
+| 03    | `PopupButton`    | done (2026-07-28) — **2 raised, still open**  |
+| 04    | `Sidebar`        | done (2026-07-28) — no export; inferred       |
+| 05    | base ramp → teal | **moot, closed unrun** — coverage check empty |
+| 06    | package debts    | ready-for-human — 1–4 fixed in v0.5.0; 5 open |
 
 ### Still owed: the all-five visual review
 

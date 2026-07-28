@@ -5,8 +5,11 @@ import { RouterProvider } from "react-router";
 import { router } from "./routes/router.tsx";
 
 // Self-hosted brand fonts. DM Sans (variable, body/UI) + Barlow Condensed
-// (static; display only needs the 600/700 weights the type scale uses).
+// (static; display needs the 600/700 weights the type scale uses, plus 400 for
+// the landing hero's eyebrow and subtitle — without it those two lines get a
+// browser-synthesized regular off the 600, see docs/styling.md §8).
 import "@fontsource-variable/dm-sans";
+import "@fontsource/barlow-condensed/latin-400.css";
 import "@fontsource/barlow-condensed/latin-600.css";
 import "@fontsource/barlow-condensed/latin-700.css";
 import "./styles/tokens.css";

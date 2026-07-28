@@ -1,6 +1,6 @@
 # 17 — Landing page (`/`)
 
-Status: ready-for-human
+Status: done (2026-07-28)
 Phase: 1
 Blocked by: 01, 02, 03
 Gate: Gate 1 (client wireframe approval)
@@ -37,3 +37,33 @@ the blueprint**, so its content is defined here, not sourced from `CONTEXT.md`.
 
 Replaces the placeholder landing component stubbed in issue 01. Content beyond the title
 is undefined and will be settled with the client later.
+
+## Comments
+
+**2026-07-28 — built to a supplied design; scope changed.** The client supplied a hero
+comp (full-bleed backdrop from issue 19, activity code, title, one CTA) with per-line type
+specs. Built as specified. Two departures from the scope above, both deliberate:
+
+1. **The five section entry points are NOT there.** The design has a single call to
+   action, and `AppSidebar` (issue 18, which did not exist when this was written) already
+   jumps to Wizard, Acronyms, References and Glossary. Under ADR 0001 the app is a linear
+   walkthrough with `/` as step 0, so a card grid would have been a second, competing
+   navigation. **The acceptance line requiring them is superseded** — reopen only if the
+   client asks for a directory-style landing page.
+2. **Brand styling, not "structural tokens only".** That constraint predates Gate 2, which
+   has since been passed; the design is a real comp with colours and type.
+
+The CTA target is `nextOf("/")` from `src/data/sectionOrder.ts`, i.e. the same computation
+the sidebar's Next arrow makes here — the two cannot disagree about what follows `/`.
+
+Title single-sourcing done as `src/data/activity.ts`, which `education.ts` imports for its
+framing block (`ACTIVITY_TITLE`). The landing hero renders the halves either side of the
+colon at different sizes, so the constant is exported split as well as whole.
+
+Typography rationale, the `clamp()` ramp and the `<main>` centring change are documented
+in `docs/styling.md` §8. The CTA renders as a `<button>` rather than a link because mlg
+`Button` has no `href`/`render` — logged as debt 5 in
+`.scratch/mlg-reskin/issues/06-package-debts.md`.
+
+Still TBD from the original scope, and still not invented: CME framing, learning
+objectives, accreditation copy.

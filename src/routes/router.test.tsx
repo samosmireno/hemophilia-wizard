@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
+import { ACTIVITY_TITLE } from "../data/activity";
 import { routes } from "./router";
 
 function renderAt(path: string) {
@@ -16,7 +17,7 @@ const heading = () => screen.getByRole("heading", { level: 1 });
 describe("router", () => {
   it("renders the landing page at /", () => {
     renderAt("/");
-    expect(heading()).toHaveTextContent(/^Home$/);
+    expect(heading()).toHaveTextContent(ACTIVITY_TITLE);
   });
 
   it.each([
@@ -60,8 +61,39 @@ describe("router", () => {
 
   it("redirects an unknown top-level route to the landing page", async () => {
     const router = renderAt("/nope");
-    expect(await screen.findByRole("heading", { level: 1, name: /^Home$/ })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 1, name: ACTIVITY_TITLE }),
+    ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/");
+  });
+
+  // Backdrops are decorative, so they have no accessible role to query — the
+  // data attribute is the seam. The shell's is unconditional; `/` adds a second,
+  // its own (issue 19), which paints over the shell's at the same `-z-10` by
+  // landing later in DOM order.
+  describe("page backdrop", () => {
+    const backdrop = (which: string) => document.querySelector(`[data-page-backdrop="${which}"]`);
+
+    it.each(["/", "/wizard", "/explore", "/education/disease-background", "/glossary"])(
+      "the shell paints the default gradient at %s",
+      (path) => {
+        renderAt(path);
+        expect(backdrop("default")).toHaveClass("bg-page");
+      },
+    );
+
+    it("adds the landing backdrop at / only", () => {
+      renderAt("/");
+      expect(backdrop("landing")).toBeInTheDocument();
+    });
+
+    it.each(["/wizard", "/explore", "/education/disease-background", "/glossary"])(
+      "has no landing backdrop at %s",
+      (path) => {
+        renderAt(path);
+        expect(backdrop("landing")).not.toBeInTheDocument();
+      },
+    );
   });
 
   // The sidebar's jump items are covered in depth by `sidebar.test.tsx`; this

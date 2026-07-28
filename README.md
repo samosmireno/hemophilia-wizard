@@ -36,7 +36,8 @@ npm run upgrade       # bump every dep to latest, then reinstall
 - **React 19** + **TypeScript ~6** (strict-ish: `noUnusedLocals`, `verbatimModuleSyntax`, `erasableSyntaxOnly`)
 - **Vite 8** — `@vitejs/plugin-react`, `@tailwindcss/vite`, `vite-plugin-svgr`
   (import `./icon.svg?react` for a component; plain import stays a URL)
-- **Tailwind v4** — CSS-native config in `src/styles/tokens.css` (`@theme`), no JS config file
+- **Tailwind v4** — CSS-native config in `src/styles/tokens.css` (`@theme`), no JS config file;
+  see [`docs/styling.md`](docs/styling.md) for the design-token rationale
 - **`cn()`** helper — `clsx` + `tailwind-merge` (`src/lib/cn.ts`)
 - **ESLint 10** flat config + typescript-eslint + react-hooks + react-refresh
 - **Prettier 3** + `prettier-plugin-tailwindcss` (aware of `cn`/`clsx`/`twMerge`)

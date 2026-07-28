@@ -1,22 +1,21 @@
-/* Design tokens. Define CSS variables in the @theme block below and Tailwind v4
-   generates matching utilities (e.g. --color-brand-teal-50 → bg-brand-teal-50,
-   text-brand-teal-50). The raw brand palette lives here; the semantic layer
-   (bg-surface, text-heading, …) is defined per issue 02. */
+/* Design tokens. Variables declared in @theme become Tailwind utilities
+   (--color-brand-teal-50 → bg-brand-teal-50, text-brand-teal-50, …).
+
+   RATIONALE FOR EVERY VALUE BELOW LIVES IN `docs/styling.md` — where each colour
+   came from, why a mapping beat the obvious one, and what is still open. Change a
+   token, change that doc. */
 
 @import "tailwindcss";
 @import "mlg-components/tokens.css";
-/* Path is relative to THIS file. `@mlg-components/dist` does not work — the
-   leading @ reads as an npm scope, and the package is unscoped, so Tailwind
-   silently scans nothing and the components render unstyled. */
+/* Path is relative to THIS file, and the leading @ form does not work. Getting it
+   wrong renders every mlg component unstyled, silently. See docs/styling.md §1. */
 @source "../../node_modules/mlg-components/dist";
 
 @theme {
-  /* ─── Typography ──────────────────────────────────────────────────────────
-     DM Sans is the app default (body/UI); Barlow Condensed is the display face
-     (font-display utility). Fonts are self-hosted via @fontsource, imported in
-     main.tsx. The type scale bundles size + weight + line-height per step, so a
-     single utility (e.g. text-h1) sets all three. Line-heights for h1–h4/body
-     are house defaults; small is from the source spec (12px/500/19.8px). */
+  /* ─── Typography (docs/styling.md §2) ─────────────────────────────────────
+     DM Sans = default, Barlow Condensed = display (font-display). Self-hosted
+     via @fontsource, imported in main.tsx. Each step bundles size + weight +
+     line-height, so one utility (text-h1) sets all three. */
   --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
 
@@ -44,10 +43,11 @@
   --text-small--font-weight: 500;
   --text-small--line-height: 19.8px;
 
-  /* ─── Palette tokens (raw scales, not yet wired to any UI) ─────────────────
-     Namespaced `--color-brand-<name>-<step>` so they never collide with
-     Tailwind's built-in `teal`/`slate` scales. Steps run 0→100 (lightest→
-     darkest), matching the design source. No semantic aliases yet. */
+  /* ─── Brand palette (docs/styling.md §3) ──────────────────────────────────
+     Raw scales, namespaced so they never collide with Tailwind's built-in
+     teal/slate. Steps run 0→100, lightest→darkest. No semantic aliases yet.
+     NB: -25 is a pastel tint, not a lighter -50 — see the doc before using it
+     as a hover state. */
 
   /* TEAL — PRIMARY */
   --color-brand-teal-0: #eef8f6;
@@ -84,27 +84,43 @@
   --color-brand-sand-75: #7a5c38;
   --color-brand-sand-100: #3a2810;
 
-  /* ─── mlg-components: NavArrowButton ──────────────────────────────────────
-     Component-layer overrides (package v0.4.0). These sit on top of the
-     package's accent ramp rather than replacing it, so re-pointing
-     `--color-ui-accent*` later leaves the arrows crimson. The other four mlg
-     components are still on the package default and get re-skinned separately.
+  /* ─── Page backgrounds (docs/styling.md §6) ───────────────────────────────
+     Two radial gradients, from the designer. The `--background-image-*`
+     namespace yields `bg-page` / `bg-page-landing` — the arbitrary-value
+     `bg-[radial-gradient(…)]` form belongs in neither JSX nor here.
 
-     Values are from the Figma four-state export (default/click/hover/focus).
-     Its stock Tailwind reds stood in for the crimson scale below, and its
-     green/teal inner glows were residue from the package default — restated
-     here in crimson-75.
+     Three of the four stops are exact palette steps, so they are derived with
+     color-mix rather than transcribed as rgba() and a palette change still
+     moves them (verified: Tailwind keeps the var() references live under an
+     @supports color-mix rule, and only the ancient-browser fallback inlines
+     the hex — unlike --shadow-*, which is inlined outright. See §1). */
 
-     Shadows must be declared in `@theme`, never `:root`: Tailwind resolves
-     `--shadow-*` at build time and inlines the value, so a `:root` override
-     compiles to nothing. Colour tokens work in either place. */
+  /* Landing only. lagoon-25 → teal-75, both at 77%. */
+  --background-image-page-landing: radial-gradient(
+    ellipse 123.99% 135.17% at 29.44% -14.63%,
+    color-mix(in srgb, var(--color-brand-lagoon-25) 77%, transparent) 0%,
+    color-mix(in srgb, var(--color-brand-teal-75) 77%, transparent) 100%
+  );
+
+  /* Every other route. White → an off-scale mint, both at 40%. That second
+     stop is `rgba(114.61, 213.07, 191.53)` in the export — fractional channels,
+     i.e. an opacity-flattened Figma layer, not a picked colour. Nearest step is
+     teal-25 at dE .042, twice as close as anything else but still over JND, so
+     it stays literal per the §4 rule. Worth a designer question. */
+  --background-image-page: radial-gradient(
+    ellipse 58.7% 133.55% at 48.51% 45.06%,
+    color-mix(in srgb, #ffffff 40%, transparent) 0%,
+    rgba(114.61, 213.07, 191.53, 0.4) 100%
+  );
+
+  /* ─── mlg-components ──────────────────────────────────────────────────────
+     Component-layer overrides on package v0.4.0; the base ramp is untouched, so
+     re-pointing --color-ui-accent* later cannot disturb these. Shadows MUST be
+     declared here in @theme, never :root — Tailwind inlines --shadow-* at build
+     time and a :root override compiles to nothing. docs/styling.md §1, §4. */
+
+  /* NavArrowButton — crimson (docs/styling.md §4.1) */
   --color-ui-arrow-bg: var(--color-brand-crimson-50);
-  /* Not `crimson-25`: that step is a pastel tint (2.6x the luminance, half the
-     chroma) and washes out. The design's hover barely changes lightness at all
-     — it rotates hue red->rose at constant L. Crimson-50 already sits at that
-     rose hue, so only the magnitude transfers: a 4% lift, luminance ratio
-     1.04x against the design's 1.03x. Derived from the scale rather than
-     hardcoded so a crimson change still moves it. */
   --color-ui-arrow-bg-hover: color-mix(
     in oklab,
     var(--color-brand-crimson-50) 96%,
@@ -112,11 +128,6 @@
   );
   --color-ui-arrow-bg-active: var(--color-brand-crimson-75);
   --color-ui-arrow-fg: #ffffff;
-  /* teal-0 rather than plain white: the design's #eef8f6 is exactly the
-     primary's lightest tint, so the chevron picks up the house cool-white on
-     hover. 4.10:1 against the corrected hover fill above — clears the 3:1 icon
-     threshold. (It was 1.85:1 while hover was mis-mapped to crimson-25; that
-     failure was our mapping, not the design.) */
   --color-ui-arrow-fg-hover: var(--color-brand-teal-0);
   --color-ui-arrow-fg-active: #939393;
   --color-ui-arrow-ring: #ffffff;
@@ -130,344 +141,122 @@
   --shadow-ui-arrow-focus:
     0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px 1px 1px 0px rgba(143, 26, 46, 0.53);
 
-  /* ─── mlg-components: Button ──────────────────────────────────────────────
-     The wide text CTA. Same pattern as the arrows above: component-layer
-     overrides only, package v0.4.0 untouched.
-
-     The Figma export's stock class names (`red-500`, `rose-900`, `neutral-400`)
-     are the export generator's approximations. Sampling the designer's PNG gives
-     the true fills, and three of them land exactly on the brand palette:
-     default = crimson-50, active = crimson-75, hover label = teal-0. That
-     exactness is the confirmation the stock reds were standing in for crimson.
-
-     `--shadow-ui-btn` is omitted deliberately: the design's resting shadow is
-     identical to the package default, so there is nothing to restate. */
-  --color-ui-btn-bg: var(--color-brand-crimson-50); /* #d63a52, exact */
-  /* Literal, and it has to be. The design's hover is *more* chromatic than
-     crimson-50 (C .229 vs .192) — and crimson-50 is the most chromatic step the
-     scale has. `color-mix` can only pull chroma down, so no combination of brand
-     steps reaches this colour; the 96% mix used on the arrows lands at #d73f55,
-     a quarter of the lift. The scale is missing a "brighter than -50" step and
-     this is it. See issue 01 for the palette question that raises. */
-  --color-ui-btn-bg-hover: #f73150;
-  --color-ui-btn-bg-active: var(--color-brand-crimson-75); /* #8f1a2e, exact */
-  /* The design switches hue family entirely on focus: crimson -> teal. That
-     more than preserves the package's rule that a focused button must never
-     read as a pressed one (there, `accent-deep` vs `accent-strong`).
-     The design's #1a847e is teal-50 rotated ~11deg toward cyan at identical
-     L and chroma (dL .018, dC .000) — off the house hue for no stated reason,
-     so it maps onto teal-50 and tracks the scale. */
+  /* Button — crimson, teal focus (docs/styling.md §4.2)
+     --shadow-ui-btn omitted deliberately: identical to the package default. */
+  --color-ui-btn-bg: var(--color-brand-crimson-50);
+  --color-ui-btn-bg-hover: #f73150; /* literal — brighter than any crimson step */
+  --color-ui-btn-bg-active: var(--color-brand-crimson-75);
   --color-ui-btn-bg-focus: var(--color-brand-teal-50);
-  --color-ui-btn-fg: #ffffff; /* also the focus label — the component re-asserts it */
-  --color-ui-btn-fg-hover: var(--color-brand-teal-0); /* #eef8f6, exact — 3.52:1 on hover */
-  --color-ui-btn-fg-active: #939393; /* off-palette, verbatim; matches the arrows' press */
-  /* teal-100, not teal-75. The 3px inset focus ring is a non-text indicator, so
-     it owes 3:1 against its own fill: teal-75 gives 1.92:1, teal-100 gives
-     3.49:1. The design's own pairing (#0e4e4c on #1a847e) was 2.10:1 — this
-     keeps the intent, a dark teal rim, and clears the threshold. */
+  --color-ui-btn-fg: #ffffff;
+  --color-ui-btn-fg-hover: var(--color-brand-teal-0);
+  --color-ui-btn-fg-active: #939393;
   --color-ui-btn-ring: var(--color-brand-teal-100);
 
-  /* Ring alpha .15 -> .20 per the export's `outline-white/20`. It stays folded
-     into the box-shadow as an `inset 0 0 0 1px` rather than becoming a real
-     outline: that is the package's canonical mechanism (no layout box, cannot
-     collide with the focus outline), and re-tinting it means restating the
-     whole value. */
   --shadow-ui-btn-hover:
     inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2), 0px 2px 4px 0px rgba(0, 0, 0, 0.25),
     inset 0px 2px 4px 2px rgba(255, 255, 255, 0.25);
-  /* Same four layers as the package; the opaque inner rim was
-     rgba(4, 33, 25, 1) — emerald residue from the default the designer
-     recoloured over. Restated in the crimson-dark the design actually uses,
-     the same value the arrows' press state landed on. */
   --shadow-ui-btn-active:
     0px 1px 2px 0px rgba(0, 0, 0, 0.25), 0px 1px 2px 0px rgba(0, 0, 0, 0.15),
     inset 0px 2px 4px 0px rgba(255, 255, 255, 0.25), inset 0px 1px 2px 1px rgba(57, 27, 32, 1);
 
-  /* ─── mlg-components: NavBarButton ────────────────────────────────────────
-     The round utility button in the nav rail. Tonally inverted from the other
-     two: white surface, coloured *glyph*, so the brand scale lands on `-fg` and
-     the contrast maths runs against a near-white ground rather than a saturated
-     one. Also read by `Sidebar`'s "More" trigger — same visual object, same
-     bar — so this block moves that too (see issue 04).
-
-     THIS EXPORT WAS ALMOST ENTIRELY RESIDUE. Sampling the designer's PNG
-     per-pixel returned the package's own emerald byte-for-byte in five of seven
-     fills (#33a482 = accent-strong, #43cea4 = accent, #257b61 = accent-deep,
-     #d2d5d4 = mist, #ffffff) and in all three shadows. The designer repainted
-     exactly two things — the hover tint and the focus ring — and the ring landed
-     on #0d2e26, which is brand-teal-100 exactly. That exactness is the tell:
-     the intent was teal, the rest simply never got repainted. Transcribing it
-     would have left this component emerald beside a crimson `Button`, so the
-     whole set is mapped onto the primary and the two deliberate moves are the
-     anchors it is mapped around.
-
-     Primary, not the accent: the crimson is reserved for the wizard's prev/next
-     (decision 2 in the spec). A nav rail is chrome. */
-  --color-ui-navbar-bg: var(--color-ui-white); /* #ffffff, exact — restated so the token is owned */
-  /* teal-0, and it is near-exact: the design's #dffff6 differs by dL .004
-     (luminance ratio 1.02x), a 6deg hue rotation and a hair more chroma. No mix
-     off the scale gets closer — pulling toward teal-25 darkens, moving away.
-     This is the third time #eef8f6 has turned up as a designer's "mint tint"
-     (the arrows' hover fg, `Button`'s hover label), which is what a house
-     lightest-step looks like when it is working. */
+  /* NavBarButton — teal, tonally inverted: white ground, coloured glyph
+     (docs/styling.md §4.3). Also drives Sidebar's "More" trigger.
+     -bg-current / -fg-current left UNSET on purpose (v0.5.0 tokens; AppSidebar
+     marks the current item with `disabled` instead — debt 2, issue 06).
+     No --shadow-ui-navbar-hover: the component paints the resting one through
+     hover. */
+  --color-ui-navbar-bg: var(--color-ui-white);
   --color-ui-navbar-bg-hover: var(--color-brand-teal-0);
-  /* Off-palette and literal, like `--color-ui-btn-fg-active`. A pressed white
-     tile going neutral grey is palette-agnostic by design and the brand has no
-     equivalent step — slate is blue-tinted, and its -0 is *lighter* than white
-     ground, which is the wrong direction for a press. Kept as the package's
-     value. This is the one token here indistinguishable from residue; it is
-     also the one where residue and correct answer coincide. */
-  --color-ui-navbar-bg-active: #d2d5d4;
-  --color-ui-navbar-fg: var(
-    --color-brand-teal-50
-  ); /* 4.18:1 on white, up from the design's 3.10:1 */
-  /* The design lifts the glyph hard on hover — accent-strong to accent, a 1.66x
-     luminance jump — and that lift is itself package residue, not a designer
-     decision. It cannot survive here: the ground lightens on hover too, so
-     1.66x lands at 1.86:1 in the design's own export. teal-25 reproduces the
-     failure identically (1.84:1) — the -25 pastel trap again, from the other
-     side. The direction is kept and the magnitude cut to what the inverted
-     tonality affords: 3.56:1 on teal-0, clear of the 3:1 icon threshold. The
-     hover is legible regardless, because the ground carries it (white -> mint). */
+  --color-ui-navbar-bg-active: #d2d5d4; /* off-palette press grey, verbatim */
+  --color-ui-navbar-fg: var(--color-brand-teal-50);
   --color-ui-navbar-fg-hover: color-mix(
     in oklab,
     var(--color-brand-teal-50) 90%,
     var(--color-brand-teal-25)
   );
-  --color-ui-navbar-fg-active: var(--color-brand-teal-75); /* 5.44:1 on the press grey */
-  /* #0d2e26, exact — one of the two colours the designer actually repainted.
-     CAVEAT, and it is a live one: `NavBarButton` draws its focus outline with no
-     `-outline-offset`, so the ring lands on the *page* ground, not on the
-     button's own white fill. On a teal-100 surface it is 1.00:1 — it disappears
-     completely (verified on-screen, not inferred). `Button` does not have this
-     problem because it draws its ring inset. Since this component lives in the
-     nav rail, whatever issue 04 gives `--color-ui-sidebar-bg` must not be
-     teal-100 — or v0.4.x needs `-outline-offset-[3px]` here to match `Button`.
-     A focus indicator that vanishes is a WCAG 2.4.11 failure, so this cannot be
-     left to chance. */
+  --color-ui-navbar-fg-active: var(--color-brand-teal-75);
+  /* Drawn with no outline-offset, so it lands on the page ground — whatever
+     surface this sits on must not be teal-100. See the media query at the end. */
   --color-ui-navbar-ring: var(--color-brand-teal-100);
-
-  /* DELIBERATELY UNSET: `--color-ui-navbar-bg-current` / `-fg-current`.
-     mlg-components v0.5.0 added them so the current page can be marked without
-     being disabled, which would put that item back in the tab order. Both
-     default to the resting fill in the package, so leaving them unset keeps the
-     current-page treatment invisible — and `AppSidebar` keeps dimming the
-     current item via `disabled` instead.
-
-     That is a workaround, not the destination: it conflates "you are here" with
-     "unavailable". Setting these properly needs a Figma answer that does not
-     exist yet, and guessing a colour here would be inventing design. Tracked as
-     debt 2 in `.scratch/mlg-reskin/issues/06-package-debts.md`. */
-
-  /* NOT FROM THE EXPORT — the tooltip was never supplied (issue 02 is still
-     open on it). Inferred: teal-100 is the darkest step and the one colour the
-     designer explicitly reached for here, so the tooltip matches the ring.
-     14.62:1, well past the 4.5:1 body-text threshold this is the only element
-     in the package to owe. Revisit if the export arrives, and again in issue 04
-     — a teal-100 tooltip needs a sidebar ground it does not sink into. */
+  /* Inferred, never exported. */
   --color-ui-navbar-tooltip-bg: var(--color-brand-teal-100);
   --color-ui-navbar-tooltip-fg: var(--color-ui-white);
 
-  /* All three shadows are the package default in the export, emerald glows and
-     all, restated on the teal the fills now use: rgba(51,164,130) accent-strong
-     -> teal-50, rgba(37,123,97) accent-deep -> teal-75. The focus glow's
-     rgba(26,132,126,.53) is the same stray #1a847e teal the arrows and `Button`
-     both carried — teal-50 rotated ~11deg toward cyan — mapped back onto the
-     house hue for the third time.
-
-     There is no `--shadow-ui-navbar-hover`: the component paints `shadow-ui-navbar`
-     through hover, and the export agrees. The `hover:border-white/20` stays dead
-     per spec constraint 2 — here it is invisible by construction anyway, white/20
-     over a mint tint. */
   --shadow-ui-navbar:
     0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px -1px 1px 0px rgba(45, 138, 120, 0.5);
   --shadow-ui-navbar-active: inset 0px 1px 1px 0px rgba(26, 90, 76, 1);
   --shadow-ui-navbar-focus:
     0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px 1px 1px 0px rgba(45, 138, 120, 0.53);
 
-  /* ─── mlg-components: PopupButton ─────────────────────────────────────────
-     The `+` -> `×` disclosure trigger. Two independent skins, closed and open,
-     each with its own full token set (the open one is a tonal inversion, dark
-     glyph on dark ground, so it does not derive from the closed one).
-
-     THIS COMPONENT IS LAGOON, not crimson and not teal. Issue 03 left the
-     family open — arrows-accent or library-primary — and the design answered
-     with neither: every colour the designer used sits at hue 208-213deg, and
-     the closed ground sampled #4abfd4, which is `--color-brand-lagoon-25` to
-     three decimals in L, C *and* H. That exactness is the same tell as the
-     NavBarButton ring landing on teal-100 — the designer reached into the
-     palette on purpose. Nothing emerald survived anywhere in the fills, so
-     unlike issue 02 this export was a full repaint, not residue.
-
-     The four off-scale colours are all lagoon *desaturated*: same hue, chroma
-     below every step the scale has. They are derived with `color-mix` rather
-     than hardcoded so a lagoon change still moves them; each lands within
-     dE 0.013 OKLab of the designer's pixel, i.e. under the JND.
-
-     CONTRAST: this design fails the 3:1 non-text threshold in every state it
-     specifies (2.17:1 default, 1.83:1 hover, 2.49:1 press/open, 2.66:1 open
-     hover). Unlike issues 00 and 02, that is NOT a mapping error to fix — the
-     mapping is exact. lagoon-25 is a light step (lum .435) being used as a
-     saturated ground under a white glyph; every other component in the library
-     uses its scale's -50 step for that job. Transcribed faithfully and raised
-     in issue 03; the one-token fix, if the designer wants it, is
-     `--color-ui-popup-bg: var(--color-brand-lagoon-50)` -> 3.58:1. */
-  --color-ui-popup-bg: var(--color-brand-lagoon-25); /* #4abfd4, exact */
-  /* The design does not move the ground on hover at all — the state is carried
-     by the glyph (white -> #bff5ff), the white/60 outline and the white inner
-     glow. Restated rather than left to fall through to the package's emerald. */
-  --color-ui-popup-bg-hover: var(--color-brand-lagoon-25);
-  /* #67a0aa: lagoon hue at L .670 but chroma .061, well under lagoon-25's .107
-     and lagoon-50's .108 — no step and no lagoon-to-lagoon step blend reaches
-     it, only a blend through the near-white -0. dE .011. Note this is also the
-     open skin's resting ground: `-bg-active`/`-fg-active` are the press state
-     for BOTH skins, and the design makes the closed press preview the open
-     look. (Consequence: pressing the *open* × changes nothing but `scale-95`.) */
+  /* PopupButton, closed skin — lagoon (docs/styling.md §4.4)
+     Fails 3:1 in every state as specified; faithful to the design, raised as
+     issue 03 RAISED 1 — do not "fix" it here without the designer.
+     --shadow-ui-popup-hover and --color-ui-popup-outline-hover omitted
+     deliberately: both are the package default exactly. */
+  --color-ui-popup-bg: var(--color-brand-lagoon-25);
+  --color-ui-popup-bg-hover: var(--color-brand-lagoon-25); /* ground does not move */
+  /* Also the OPEN skin's resting ground — the closed press previews the open look. */
   --color-ui-popup-bg-active: color-mix(
     in oklab,
     var(--color-brand-lagoon-75) 59%,
     var(--color-brand-lagoon-0)
   );
   --color-ui-popup-fg: #ffffff;
-  /* Literal, and it has to be — the same situation as `--color-ui-btn-bg-hover`.
-     #bff5ff is a saturated ice-blue (L .936, C .056); the brand's lightest steps
-     are near-neutral (lagoon-0 is C .018), so mixing toward -0 loses the chroma
-     and mixing toward -25 loses the lightness. Closest reachable blend is
-     dE .025, visibly flatter. The scale has no saturated near-white and this
-     is it. Note the design *dims* the glyph on hover — 2.17:1 -> 1.83:1. */
-  --color-ui-popup-fg-hover: #bff5ff;
-  /* #46595c — lagoon-75's lightness at a third of its chroma. dE .013. Also the
-     open skin's glyph and focus ring, per the -active note above. */
+  --color-ui-popup-fg-hover: #bff5ff; /* literal — no saturated near-white in the scale */
   --color-ui-popup-fg-active: color-mix(
     in oklab,
     var(--color-brand-lagoon-100) 74%,
     var(--color-brand-lagoon-0)
   );
-  /* White, per the design. Drawn at `outline-offset-2`, so it lands on the page
-     ground, not the button — invisible on a light surface. Same open risk as
-     `--color-ui-arrow-ring` (issue 00) and the mirror of the open ring below.
-     14.62:1 on teal-100, 1.00:1 on white. Resolve when issue 04 fixes the
-     ground this sits on. */
   --color-ui-popup-ring: #ffffff;
 
-  /* Resting shadow, painted in every state of both skins. The inner glow was
-     rgba(26,132,126,.50) — the stray #1a847e teal for the fourth time in this
-     package (arrows, `Button`, `NavBarButton`) — restated on lagoon-50.
-     The design gives three slightly different resting geometries across the
-     states and the package has only one token; this takes the closed default's
-     (`inset 0 -1px 2.6px 1px`, a glow up off the bottom edge), which is both
-     the resting appearance the token names and the one the designer actually
-     repainted — the other two are the package's `inset 0 1px 1px` untouched.
-
-     `--shadow-ui-popup-hover` is omitted deliberately: the design's hover
-     shadow is the package default exactly, with no colour to restate. So is
-     `--color-ui-popup-outline-hover` (rgba(255,255,255,.6)). Same call as
-     `--shadow-ui-btn` in the `Button` block. */
   --shadow-ui-popup:
     0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px -1px 2.6px 1px rgba(10, 148, 174, 0.5);
 
-  /* Open "×" skin. Resting ground and glyph are the closed skin's press pair —
-     one colour, declared once, referenced here so the two cannot drift. */
+  /* PopupButton, open "×" skin — a tonal inversion, not derived from the closed
+     one. Resting ground/glyph reference the closed press pair so they cannot
+     drift. */
   --color-ui-popup-open-bg: var(--color-ui-popup-bg-active);
-  /* #79ccdb, dE .003 — lagoon-25 lifted toward the near-white. */
   --color-ui-popup-open-bg-hover: color-mix(
     in oklab,
     var(--color-brand-lagoon-25) 75%,
     var(--color-brand-lagoon-0)
   );
-  /* Issue 03's RAISED 2, now closed. The component used to paint its focus-
-     visible ground from the token above, so the open focus state could not keep
-     the design's resting ground; mlg-components v0.4.1 splits this token out
-     (it still defaults to the hover ground, hence the explicit override here).
-     Faithful to the export — and it gives up the accidental 4.09:1 that the
-     forced hover ground bought: this state now reads 2.49:1 like the rest of
-     the skin, so all seven states fail 1.4.11 until RAISED 1 is answered. */
   --color-ui-popup-open-bg-focus: var(--color-ui-popup-open-bg);
   --color-ui-popup-open-fg: var(--color-ui-popup-fg-active);
-  /* #317b8a, dE .004 — between lagoon-50 and -75 in lightness, under both in
-     chroma, so it is reached by blending -25 into the darkest step. */
   --color-ui-popup-open-fg-hover: color-mix(
     in oklab,
     var(--color-brand-lagoon-25) 58%,
     var(--color-brand-lagoon-100)
   );
-  /* Same dark as the glyph, per the design. Drawn with no outline-offset, so
-     like `NavBarButton` it lands on the page ground: 7.41:1 on white, but
-     1.97:1 on teal-100 — it disappears on a dark rail. This is the identical
-     WCAG 2.4.11 exposure issue 02 raised, and it is the reason the package's
-     ground-independent `inset 0 0 0 4px` ring (dropped below, because the
-     design drops it) is worth reinstating if issue 04 puts this on a dark
-     surface. */
+  /* No outline-offset — lands on the page ground, and vanishes on a dark one. */
   --color-ui-popup-open-ring: var(--color-ui-popup-fg-active);
-  /* The package draws a solid 4px `outline-offset-[-2px]` ring on open hover.
-     The design has no such ring — confirmed twice: absent from the export, and
-     the designer's PNG shows a soft ~3px gradient rim (the shadow's dark inner
-     glow) where a solid ring would be four flat pixels. Zeroed rather than
-     recoloured; the edge below does the work. */
-  --color-ui-popup-open-outline-hover: transparent;
+  --color-ui-popup-open-outline-hover: transparent; /* the design has no such ring */
 
-  /* Package default geometry; the opaque inner rim was rgba(4,33,25,1), the
-     same emerald-dark residue `Button`'s press state carried, restated on
-     lagoon-100. */
   --shadow-ui-popup-open-hover:
     0px 2px 4px 0px rgba(0, 0, 0, 0.25), inset 0px 2px 4px 2px rgba(255, 255, 255, 0.25),
     inset 0px 0px 2.6px 1px rgba(5, 42, 50, 1);
-  /* Two layers, not three: the design drops the package's `inset 0 0 0 4px`
-     graphite ring and indicates focus with the outward ring above instead —
-     measured, not assumed (the focus circle is ~6px wider than the resting one
-     at 1x and its fill runs flat from edge to glyph). The remaining glow was
-     rgba(0,163,220,1), the package's own off-family literal, mapped onto
-     lagoon-50 as the nearest step in lightness. */
+  /* Two layers, not three: the design drops the package's graphite inner ring. */
   --shadow-ui-popup-open-focus:
     0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px 0px 2.6px 1px rgba(10, 148, 174, 1);
 
-  /* ─── mlg-components: Sidebar ─────────────────────────────────────────────
-     The rail / bottom-bar chrome. One token, and it is painted in exactly one
-     layout: `SidebarRail` (>=1024px) sets NO background at all — it is a bare
-     flex column, so up there the buttons float on the page ground and this
-     token is unused. Only `SidebarBottomBar` and its "More" popover paint it.
-     Everything else visible in the bar belongs to `NavBarButton` (issue 02)
-     and `NavArrowButton` (issue 00).
-
-     No Figma export of the rail or bar ever arrived, so this is inferred, not
-     transcribed. Teal-100 is the primary's darkest step and the direction the
-     spec already commits the ramp to (decision 4); chrome takes the primary,
-     not the accent.
-
-     It also clears every contrast check in the bar — measured, not assumed:
-     white NavBarButton fill 14.62:1, crimson NavArrowButton fill 3.19:1, and
-     both focus rings 14.62:1 given the media query below. */
+  /* Sidebar — teal-100 chrome (docs/styling.md §4.5). Inferred, never exported.
+     Painted only by SidebarBottomBar and its "More" popover; SidebarRail
+     (>=1024px) sets no background at all. */
   --color-ui-sidebar-bg: var(--color-brand-teal-100);
-
-  /* Tightens the rail's vertical rhythm from the package default 1.25rem
-     (`gap-5`) to 0.5rem (`gap-2`) — the five jump buttons and the Back/Front
-     arrow pair both. The rail paints no background, so this spacing is the
-     only thing grouping the column; at 1.25rem the buttons read as five
-     unrelated dots rather than one control. Bar layout is unaffected. */
+  /* Package default is 1.25rem; the rail has no background, so this gap is the
+     only thing grouping the column. Bar layout unaffected. */
   --spacing-ui-sidebar-gap: 0.5rem;
 }
 
-/* ─── Sidebar bottom-bar focus ring ────────────────────────────────────────
-   `NavBarButton` draws its focus outline with no `outline-offset`, so the ring
-   lands on whatever is *behind* the button rather than on its own white fill.
-   That ground differs by layout: the page in the rail, `--color-ui-sidebar-bg`
-   in the bar. One token cannot serve both — teal-100 on teal-100 is 1.00:1,
-   an invisible focus indicator and a WCAG 2.4.11 failure (issue 02, "Raised").
-
-   So the ring follows the ground. Above the breakpoint it stays teal-100 on
-   the light page (14.62:1); below it flips to white on the teal-100 bar
-   (14.62:1), which also matches `NavArrowButton`'s white ring so both controls
-   in the bar indicate focus identically. Under 640px the "More" popover paints
-   the same `--color-ui-sidebar-bg`, so the white ring stays correct there too.
-
-   This works only because Tailwind compiles colour utilities to a runtime
-   `var()` reference (`outline-color: var(--color-ui-navbar-ring)`) — verify
-   with the compiled-CSS check in the spec's Method if it ever stops applying.
-   A shadow token could NOT be overridden this way; `@theme` inlines those.
-
-   64rem === 1024px === `Sidebar`'s `breakpoint` prop default, which is a JS
-   `matchMedia` the CSS cannot see. `AppSidebar` deliberately leaves that prop
-   unset; passing a custom value would desync the two silently. */
+/* Sidebar bottom-bar focus ring (docs/styling.md §5).
+   NavBarButton's outline has no offset, so it paints on the ground *behind* the
+   button — the light page in the rail, --color-ui-sidebar-bg in the bar. One
+   token cannot serve both (teal-100 on teal-100 = 1.00:1, a WCAG 2.4.11 failure),
+   so the ring follows the ground. Works only because colour utilities compile to
+   a runtime var(); a shadow token could NOT be flipped this way.
+   64rem === Sidebar's `breakpoint` default, which is JS matchMedia the CSS cannot
+   see — AppSidebar leaves that prop unset so the two cannot desync. */
 @media (width < 64rem) {
   :root {
     --color-ui-navbar-ring: var(--color-ui-white);

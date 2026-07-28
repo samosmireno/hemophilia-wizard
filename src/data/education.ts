@@ -16,6 +16,8 @@
  * No display order/color/grouping fields — that is Phase 1/3 presentation.
  */
 
+import { ACTIVITY_TITLE } from "./activity";
+
 export interface BenefitsChallenges {
   benefits: string[];
   challenges: string[];
@@ -38,7 +40,9 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     id: "evolving-landscape",
     title: "The Evolving Treatment Landscape for Hemophilia",
     body: [
-      "The Future Is Now: Personalizing Hemophilia Prophylaxis in an Era of Novel Agents",
+      // Shared with the landing hero, which renders the same string as its
+      // headline — see `activity.ts`.
+      ACTIVITY_TITLE,
       "The hemophilia treatment landscape is rapidly evolving",
       "Novel therapies improve bleed protection, reduce treatment burden, and enable individualized treatment",
       "Novel therapeutic classes: FVIIIa-mimetic BsAbs (HA); Hemostatic rebalancing agents (HA/HB); Gene therapy (HB)",

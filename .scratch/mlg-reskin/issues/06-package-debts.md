@@ -5,16 +5,18 @@ Blocked by: —
 
 ## Goal
 
-Limitations in `mlg-components` v0.4.1 found while building the real
-navigation (`.scratch/app-buildout/issues/18-navigation-sidebar.md`). None
-blocked that work; all were accepted deliberately and are recorded here so they
-are known debt rather than oversight. Each is a package change — we own the
-repo (`github.com/samosmireno/mlg-components`).
+Limitations in `mlg-components` found while building against it. Debts 1–4 came
+out of the real navigation (`.scratch/app-buildout/issues/18-navigation-sidebar.md`)
+on v0.4.1; debt 5 out of the landing page
+(`.scratch/app-buildout/issues/17-landing-page.md`) on v0.5.0. None blocked the
+work; all were accepted deliberately and are recorded here so they are known debt
+rather than oversight. Each is a package change — we own the repo
+(`github.com/samosmireno/mlg-components`).
 
-**All four shipped in `mlg-components` v0.5.0 (2026-07-28)** — a minor, new API
+**Debts 1–4 shipped in `mlg-components` v0.5.0 (2026-07-28)** — a minor, new API
 surface, no breaking change. This app is on `^0.5.0` and has taken up all of it
 except the debt 2 colours, which are a design decision that has not been made.
-See [Follow-up in this app](#follow-up-in-this-app).
+**Debt 5 is open.** See [Follow-up in this app](#follow-up-in-this-app).
 
 ## 1. `SidebarItem` has no `href` — navigation renders as buttons — FIXED (v0.5.0)
 
@@ -123,6 +125,32 @@ padding (`py-5`) and offsets (`right-8 bottom-3`) are still hardcoded, and there
 is no `classNames` slot object. Add one if a consumer needs more than the gap —
 don't add it speculatively.
 
+## 5. `Button` has no `href` / `render` — a destination renders as a button — OPEN
+
+Found on v0.5.0 building the landing hero. `ButtonProps` is
+`ButtonHTMLAttributes<HTMLButtonElement>` and the component renders
+`<button type="button">`, full stop. So the app's single most prominent
+destination — **LET'S GET STARTED**, which goes to the first step of the
+walkthrough — is a button that navigates:
+
+- Screen readers announce "button", not "link".
+- No cmd-click / middle-click / "open in new tab", no status-bar URL preview,
+  nothing to copy-link-address from.
+
+This is debt 1 again, one component over. The fix is the same shape and should
+reuse it verbatim rather than invent a second convention: `href` → `<a>`,
+`render(props)` → whatever you return, `render` > `href` > `onClick`, `disabled`
+overrides both and forces `<button disabled>`. `NavBarButtonProps` already types
+its props against `HTMLElement` for exactly this reason and is the model to copy.
+
+**Accepted for now** in `src/routes/Landing.tsx` as
+`<Button onClick={() => navigate(next)}>`. The lost affordances are worth less
+here than they were for the sidebar: nobody opens step 1 of a linear walkthrough
+in a background tab, whereas Glossary/Acronyms/References — the pages debt 1 was
+really about — are exactly what you want beside the wizard. Revisit when `Button`
+is next touched, or sooner if a second `Button` in the app turns out to be a
+destination too.
+
 ## Follow-up in this app
 
 1. ~~**Publish** `mlg-components` 0.5.0.~~ Done 2026-07-28.
@@ -158,3 +186,10 @@ same family as 1 and 2 (the composite offered no way in), which is worth noticin
 if a fifth one shows up. `Sidebar` still has no general `className`/`classNames`
 escape hatch — three targeted knobs now exist instead. That is the right trade
 while the consumer list is one app; revisit if it grows.
+
+The fifth one showed up, and it is that same family a third time: every debt here
+except 3 is "the component decides what element/look it renders and the consumer
+cannot say otherwise". When `Button` gets its `render`, that is worth applying to
+the whole package in one pass rather than one component per page built — the next
+candidate is `NavArrowButton`, whose Prev/Next are genuinely actions today but
+would be links the moment the walkthrough gets shareable step URLs.

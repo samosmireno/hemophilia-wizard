@@ -24,7 +24,9 @@ Test files live next to source as `*.test.ts`/`*.test.tsx` — the Vitest glob i
 - **React 19** + **TypeScript ~6** — component framework
 - **Vite 8** — dev server and bundler (`@vitejs/plugin-react`)
 - **Tailwind CSS v4** — via `@tailwindcss/vite`; **no `tailwind.config.*`**, configuration
-  is CSS-native in `src/styles/tokens.css` (the `@theme` block defines tokens that become utilities)
+  is CSS-native in `src/styles/tokens.css` (the `@theme` block defines tokens that become utilities).
+  **`docs/styling.md` is the rationale for every token in that file** — read it before changing a
+  colour, and update it when you do
 - **Vitest** — jsdom environment, `@testing-library/react`, `jest-dom` matchers registered in `src/test/setup.ts`
 - **react-ga4** — optional GA4; only initialized when `VITE_GA_MEASUREMENT_ID` is set (see `src/main.tsx`)
 

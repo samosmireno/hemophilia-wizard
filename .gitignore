@@ -27,3 +27,8 @@ dist-ssr
 .env
 documents/
 treatment-wizard-demo.html
+
+# Landing background footage, as delivered — 9 MB, and nothing imports it. Only
+# the derived `landing-loop.mp4` / `landing-poster.jpg` are committed; the ffmpeg
+# recipe that produces them from this file is in docs/styling.md §7.
+src/assets/landing-video.mp4
