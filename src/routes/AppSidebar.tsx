@@ -8,7 +8,7 @@ import {
   WizardIcon,
   type SidebarItem,
 } from "mlg-components";
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 
 import { SECTION_ORDER, nextOf, prevOf, type SectionPath } from "../data/sectionOrder";
 
@@ -23,9 +23,14 @@ import { SECTION_ORDER, nextOf, prevOf, type SectionPath } from "../data/section
  * `src/styles/tokens.css` mirrors it in a media query to flip the focus-ring
  * colour for the bar. Passing a custom value here would silently desync the two.
  *
- * Note the jump items are *buttons*, not links — `SidebarItem` takes an
- * `onClick`, not an `href`, so there is no cmd-click / open-in-new-tab.
- * Tracked in `.scratch/mlg-reskin/issues/06-package-debts.md`.
+ * The jump items render as real `<Link>`s via `SidebarItem.render` (added in
+ * mlg-components 0.5.0), so cmd-click and "open in new tab" work — Glossary,
+ * Acronyms and References are exactly the pages a learner wants in a second tab
+ * while working the wizard. `render` rather than `href` because a bare anchor
+ * would reload the whole app instead of navigating client-side.
+ *
+ * The Prev/Next arrows stay `onClick` handlers: they are actions computed from
+ * the current position, not addressable destinations.
  */
 
 /** The five always-visible jump targets, in rail order (top to bottom). */
@@ -75,12 +80,21 @@ export default function AppSidebar() {
   const items: SidebarItem[] = JUMP_TARGETS.map(({ path, label, Icon }) => ({
     icon: <Icon />,
     label,
-    // The current page's own button is dimmed and inert. `active` still sets
+    // The current page's own item is dimmed and inert. `active` still sets
     // `aria-current="page"`: a disabled button leaves the tab order, so without
     // it a keyboard or screen-reader user would never meet the "you are here".
+    //
+    // `disabled` also forces the button branch, so the current item is the one
+    // item that is *not* a link — deliberate, since it addresses the page you
+    // are already on. 0.5.0 added `--color-ui-navbar-{bg,fg}-current` as the
+    // non-disabling alternative, but it needs a design decision we do not have
+    // yet, so the dimming stays. See issue 06, debt 2.
     active: pathname === path,
     disabled: pathname === path,
-    onClick: () => void navigate(path),
+    // No `onClick` — `Link` owns the navigation. The bottom bar's "More" menu
+    // still closes itself: `Sidebar` passes its own close handler through the
+    // props spread below.
+    render: (props) => <Link to={path} {...props} />,
   }));
 
   return (

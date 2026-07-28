@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
@@ -15,6 +15,8 @@ function renderAt(path: string) {
 
 const at = (router: ReturnType<typeof renderAt>) => router.state.location.pathname;
 const button = (name: string) => screen.getByRole("button", { name });
+/** A jump target you are not currently on — renders as a real `<a>`. */
+const link = (name: string) => screen.getByRole("link", { name });
 
 /** The five always-visible jump targets, as label → path. */
 const JUMPS = [
@@ -61,35 +63,45 @@ describe("sidebar — walkthrough spine", () => {
   });
 });
 
-describe("sidebar — jump buttons", () => {
+describe("sidebar — jump targets", () => {
   it.each(JUMPS)("%s navigates to %s", async (label, path) => {
     const user = userEvent.setup();
-    // Start somewhere every jump is reachable from — the target's own button is
+    // Start somewhere every jump is reachable from — the target's own item is
     // disabled once you are on it.
     const router = renderAt("/explore");
 
-    await user.click(button(label));
+    await user.click(link(label));
     expect(at(router)).toBe(path);
   });
 
-  it.each(JUMPS)("disables the %s button while on %s", (label, path) => {
-    renderAt(path);
-    expect(button(label)).toBeDisabled();
-    expect(button(label)).toHaveAttribute("aria-current", "page");
+  // The point of rendering these as anchors rather than buttons: a real href is
+  // what makes cmd-click, middle-click and "open in new tab" work, which is how
+  // a learner keeps Glossary or References open beside the wizard.
+  it.each(JUMPS)("exposes %s as a real link to %s", (label, path) => {
+    renderAt("/explore");
+    expect(link(label)).toHaveAttribute("href", path);
   });
 
-  it("leaves every other jump button enabled and unmarked", () => {
+  it.each(JUMPS)("renders the %s item as a disabled button while on %s", (label, path) => {
+    renderAt(path);
+    // `disabled` forces the button branch, so the current item is the one jump
+    // target that is deliberately not a link.
+    expect(button(label)).toBeDisabled();
+    expect(button(label)).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByRole("link", { name: label })).not.toBeInTheDocument();
+  });
+
+  it("leaves every other jump target a link and unmarked", () => {
     renderAt("/glossary");
     for (const [label] of JUMPS.filter(([, path]) => path !== "/glossary")) {
-      expect(button(label)).toBeEnabled();
-      expect(button(label)).not.toHaveAttribute("aria-current");
+      expect(link(label)).not.toHaveAttribute("aria-current");
     }
   });
 
-  it("marks no jump button on an in-flow page that has none", () => {
+  it("marks no jump target on an in-flow page that has none", () => {
     renderAt("/explore");
     for (const [label] of JUMPS) {
-      expect(button(label)).toBeEnabled();
+      expect(link(label)).not.toHaveAttribute("aria-current");
     }
   });
 });
@@ -104,7 +116,7 @@ describe("sidebar — off-line reference pages", () => {
     const user = userEvent.setup();
     const router = renderAt("/explore");
 
-    await user.click(button("Glossary"));
+    await user.click(link("Glossary"));
     expect(at(router)).toBe("/glossary");
 
     await user.click(button("Previous"));
@@ -115,12 +127,12 @@ describe("sidebar — off-line reference pages", () => {
     const user = userEvent.setup();
     const router = renderAt("/wizard");
 
-    await user.click(button("Acronyms"));
+    await user.click(link("Acronyms"));
     await user.click(button("Previous"));
     expect(at(router)).toBe("/wizard");
 
     await user.click(button("Next")); // /wizard -> /explore
-    await user.click(button("References"));
+    await user.click(link("References"));
     await user.click(button("Previous"));
     expect(at(router)).toBe("/explore");
   });
@@ -147,9 +159,27 @@ describe("sidebar — layout variants", () => {
     expect(at(router)).toBe("/resources");
   });
 
+  // The jump items carry no `onClick` of their own — `Link` owns the
+  // navigation — so the menu can only close if `Sidebar` passes its own close
+  // handler down to the rendered control. Regression guard for that path.
+  it("closes the More menu after picking an item from it", async () => {
+    setViewport(false);
+    const user = userEvent.setup();
+    const router = renderAt("/explore");
+
+    await user.click(button("More"));
+    // Scope to the menu: below `sm` the bar also holds an inline copy of every
+    // item, hidden by a class jsdom does not evaluate.
+    const menu = screen.getByRole("menu");
+    await user.click(within(menu).getByRole("link", { name: "Glossary" }));
+
+    expect(at(router)).toBe("/glossary");
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
   it("renders the rail above the breakpoint, with no More trigger", () => {
     renderAt("/explore");
     expect(screen.queryByRole("button", { name: "More" })).not.toBeInTheDocument();
-    expect(button("Home")).toBeInTheDocument();
+    expect(link("Home")).toBeInTheDocument();
   });
 });

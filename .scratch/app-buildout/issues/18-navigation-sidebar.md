@@ -86,14 +86,16 @@ Prev handler; reading it during render is unsound under concurrent rendering and
 - `src/test/setup.ts` — `matchMedia` stub. jsdom has none, and `Sidebar` calls it to pick
   its layout, so without this _every_ routed test throws. Defaults to the rail; exports
   `setViewport(false)` for bar-variant tests.
-- `src/routes/sidebar.test.tsx` — 26 tests.
+- `src/routes/sidebar.test.tsx` — 32 tests.
 - `src/routes/router.test.tsx` — one test retargeted from the deleted placeholder links.
 
 ## Known limits
 
-- The jump items are **buttons, not links** — `SidebarItem` takes `onClick`, not `href`,
-  so there is no cmd-click / open-in-new-tab. Accepted; tracked as debt 1 in
-  `.scratch/mlg-reskin/issues/06-package-debts.md` along with two related package gaps.
+- ~~The jump items are **buttons, not links**.~~ **Resolved 2026-07-28** in
+  `mlg-components` v0.5.0, which added `SidebarItem.render`. `AppSidebar` now returns a
+  react-router `<Link>` per target, so cmd-click / open-in-new-tab work. The one
+  exception is the current page's own item: `disabled` keeps it a `<button>`, which is
+  intended. See debt 1 in `.scratch/mlg-reskin/issues/06-package-debts.md`.
 - Issue 18's original scope mentioned `aria-current` matching the `/education` **prefix**.
   Moot as built: there is no Education jump button, so no item can be current on an
   education chapter. Revisit if one is added.

@@ -247,6 +247,18 @@
      left to chance. */
   --color-ui-navbar-ring: var(--color-brand-teal-100);
 
+  /* DELIBERATELY UNSET: `--color-ui-navbar-bg-current` / `-fg-current`.
+     mlg-components v0.5.0 added them so the current page can be marked without
+     being disabled, which would put that item back in the tab order. Both
+     default to the resting fill in the package, so leaving them unset keeps the
+     current-page treatment invisible — and `AppSidebar` keeps dimming the
+     current item via `disabled` instead.
+
+     That is a workaround, not the destination: it conflates "you are here" with
+     "unavailable". Setting these properly needs a Figma answer that does not
+     exist yet, and guessing a colour here would be inventing design. Tracked as
+     debt 2 in `.scratch/mlg-reskin/issues/06-package-debts.md`. */
+
   /* NOT FROM THE EXPORT — the tooltip was never supplied (issue 02 is still
      open on it). Inferred: teal-100 is the darkest step and the one colour the
      designer explicitly reached for here, so the tooltip matches the ring.
@@ -426,6 +438,13 @@
      white NavBarButton fill 14.62:1, crimson NavArrowButton fill 3.19:1, and
      both focus rings 14.62:1 given the media query below. */
   --color-ui-sidebar-bg: var(--color-brand-teal-100);
+
+  /* Tightens the rail's vertical rhythm from the package default 1.25rem
+     (`gap-5`) to 0.5rem (`gap-2`) — the five jump buttons and the Back/Front
+     arrow pair both. The rail paints no background, so this spacing is the
+     only thing grouping the column; at 1.25rem the buttons read as five
+     unrelated dots rather than one control. Bar layout is unaffected. */
+  --spacing-ui-sidebar-gap: 0.5rem;
 }
 
 /* ─── Sidebar bottom-bar focus ring ────────────────────────────────────────
