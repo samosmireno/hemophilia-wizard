@@ -24,9 +24,30 @@ the client palette/type with near-zero markup churn.
 - Tokens compile to Tailwind utilities and render.
 - A short token reference exists (comment block in tokens.css or a note here).
 
+## Watch for: a dark page surface breaks the sidebar's focus ring
+
+Whatever this issue makes the page background, check the nav rail against it.
+
+`mlg-components`' `NavBarButton` draws its focus outline with **no
+`outline-offset`**, so the ring lands on whatever is behind the button. In the
+bottom bar (<1024px) that is `--color-ui-sidebar-bg`, which issue 04 handles. In
+the **rail** (>=1024px) `SidebarRail` paints no background at all, so the ring
+resolves against the _page_ — and it passes today only because the page has none
+and defaults to white (teal-100 ring on white = 14.62:1).
+
+Give the page a dark surface and that becomes ~1:1 — an invisible focus
+indicator and a WCAG 2.4.11 failure. The fix at that point is the package change
+issue 02 of the re-skin set proposed: add `-outline-offset-[3px]` to
+`NavBarButton` so its ring draws on its own white fill, the way `Button` already
+does. See `.scratch/mlg-reskin/issues/04-sidebar.md`.
+
 ## Notes
 
 This is the styling seam. Phase 3 should be "fill token values," not "rewrite markup."
+
+Note issue 18 (navigation sidebar) shipped **without** waiting on this issue — the
+sidebar reads only `mlg-components` package tokens, never app semantic ones. The
+dependency was dropped deliberately; see that issue.
 
 **Raw palette already landed (2026-07-27).** The client color palette exists in
 `tokens.css` `@theme` as raw scales — `--color-brand-<name>-<step>` for five families

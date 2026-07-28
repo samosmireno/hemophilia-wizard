@@ -347,12 +347,12 @@ Content is `[PDF-V]` unless tagged `[PPTX]`.
 `/education/:section` subroutes, **not** a single page. The §7.x content below maps to four
 chapters:
 
-| Chapter subroute       | Source subsections           |
-| ---------------------- | ---------------------------- |
-| `disease-background`   | §7.2                         |
-| `treatment-landscape`  | §7.1, §7.3, §7.4             |
-| `rebalancing-agents`   | §7.6 (wizard cross-link target) |
-| `fviiia-mimetics`      | §7.5 (wizard cross-link target) |
+| Chapter subroute      | Source subsections              |
+| --------------------- | ------------------------------- |
+| `disease-background`  | §7.2                            |
+| `treatment-landscape` | §7.1, §7.3, §7.4                |
+| `rebalancing-agents`  | §7.6 (wizard cross-link target) |
+| `fviiia-mimetics`     | §7.5 (wizard cross-link target) |
 
 The §7.7 "Click here:" figures are **in-chapter local-state pop-ups** — not routes, and not the
 `?drug=<id>` overlay (that param is reserved for drug sheets, [§6](#6-drug-information-sheets) /

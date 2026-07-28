@@ -2,7 +2,6 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import ReactGA from "react-ga4";
 import { RouterProvider } from "react-router";
-
 import { router } from "./routes/router.tsx";
 
 // Self-hosted brand fonts. DM Sans (variable, body/UI) + Barlow Condensed

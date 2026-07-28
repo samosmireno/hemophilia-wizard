@@ -19,6 +19,7 @@ the blueprint**, so its content is defined here, not sourced from `CONTEXT.md`.
 
   Single-source this string — it also appears as the education framing block
   (`CONTEXT.md` §7.1). Share one constant so the two never drift.
+
 - Entry points into the five sections (Education, Wizard, Explore, Resources, Survey) —
   navigable cards/links into the app via the issue-01 nav shell.
 - Everything else (CME framing, learning objectives, accreditation copy, hero/visual) is

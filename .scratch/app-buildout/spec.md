@@ -62,15 +62,15 @@ the line, each reachable anytime from its own sidebar button.
 **In the linear flow (Prev/Next order):**
 
 1. `/` — **Landing page** (net-new; not in the blueprint). Dedicated page, not a redirect.
-2–5. `/education/:section` — Education is a **multi-chapter module**; chapters in order:
-  `disease-background`, `treatment-landscape`, `rebalancing-agents`, `fviiia-mimetics`
-  (last two are wizard cross-link targets, so their URLs must be stable). Bare `/education`
-  redirects to `disease-background`; unknown `:section` → `disease-background` (first chapter).
-6. `/wizard` — branching decision tree (Q1 type → Q2 inhibitors → Q3 reason → leaf).
-  **Single route** — all step state computed in-page, no per-step subroutes.
-7. `/explore` — filterable comparison table (3 dropdowns).
-8. `/resources` — curated **Resources** panel only.
-9. `/survey` — 3 Likert/usage questions.
+   2–5. `/education/:section` — Education is a **multi-chapter module**; chapters in order:
+   `disease-background`, `treatment-landscape`, `rebalancing-agents`, `fviiia-mimetics`
+   (last two are wizard cross-link targets, so their URLs must be stable). Bare `/education`
+   redirects to `disease-background`; unknown `:section` → `disease-background` (first chapter).
+2. `/wizard` — branching decision tree (Q1 type → Q2 inhibitors → Q3 reason → leaf).
+   **Single route** — all step state computed in-page, no per-step subroutes.
+3. `/explore` — filterable comparison table (3 dropdowns).
+4. `/resources` — curated **Resources** panel only.
+5. `/survey` — 3 Likert/usage questions.
 
 **Off the line (standalone, always-accessible, not in Prev/Next):**
 
@@ -105,24 +105,24 @@ both engines already exist.
 
 ## Issue index
 
-| #   | Phase | Title                                             | Gate   |
-| --- | ----- | ------------------------------------------------- | ------ |
-| 00  | 0     | Content model & shared types (extract all data)   | —      |
-| 01  | 0     | Router + app shell / navigation                   | —      |
-| 02  | 0     | Semantic design-token scaffold in tokens.css      | —      |
-| 03  | 0     | Headless component primitives                     | —      |
-| 06  | 0     | Survey submission adapter seam + stub             | —      |
-| 07  | 0     | Analytics: per-route pageviews                    | —      |
-| 08  | 1     | Wizard section                                    | Gate 1 |
-| 09  | 1     | Explore comparison table                          | Gate 1 |
-| 10  | 1     | Drug info sheets (modal overlay via `?drug=`)     | Gate 1 |
-| 11  | 1     | Education blocks                                  | Gate 1 |
+| #   | Phase | Title                                                   | Gate   |
+| --- | ----- | ------------------------------------------------------- | ------ |
+| 00  | 0     | Content model & shared types (extract all data)         | —      |
+| 01  | 0     | Router + app shell / navigation                         | —      |
+| 02  | 0     | Semantic design-token scaffold in tokens.css            | —      |
+| 03  | 0     | Headless component primitives                           | —      |
+| 06  | 0     | Survey submission adapter seam + stub                   | —      |
+| 07  | 0     | Analytics: per-route pageviews                          | —      |
+| 08  | 1     | Wizard section                                          | Gate 1 |
+| 09  | 1     | Explore comparison table                                | Gate 1 |
+| 10  | 1     | Drug info sheets (modal overlay via `?drug=`)           | Gate 1 |
+| 11  | 1     | Education blocks                                        | Gate 1 |
 | 12  | 1     | Resources / References / Glossary / Acronyms (4 routes) | Gate 1 |
-| 13  | 1     | Survey UI                                         | Gate 1 |
-| 17  | 1     | Landing page (`/`)                                | Gate 1 |
-| 18  | 1     | Navigation sidebar (Prev/Next + jump buttons)     | Gate 1 |
-| 14  | 3     | Styling: fill tokens + reference route            | Gate 2 |
-| 15  | 3     | Styling: propagate + states / motion / responsive | Gate 2 |
-| 16  | 4     | Hardening: a11y · QA · content proof · deploy     | —      |
+| 13  | 1     | Survey UI                                               | Gate 1 |
+| 17  | 1     | Landing page (`/`)                                      | Gate 1 |
+| 18  | 1     | Navigation sidebar (Prev/Next + jump buttons)           | Gate 1 |
+| 14  | 3     | Styling: fill tokens + reference route                  | Gate 2 |
+| 15  | 3     | Styling: propagate + states / motion / responsive       | Gate 2 |
+| 16  | 4     | Hardening: a11y · QA · content proof · deploy           | —      |
 
 Gate 1 = client wireframe approval. Gate 2 = client palette/type delivered + approved.

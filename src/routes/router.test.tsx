@@ -64,10 +64,13 @@ describe("router", () => {
     expect(router.state.location.pathname).toBe("/");
   });
 
-  it("navigates via the placeholder nav without a full reload", async () => {
+  // The sidebar's jump buttons are covered in depth by `sidebar.test.tsx`; this
+  // keeps a route-level check that navigating actually resolves the target
+  // route and renders it, not just that the location changed.
+  it("navigates via the sidebar without a full reload", async () => {
     const user = userEvent.setup();
     const router = renderAt("/");
-    await user.click(screen.getByRole("link", { name: "Wizard" }));
+    await user.click(screen.getByRole("button", { name: "Wizard" }));
     expect(heading()).toHaveTextContent(/Treatment Wizard/);
     expect(router.state.location.pathname).toBe("/wizard");
   });
