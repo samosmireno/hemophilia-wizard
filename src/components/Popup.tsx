@@ -4,6 +4,14 @@ import { PopupButton } from "mlg-components";
 import { cn } from "../lib/cn";
 
 /**
+ * The crimson band's horizontal padding, shared by the title and the subtitle.
+ * Stated once because the two must agree: it is what keeps both lines centred
+ * on the card *and* clear of the ✕, and a band whose lines disagree on their
+ * inset reads as one of them being off-centre.
+ */
+const BAND_INSET = "px-[clamp(5.5rem,7vw,6.25rem)]";
+
+/**
  * The §7.7 click-through pop-up — the card behind every "Click here:"
  * disclosure. This is the **skeleton** issue 03 calls for: chrome, behaviour
  * and a11y, with one scroll region the calling popup fills. It knows nothing
@@ -29,13 +37,25 @@ import { cn } from "../lib/cn";
 export default function Popup({
   open,
   title,
+  subtitle,
   onClose,
   surface = "gradient",
   children,
 }: {
   open: boolean;
-  /** Rendered in the crimson band, and the dialog's accessible name. */
+  /** Rendered in the crimson band, and the first half of the accessible name. */
   title: string;
+  /**
+   * A second, smaller line under the title, where the design gives the card
+   * one — §7.4's "(Options include SHL, EHL, and UHL FVIII/FIX products)".
+   *
+   * **It joins the accessible name**, rather than being visible text only: the
+   * parenthetical is a scope qualifier, naming *which* products the card is
+   * about. Left out of the name, that scoping exists only in a line a screen
+   * reader reaches after the dialog has already announced itself as being about
+   * something broader than it is.
+   */
+  subtitle?: string;
   /** Called for all three close routes: ESC, the ✕, and a backdrop click. */
   onClose: () => void;
   /**
@@ -52,6 +72,7 @@ export default function Popup({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const subtitleId = useId();
 
   /**
    * Guards the backdrop click against a text selection that starts inside the
@@ -104,7 +125,10 @@ export default function Popup({
     //   itself to the top-left instead of centring in the viewport.
     <dialog
       ref={ref}
-      aria-labelledby={titleId}
+      // A space-separated id list, not `cn()`: that helper runs tailwind-merge,
+      // which is entitled to reorder or drop tokens it recognises — harmless
+      // for classes, silent breakage for an accessible name.
+      aria-labelledby={subtitle ? `${titleId} ${subtitleId}` : titleId}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -136,17 +160,36 @@ export default function Popup({
             export (12 + two 46.73px lines + 12 = 117.5), so it grows with a
             title that wraps to three lines instead of clipping it. */}
         <header className="relative shrink-0 bg-brand-crimson-50 py-5">
-          {/* The horizontal padding is symmetric so the title stays centred on
-              the card, and sized to clear the ✕ on the right — its floor is the
-              button's own 65px plus the 22px inset, so the two never overlap.
-              Type is raw design values per §8's precedent; the scale has no
-              45.5px step. */}
+          {/* `BAND_INSET` is symmetric so the title stays centred on the card,
+              and sized to clear the ✕ on the right — its floor is the button's
+              own 65px plus the 22px inset, so the two never overlap. Type is
+              raw design values per §8's precedent; the scale has no 45.5px
+              step. */}
           <h2
             id={titleId}
-            className="px-[clamp(5.5rem,7vw,6.25rem)] text-center font-display text-[clamp(1.375rem,3.157vw,2.25rem)] leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase"
+            className={cn(
+              BAND_INSET,
+              "text-center font-display text-[clamp(1.375rem,3.157vw,2.25rem)] leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase",
+            )}
           >
             {title}
           </h2>
+
+          {/* Same inset as the title, so the two lines share one centre and one
+              clearance from the ✕. 20px lands on `text-h4` exactly, but that
+              token carries weight 600 and the design draws 500 — hence the
+              explicit `font-medium` rather than a raw size. */}
+          {subtitle && (
+            <p
+              id={subtitleId}
+              className={cn(
+                BAND_INSET,
+                "mt-1 text-center font-display text-h4 font-medium tracking-wide text-white uppercase",
+              )}
+            >
+              {subtitle}
+            </p>
+          )}
 
           {/* The same `PopupButton` that triggers the popup, in its open skin —
               the export is literally that component's "+" rotated 45°. It is a

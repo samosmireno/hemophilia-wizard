@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import { topicById } from "../../data/education";
@@ -96,12 +97,102 @@ describe("treatment-landscape chapter", () => {
    * must not be `<img>` elements standing empty, and they must not be
    * focusable — a box that traps a tab stop and opens nothing is worse than a
    * gap. This is the guard on that until the assets land.
+   *
+   * Queried by role rather than by selector: `Popup` is mounted unconditionally
+   * (its `showModal()` effect needs the element in the DOM), so the card's own ✕
+   * is a fourth `<button>` in the container. Role queries honour the closed
+   * dialog's `display: none` and see only what a user can reach, which is what
+   * this was ever asserting.
    */
   it("reserves the figure boxes without announcing or focusing them", () => {
-    const { container } = render(<TreatmentLandscape />);
+    render(<TreatmentLandscape />);
 
     expect(screen.queryAllByRole("img")).toHaveLength(0);
     // The three `+` triggers, and nothing else.
-    expect(container.querySelectorAll("button, [tabindex]")).toHaveLength(3);
+    expect(screen.queryAllByRole("button")).toHaveLength(3);
+  });
+
+  /**
+   * Only the clotting row has a card. The other two keep the inert toggle
+   * `DisclosureBand` documents — the `+` flips, but nothing opens — so
+   * `aria-haspopup` is announced on exactly one trigger.
+   */
+  it("advertises a dialog on the one trigger that opens one", () => {
+    render(<TreatmentLandscape />);
+    const advertised = screen
+      .getAllByRole("button")
+      .filter((button) => button.getAttribute("aria-haspopup") === "dialog");
+
+    expect(advertised).toHaveLength(1);
+    expect(advertised[0]).toHaveAccessibleName(
+      "Expand Benefits and challenges of clotting replacement therapies",
+    );
+  });
+
+  /**
+   * The card's name is title + subtitle, not the title alone: the parenthetical
+   * names which products the card is about, so a dialog announced without it
+   * claims a broader scope than it has. This is the guard on `Popup`'s
+   * `aria-labelledby` still pointing at both.
+   */
+  it("names the clotting card with its subtitle as well as its title", async () => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Expand Benefits and challenges of clotting replacement therapies",
+      }),
+    );
+
+    expect(screen.getByRole("dialog")).toHaveAccessibleName(
+      "Benefits and Challenges Associated with Clotting Factor Replacement Therapies " +
+        "(Options include SHL, EHL, and UHL FVIII/FIX products)",
+    );
+  });
+
+  /**
+   * The card renders the data module's pair verbatim. Asserted from the data
+   * rather than from literals so a copy edit lands in one place — and asserted
+   * at all because the benefits list is now two items where §7.4 once had
+   * three, and a re-added bullet should fail here.
+   */
+  it("renders the clotting benefits and challenges from the data module", async () => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Expand Benefits and challenges of clotting replacement therapies",
+      }),
+    );
+
+    const dialog = within(screen.getByRole("dialog"));
+    const { benefits, challenges } = topicById("clotting-factor-replacement")!.benefitsChallenges!;
+
+    expect(benefits).toHaveLength(2);
+    for (const bullet of [...benefits, ...challenges]) {
+      expect(dialog.getByText(bullet)).toBeInTheDocument();
+    }
+    for (const heading of ["Benefits", "Challenges"]) {
+      expect(dialog.getByRole("heading", { level: 3, name: heading })).toBeInTheDocument();
+    }
+  });
+
+  /**
+   * The drop is ornament, unlike every other §7 figure — so it must stay out of
+   * the accessibility tree even once the card that holds it is open.
+   */
+  it("keeps the blood drop decorative", async () => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Expand Benefits and challenges of clotting replacement therapies",
+      }),
+    );
+
+    expect(screen.queryAllByRole("img")).toHaveLength(0);
   });
 });

@@ -35,6 +35,12 @@
  * `max-h` or its band padding moves, this goes stale in the direction of a
  * scrollbar rather than a broken layout.
  *
+ * **`Popup`'s `subtitle` is the live edge of that coupling.** A subtitle adds a
+ * fourth line to the band, and the 10rem above allows for three. No caller of
+ * this component passes one today, so nothing is stale — but the first figure
+ * card that wants a subtitle needs this number re-measured, not just the prop
+ * threaded through.
+ *
  * Two maxima and no fitting mode: given `width`/`height` that are `auto`, the
  * browser scales the image down to satisfy whichever constraint binds first and
  * preserves the aspect ratio itself — the box never needs to letterbox because

@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import Popup from "./Popup";
 
 const TITLE = "Hemostatic Rebalancing Agents in Treatment of HA/HB";
+const SUBTITLE = "(Options include SHL, EHL, and UHL FVIII/FIX products)";
 
 /** The dialog is always mounted; `open` is what `showModal()` reflects. */
 const dialog = () => screen.getByRole("dialog", { hidden: true });
@@ -42,6 +43,50 @@ describe("Popup", () => {
     );
 
     expect(dialog()).toHaveAccessibleName(TITLE);
+  });
+
+  /**
+   * The subtitle is a scope qualifier — it names which products the card covers
+   * — so it belongs to the dialog's name and not merely to its body. Title
+   * first, then subtitle, which is the order `aria-labelledby` lists the ids in.
+   */
+  it("names the dialog with its title AND subtitle when it has one", () => {
+    render(
+      <Popup open title={TITLE} subtitle={SUBTITLE} onClose={vi.fn()}>
+        <p>body</p>
+      </Popup>,
+    );
+
+    expect(dialog()).toHaveAccessibleName(`${TITLE} ${SUBTITLE}`);
+  });
+
+  it("renders no subtitle element when none is given", () => {
+    render(
+      <Popup open title={TITLE} onClose={vi.fn()}>
+        <p>body</p>
+      </Popup>,
+    );
+
+    expect(screen.queryByText(SUBTITLE)).not.toBeInTheDocument();
+    expect(dialog()).toHaveAccessibleName(TITLE);
+  });
+
+  /**
+   * A class assertion, which this suite otherwise avoids — and it is here
+   * because the bug it guards is invisible to every other kind of test. Routing
+   * these classes through `cn()` silently dropped `text-h4`: tailwind-merge does
+   * not know this project's `@theme` font sizes, reads `text-h4` as a colour,
+   * and lets the `text-white` beside it win. jsdom applies no Tailwind at all,
+   * so the subtitle rendered at an inherited 16px with the whole suite green.
+   */
+  it("keeps the subtitle's font-size utility intact", () => {
+    render(
+      <Popup open title={TITLE} subtitle={SUBTITLE} onClose={vi.fn()}>
+        <p>body</p>
+      </Popup>,
+    );
+
+    expect(screen.getByText(SUBTITLE)).toHaveClass("text-h4", "font-medium");
   });
 
   it("closes on the ✕", async () => {

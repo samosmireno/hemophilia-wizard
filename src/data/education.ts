@@ -122,7 +122,6 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     //  (Options include SHL, EHL, and UHL FVIII/FIX products)"
     benefitsChallenges: {
       benefits: [
-        "Initiation and amplification of the clotting cascade",
         "Dosing frequency varies by product and patient need",
         "Well-understood long-term safety and efficacy",
       ],

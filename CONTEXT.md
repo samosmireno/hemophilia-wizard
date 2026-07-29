@@ -414,8 +414,8 @@ inter-individual variability and uncertain duration.
   **may apply even for FVIII plasma levels ≥2 IU/dL**.
 - **Benefits & Challenges Associated with Clotting Factor Replacement Therapies** (SHL, EHL, UHL
   FVIII/FIX products):
-  - _Benefits:_ initiation and amplification of the clotting cascade; dosing frequency varies by
-    product and patient need; well-understood long-term safety and efficacy.
+  - _Benefits:_ dosing frequency varies by product and patient need; well-understood long-term
+    safety and efficacy.
   - _Challenges:_ IV administration, infusion preparation, venous access, and ongoing
     dosing/monitoring (FVIII/FIX monitoring, PK-guided dose optimization, peak/trough levels);
     development of neutralizing antibodies (inhibitors) to FVIII/FIX can reduce efficacy and
