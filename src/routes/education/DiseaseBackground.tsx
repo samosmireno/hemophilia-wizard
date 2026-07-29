@@ -1,10 +1,11 @@
 import bleedingUrl from "../../assets/images/bleeding_manifestations_diagram.webp";
 import cascadeThumbUrl from "../../assets/images/clotting-cascade-thumb.webp";
 import diagnosticUrl from "../../assets/images/diagnostic_approach_diagram.webp";
+import BulletList from "../../components/BulletList";
 import DisclosureBand, { type Disclosure } from "../../components/DisclosureBand";
 import ExpandableFigure from "../../components/ExpandableFigure";
 import PopupFigure from "../../components/PopupFigure";
-import { type Bullet, SEVERITY_TABLE, topicById } from "../../data/education";
+import { SEVERITY_TABLE, topicById } from "../../data/education";
 import { cn } from "../../lib/cn";
 import { usePreloadImages } from "../../lib/preloadImage";
 import ClottingCascadeFigure from "./ClottingCascadeFigure";
@@ -239,26 +240,5 @@ function SeverityTable() {
         </tr>
       </tbody>
     </table>
-  );
-}
-
-function BulletList({ items, className }: { items: readonly Bullet[]; className?: string }) {
-  return (
-    <ul className={cn("list-disc pl-6 text-body text-black", className)}>
-      {items.map((item) =>
-        typeof item === "string" ? (
-          <li key={item}>{item}</li>
-        ) : (
-          <li key={item.text}>
-            {item.text}
-            <ul className="list-disc ps-7">
-              {item.children.map((child) => (
-                <li key={child}>{child}</li>
-              ))}
-            </ul>
-          </li>
-        ),
-      )}
-    </ul>
   );
 }

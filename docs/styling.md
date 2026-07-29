@@ -917,6 +917,84 @@ breaks line 1 after "…disorders, resulting" while the shipped page fits
 whether this chapter transcribes raw values the way the landing hero does (§8) or
 snaps to the scale.
 
+### `treatment-landscape`
+
+The second designed chapter (`src/routes/education/TreatmentLandscape.tsx`), from a
+**1440 × 800** artboard like the first. It carries the same type as
+`disease-background` by instruction — `text-h1` title, `text-h2` sub-headings,
+`text-body` bullets, `text-h3` captions, all with the same tracking — so open item 9
+above applies to it unchanged and is not re-litigated here.
+
+**Layout.** Three rows of `[prose | figure | disclosure]` in **one grid**, not a
+prose column beside an independently-spaced rail. Each block is paired with its own
+figure and its own `+`, and the grid is what holds that pairing when a bullet is
+added. Measured off the export, rows 2 and 3 have box-top ≈ heading-top within 8px,
+which is what says the pairing is real rather than coincidence.
+
+Tracks are stated as the residue of the content column:
+
+```
+1168 − 24 − 202 − 24 − 286  =  632px prose
+```
+
+which puts the figure box at x=768 (the artboard draws 762) and the caption's right
+edge on the content column's own at x=1280 — landing its left edge on 994, which is
+where the artboard's caption ink starts. The `+` centres at 1137 against a measured 1135. All `lg:` only; below that the grid collapses and DOM order stacks each row
+prose → figure → caption.
+
+The 24px column gap is a tightening of the artboard's 32, applied after the first
+pass; the figure box moves 6px right of where the export draws it and everything else
+still lands. The caption track is what is load-bearing here, not the prose width —
+286px is what puts the column's right edge where the design has it.
+
+`items-center` throughout: whichever of prose / figure / caption is tallest sets the
+row, and the other two sit level with its middle. The artboard's own alignment is
+inconsistent — it lifts the **first** figure ~30px above its heading (the "figure sets
+the top, prose is nudged down" relationship `disease-background` reproduces with
+per-column margins) and leaves the other two level with theirs. One rule across three
+rows beat reproducing a 30px eyeball as a per-row nudge, and centring reads as
+deliberate where a ragged top edge reads as a mistake.
+
+The caption cell is therefore `flex flex-col items-center` and nothing more — under
+`items-start` it carried a 166px floor and `justify-center` so the `+` would centre
+against the figure beside it, and the row's own centring makes both inert.
+
+**The reserved boxes.** All three §7.7 figures on this chapter are image-borne with
+no asset (CONTEXT.md §7.7), so the artboard's "PLACEHOLDER" boxes ship as empty
+`202×166` bordered `<div>`s that hold the track open. Not an `<img>`: an empty one
+announces itself as broken and takes an `alt` it has nothing to say in. An empty
+`<div>` is already invisible to assistive tech, so it needs no `aria-hidden`.
+
+The export draws them **164 / 224 / 166** tall — same width, three heights. Read as
+the designer stretching a placeholder to fill its row rather than as spec, and shipped
+uniform at the two that agree, so the rail reads as a set and dropping in real assets
+does not re-cut the grid.
+
+**Vertical rhythm.** `mt-8` from the h1 (the designer's 32px, same as §11's
+`h1 → "Disease mechanism…"`), `gap-y-5` between rows, and `mt-4` from each `+` to its
+caption (matching `DisclosureBand`). The row gap measures 25 and 28 ink-to-ink on the
+export and ships at 20 — tightened, like the column gap, once the rows were centred
+and the ragged edge the looser value was absorbing went away.
+
+**It fits one screen.** 800px exactly at 1440×800, verified in Chromium — so the §11
+open item below happens to be satisfied here. That is a property of this chapter's
+content, not a rule, and it does not close the item: the rule still wants writing once
+all four chapters exist.
+
+**The 1024px cliff bites harder here.** §12's open item leaves `disease-background`
+with a 250px prose column at exactly 1024px; this grid's fixed tracks leave **220px**.
+Verified, cramped but not broken, and deliberately not fixed separately — the `clamp()`
+that section proposes is one change that fixes both.
+
+**Copy that diverges from the source.** The three sub-headings are literals, not
+`topic.title`: two carry a colon the source titles do not, and the middle is
+"Non-factor therapies:" over a topic named "Non-factor Replacement Therapies". The
+first caption reads "clotting **replacement** therapies" where CONTEXT.md §7.4/§7.7
+both say "clotting-**factor** replacement therapies" — shipped as drawn, because the
+artboard is the authority for on-screen copy, and raised for the designer rather than
+silently corrected (contrast the export's "FACOTOR", which is an unambiguous typo and
+is not reproduced).
+
 ---
 
 ## 12. Layout geometry
@@ -986,6 +1064,10 @@ layout can least afford to pay it in full. Not done: the rail clearance is a
 genuine discontinuity at `lg` (below it the sidebar is a bottom bar and there is
 no rail to clear), so the breakpoint cannot go away entirely, and the fix wants
 deciding alongside §11's one-screen rule rather than twice.
+
+`treatment-landscape` has since made this the wider of two cases: its three fixed
+tracks leave **220px** of prose at 1024px against that chapter's 250px. One `clamp()`
+still fixes both, which is the argument for not patching either page.
 
 ---
 

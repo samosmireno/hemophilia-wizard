@@ -118,3 +118,47 @@ screen-reader user hears the same verb here as on the three disclosures below.
 
 Still not met by this issue: the other two §7.7 figures have no assets, glossary
 cross-links (issue 12) are unwired, and styling.md §9 items 9–11 stay open.
+
+**2026-07-29 — `treatment-landscape` first pass (design applied).**
+
+The second of the four chapters is built against a 1440×800 artboard, at the same
+type and tracking as `disease-background` by instruction. Three rows of
+`[prose | reserved figure | "Click here:" +]` in one grid; geometry, the track
+arithmetic and the browser verification are in docs/styling.md §11.
+
+Two things worth recording beyond the layout:
+
+`EducationTopic` content **moved to match the design's filing**. The three §7.1
+landscape bullets ("The hemophilia treatment landscape is rapidly evolving", "Novel
+therapies improve bleed protection…", "Novel therapeutic classes:") now live on the
+`nft` topic, whose `body` was empty, because that is the heading the design puts them
+under — "Non-factor therapies:", with the `+` beside them opening that same topic's
+`benefitsChallenges`. `evolving-landscape` is left holding `ACTIVITY_TITLE` alone plus
+the `title` this chapter uses as its `<h1>`. The classes bullet became a `NestedBullet`
+at the same time, the design drawing it indented exactly as `disease-mechanism`'s
+HA/HB pair. Nothing consumed any of these topics before, so the move cost nothing.
+
+`BulletList` moved out of `DiseaseBackground` into `src/components/` — two chapters
+now draw the same list, and the second copy would have been verbatim.
+
+**Not met by this pass**, deliberately:
+
+- **The three `+` buttons open nothing.** Uncontrolled `PopupButton`s, no `Popup`
+  mounted, no `aria-haspopup` (announced only where something opens, per
+  `DisclosureBand`). Content is a later pass, by agreement. Consequence: a clicked
+  `+` sticks as `×`, the same state the two content-less disclosures on
+  `disease-background` are already in.
+- **The three figures have no assets** (CONTEXT.md §7.7 marks them image-borne), so
+  the artboard's "PLACEHOLDER" boxes ship as empty reserved boxes holding the track.
+- **§7.3's treatment-options class matrix is not on this artboard**, though this issue
+  and CONTEXT.md's chapter table both assign it here. Most likely it is behind the
+  third `+` ("Novel therapy classes for HA/HB"), which puts it in the deferred pop-up
+  work. Until that is confirmed with the designer, "all education content present"
+  stays open for this chapter.
+- **§7.4's other three bullets render nowhere.** The design shows only the lead
+  clotting-factor bullet; the prophylaxis guidance (recommended over episodic ·
+  greatly reduces bleeding risk · may apply at ≥2 IU/dL) belongs to a different
+  chapter and stays in the data module, sliced off here with a comment.
+- Glossary cross-links (issue 12) are not wired.
+- styling.md §9 items 9–11 and §12's 1024px cliff stay open; this chapter makes the
+  cliff the wider of the two cases (220px of prose against 250px).

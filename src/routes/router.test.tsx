@@ -37,13 +37,18 @@ describe("router", () => {
     expect(heading()).toHaveTextContent(expected);
   });
 
-  it("renders the disease-background chapter", () => {
-    renderAt("/education/disease-background");
-    expect(heading()).toHaveTextContent("Hemophilia Disease Background");
+  // The built chapters, by the `<h1>` each one actually carries. A chapter
+  // graduates from the placeholder list below to this one as its design lands.
+  it.each([
+    ["disease-background", "Hemophilia Disease Background"],
+    ["treatment-landscape", "The Evolving Treatment Landscape for Hemophilia"],
+  ])("renders the %s chapter", (section, title) => {
+    renderAt(`/education/${section}`);
+    expect(heading()).toHaveTextContent(title);
   });
 
-  it.each(["treatment-landscape", "rebalancing-agents", "fviiia-mimetics"])(
-    "renders the %s education chapter",
+  it.each(["rebalancing-agents", "fviiia-mimetics"])(
+    "renders the %s education chapter placeholder",
     (section) => {
       renderAt(`/education/${section}`);
       expect(heading()).toHaveTextContent(`Education — ${section}`);

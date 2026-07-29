@@ -57,14 +57,16 @@ export interface EducationTopic {
 export const EDUCATION_TOPICS: readonly EducationTopic[] = [
   {
     id: "evolving-landscape",
+    /** Also the `treatment-landscape` chapter's `<h1>`, read from here. */
     title: "The Evolving Treatment Landscape for Hemophilia",
     body: [
       // Shared with the landing hero, which renders the same string as its
       // headline — see `activity.ts`.
+      //
+      // The only bullet left here. The other three moved to `nft` below,
+      // because that is the heading the design files them under — see the note
+      // on that topic.
       ACTIVITY_TITLE,
-      "The hemophilia treatment landscape is rapidly evolving",
-      "Novel therapies improve bleed protection, reduce treatment burden, and enable individualized treatment",
-      "Novel therapeutic classes: FVIIIa-mimetic BsAbs (HA); Hemostatic rebalancing agents (HA/HB); Gene therapy (HB)",
     ],
   },
   {
@@ -167,10 +169,37 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     ],
     figures: ["Mechanism of Action for Denecimig (Mim8): FVIIIa-mimetic BsAb"],
   },
+  /**
+   * §7.6's benefits/challenges pair, and — since the `treatment-landscape`
+   * design landed — the three §7.1 landscape bullets as well.
+   *
+   * **The prose is §7.1's but the heading over it is this topic's**, which is
+   * the design's own filing, not a transcription slip: the chapter draws these
+   * three bullets under "Non-factor therapies:" and the `+` beside them opens
+   * this topic's `benefitsChallenges`. They were in `evolving-landscape` while
+   * nothing rendered them; `body` was empty here for the same reason.
+   *
+   * `title` is still §7.6's name for the class and is not what the chapter
+   * shows — that heading is a literal there, because the two disagree.
+   */
   {
     id: "nft",
     title: "Non-factor Replacement Therapies",
-    body: [],
+    body: [
+      "The hemophilia treatment landscape is rapidly evolving",
+      "Novel therapies improve bleed protection, reduce treatment burden, and enable individualized treatment",
+      {
+        // One flat semicolon-joined string until the design showed it drawn as
+        // a nested list — the same shape, and the same reasoning, as
+        // `disease-mechanism`'s HA/HB pair above.
+        text: "Novel therapeutic classes:",
+        children: [
+          "FVIIIa-mimetic BsAbs (HA)",
+          "Hemostatic rebalancing agents (HA/HB)",
+          "Gene therapy (HB)",
+        ],
+      },
+    ],
     benefitsChallenges: {
       benefits: [
         "Subcutaneous administration",
