@@ -752,6 +752,8 @@ narrower than the 1165px content column, so it stays centred within it.
 | 9   | `disease-background` renders at the §2 type scale, but the reference measures ~32px sub-headings, ~18px body and ~22px captions against the scale's 26/16/20. Needs the designer's sizes, then a scale-vs-raw-values call.                                                                                                                                                                                                                                                                             | §11                   |
 | 10  | The chapter is specified to fit one screen and currently does not (818px at 1440×800). Wants one rule across all four chapters rather than per-page constants.                                                                                                                                                                                                                                                                                                                                         | §11                   |
 | 11  | Four of the eight vertical gaps are ink-to-ink measurements off the reference PNG rather than the designer's box gaps, so they render slightly loose.                                                                                                                                                                                                                                                                                                                                                  | §11                   |
+| 12  | The pop-up export has **no scrim** — nothing dims the page behind a dialog that traps focus. The shipped `rgb(0 0 0 / .5)` is inferred, like §4.3's tooltip and §4.5's sidebar. The card's own 55%-black shadow was drawn against Figma's dark canvas and does much less work over the light `bg-page`.                                                                                                                                                                                                | §13                   |
+| 13  | The pop-up title is 45.47px, off the §2 scale, and ships as a raw value under §8's precedent. Same open question as item 9 — if the designer's sizes arrive for the chapters, this wants deciding with them rather than separately.                                                                                                                                                                                                                                                                    | §13                   |
 
 ---
 
@@ -984,3 +986,312 @@ layout can least afford to pay it in full. Not done: the rail clearance is a
 genuine discontinuity at `lg` (below it the sidebar is a bottom bar and there is
 no rail to clear), so the breakpoint cannot go away entirely, and the fix wants
 deciding alongside §11's one-screen rule rather than twice.
+
+---
+
+## 13. Pop-ups
+
+`src/components/Popup.tsx` is the card behind every §7.7 "Click here:"
+disclosure — the skeleton issue 03 asks for, with one scroll region the calling
+popup fills. Reference is Figma `144:431` ("Pop 8"), **1066 × 645** on the 1440
+canvas, i.e. 74% × 81% of it.
+
+### It is a real `<dialog>`, opened with `showModal()`
+
+Three things then come from the platform rather than from code: the focus trap,
+focus restoration on close, and the **top layer**. The last is not a nicety —
+`DisclosureBand` wraps its content in `isolate` + `overflow-hidden` to clip the
+arch (§4.4's callers), so an in-flow panel the size of this card is cut by it.
+A modal dialog escapes every ancestor's clipping and stacking context by
+definition, which also clears `TopRule`'s `z-30` (§10) and the sidebar's
+z-40/z-50 without the popup owning a z-index at all.
+
+The element is a transparent, viewport-filling layer and the card is a child of
+it. That is what makes a backdrop click detectable: `::backdrop` is a
+pseudo-element and never an event target, so a dialog sized to its own content
+has no way to hear one.
+
+**`open` is the single source of truth.** The `cancel` handler preventDefaults,
+so the element never closes itself behind React's back — ESC routes through
+`onClose` like the ✕ and the backdrop do, and the DOM and the prop cannot
+disagree. Scroll lock is the one item on issue 03's list the platform does not
+supply; `showModal()` makes the page inert but leaves it scrollable.
+
+### Geometry
+
+Every figure below is from the node's metadata (clean integers), not from the
+`get_design_context` code dump, whose values are the same numbers scaled by
+1.263 and therefore fractional.
+
+| Part            | Design                                    | Shipped                              |
+| --------------- | ----------------------------------------- | ------------------------------------ |
+| Card            | 1066 × 645                                | `w-[min(1066px,92vw)] max-h-[85dvh]` |
+| Radius / border | 40.417px / 5.052px `crimson-50`           | verbatim                             |
+| Shadow          | `0 22.735px 50.142px 5.052px` black @ 55% | `--shadow-popup`                     |
+| Band padding    | 12px top and bottom                       | `py-3`                               |
+| ✕ inset         | 22px from the card's right edge, centred  | verbatim                             |
+| Body gutters    | 64px sides, 32px under the band           | `px-16 py-8`                         |
+
+**The band is content-height, not 118px.** The text node measures y=15, h=94
+inside a band running y=3–121, so 12 + (2 × 46.73) + 12 = 117.5 ≈ the 118px the
+band renders at. Shipping the padding rather than the height is what lets a
+title that wraps to three lines on a phone grow the band instead of being
+clipped by it.
+
+**The border is a plain CSS border and the band sits inside it.** In Figma the
+band overhangs the card and is clipped; here `overflow-hidden` clips it to the
+padding box instead. Band and border are the same `crimson-50`, so the top edge
+reads as one mass either way.
+
+### The title
+
+45.469px / 46.732 leading / +1.3136px tracking, Barlow Condensed Bold, uppercase.
+The §2 scale has no step there — `text-h1` at 52px is 13% larger and wraps the
+title to three lines inside a band drawn for two — so this transcribes raw
+values under §8's precedent, expressed relative so they survive the clamp:
+
+```
+text-[clamp(1.375rem,3.157vw,2.842rem)]   /* 45.47px at 1440 */
+leading-[1.0278]                          /* = 46.732 / 45.469 */
+tracking-[0.0289em]                       /* = 1.3136 / 45.469 */
+```
+
+The horizontal padding is `clamp(5.5rem,7vw,6.25rem)` — 100px at 1440, floored
+at 88px, which is the ✕'s own 65px plus its 22px inset. Symmetric, so the title
+stays centred on the card rather than in the space left beside the button.
+
+**Deviation, deliberate:** the design's title box is 713.6px wide starting at
+x=156, i.e. its centre sits **20.19px left of the card's**. That is a hand-drag,
+not a rule — 1.9% of the card width — and replicating an asymmetric nudge would
+make it look intentional. Centred instead.
+
+### The body gradient — `--background-image-popup`
+
+Figma draws three stops. The outer two are exact brand steps:
+
+| Stop | Sampled   | Is                     |
+| ---- | --------- | ---------------------- |
+| 0    | `#fdf8f2` | `brand-sand-0`, exact  |
+| 0.5  | `#bedfd4` | see below              |
+| 1    | `#7ec5b6` | `brand-teal-25`, exact |
+
+**The middle stop is redundant and is dropped.** `#bedfd4` is the exact sRGB
+midpoint of the other two — (253+126)/2 = 190, (248+197)/2 = 223, (242+182)/2 =
+212 — and both SVG and CSS gradients interpolate in sRGB by default, so a
+two-stop gradient reproduces it. Its exactness is also what confirms the
+interpolation space, which is why it is worth recording rather than just
+deleting.
+
+Same tell as §4.4 and §6: two exact palette steps mean the designer reached into
+the scale on purpose, so both ship as live `var()` references and a palette
+change still moves the fill. Verified in the build — unlike the §6 gradients
+this one needs no `@supports` fork, because it contains no `color-mix`.
+
+**Deviation, deliberate: the rotation is dropped.** The export is a _rotated_
+ellipse — `gradientTransform="matrix(-103.14 23.614 -20.314 -74.493 542.05
+341.53)"` at `r=10`, which is radii 1058 × 772 centred at (542, 342), the major
+axis 12.9° off horizontal. CSS `radial-gradient` cannot rotate one. The shipped
+approximation is the unrotated equivalent:
+
+```css
+radial-gradient(
+  ellipse 99.26% 119.71% at 50.85% 52.95%,
+  var(--color-brand-sand-0) 0%,
+  var(--color-brand-teal-25) 100%
+)
+```
+
+The radii are 99% and 120% of the box, so the outer stop is reached only past
+the corners and the visible isolines move by a few px. The alternatives were
+Figma's own encoded-SVG data URI — pixel-exact, but with both hexes frozen
+inside it, and ruled out by §6's "no gradient strings in JSX" — or a rotated
+pseudo-element, which buys 13° for an extra layer inside an already-clipped
+rounded card.
+
+### The scrim is inferred
+
+Nothing in the export dims the page. `::backdrop` ships at `rgb(0 0 0 / .5)`
+because the card's 55%-black drop shadow was drawn against Figma's dark canvas
+and does much less separating over the light `bg-page` — a focus-trapping dialog
+that leaves the page fully lit reads as inconsistent. Inferred rather than
+transcribed, on the same footing as §4.3's tooltip and §4.5's sidebar, and
+logged as open item 12.
+
+### Two buttons are named "Close &lt;label&gt;"
+
+An open disclosure puts the trigger (showing ✕) and the dialog's own ✕ in the
+document at once, and `PopupButton` builds both names the same way. **This is
+not a real ambiguity** — `showModal()` makes everything outside the dialog inert,
+so only one is ever reachable — but jsdom implements no top layer, so the tests
+scope their queries to the `<ul>` and to the dialog rather than searching the
+document.
+
+### The jsdom shim
+
+jsdom 25 has the `open` attribute but neither `showModal()` nor `close()` (they
+landed in jsdom 26), so `src/test/setup.ts` stands them in. `CLAUDE.md`'s
+reproducibility rule makes a dependency bump a deliberate act, not a side effect
+of a feature.
+
+**The shim is only the state machine.** The three things `showModal()` is chosen
+for are not reproduced, because a fake of them would only assert itself — they
+are the platform's contract and belong in a browser check. ESC is in the same
+category: jsdom fires no `cancel` event, so `Popup.test.tsx` dispatches one
+directly and the test name says so.
+
+### Two UA `dialog` rules this has to fight, and did not at first
+
+Both are on the `<dialog>`'s own class list, and dropping either reproduces a
+bug this shipped with:
+
+- **`hidden open:grid`, never a bare `grid`.** A closed dialog is hidden by
+  `dialog:not([open]) { display: none }` in the UA stylesheet, and **any** author
+  `display` beats a UA one regardless of specificity. A bare `display: grid`
+  therefore leaves an empty, unclosable card painted over the page from first
+  render — the trigger fills in its title but has nothing to close, because the
+  element was never `[open]` to begin with.
+- **`size-full`.** The UA sizes a dialog `width: fit-content; height:
+fit-content`, and `inset-0` cannot defeat that — insets only stretch an element
+  whose size is `auto`. Without it the layer shrinks onto the card and pins
+  itself to the top-left instead of filling the viewport, so `place-items-center`
+  has nothing to centre in.
+
+Neither is reachable from the test suite: jsdom implements no `dialog` UA styles
+at all, so `display` and layout are both meaningless there. This is the class of
+bug the section below exists for.
+
+### Verified in a browser
+
+Chromium at 1440×800 and 390×780 on `/education/disease-background`: closed →
+`display: none` and 0×0; open → the layer fills 1440×800 with the card 1066px
+centred at (187, 304); focus lands on the ✕ and is restored to the trigger on
+close; ESC and a backdrop click both close; a content-less disclosure opens
+nothing; at 390px the card is 359px (= 92vw), centred, with the title wrapped to
+three lines and the band grown to fit it.
+
+Also checked in the compiled CSS: `bg-popup` resolves to the live `var()` chain,
+and `--shadow-popup` inlines onto its utility as §1 predicts.
+
+### The height floor
+
+The design draws 645px, and the card's height is otherwise its content's — which
+left the one popup with content today (a single bullet) rendering 193px, reading
+as a bar rather than the drawn card, with the body gradient showing only its warm
+centre. So the card carries a floor as well as the `85dvh` cap:
+
+```
+min-h-[min(520px,85dvh)]   max-h-[85dvh]
+```
+
+520px is a chosen number, not a transcribed one — it is short of the drawn 645px
+deliberately, so a popup whose content genuinely is brief does not open a screen
+of empty gradient.
+
+**The floor is guarded by the cap, and must stay that way.** `min-height` beats
+`max-height` in CSS, so a bare `min-h-[520px]` would push the card past `85dvh`
+on any viewport shorter than ~612px — a phone in landscape — and overflow it off
+screen with no way to scroll back. Written as `min(520px, 85dvh)` the two cannot
+disagree.
+
+### The figure that opens itself — `ExpandableFigure`
+
+Three of the four §7.7 targets on `/education/disease-background` hang off the
+`DisclosureBand`. The fourth — the clotting cascade — the design draws in the
+chapter body instead, so it is `src/components/ExpandableFigure.tsx`: a
+thumbnail that is its own trigger, wrapping the same `Popup`.
+
+It owns its open state, as `DisclosureBand` does and for the same reason. Two of
+them on one page cannot both be open, because `showModal()` makes everything
+behind the first one inert. Like `Popup`, it knows nothing about what it opens —
+`children` is the card's body, which is what lets one component serve both a
+single raster (`PopupFigure`) and a composed figure (below).
+
+**The hover hint reuses `Popup`'s scrim, deliberately.** `bg-black/50` here is
+the same literal as the card's `backdrop:bg-black/50`, so hovering the thumbnail
+previews the wash that is about to cover the page. It fires on `:focus-visible`
+as well as `:hover` — a keyboard user never hovers. Touch reaches neither, so on
+a phone the figure reads as static; accepted, since a tap costs nothing.
+
+### The cascade is composed, not photographed
+
+The designer's `clotting-cascade-popup.webp` is the pop-up in its _open_ state:
+title band, ✕, two annotation notes, the diagram, and a conclusion, all flattened
+into one raster. Only the diagram is genuinely a picture. So the file is taken
+apart:
+
+| file / element                  | where it comes from                               | what it becomes                                        |
+| ------------------------------- | ------------------------------------------------- | ------------------------------------------------------ |
+| crimson band + ✕                | —                                                 | dropped; `Popup` draws its own                         |
+| `clotting-cascade-thumb.webp`   | fill `(1761,23)–(1846,108)` with `#d63a52`        | the closed state — keeps its band, so it labels itself |
+| `clotting-cascade-diagram.webp` | crop to the diagram's ink, `(640,304)–(1855,946)` | the only real picture, 1215×642                        |
+| the two notes                   | transcribed                                       | `CLOTTING_CASCADE_NOTES` in `src/data/education.ts`    |
+| the conclusion                  | transcribed                                       | `CLOTTING_CASCADE_CONCLUSION`, stored sentence-case    |
+
+`src/routes/education/ClottingCascadeFigure.tsx` reassembles them: notes left,
+diagram right (`md:grid-cols-[1fr_2fr]`, matching the export's 1:2.1), conclusion
+spanning under both, stacking to one column below `md`.
+
+Why bother, when one flat raster would have rendered identically at 1440: the
+notes and the conclusion are sentences. As markup they reflow instead of scaling
+with the image, they are selectable and translatable, and — the reason that
+actually forced it — they no longer have to be duplicated into the diagram's
+`alt`. CONTEXT.md §7.7 marks this whole figure image-borne; this moves two thirds
+of it back into the text layer, and the `alt` shrinks to describing the cascade
+alone.
+
+**The card is white for this one figure.** `Popup` takes `surface="white"` as an
+opt-in, because the diagram is drawn on white and the `--background-image-popup`
+gradient would frame it as a rectangle. Not a global change: the severity table
+draws its header pills with `bg-white/50`, and the gradient is what makes those
+visible.
+
+Measured off the source rather than eyeballed: the band is 133px tall, the ✕ is a
+76×76 circle at (1766, 28), and the band is flat crimson on all four sides of it,
+so removing the glyph is a rectangle fill and not inpainting. The fill colour is
+`--color-brand-crimson-50` (`#d63a52`); the raster samples one lower in blue,
+which is webp quantisation, not a second crimson. The title survives the crop
+centred — its white pixels span x 316–1577, centre 946.5 against the band's 947 —
+so the ✕ was overlaid on it, not displacing it.
+
+The note fill is `--color-figure-note`, sampled `#d0eae6`. It is not a scale step,
+but `color-mix(teal-25 27%, teal-0)` lands at dE .0021 OKLab against it — two
+orders under JND, where the nearest steps themselves are dE .057 and .152 — so it
+is derived, per the §3/§4 rule, and a teal change still moves it.
+
+### `PopupFigure` is sized from the asset, not from a constant
+
+The §7.7 exports are not one size — the diagnostic and bleeding diagrams are
+drawn 720 wide. So `PopupFigure` takes `width` and `height` and caps at
+`min(<width>px, 100%)` rather than a shared constant: upscaling a raster past its
+native width only softens it, and a single cap cannot serve assets of different
+sizes.
+
+### Verified in a browser
+
+Chromium at 1440×800 and 390×780 on `/education/disease-background`.
+
+Thumbnail, closed:
+
+- The button, the image and the hint overlay are one box to within 0.5px at both
+  viewports — which is why the thumbnail is capped by width alone. A height cap
+  would have let the image satisfy it by narrowing, leaving the overlay hanging
+  off the side of the picture it is supposed to cover.
+- Hint opacity is 0 at rest and 1 on `:hover` _and_ on `:focus-visible`; the ring
+  resolves to `rgb(214, 58, 82)`, i.e. `--color-brand-crimson-50`.
+- The hint's background and the card's `::backdrop` both compute to
+  `oklab(0 0 0 / 0.5)` — the reuse is real, not just the same source string.
+
+Card, open, at 1440:
+
+- Surface is `rgb(255,255,255)` with `background-image: none` — the opt-in works.
+- 1066×520 card, 928×406 figure, no scrollbar (433 vs 433).
+- Notes 301px wide sit entirely left of the 603px diagram; note fill computes to
+  `srgb(0.8147 0.9185 0.8969)` = the sampled `#d0eae6` within one 8-bit step.
+- The conclusion renders `rgb(214,58,82)` with `text-transform: uppercase` while
+  its DOM text stays "Hemophilia reduces thrombin generation".
+- Two dialogs are mounted on this chapter and exactly one is ever open; focus
+  moves to the ✕ on open and is restored to the thumbnail on ESC.
+
+At 390 the grid stacks to one column and the card scrolls (668 vs 601), which is
+the intended degradation — the notes stay legible at full width rather than being
+scaled down with the picture, which is precisely what the flat raster could not do.

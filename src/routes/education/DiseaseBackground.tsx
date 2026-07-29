@@ -1,7 +1,18 @@
-import cascadeUrl from "../../assets/images/clotting-cascade-popup.webp";
+import bleedingUrl from "../../assets/images/bleeding_manifestations_diagram.webp";
+import cascadeThumbUrl from "../../assets/images/clotting-cascade-thumb.webp";
+import diagnosticUrl from "../../assets/images/diagnostic_approach_diagram.webp";
 import DisclosureBand, { type Disclosure } from "../../components/DisclosureBand";
-import { type Bullet, topicById } from "../../data/education";
+import ExpandableFigure from "../../components/ExpandableFigure";
+import PopupFigure from "../../components/PopupFigure";
+import { type Bullet, SEVERITY_TABLE, topicById } from "../../data/education";
 import { cn } from "../../lib/cn";
+import ClottingCascadeFigure from "./ClottingCascadeFigure";
+
+/**
+ * The clotting cascade's own heading, which is not its §7.7 caption ("Disease
+ * mechanism for HA/HB") — the same caption-vs-title split `Disclosure` records.
+ */
+const CASCADE_TITLE = "Initiation and Amplification of the Clotting Cascade";
 
 /**
  * `/education/disease-background` — CONTEXT.md §7.2, the first chapter of the
@@ -18,20 +29,53 @@ const DIAGNOSIS = topicById("diagnosis")!;
  * The three "Click here:" disclosures under the severity heading (§7.7).
  *
  * Labels are literals rather than data reads: only the first has a matching
- * `EDUCATION_TOPICS` title, so it is also the only one that can open anything
- * today — the other two are §7.7 figures, and those 24 images are not yet
- * available as assets (CONTEXT.md). They render as buttons that toggle and show
- * nothing, which is issue 11's accepted placeholder state; give them `content`
- * when the assets land. Second pass reconciles all three with the data model.
+ * `EDUCATION_TOPICS` title. Second pass reconciles all three with the data
+ * model.
+ *
+ * **Every one of them carries its own `title`.** The caption under the button
+ * and the heading on the card are different strings in the design — the caption
+ * names the target from the §7.7 index ("Diagnostic algorithm for HA/HB"), the
+ * card wears the figure's own title ("Diagnostic approach for Hemophilia A/B").
+ * Neither is derivable from the other, so both are stated.
  *
  * A 3-tuple, matching `DisclosureBand`'s prop: the band's grid and arch are
  * drawn around three columns, so a fourth is a design question, and the type is
  * what makes it get asked.
  */
 const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
-  { label: DIAGNOSIS.title, content: <BulletList items={DIAGNOSIS.body} /> },
-  { label: "Disease severity and bleeding in HA/HB" },
-  { label: "Typical bleeding manifestations in males and females with HA/HB" },
+  {
+    label: DIAGNOSIS.title,
+    title: "Diagnostic approach for Hemophilia A/B",
+    content: (
+      <PopupFigure
+        src={diagnosticUrl}
+        width={720}
+        height={608}
+        alt="Diagnostic algorithm for hemophilia A and B. Initial testing: PT/aPTT, then a mixing study if the aPTT is prolonged. A prolonged aPTT that corrects leads to factor assays, which split into reduced FVIII activity and reduced FIX activity. Reduced FVIII activity also prompts VWF testing (VWF:Ag and VWF:Act) to rule out von Willebrand disease. Both arms lead to genetic analysis: F8 genotyping confirms hemophilia A and F9 genotyping confirms hemophilia B, identifying the mutation and inhibitor risk. VWF testing is repeated for discrepant results, suspected inhibitors, and complex cases."
+      />
+    ),
+  },
+  {
+    label: "Disease severity and bleeding in HA/HB",
+    // "FACOTOR" in the export is a typo and is not reproduced.
+    title: "Hemophilia Severity Based on Factor VIII/IX Level",
+    content: <SeverityTable />,
+  },
+  {
+    label: "Typical bleeding manifestations in males and females with HA/HB",
+    // Same string the `severity-bleeding` topic lists as its figure caption —
+    // stated here rather than read out of that array, which is an unordered
+    // list of captions and not a keyed lookup.
+    title: "Bleeding in males and females with hemophilia",
+    content: (
+      <PopupFigure
+        src={bleedingUrl}
+        width={720}
+        height={655}
+        alt="Typical bleeding manifestations in males and females with hemophilia A or B, annotated on a body diagram. Musculoskeletal bleeding, mainly the elbows, ankles, and knees, accounts for 80%. Also shown: intracranial hemorrhage; oropharyngeal cavity bleeding; epistaxis, rarely; gastrointestinal bleeding; genitourinary bleeding; heavy menstrual bleeding and postpartum hemorrhage; and easy bruising."
+      />
+    ),
+  },
 ];
 
 export default function DiseaseBackground() {
@@ -60,25 +104,25 @@ export default function DiseaseBackground() {
         </div>
 
         {/*
-          Placeholder, deliberately: a static figure, not a disclosure. The
-          close glyph in the top-right is part of the raster — this is the
-          designer's export of the §7.7 "Disease mechanism for HA/HB" pop-up in
-          its open state — so it currently paints a control that does nothing.
-          Known and accepted for this pass; the second pass wires all four
-          disclosures against issue 03's Modal primitive, at which point this
-          becomes a real panel with a real close button.
+          The one §7.7 target the design draws in the chapter body rather than
+          behind a "Click here:" button, so it is an `ExpandableFigure` and not a
+          fourth `Disclosure` — the band's grid and arch are built for three.
 
-          Everything in the image is image-borne (CONTEXT.md §7.7): the title,
-          the annotations and the cascade itself exist in no text layer, so the
-          alt text is the only route to this content and has to carry it.
+          The thumbnail is the designer's export with only the ✕ cropped out —
+          a control that did nothing while this was a static placeholder — so it
+          keeps the crimson title band and labels itself in a 470px column. What
+          it opens is rebuilt as markup rather than shown as that same raster
+          (docs/styling.md §13), which is why the card is white: the diagram is
+          drawn on white, and the tinted body would frame it as a rectangle.
         */}
-        <figure className="mt-8 lg:mt-0">
-          <img
-            src={cascadeUrl}
-            alt="Initiation and amplification of the clotting cascade. Vascular injury exposes tissue factor, which with FVIIa initiates coagulation; FVIIIa and FIXa amplify it through FXa, FVa, calcium and phospholipid to generate thrombin and form a fibrin clot. The amplification loop is critical for thrombin generation in tissues with limited expression of tissue factor, such as joints and muscles. Hemophilia reduces thrombin generation."
-            className="max-h-64 w-full max-w-[470px] rounded-xl"
-          />
-        </figure>
+        <ExpandableFigure
+          thumbSrc={cascadeThumbUrl}
+          title={CASCADE_TITLE}
+          surface="white"
+          className="mt-8 max-w-[470px] lg:mt-0"
+        >
+          <ClottingCascadeFigure />
+        </ExpandableFigure>
 
         <BulletList items={DIAGNOSIS.body} className="mt-4 lg:col-span-2" />
       </div>
@@ -96,6 +140,87 @@ export default function DiseaseBackground() {
       */}
       <DisclosureBand title="Hemophilia Severity and Bleeding Patterns" disclosures={DISCLOSURES} />
     </section>
+  );
+}
+
+/** The banner over the bullet row — a table heading in the design, so a literal here. */
+const MANIFESTATION_HEADING = "Bleeding Manifestation Based on Severity";
+
+/**
+ * `SEVERITY_TABLE` as the §7.7 pop-up draws it: severity across the top, the
+ * factor level under it, then the bleeding manifestations under a banner of
+ * their own.
+ *
+ * **A real `<table>`**, not the grid the visual suggests. The two pale bars
+ * span all three columns and read as single pills, which is a grid's natural
+ * shape and a table's awkward one — but the content is a genuine 3×2 matrix
+ * (severity × [factor level, manifestations]), and a grid throws away the
+ * column association that makes ">5% – <40%" mean something. `border-separate`
+ * with zero x-spacing buys the pill back: the header cells touch, share one
+ * `bg-white/50`, and only the outer two round, so the row paints as one bar.
+ * The banner is one `colspan=3` cell for the same reason — a `colgroup` header
+ * over the row beneath it, which is what it is.
+ *
+ * Type is raw design values under §8's precedent — 26/700 lands on the `text-h3`
+ * step at a heavier weight, and 22px is off the scale entirely. The column rules
+ * are inferred: the export draws a hairline the palette has no token for.
+ */
+function SeverityTable() {
+  return (
+    <table className="w-full table-fixed border-separate border-spacing-x-0 border-spacing-y-2 text-center text-black">
+      <thead>
+        <tr>
+          {SEVERITY_TABLE.map((row, index) => (
+            <th
+              key={row.severity}
+              scope="col"
+              className={cn(
+                "bg-white/50 px-2 py-5 text-h3 font-bold",
+                index === 0 && "rounded-l-2xl",
+                index === SEVERITY_TABLE.length - 1 && "rounded-r-2xl",
+              )}
+            >
+              {row.severity}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          {SEVERITY_TABLE.map((row, index) => (
+            <td
+              key={row.severity}
+              className={cn("px-2 py-5 text-h3 font-bold", index > 0 && "border-l border-black/10")}
+            >
+              {row.factorLevel}
+            </td>
+          ))}
+        </tr>
+        <tr>
+          <th
+            scope="colgroup"
+            colSpan={SEVERITY_TABLE.length}
+            className="rounded-2xl bg-white/50 px-2 py-5 text-h3 font-bold"
+          >
+            {MANIFESTATION_HEADING}
+          </th>
+        </tr>
+        <tr>
+          {SEVERITY_TABLE.map((row, index) => (
+            <td
+              key={row.severity}
+              className={cn("px-2 pt-2 pb-6 align-top", index > 0 && "border-l border-black/10")}
+            >
+              <ul className="list-disc pl-6 text-left text-[22px] leading-[1.6] font-normal">
+                {row.manifestations.map((manifestation) => (
+                  <li key={manifestation}>{manifestation}</li>
+                ))}
+              </ul>
+            </td>
+          ))}
+        </tr>
+      </tbody>
+    </table>
   );
 }
 

@@ -113,6 +113,23 @@
     rgba(114.61, 213.07, 191.53, 0.4) 100%
   );
 
+  /* ─── Popups (docs/styling.md §13) ────────────────────────────────────────
+     The §7.7 click-through dialog's body fill. Figma draws a *rotated* ellipse
+     (~13°) with three stops; the middle one is the exact sRGB midpoint of the
+     other two, so it is redundant in an sRGB gradient and dropped. Both end
+     stops are exact palette steps, hence live var() refs rather than hexes —
+     same rule as the page gradients above. CSS cannot rotate a radial-gradient;
+     the outer stop sits past the corners, so the unrotated approximation moves
+     the visible isolines by a few px. */
+  --background-image-popup: radial-gradient(
+    ellipse 99.26% 119.71% at 50.85% 52.95%,
+    var(--color-brand-sand-0) 0%,
+    var(--color-brand-teal-25) 100%
+  );
+
+  /* In @theme, not :root — Tailwind inlines --shadow-* at build time (§1). */
+  --shadow-popup: 0px 22.735px 50.142px 5.052px rgba(0, 0, 0, 0.55);
+
   /* ─── Education chapters (docs/styling.md §11) ────────────────────────────
      The caption under each PopupButton disclosure. Sampled #074655 — off every
      lagoon step, but it is the scale's own midpoint: color-mix(lagoon-75 52%,
@@ -124,6 +141,19 @@
     in oklab,
     var(--color-brand-lagoon-75) 52%,
     var(--color-brand-lagoon-100)
+  );
+
+  /* The pale fill behind the annotation notes beside a §7.7 figure — the two
+     callouts the clotting-cascade export draws to the left of the diagram.
+     Sampled #d0eae6, which is not a scale step but sits almost exactly between
+     two: color-mix(teal-25 27%, teal-0) lands at dE .0021 OKLab, two orders
+     under JND (the nearest steps themselves are dE .057 and .152). Derived
+     rather than transcribed so a teal change still moves it — same §3/§4 rule
+     as --color-popup-caption above. */
+  --color-figure-note: color-mix(
+    in srgb,
+    var(--color-brand-teal-25) 27%,
+    var(--color-brand-teal-0)
   );
 
   /* ─── Layout geometry (docs/styling.md §12) ───────────────────────────────

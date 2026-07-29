@@ -231,30 +231,62 @@ export function topicById(id: string): EducationTopic | undefined {
   return EDUCATION_TOPICS.find((topic) => topic.id === id);
 }
 
+/**
+ * The two annotation notes the §7.7 clotting-cascade figure draws beside the
+ * diagram, and the conclusion under it.
+ *
+ * Transcribed off the designer's export, which is the only source: CONTEXT.md
+ * §7.7 records this content as image-borne — it appears in no text layer of the
+ * `[PDF-V]` blueprint. Here rather than in the component because it IS content,
+ * and because a chapter should not be the place a sentence of source copy lives.
+ *
+ * The conclusion is stored sentence-case; the design shouts it, but uppercase is
+ * CSS in this codebase so the accessible name stays readable.
+ */
+export const CLOTTING_CASCADE_NOTES: readonly string[] = [
+  "The amplification loop is critical for thrombin generation in tissues with limited expression of tissue factor (joints and muscles)",
+  "FVIII and FIX play a critical role in amplifying the generation of thrombin and in clot formation",
+];
+
+/** The crimson line under the §7.7 clotting-cascade figure. */
+export const CLOTTING_CASCADE_CONCLUSION = "Hemophilia reduces thrombin generation";
+
 /** §7.2 severity classification (PPTX slide 6). */
 export interface SeverityRow {
   severity: string;
   factorLevel: string;
-  manifestation: string;
+  /**
+   * One entry per bullet, not one semicolon-joined sentence: the §7.7 pop-up
+   * draws these as a list under each severity, so the split is the content's
+   * own shape rather than the renderer's job to guess back out of punctuation.
+   */
+  manifestations: readonly string[];
 }
 
 export const SEVERITY_TABLE: readonly SeverityRow[] = [
   {
     severity: "Mild",
     factorLevel: ">5% – <40%",
-    manifestation: "Rare spontaneous bleeding; prolonged bleeding with major trauma or surgery",
+    manifestations: [
+      "Rare spontaneous bleeding",
+      "Prolonged bleeding with major trauma or surgery",
+    ],
   },
   {
     severity: "Moderate",
     factorLevel: "1% – 5%",
-    manifestation:
-      "Occasional spontaneous bleeding; prolonged bleeding with minor trauma or surgery",
+    manifestations: [
+      "Occasional spontaneous bleeding",
+      "Prolonged bleeding with minor trauma or surgery",
+    ],
   },
   {
     severity: "Severe",
     factorLevel: "<1%",
-    manifestation:
-      "Frequent hemorrhages in joints, muscles, and soft tissues; life-threatening bleeding episodes (eg, intracranial hemorrhage)",
+    manifestations: [
+      "Frequent hemorrhages in joints, muscles, and soft tissues",
+      "Life-threatening bleeding episodes (eg, intracranial hemorrhage)",
+    ],
   },
 ];
 

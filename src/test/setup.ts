@@ -11,6 +11,31 @@ import { afterEach, beforeEach, vi } from "vitest";
 afterEach(cleanup);
 
 /**
+ * jsdom 25 implements `<dialog>`'s `open` attribute but neither `showModal()`
+ * nor `close()` — they arrived in jsdom 26, and `CLAUDE.md`'s reproducibility
+ * rule says dependency bumps are deliberate, not incidental to a feature. So
+ * `Popup` gets a stand-in.
+ *
+ * **This shim is only the state machine.** The three things `showModal()` is
+ * actually chosen for — the top layer, the focus trap and focus restoration —
+ * are not reproduced, because a fake of them would only ever assert itself.
+ * Nothing in the suite tests them; they are the platform's contract, verified
+ * in a browser. What the shim does support is "is it open", which is what the
+ * component's own logic turns on. ESC is in the same category: jsdom fires no
+ * `cancel` event, so `Popup.test.tsx` dispatches one directly and says so.
+ */
+if (!HTMLDialogElement.prototype.showModal) {
+  HTMLDialogElement.prototype.showModal = function showModal() {
+    this.open = true;
+  };
+  HTMLDialogElement.prototype.close = function close(returnValue?: string) {
+    if (returnValue !== undefined) this.returnValue = returnValue;
+    this.open = false;
+    this.dispatchEvent(new Event("close"));
+  };
+}
+
+/**
  * jsdom implements no `window.matchMedia`, and two different things ask for it:
  *
  * - `mlg-components`' `Sidebar` — mounted by `AppShell`, so present in *every*

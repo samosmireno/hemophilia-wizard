@@ -1,7 +1,8 @@
-import { type ReactNode, useId, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { PopupButton } from "mlg-components";
 
 import BrandLoop from "./BrandLoop";
+import Popup from "./Popup";
 
 /** One "Click here:" disclosure — the caption under the button, and what it opens. */
 export interface Disclosure {
@@ -11,6 +12,16 @@ export interface Disclosure {
    * that opens ("Expand Diagnostic algorithm for HA/HB").
    */
   label: string;
+  /**
+   * The dialog's own heading, where the design gives it one that is not the
+   * caption — which is the usual case, not the exception: the caption names the
+   * target from the §7.7 index ("Diagnostic algorithm for HA/HB") while the card
+   * wears the figure's own title ("Diagnostic approach for Hemophilia A/B").
+   * Optional because the two do coincide for some targets, and because a caller
+   * that has not been reconciled with the design yet is better off showing the
+   * caption twice than showing nothing.
+   */
+  title?: string;
   /**
    * What the button opens. Optional because it genuinely is: the §7.7 targets
    * are image-borne (CONTEXT.md) and most of those 24 figures are not yet
@@ -60,16 +71,15 @@ export default function DisclosureBand({
   disclosures: readonly [Disclosure, Disclosure, Disclosure];
 }) {
   /**
-   * One panel, so one open index rather than three booleans: the panel is
-   * full-width under the row, and two open at once would have nowhere to go.
-   * Opening a second closes the first; clicking the open one closes it.
+   * One dialog, so one open index rather than three booleans: two modals at
+   * once is not a state the top layer should be asked to represent. Opening a
+   * second closes the first; clicking the open one closes it.
    *
    * State lives here rather than in each `PopupButton` (which would happily
    * manage its own) precisely because that mutual exclusion is a fact about the
    * band, not about a button.
    */
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const panelId = useId();
   const open = openIndex === null ? undefined : disclosures[openIndex];
 
   return (
@@ -96,9 +106,12 @@ export default function DisclosureBand({
             <PopupButton
               label={disclosure.label}
               open={openIndex === index}
-              // `aria-controls` only where a panel will actually exist — a
-              // reference to a missing id is worse than no reference.
-              aria-controls={disclosure.content ? panelId : undefined}
+              // Not `aria-controls`: a modal dialog lives in the top layer, so
+              // it is not a region of the page this button expands — and the
+              // pattern for a control that summons one is `aria-haspopup`.
+              // Announced only where something will actually open, for the same
+              // reason the old `aria-controls` was conditional.
+              aria-haspopup={disclosure.content ? "dialog" : undefined}
               onClick={(next) => setOpenIndex(next ? index : null)}
             />
             <p className="mt-4 flex max-w-68 flex-1 items-center text-center text-h3 font-bold text-popup-caption">
@@ -109,19 +122,27 @@ export default function DisclosureBand({
       </ul>
 
       {/*
-        Provisional presentation, deliberately: an in-flow panel, because §7.7
-        calls these "in-chapter local-state pop-ups" and issue 03's Modal
-        primitive — which owns focus trapping, the close affordance and the
-        backdrop — does not exist yet. When it lands, this element is what it
-        replaces; the props above do not change, since `content` is already
-        "what opens" rather than "what renders here".
+        `content` was always "what opens" rather than "what renders here", so
+        swapping the provisional in-flow panel for issue 03's dialog changed
+        nothing above this line.
 
-        Rendered unconditionally so `aria-controls` always resolves, and left
-        empty when the open disclosure has no content yet.
+        **A disclosure with no content opens nothing.** `open` is gated on the
+        content existing, not on a disclosure being selected — most of the §7.7
+        targets are figures whose assets do not exist yet, and an empty modal is
+        a worse placeholder than the inert toggle issue 11 accepted. The button
+        still flips to ✕, which is the state it was in before.
+
+        Mounted unconditionally: the effect that calls `showModal()` needs the
+        element to already be in the DOM, and the children it wraps are
+        `undefined` while closed, so nothing renders early.
       */}
-      <div id={panelId} className="mx-auto mt-10 max-w-3xl px-8 pb-12 empty:hidden">
+      <Popup
+        open={open?.content !== undefined}
+        title={open?.title ?? open?.label ?? ""}
+        onClose={() => setOpenIndex(null)}
+      >
         {open?.content}
-      </div>
+      </Popup>
     </div>
   );
 }
