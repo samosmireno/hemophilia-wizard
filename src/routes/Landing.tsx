@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { Button } from "mlg-components";
 import { useNavigate } from "react-router";
 
-import loopUrl from "../assets/landing-loop.mp4";
-import posterUrl from "../assets/landing-poster.jpg";
+import BrandLoop from "../components/BrandLoop";
 import { ACTIVITY_CODE, ACTIVITY_TITLE_LEAD, ACTIVITY_TITLE_TAIL } from "../data/activity";
 import { nextOf } from "../data/sectionOrder";
 
@@ -95,11 +93,6 @@ export default function Landing() {
   );
 }
 
-/** True when the OS asks for reduced motion. Read once, at mount — see below. */
-function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
 /**
  * The `/`-only backdrop: looping footage with the landing gradient washed over
  * it. Structurally a sibling of `AppShell`'s default backdrop rather than a
@@ -120,51 +113,23 @@ function prefersReducedMotion() {
  * looks exactly as it did prior to this feature rather than flashing an
  * invented colour.
  *
- * `autoPlay muted playsInline` is the full set browsers require — Chrome blocks
- * unmuted autoplay and iOS Safari additionally requires `playsinline`. The clip
- * carries no audio track at all, so `muted` costs nothing. Note that autoplay is
- * refused outright under iOS Low Power Mode whatever the attributes say, which
- * makes the poster a state a real share of visitors will see rather than a
- * loading detail — it is frame 0, so under the gradient it reads as the intended
- * composite, not as a placeholder.
- *
- * Declarative `autoPlay` beats a `ref.current.play()` effect here for a second
- * reason: jsdom implements no media playback, so the effect form throws "Not
- * implemented" through the whole suite.
- *
- * Under `prefers-reduced-motion: reduce` the `<video>` is not mounted at all —
- * not mounted-and-paused — which also skips the 1.9 MB fetch. The still shown
- * instead is the same poster frame, so the two motionless paths agree. The query
- * is read once at mount with no `change` listener: the setting effectively never
- * moves mid-session, and subscribing would mean `useSyncExternalStore` for a
- * decorative layer.
+ * The footage itself — autoplay attributes, poster, the reduced-motion fallback —
+ * is `BrandLoop`, which `education/DiseaseBackground` also crops into its
+ * severity band. Everything specific to `/` stays here: full-bleed geometry and
+ * the gradient over the top.
  *
  * `landing-loop.mp4` is a ping-pong of the delivered footage — see
  * docs/adr/0002-ping-pong-landing-loop.md for why, and docs/styling.md §7 for
  * the ffmpeg recipe.
  */
 function LandingBackdrop() {
-  const [reduced] = useState(prefersReducedMotion);
-
   return (
     <div
       aria-hidden="true"
       data-page-backdrop="landing"
       className="fixed inset-0 -z-10 overflow-hidden bg-white"
     >
-      {reduced ? (
-        <img src={posterUrl} alt="" className="size-full object-cover" />
-      ) : (
-        <video
-          src={loopUrl}
-          poster={posterUrl}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="size-full object-cover"
-        />
-      )}
+      <BrandLoop />
       <div className="absolute inset-0 bg-page-landing" />
     </div>
   );

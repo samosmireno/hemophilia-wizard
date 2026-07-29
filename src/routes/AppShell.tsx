@@ -11,6 +11,31 @@ import AppSidebar from "./AppSidebar";
  * `fixed` in both its layouts, so `<main>` reserves clearance: bottom for the
  * bar (<1024px), right for the rail (>=1024px).
  *
+ * The padding is the app's, not any one page's, and every value in it that came
+ * from somewhere else is a token rather than a number (docs/styling.md §12).
+ * The design puts content `--spacing-gutter` (112px) from the left edge on its
+ * 1440-wide canvas and every page inherits that here; the right side adds
+ * `--spacing-rail` on top, which is what stops the content column clear of the
+ * rail. Both are `lg:` only — 112px of a 375px phone would leave 151px of text,
+ * so below that the gutter is an invented comfort value (32px, 48px at `sm`)
+ * and stays a plain utility, because no design canvas exists down there to
+ * transcribe.
+ *
+ * The vertical padding is clearance for chrome, not page rhythm: the top clears
+ * `TopRule`'s band (`--spacing-below-rule` = the band + the designer's 16px, or
+ * 32px at `lg`), and the bottom clears the sidebar's bottom bar
+ * (`--spacing-bar`), which is not there at `lg` where the rail takes over. Page
+ * rhythm proper is NOT here — it differs per page (see
+ * `education/DiseaseBackground`) and the shell holds no route knowledge.
+ *
+ * `max-w-content` caps the measure. Fixed gutters alone give the content column
+ * no upper bound, so on a wide monitor a chapter's prose would just keep
+ * growing; the cap is the column's width at the design canvas, so nothing moves
+ * at or below 1440 and the column centres above it. It lives on a wrapper
+ * because `<main>`'s own padding is what clears the fixed chrome, and those two
+ * jobs want different boxes. The wrapper is `flex flex-1 flex-col` so that a
+ * page opting into vertical centring still sees a growing flex parent.
+ *
  * `min-h-dvh flex flex-col` is what lets a page centre itself vertically: the
  * child opts in with `flex-1` (see `Landing`). A percentage height would NOT
  * work — `min-height: 100%` against a parent whose `height` is `auto` resolves
@@ -59,8 +84,10 @@ export default function AppShell() {
         data-page-backdrop="default"
         className="fixed inset-0 -z-10 bg-page"
       />
-      <main className="flex min-h-dvh flex-col p-4 pb-20 lg:pr-24 lg:pb-4">
-        <Outlet />
+      <main className="flex min-h-dvh flex-col px-8 pt-below-rule pb-bar sm:px-12 lg:px-gutter lg:pt-below-rule-lg lg:pr-gutter-rail lg:pb-0">
+        <div className="mx-auto flex w-full max-w-content flex-1 flex-col">
+          <Outlet />
+        </div>
       </main>
       <AppSidebar />
     </>

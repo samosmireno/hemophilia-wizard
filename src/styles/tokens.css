@@ -23,7 +23,7 @@
   --text-h1--font-weight: 700;
   --text-h1--line-height: 1.05;
 
-  --text-h2: 36px;
+  --text-h2: 32px;
   --text-h2--font-weight: 700;
   --text-h2--line-height: 1.1;
 
@@ -112,6 +112,43 @@
     color-mix(in srgb, #ffffff 40%, transparent) 0%,
     rgba(114.61, 213.07, 191.53, 0.4) 100%
   );
+
+  /* ─── Education chapters (docs/styling.md §11) ────────────────────────────
+     The caption under each PopupButton disclosure. Sampled #074655 — off every
+     lagoon step, but it is the scale's own midpoint: color-mix(lagoon-75 52%,
+     lagoon-100) lands at dE .0006 OKLab, two orders under JND. Derived rather
+     than transcribed so a lagoon change still moves it (§3/§4 rule).
+     Named outside `brand-` (that namespace is the raw scale) and outside `ui-`
+     (that one belongs to mlg-components). */
+  --color-popup-caption: color-mix(
+    in oklab,
+    var(--color-brand-lagoon-75) 52%,
+    var(--color-brand-lagoon-100)
+  );
+
+  /* ─── Layout geometry (docs/styling.md §12) ───────────────────────────────
+     The shell's padding, as the facts it is made of. Each value below comes
+     from OUTSIDE `AppShell` — the designer's 1440 canvas, the top rule, or the
+     sidebar's own dimensions in mlg-components — which is why it is named here
+     rather than written as a utility. The shell's other padding (the 32/48px
+     small-screen gutters, the 16px bottom) was invented for comfort, is
+     specified by nobody, and stays as plain utilities. */
+  --spacing-gutter: 7rem; /* 112px — designer's content inset on the 1440 canvas (§11) */
+  --spacing-rule: 0.875rem; /* 14px — TopRule's band height (§10) */
+  --spacing-rail: 3rem; /* 48px — clearance past the sidebar rail, >=1024px */
+  --spacing-bar: 5rem; /* 80px — clearance past the sidebar bottom bar, <1024px */
+
+  /* Composed. Defined here, from the addends, so the seam stays greppable —
+     pre-summing these into utilities is how `pr-40` and the 163px in the
+     comment beside it drifted apart. */
+  --spacing-gutter-rail: calc(var(--spacing-gutter) + var(--spacing-rail));
+  --spacing-below-rule: calc(var(--spacing-rule) + 1rem);
+  --spacing-below-rule-lg: calc(var(--spacing-rule) + 2rem);
+
+  /* The content column at the design width: 1440 - 112 - 160. A cap, not a
+     width — it only bites above the canvas, where the designer said nothing
+     and fixed gutters would otherwise let the measure grow without limit. */
+  --container-content: 73rem; /* 1168px */
 
   /* ─── mlg-components ──────────────────────────────────────────────────────
      Component-layer overrides on package v0.4.0; the base ramp is untouched, so

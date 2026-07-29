@@ -620,6 +620,37 @@ Under `prefers-reduced-motion: reduce` the `<video>` is not mounted at all
 shown instead is that same poster, so both motionless paths agree. The query is
 read once at mount, with no `change` listener.
 
+### 7.1 The second placement — the severity band
+
+The same footage backs the "Hemophilia severity and bleeding patterns" band at
+the foot of `/education/disease-background`, cropped into the arch with
+`object-cover`. Everything above that is placement-specific — full-bleed geometry
+and the teal gradient belong to `Landing` — so only the media itself is shared,
+as `src/components/BrandLoop.tsx`: the poster, the autoplay attributes and the
+reduced-motion branch documented above, and nothing else.
+
+The wash here is **not** the §7 landing composite. Measured the same way —
+sampling the designer's band export against the raw frames — it is
+
+```
+0.20 * video + 0.80 * (brand-crimson-50 at 15% over the §6 page gradient)
+```
+
+which lands within ~2/255 per channel on both anchors available in the export
+(the teal-grey plate between cells, and a cell body). Raw footage teal-grey
+`rgb(128 146 137)` composites to `rgb(200 200 197)` against the export's
+`rgb(198 201 196)`–`rgb(204 204 201)`.
+
+So the band needs no overlay element and no blend mode, unlike `/`: the div's own
+`bg-brand-crimson-50/15` is what the video composites against, and `opacity-20`
+on the video is the entire effect. That also makes the pre-decode state correct
+by construction rather than by a second layer.
+
+**The two numbers move together.** The 15% tint is what supplies the warm cast
+that pulls the raw footage's green plate to neutral; the 20% is what sets how
+present the imagery is. Raising the opacity alone re-greens the band. Refit both
+against the export rather than nudging one.
+
 ---
 
 ## 8. Landing hero type
@@ -698,8 +729,11 @@ Accepted deliberately and tracked as debt 5 in
 with `flex-1`. A percentage would not work: `min-height: 100%` against a parent
 whose `height` is `auto` resolves to zero, and `min-h-dvh` leaves it `auto`. The
 padding is inside that height (border-box), so the hero centres in the area clear
-of the bar and the rail rather than behind them — which does mean it sits ~48px
-left of true viewport centre at ≥1024px, optically clearing the rail.
+of the bar and the rail rather than behind them — which does mean it sits left of
+true viewport centre at ≥1024px, optically clearing the rail. That offset is
+~25px since §11 widened the shell's gutters to 112/163 (it was ~48px under the
+old `p-4 lg:pr-24`). The hero itself does not move: `max-w-280` is 1120px, still
+narrower than the 1165px content column, so it stays centred within it.
 
 ---
 
@@ -715,6 +749,9 @@ left of true viewport centre at ≥1024px, optically clearing the rail.
 | 6   | No semantic layer yet. `bg-surface`, `text-heading`, etc. do not exist; the app reads raw brand steps in the meantime.                                                                                                                                                                                                                                                                                                                                                                                 | app-buildout issue 02 |
 | 7   | The inner gradient's second stop is off-scale (`rgba(114.61, 213.07, 191.53)`, dE .042 from `teal-25`) while the other three stops are exact palette. Probably meant to be `teal-25`; kept literal pending a designer answer.                                                                                                                                                                                                                                                                          | §6                    |
 | 8   | The landing footage does not loop — it is a continuous dolly-in, 46.5/255 apart end to end. Ping-ponging it is a workaround; **ask the designer for an 8–12 s clip that loops cleanly**. That would halve the asset and remove the direction reversal.                                                                                                                                                                                                                                                 | §7, ADR 0002          |
+| 9   | `disease-background` renders at the §2 type scale, but the reference measures ~32px sub-headings, ~18px body and ~22px captions against the scale's 26/16/20. Needs the designer's sizes, then a scale-vs-raw-values call.                                                                                                                                                                                                                                                                             | §11                   |
+| 10  | The chapter is specified to fit one screen and currently does not (818px at 1440×800). Wants one rule across all four chapters rather than per-page constants.                                                                                                                                                                                                                                                                                                                                         | §11                   |
+| 11  | Four of the eight vertical gaps are ink-to-ink measurements off the reference PNG rather than the designer's box gaps, so they render slightly loose.                                                                                                                                                                                                                                                                                                                                                  | §11                   |
 
 ---
 
@@ -728,9 +765,10 @@ reference at `rgb(214, 58, 82)`, i.e. the palette step exactly, no literal
 needed. It is the same accent the CTA and the Prev/Next arrows already carry
 (§4.1, §4.2), so the band reads as brand chrome rather than a status colour.
 
-The height is written `h-3.5`, which is `0.875rem` = 14px on the default
-spacing scale — a step that happens to land on the design value, not an
-arbitrary value in disguise.
+The height is `h-rule` (`--spacing-rule`, `0.875rem` = 14px). It was `h-3.5` —
+that default step lands on the design value exactly — but the shell has to add
+the same 14px to its own top padding to clear the band, and a height and a
+padding that must agree should not be two literals maintained apart. §12.
 
 ### Where it is mounted
 
@@ -748,10 +786,201 @@ component.
 every page 14px taller than the viewport and give each one a scrollbar with
 nothing to scroll, so the rule is `fixed inset-x-0 top-0` and out of flow.
 
-Nothing compensates for it in `<main>`'s padding, deliberately: the rule is 14px
-and `<main>` opens with 16px (`p-4`), so at scroll top the band overlaps padding
-only. Content passing under it once the page scrolls is the intended behaviour.
+`<main>` opens with the band's own height plus the designer's gap beneath it —
+`pt-below-rule`, composed in §12 from the same `--spacing-rule` this element is
+drawn with — so at scroll top the band overlaps padding only. Content passing
+under it once the page scrolls is the intended behaviour.
 
 `z-30` places it over page content — which is unpositioned, and would otherwise
 paint below a `fixed` sibling only by DOM luck — and under the sidebar's own
 z-40/z-50 chrome, so the bottom bar's "More" popover is never cut by it.
+
+---
+
+## 11. Education chapters
+
+The first designed content page is `/education/disease-background`
+(`src/routes/education/DiseaseBackground.tsx`). Its reference is a **1440 × 800**
+artboard — derived, not assumed: the crimson rule measures 18 image px on a
+2000px-wide export, and 18 / (2000/1440) = 12.96 ≈ the 14px of §10. Every figure
+below is in CSS px at that canvas.
+
+### The app-wide gutter
+
+Content starts **112px** from the left edge and the column ends **160px** from
+the right — the same 112 plus 48px of clearance for the rail, putting the
+column's right edge at x=1280. Both live on `<main>` in `AppShell` as tokens
+(§12), not on the page: the designer specified the left gutter for every page,
+so restating it per chapter would be eight chances to disagree. Both are `lg:`
+only; 112px of a 375px phone leaves 151px of text.
+
+Page **rhythm** deliberately does not live in the shell — it differs per page, and
+the shell holds no route knowledge (§6). The shell's vertical padding is a
+different thing: clearance for its own fixed chrome, the rule above and the
+sidebar below.
+
+### Off-palette black
+
+Body copy and the two sub-headings sample as pure `#000000`. The palette has no
+black and nothing within reach of one: the nearest step is `slate-100` (`#111d2e`)
+at dE .232 OKLab, roughly 10× the just-noticeable threshold every other mapping in
+this document holds itself to, and it is a blue-black rather than a neutral. So it
+ships as `text-black`, verbatim, per the §3/§4 rule that off-scale colours are
+written as-is and raised rather than rounded into the palette. Issue 02's semantic
+layer is where it becomes `text-body` / `text-heading`.
+
+### `--color-popup-caption`
+
+The caption under each `PopupButton` samples `#074655` — off every lagoon step, but
+it is the scale's own midpoint:
+
+```
+color-mix(in oklab, lagoon-75 52%, lagoon-100)   →   dE .0006
+```
+
+Two orders of magnitude under JND, which is the same tell §4.4 records for the
+`PopupButton` fills themselves: the designer was working inside the lagoon family
+on purpose. Derived rather than transcribed so a lagoon change still moves it, and
+verified in the build — Tailwind keeps the live `color-mix` under
+`@supports (color: color-mix(…))` exactly as it does for the gradients in §6.
+
+Named outside both existing namespaces on purpose: `brand-` is the raw scale, and
+`ui-` belongs to `mlg-components`.
+
+### Layout
+
+A two-column grid at `lg+` — `1fr` + a fixed **470px** figure with the designer's
+**32px** gutter, which lands the prose at 112–775 and the card at 807–1277.
+
+Only the diagnosis **bullet** spans both columns. Its heading sits in the left
+column _beside_ the figure, which is where the reference has it: the card runs to
+y=392 and the heading's ink to y=403. Getting this wrong (spanning the whole
+diagnosis block) opens a 97px hole where the design has 16px.
+
+Below `lg` the grid collapses to one column and DOM order carries the stack:
+mechanism → figure → diagnosis → disclosures.
+
+The severity heading and the button row are centred on the **content column**, not
+the viewport. The reference centres them on its 1440 artboard, which is ~25px
+right of the column centre once the asymmetric rail gutter is taken off; breaking
+two elements out of the container to recover 25px is not worth the machinery.
+
+### Vertical spacing
+
+| Gap                            |  px | Source   |
+| ------------------------------ | --: | -------- |
+| crimson rule → h1              |  32 | designer |
+| h1 → "Disease mechanism…"      |  32 | designer |
+| sub-heading → its bullets      |  28 | measured |
+| mechanism → "Diagnosis:"       |  16 | designer |
+| "Diagnosis:" → its bullet      |  22 | measured |
+| bullet → severity heading      |  66 | measured |
+| severity heading → `+` buttons |  45 | measured |
+| `+` button → its caption       |  40 | designer |
+
+"Designer" values are box gaps and are exact. "Measured" values are ink-to-ink off
+the reference image, so they render a little looser than intended wherever a line
+box carries leading above its glyphs — replace them when the Figma numbers arrive.
+
+The rule-to-h1 gap is the only one of the eight the chapter does not set itself.
+The rule is `fixed` and out of flow (§10), so the gap has to be padding on
+`<main>`, and it is the same for every chapter — it is `--spacing-below-rule-lg`
+in §12, the band's 14px plus this 32, and the h1 carries no top margin at all.
+
+### Open: the chapter is meant to fit one screen
+
+The reference fills its 800px artboard exactly — 59px above the h1, the ink, eight
+gaps, 4px of slack — and the chapter is specified to fit one screen rather than
+scroll. **This is not implemented.** The page is currently 818px tall at 1440×800
+and scrolls.
+
+A first attempt scaled all eight gaps off a single `--v` length clamped against
+`100dvh`, so they shrank in proportion as the viewport shortened. It worked, but
+the incompressible constant it needs is a per-page magic number — and the one
+derived from the artboard was wrong by 104px, because ink measurements do not
+include line-box leading. This wants **one rule for every chapter**, written once
+the other three exist, not eight numbers per page. Deferred deliberately.
+
+### Open: the type is smaller than the reference
+
+The chapter uses the §2 scale — `text-h1` for the title, `text-h2` for the severity
+heading, `text-h3` for the sub-headings, `text-body` for bullets, `text-h4` for
+captions. The first two match the reference; **the last three do not.** Cap-height
+measurements put the reference at roughly 32px sub-headings, 18px body and 22px
+captions, against the scale's 26 / 16 / 20.
+
+The wrap points prove it independently: at an identical 663px column the reference
+breaks line 1 after "…disorders, resulting" while the shipped page fits
+"…resulting from X–". Awaiting the designer's actual type sizes, and then a call on
+whether this chapter transcribes raw values the way the landing hero does (§8) or
+snaps to the scale.
+
+---
+
+## 12. Layout geometry
+
+`AppShell`'s `<main>` carries the padding every page inherits. It used to be
+eight numbers in a class string; it is now four tokens and three composed from
+them, because most of those numbers came from **outside** the shell and the
+sums hid where the seams were.
+
+| Token                     |   px | Where it comes from                       |
+| ------------------------- | ---: | ----------------------------------------- |
+| `--spacing-gutter`        |  112 | Designer's content inset, 1440 canvas §11 |
+| `--spacing-rule`          |   14 | `TopRule`'s band height §10               |
+| `--spacing-rail`          |   48 | Past the sidebar rail, ≥1024px            |
+| `--spacing-bar`           |   80 | Past the sidebar bottom bar, <1024px      |
+| `--spacing-gutter-rail`   |  160 | `gutter + rail`                           |
+| `--spacing-below-rule`    |   30 | `rule + 16` (designer's gap)              |
+| `--spacing-below-rule-lg` |   46 | `rule + 32` (designer's gap at `lg`)      |
+| `--container-content`     | 1168 | `1440 − gutter − gutter-rail`             |
+
+### What is deliberately _not_ a token
+
+The 32px horizontal gutter below `sm`, the 48px at `sm`, and the 16px bottom
+padding at `lg`. No design canvas exists below 1440 — those three were invented
+here for comfort, are specified by nobody, and have one consumer each. Naming
+them would claim an authority they do not have. This is §3's rule for off-scale
+colours pointed at spacing: transcribe what the designer gave you, and leave what
+you made up looking like what it is.
+
+### The composed values are `calc`, not arithmetic
+
+`--spacing-gutter-rail` is `calc(var(--spacing-gutter) + var(--spacing-rail))`,
+not `10rem`. The addends survive into the built CSS, so re-pointing the gutter
+moves the right edge with it. This is not hypothetical tidiness: the shipped
+value was `pr-40` while the comment beside it said 163px, because the two had
+been summed by hand at different times from different rail widths. Same
+motivation as `--color-popup-caption` in §11 — derive it and the source change
+propagates.
+
+`--spacing-rule` earns its name the same way. It has two consumers that must
+agree: `TopRule` draws the band with `h-rule`, and `<main>` clears it with a top
+padding built from the same token. As `h-3.5` plus a hand-summed `pt-12`, that
+agreement was a coincidence maintained by whoever noticed.
+
+### Clearance and measure are different boxes
+
+`<main>` holds the padding — it clears the fixed chrome, so it must be the
+element the chrome is measured against. `max-w-content` sits on a wrapper inside
+it. Fixed gutters give the content column no upper bound, so on a 2560px monitor
+a chapter's prose column would be ~1790px wide; the cap is the column's width at
+the design canvas, so nothing moves at or below 1440 and the column centres
+above it.
+
+The wrapper is `flex w-full flex-1 flex-col`, which is load-bearing: §8's
+vertical centring has `Landing` claim leftover height with `flex-1`, and that
+only works if every box between it and `min-h-dvh` is a growing flex parent.
+
+### Open: the 1024px cliff
+
+The gutter steps 48 → 112 at `lg`, so crossing that one pixel takes the content
+column from 927px to 752px. That is also exactly where §11's chapter grid turns
+on its fixed 470px figure, leaving the prose column at 752 − 32 − 470 = **250px**.
+
+A `clamp()` ramping the gutter from 48px at 1024 to 112px at 1440 would fix it
+without touching the transcription — 112 is a 1440 number and 1024 is where the
+layout can least afford to pay it in full. Not done: the rail clearance is a
+genuine discontinuity at `lg` (below it the sidebar is a bottom bar and there is
+no rail to clear), so the breakpoint cannot go away entirely, and the fix wants
+deciding alongside §11's one-screen rule rather than twice.

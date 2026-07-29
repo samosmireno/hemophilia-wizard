@@ -14,6 +14,10 @@ function renderAt(path: string) {
 
 const heading = () => screen.getByRole("heading", { level: 1 });
 
+/** The h1 of the chapter every unresolvable `/education/...` path lands on. */
+const firstChapterHeading = () =>
+  screen.findByRole("heading", { level: 1, name: "Hemophilia Disease Background" });
+
 describe("router", () => {
   it("renders the landing page at /", () => {
     renderAt("/");
@@ -33,7 +37,12 @@ describe("router", () => {
     expect(heading()).toHaveTextContent(expected);
   });
 
-  it.each(["disease-background", "treatment-landscape", "rebalancing-agents", "fviiia-mimetics"])(
+  it("renders the disease-background chapter", () => {
+    renderAt("/education/disease-background");
+    expect(heading()).toHaveTextContent("Hemophilia Disease Background");
+  });
+
+  it.each(["treatment-landscape", "rebalancing-agents", "fviiia-mimetics"])(
     "renders the %s education chapter",
     (section) => {
       renderAt(`/education/${section}`);
@@ -41,21 +50,26 @@ describe("router", () => {
     },
   );
 
+  // `CHAPTERS` is looked up with `Object.hasOwn`, so an inherited Object key is
+  // not a section — `in` would resolve it and then try to render it.
+  it.each(["not-a-real-section", "toString", "constructor"])(
+    "redirects the unknown education section %s to the first chapter",
+    async (section) => {
+      const router = renderAt(`/education/${section}`);
+      expect(await firstChapterHeading()).toBeInTheDocument();
+      expect(router.state.location.pathname).toBe("/education/disease-background");
+    },
+  );
+
   it("redirects bare /education to the first chapter", async () => {
     const router = renderAt("/education");
-    expect(await screen.findByText("Education — disease-background")).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe("/education/disease-background");
-  });
-
-  it("redirects an unknown education section to the first chapter", async () => {
-    const router = renderAt("/education/not-a-real-section");
-    expect(await screen.findByText("Education — disease-background")).toBeInTheDocument();
+    expect(await firstChapterHeading()).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/education/disease-background");
   });
 
   it("redirects a deeper unknown path under a section to that section", async () => {
     const router = renderAt("/education/foo/bar");
-    expect(await screen.findByText("Education — disease-background")).toBeInTheDocument();
+    expect(await firstChapterHeading()).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/education/disease-background");
   });
 

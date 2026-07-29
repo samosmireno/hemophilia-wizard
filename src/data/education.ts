@@ -6,11 +6,13 @@
  * `documents/out_raw.txt`). Text verbatim (PDF soft-hyphen artifacts removed).
  *
  * Shape is deliberately lean (issue 00 anti-over-modeling checklist):
- * - EDUCATION_TOPICS is a FLAT list — prose pop-ups keyed to the §7.7
+ * - EDUCATION_TOPICS is a FLAT list of topics — prose pop-ups keyed to the §7.7
  *   click-through index. Optional `benefitsChallenges` where the source authors
  *   an explicit benefits/challenges pair; optional `figures` holding only the
  *   figure CAPTIONS the PDF names (the 24 images are not yet available as
  *   assets — Phase 1 attaches real files, so there is intentionally no `src`).
+ *   A topic's `body` carries at most ONE nested level (`NestedBullet`), which
+ *   is as deep as the source goes.
  * - The two genuinely tabular blocks get bespoke row types, like TREATMENTS.
  *
  * No display order/color/grouping fields — that is Phase 1/3 presentation.
@@ -23,12 +25,29 @@ export interface BenefitsChallenges {
   challenges: string[];
 }
 
+/**
+ * A bullet that carries a nested level beneath it. The source authors two
+ * levels in places — `disease-mechanism`'s lead line ends in a colon and the
+ * HA:/HB: pair belongs under it, which is how the design renders them.
+ *
+ * The nesting is a property of the content, not of a layout: expressing it here
+ * rather than by array position means a chapter cannot silently lose its
+ * indentation when a bullet is inserted or reordered.
+ */
+export interface NestedBullet {
+  text: string;
+  children: string[];
+}
+
+/** One prose bullet — flat, or with a nested level of its own. */
+export type Bullet = string | NestedBullet;
+
 export interface EducationTopic {
   /** Stable id (matches the §7.7 click-through index where applicable). */
   id: string;
   title: string;
   /** Verbatim prose bullets. */
-  body: string[];
+  body: Bullet[];
   /** Present only where the source authors an explicit benefits/challenges pair. */
   benefitsChallenges?: BenefitsChallenges;
   /** Figure CAPTIONS the PDF names for this topic. No asset paths yet (Phase 1). */
@@ -60,9 +79,16 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     id: "disease-mechanism",
     title: "Disease mechanism for HA and HB",
     body: [
-      "HA and HB are rare but debilitating congenital bleeding disorders, resulting from X-linked recessive inheritance of clotting factor deficiencies:",
-      "HA: FVIII deficiency due to F8 gene mutation",
-      "HB: FIX deficiency due to F9 gene mutation",
+      {
+        // U+2011 NON-BREAKING HYPHEN in "X‑linked", not ASCII "-": a line break
+        // between the X and the term reads as two things. It renders identically
+        // and copies as a hyphen; only the wrap point differs.
+        text: "HA and HB are rare but debilitating congenital bleeding disorders, resulting from X‑linked recessive inheritance of clotting factor deficiencies:",
+        children: [
+          "HA: FVIII deficiency due to F8 gene mutation",
+          "HB: FIX deficiency due to F9 gene mutation",
+        ],
+      },
       "Deficiency or absence of FVIII or FIX results in inadequate thrombin generation leading to increased bleeding",
     ],
   },
@@ -194,6 +220,16 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     figures: ["NXT007 BsAb Structure", "Inno8 Mechanism of Action"],
   },
 ];
+
+/**
+ * Look a topic up by id. Chapters compose from named topics rather than
+ * rendering the list in order — `disease-background` pulls `disease-mechanism`
+ * and `diagnosis`, and the §7.x → chapter mapping is many-to-one — so this is
+ * the join between a chapter component and the content.
+ */
+export function topicById(id: string): EducationTopic | undefined {
+  return EDUCATION_TOPICS.find((topic) => topic.id === id);
+}
 
 /** §7.2 severity classification (PPTX slide 6). */
 export interface SeverityRow {

@@ -15,14 +15,16 @@ import { Outlet } from "react-router";
  * an in-flow 14px band above it would make every page 14px taller than the
  * viewport and hand each one a scrollbar it has no content for.
  *
- * No clearance padding is needed to go with it: the rule is 14px and `<main>`
- * already opens with 16px of padding, so at scroll top it covers padding, not
- * content. Scrolled content passing beneath it is the intent — `z-30` keeps it
- * over the page (which is unpositioned, and would otherwise win on DOM order)
- * and under the sidebar's own z-40/z-50 chrome.
+ * Being out of flow, it clears itself: `AppShell` opens with the band's height
+ * plus the designer's gap, composed from this same token (§12). Scrolled content
+ * passing beneath it is the intent — `z-30` keeps it over the page (which is
+ * unpositioned, and would otherwise win on DOM order) and under the sidebar's
+ * own z-40/z-50 chrome.
  *
- * 14px is the design's measurement, so it is written as `h-3.5` — that step is
- * exactly 0.875rem. `docs/styling.md` §10.
+ * 14px is the design's measurement, and it is `--spacing-rule` rather than the
+ * `h-3.5` step it happens to land on: the shell has to add the same number to
+ * its top padding, and a height and a padding that must agree should not be two
+ * separately-maintained literals. `docs/styling.md` §10, §12.
  */
 export default function TopRule() {
   return (
@@ -32,7 +34,7 @@ export default function TopRule() {
       <div
         aria-hidden="true"
         data-top-rule=""
-        className="fixed inset-x-0 top-0 z-30 h-3.5 bg-brand-crimson-50"
+        className="fixed inset-x-0 top-0 z-30 h-rule bg-brand-crimson-50"
       />
       <Outlet />
     </>

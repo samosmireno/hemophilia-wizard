@@ -42,3 +42,34 @@ Build the multi-chapter background/education module as `/education/:section` sub
 ## Notes
 
 Left-hand education blocks in the blueprint canvas.
+
+## Comments
+
+**2026-07-29 — `disease-background` first pass (design applied).**
+
+`Education.tsx` is now a slug-keyed dispatch table over four per-chapter
+components in `src/routes/education/`; the other three are still placeholders.
+`disease-background` is built against the designer's 1440×800 reference
+(docs/styling.md §11), including the app-wide 112/163 gutter now on `<main>`.
+
+`EducationTopic.body` gained a nested level (`NestedBullet`) so a chapter cannot
+lose its indentation to array position.
+
+**Not met by this pass**, deliberately, so the acceptance criteria are not yet
+satisfied:
+
+- The three §7.7 disclosures are a `DisclosureBand` component (title + a 3-tuple
+  of `{label, content?}`), which owns the open state and shows one panel at a
+  time. Only the first has content — `diagnosis` is the one label with a
+  matching `EDUCATION_TOPICS` title — and its panel is **in-flow, not a modal**,
+  because issue 03's Modal/Popup primitive does not exist yet. The other two have
+  no assets, so they toggle and show nothing. `SEVERITY_TABLE` (§7.2, PPTX slide
+  6) still renders nowhere, so "all education content present" is open.
+- The clotting-cascade figure is a **static image placeholder**. The designer's
+  export has the pop-up's close glyph baked into the raster, so the page
+  currently paints a control that does nothing. It becomes a real panel when the
+  Modal lands.
+- The other two §7.7 figures have no assets.
+- Glossary cross-links (issue 12) are not wired.
+- Type sizes and the fit-to-one-screen requirement are open — styling.md §9
+  items 9–11.
