@@ -715,3 +715,43 @@ left of true viewport centre at ≥1024px, optically clearing the rail.
 | 6   | No semantic layer yet. `bg-surface`, `text-heading`, etc. do not exist; the app reads raw brand steps in the meantime.                                                                                                                                                                                                                                                                                                                                                                                 | app-buildout issue 02 |
 | 7   | The inner gradient's second stop is off-scale (`rgba(114.61, 213.07, 191.53)`, dE .042 from `teal-25`) while the other three stops are exact palette. Probably meant to be `teal-25`; kept literal pending a designer answer.                                                                                                                                                                                                                                                                          | §6                    |
 | 8   | The landing footage does not loop — it is a continuous dolly-in, 46.5/255 apart end to end. Ping-ponging it is a workaround; **ask the designer for an 8–12 s clip that loops cleanly**. That would halve the asset and remove the direction reversal.                                                                                                                                                                                                                                                 | §7, ADR 0002          |
+
+---
+
+## 10. Page top rule
+
+Every page except the landing one opens with a full-bleed crimson band, 14px
+tall, pinned to the top of the viewport.
+
+The colour is `brand-crimson-50` (`#d63a52`) — sampled from the designer's
+reference at `rgb(214, 58, 82)`, i.e. the palette step exactly, no literal
+needed. It is the same accent the CTA and the Prev/Next arrows already carry
+(§4.1, §4.2), so the band reads as brand chrome rather than a status colour.
+
+The height is written `h-3.5`, which is `0.875rem` = 14px on the default
+spacing scale — a step that happens to land on the design value, not an
+arbitrary value in disguise.
+
+### Where it is mounted
+
+`src/routes/TopRule.tsx`, a **pathless layout route** wrapping every non-index
+child in `src/routes/router.tsx`. Not a `pathname === "/"` branch inside
+`AppShell`: which pages get the rule is a routing fact, and keeping it in the
+route config means the answer is readable from `routes` itself instead of from a
+condition that has to be revisited every time a page is added. Same principle as
+the landing backdrop in §6 — route-specific chrome does not live in the layout
+component.
+
+### Why `fixed`, and why no clearance padding
+
+`<main>` is `min-h-dvh` (§8). An in-flow 14px band stacked above it would make
+every page 14px taller than the viewport and give each one a scrollbar with
+nothing to scroll, so the rule is `fixed inset-x-0 top-0` and out of flow.
+
+Nothing compensates for it in `<main>`'s padding, deliberately: the rule is 14px
+and `<main>` opens with 16px (`p-4`), so at scroll top the band overlaps padding
+only. Content passing under it once the page scrolls is the intended behaviour.
+
+`z-30` places it over page content — which is unpositioned, and would otherwise
+paint below a `fixed` sibling only by DOM luck — and under the sidebar's own
+z-40/z-50 chrome, so the bottom bar's "More" popover is never cut by it.

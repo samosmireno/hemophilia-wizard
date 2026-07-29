@@ -9,13 +9,16 @@ import Landing from "./Landing";
 import References from "./References";
 import Resources from "./Resources";
 import Survey from "./Survey";
+import TopRule from "./TopRule";
 import Wizard from "./Wizard";
 
 /**
  * The app's route config (data router). `AppShell` is the layout route; every
  * page renders into its `<Outlet />`.
  *
- * - `/` is a standalone landing page — not a redirect into education.
+ * - `/` is a standalone landing page — not a redirect into education. It is the
+ *   only child outside `TopRule`, the pathless layout route that draws the
+ *   crimson rule across the top of every other page.
  * - `/education` has no overview: bare `/education` redirects to the first
  *   chapter; `/education/:section` renders a chapter (an unknown `:section`
  *   redirects to the first chapter from inside `Education`).
@@ -34,21 +37,26 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <Landing /> },
       {
-        path: "education",
+        element: <TopRule />,
         children: [
-          { index: true, element: <Navigate to="/education/disease-background" replace /> },
-          { path: ":section", element: <Education /> },
-          { path: "*", element: <Navigate to="/education/disease-background" replace /> },
+          {
+            path: "education",
+            children: [
+              { index: true, element: <Navigate to="/education/disease-background" replace /> },
+              { path: ":section", element: <Education /> },
+              { path: "*", element: <Navigate to="/education/disease-background" replace /> },
+            ],
+          },
+          { path: "wizard", element: <Wizard /> },
+          { path: "explore", element: <Explore /> },
+          { path: "resources", element: <Resources /> },
+          { path: "survey", element: <Survey /> },
+          { path: "glossary", element: <Glossary /> },
+          { path: "acronyms", element: <Acronyms /> },
+          { path: "references", element: <References /> },
+          { path: "*", element: <Navigate to="/" replace /> },
         ],
       },
-      { path: "wizard", element: <Wizard /> },
-      { path: "explore", element: <Explore /> },
-      { path: "resources", element: <Resources /> },
-      { path: "survey", element: <Survey /> },
-      { path: "glossary", element: <Glossary /> },
-      { path: "acronyms", element: <Acronyms /> },
-      { path: "references", element: <References /> },
-      { path: "*", element: <Navigate to="/" replace /> },
     ],
   },
 ];

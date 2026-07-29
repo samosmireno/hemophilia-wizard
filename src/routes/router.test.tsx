@@ -96,6 +96,37 @@ describe("router", () => {
     );
   });
 
+  // The crimson rule is mounted as a layout route around every non-index child,
+  // so "which pages have it" is a routing assertion rather than a styling one.
+  describe("top rule", () => {
+    const rule = () => document.querySelector("[data-top-rule]");
+
+    it.each([
+      "/wizard",
+      "/explore",
+      "/resources",
+      "/survey",
+      "/glossary",
+      "/acronyms",
+      "/references",
+      "/education/disease-background",
+    ])("paints the rule at %s", (path) => {
+      renderAt(path);
+      expect(rule()).toHaveClass("bg-brand-crimson-50");
+    });
+
+    it("has no rule on the landing page", () => {
+      renderAt("/");
+      expect(rule()).not.toBeInTheDocument();
+    });
+
+    it("has no rule after an unknown path redirects to the landing page", async () => {
+      renderAt("/nope");
+      await screen.findByRole("heading", { level: 1, name: ACTIVITY_TITLE });
+      expect(rule()).not.toBeInTheDocument();
+    });
+  });
+
   // The sidebar's jump items are covered in depth by `sidebar.test.tsx`; this
   // keeps a route-level check that navigating actually resolves the target
   // route and renders it, not just that the location changed.
