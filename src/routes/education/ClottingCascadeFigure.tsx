@@ -1,5 +1,6 @@
 import cascadeUrl from "../../assets/images/clotting_cascade_diagram.webp";
 import { CLOTTING_CASCADE_CONCLUSION, CLOTTING_CASCADE_NOTES } from "../../data/education";
+import { usePreloadImage } from "../../lib/preloadImage";
 
 /**
  * The §7.7 "Disease mechanism for HA/HB" figure, rebuilt as markup around the
@@ -23,8 +24,12 @@ import { CLOTTING_CASCADE_CONCLUSION, CLOTTING_CASCADE_NOTES } from "../../data/
  * half would set them at a measure the design does not draw.
  */
 export default function ClottingCascadeFigure() {
+  // The widest §7.7 asset, so the one whose decode is most visible as a flash of
+  // empty card on open. Warmed on mount — see `preloadImage`.
+  usePreloadImage(cascadeUrl);
+
   return (
-    <figure className="mx-auto flex max-w-[1000px] flex-col gap-6 py-4">
+    <figure className="mx-auto flex max-w-250 flex-col gap-6 py-4">
       <div className="grid items-center gap-6 md:grid-cols-[1fr_2fr]">
         <div className="flex flex-col gap-4">
           {CLOTTING_CASCADE_NOTES.map((note) => (
@@ -40,7 +45,7 @@ export default function ClottingCascadeFigure() {
         <img
           src={cascadeUrl}
           alt="Vascular injury exposes tissue factor, which with FVIIa initiates coagulation. FVIIa and tissue factor drive FVa, FXa, calcium and phospholipid to generate thrombin, which forms a fibrin clot. Thrombin feeds back to amplify the cascade through FXa and the FVIIIa–FIXa complex."
-          style={{ aspectRatio: "1215 / 642" }}
+          style={{ aspectRatio: "1220 / 650" }}
           className="w-full"
         />
       </div>

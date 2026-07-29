@@ -1223,7 +1223,7 @@ apart:
 | ------------------------------- | ------------------------------------------------- | ------------------------------------------------------ |
 | crimson band + ✕                | —                                                 | dropped; `Popup` draws its own                         |
 | `clotting-cascade-thumb.webp`   | fill `(1761,23)–(1846,108)` with `#d63a52`        | the closed state — keeps its band, so it labels itself |
-| `clotting-cascade-diagram.webp` | crop to the diagram's ink, `(640,304)–(1855,946)` | the only real picture, 1215×642                        |
+| `clotting_cascade_diagram.webp` | crop to the diagram's ink, `(640,304)–(1855,946)` | the only real picture, 1220×650                        |
 | the two notes                   | transcribed                                       | `CLOTTING_CASCADE_NOTES` in `src/data/education.ts`    |
 | the conclusion                  | transcribed                                       | `CLOTTING_CASCADE_CONCLUSION`, stored sentence-case    |
 
@@ -1265,6 +1265,32 @@ drawn 720 wide. So `PopupFigure` takes `width` and `height` and caps at
 `min(<width>px, 100%)` rather than a shared constant: upscaling a raster past its
 native width only softens it, and a single cap cannot serve assets of different
 sizes.
+
+### Figure assets are stored at 2x their drawn width, and no wider
+
+| asset                                  | drawn at | stored    | why that width                                   |
+| -------------------------------------- | -------- | --------- | ------------------------------------------------ |
+| `diagnostic_approach_diagram.webp`     | 720      | 1440×1216 | `PopupFigure` caps at `min(720px, 100%)`         |
+| `bleeding_manifestations_diagram.webp` | 720      | 1440×1252 | same cap                                         |
+| `clotting_cascade_diagram.webp`        | 610      | 1220×650  | card body 938 − `gap-6`, at the grid's 2/3 share |
+| `clotting-cascade-thumb.webp`          | 470      | 940×538   | the thumbnail's own `max-w-117.5`                |
+
+2x covers retina and stops there. The three that needed it were shipped at their
+designer-export resolution — 2868×2492, 2988×1591, 1894×1084 — which is 4–6x the
+drawn size, i.e. 16–36x the pixels to decode for no visible gain. Re-encoded at
+q82, which is indistinguishable from the source at display scale on this line art
+(checked at 3x zoom on the cascade's smallest labels) and takes the three from
+384K to 246K.
+
+**Decode cost is the reason, not bytes.** A pop-up's picture has to be rastered
+in the frame the card opens, and a 7.1MP source is enough work to miss it — the
+figure lands a frame or two late. The other half of that fix is making sure the
+asset is _fetched_ by then, which is a mounting question rather than a sizing one
+and is recorded on `preloadImage`.
+
+Keep the stored size and the `width`/`height` props in step: they are also where
+`aspect-ratio` comes from, so a pair that disagrees with the file reserves a box
+of the wrong shape and the card resettles when the image arrives.
 
 ### Verified in a browser
 

@@ -12,15 +12,22 @@
  * - The width cap is the figure's drawn width, because upscaling a raster past
  *   its native size only softens it. It is `min(…, 100%)` so a card narrower
  *   than the asset still shrinks it rather than overflowing. This is why the
- *   dimensions are props and not a shared constant: the §7.7 exports are not
- *   one size — the diagnostic and bleeding diagrams are drawn at 720 wide, the
- *   clotting cascade at 1894, and a single cap would either shrink the wide one
- *   into a corner of the card or upscale the narrow ones.
+ *   dimensions are props and not a shared constant: the §7.7 figures are not one
+ *   shape — the diagnostic diagram is 720×608 here and the bleeding one 720×626,
+ *   and a single cap would either shrink the wide one into a corner of the card
+ *   or upscale the narrow ones.
+ *
+ *   **They are half the asset's pixel dimensions, not a third of them or a
+ *   guess.** The files are stored at 2x for retina and nothing wider (see
+ *   docs/styling.md §13), so "half the asset" IS the drawn width — and because
+ *   the same numbers supply the `aspect-ratio` below, a pair that does not match
+ *   the file reserves a box of the wrong shape and the card resettles when the
+ *   picture lands.
  * - The height cap subtracts the card's chrome from its own `max-h-[95dvh]` — a
  *   measured 117px of crimson band (the title wraps to two lines at 1440) plus
  *   the body region's 16px of `py-2`, rounded up to 10rem so a title that wraps
  *   to a THIRD line on a narrower card still does not push the picture into a
- *   scroll. At 720 the bleeding diagram is 655px tall and a 1440×800 laptop
+ *   scroll. At 720 the bleeding diagram is 626px tall and a 1440×800 laptop
  *   leaves ~627px inside the card, so a width-only rule put the last inch of it
  *   behind a scrollbar.
  *
@@ -35,8 +42,20 @@
  * `height` *attributes* are absent: they are presentational hints that would
  * make the width definite again, and a definite width against a `max-height` is
  * exactly the squash `object-contain` exists to undo. The `aspect-ratio` they
- * would have supplied is set explicitly instead, so the card still reserves the
- * right box before the image decodes.
+ * would have supplied is set explicitly instead, so the card reserves the right
+ * box before the image *decodes*.
+ *
+ * **That reservation needs the bytes, though, not just the ratio.** `width` is
+ * `auto` here, so its used value comes from the image's intrinsic width — and an
+ * image that has not loaded has none, leaving `aspect-ratio` nothing to multiply
+ * and collapsing the box. A cold figure therefore opens to an empty card and
+ * then jumps taller when the picture lands, which is a *loading* bug and not a
+ * layout one: with the asset already fetched, first layout has the intrinsic
+ * size and neither the gap nor the jump happens.
+ *
+ * So this component does not warm its own URL — inside a `DisclosureBand` it
+ * mounts on the frame the card opens, far too late to matter. The chapter warms
+ * them; see `DiseaseBackground`.
  */
 export default function PopupFigure({
   src,

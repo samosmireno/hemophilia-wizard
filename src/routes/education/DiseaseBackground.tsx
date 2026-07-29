@@ -6,6 +6,7 @@ import ExpandableFigure from "../../components/ExpandableFigure";
 import PopupFigure from "../../components/PopupFigure";
 import { type Bullet, SEVERITY_TABLE, topicById } from "../../data/education";
 import { cn } from "../../lib/cn";
+import { usePreloadImages } from "../../lib/preloadImage";
 import ClottingCascadeFigure from "./ClottingCascadeFigure";
 
 /**
@@ -71,14 +72,31 @@ const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
       <PopupFigure
         src={bleedingUrl}
         width={720}
-        height={655}
+        height={626}
         alt="Typical bleeding manifestations in males and females with hemophilia A or B, annotated on a body diagram. Musculoskeletal bleeding, mainly the elbows, ankles, and knees, accounts for 80%. Also shown: intracranial hemorrhage; oropharyngeal cavity bleeding; epistaxis, rarely; gastrointestinal bleeding; genitourinary bleeding; heavy menstrual bleeding and postpartum hemorrhage; and easy bruising."
       />
     ),
   },
 ];
 
+/**
+ * The two figures a `DisclosureBand` opens, warmed from here rather than from
+ * inside them.
+ *
+ * `DisclosureBand` renders only the *open* disclosure's `content`, so the
+ * `PopupFigure`s below do not exist in the DOM until they are clicked — nothing
+ * requests these two during the chapter's own load, and a cold card opens empty
+ * and then jumps taller once the picture arrives (see `PopupFigure`). This is
+ * the nearest scope that is mounted the whole time and already holds the URLs.
+ *
+ * The cascade is absent deliberately: `ExpandableFigure` mounts its body with
+ * the chapter, so `ClottingCascadeFigure` warms itself.
+ */
+const DISCLOSURE_FIGURES = [diagnosticUrl, bleedingUrl];
+
 export default function DiseaseBackground() {
+  usePreloadImages(DISCLOSURE_FIGURES);
+
   // A growing flex column so the severity band below can take the leftover
   // height — the shell hands every page a `flex-1` wrapper inside a `min-h-dvh`
   // `<main>`, so `flex-1` here resolves against the viewport.
@@ -119,7 +137,7 @@ export default function DiseaseBackground() {
           thumbSrc={cascadeThumbUrl}
           title={CASCADE_TITLE}
           surface="white"
-          className="mt-8 max-w-[470px] lg:mt-0"
+          className="mt-8 max-w-117.5 lg:mt-0"
         >
           <ClottingCascadeFigure />
         </ExpandableFigure>
