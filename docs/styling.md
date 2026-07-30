@@ -1183,6 +1183,76 @@ Tailwind, so this was invisible to `npm test` in both directions.
 `px-16` against a `92vw` card — so 26px lead copy sets seven words to the line. Every
 card in the app has this; it is a `Popup` question rather than a chapter one.
 
+### `prophylaxis-guidance`
+
+The fourth designed chapter (`src/routes/education/ProphylaxisGuidance.tsx`), from a
+**1440 × 800** artboard like the others, and the sparsest one in the app: a heading,
+two bullets, and a full-bleed wash behind them. No figures, no `+`, nothing to open.
+
+**It is the first chapter that centres itself vertically.** The drawn block runs from
+the heading's cap top to the last bullet's descender with the space above and below
+equal to within ~8px, so it ships as `flex flex-1 flex-col justify-center` — which is
+what `AppShell`'s `min-h-dvh` column and its `flex flex-1 flex-col` wrapper were
+already there to permit (§6; `Landing` is the other caller). It centres inside the
+shell's padded box, so the rule's clearance and the bottom bar's are off the top and
+bottom before the maths — which is what puts the block a touch under the true centre
+line, as drawn. The chapter is 800px tall at 1440×800 and does not scroll, which is
+the one-screen goal the open item above records for `disease-background`.
+
+Type, measured off the 2000px export against the 1.389 scale that canvas implies:
+
+| Ink                | Measured           | Ships as                      |
+| ------------------ | ------------------ | ----------------------------- |
+| heading, 3 lines   | ~49px/58 leading   | `text-h1` (52/54.6), `lg:` up |
+| heading → bullets  | 35px ink-to-ink    | `mt-8` — the designer's 32    |
+| bullets, 26px/32.5 | 26px/32.4 measured | `text-[26px] leading-tight`   |
+
+The heading is within 6% of `text-h1` on size and looser on leading (1.18 against
+1.05), which is open item 9's discrepancy again rather than a new one — it stays on
+the scale. The bullets are raw for the §8 reason the other chapters record: 26px is
+`text-h3`'s size at weight 600 where this is 400. `rebalancing-agents` sets its
+bullets at the same 26px.
+
+**The heading steps down to `text-h2` below `lg`, which no other chapter does.** This
+one is a 17-word sentence where the others are two to six words, so at 52px it takes
+eleven lines on a 390px phone — the whole screen before the first bullet. An invented
+comfort value, exactly like the small-screen gutters above: the artboard is 1440 and
+nobody has drawn a phone. Stated as a scale step rather than a raw size so the two
+sizes read as one scale.
+
+#### The backdrop is the chapter's own, and the 15% lives in CSS
+
+`bg_image.webp` mounts as a second `fixed inset-0 -z-10` layer, later in DOM order
+than `AppShell`'s, so it paints over `bg-page` while the mint gradient still shows
+through at 15%. That is `Landing`'s arrangement (§6) one chapter deeper, and it is
+what the artboard composites: sampling the reference against the asset and the §6
+gradient, `0.15 × image over bg-page` reproduces the drawn background to within a few
+units of 255 across the canvas — which is also how the 15% was confirmed rather than
+assumed.
+
+**The asset arrived with that opacity baked in** — a uniform alpha of 38/255 (14.9%)
+over full-strength RGB. It ships flattened to an opaque image with `opacity-15` in
+CSS: the design value is then greppable and adjustable instead of hidden in an alpha
+channel, and the two composite identically (mean difference 0.21/255 over 20k sampled
+pixels; the only pixels that move are ~5.7k scattered fully-transparent ones, which is
+encoder noise at shape edges). Doubling the two would have painted the wash at 2.25%.
+
+It is `object-cover` on a square asset, centred — the crop the artboard draws — and
+`alt=""`, because it is wallpaper and the two bullets are the content.
+
+**Stored at 1920×1921, from a 5760×5763 delivery.** The 2× rule in §13 is for figures,
+where the drawn width is known and the labels have to survive; this is a full-bleed
+wash at 15% with no ink in it, so it is sized against decode cost instead: 33MP is
+8× the pixels of the biggest figure in the app for a layer nobody reads. 1920 covers
+the 1440 canvas at 1.33× and holds up on a retina viewport at this opacity; the file
+goes 721K → 116K at `-q 82`.
+
+**Verified in Chrome at 1440×800 and 390×780.** The composite matches the reference to
+a mean of 7/255 over sampled background points at 1440 (the residual is a sub-pixel
+crop offset in the export, on imagery with high local variance). At 390 the chapter
+fits one screen with the stepped-down heading, and the wash stays put while it does —
+`fixed`, so it does not stretch with the document the way a `<main>` background would.
+
 ---
 
 ## 12. Layout geometry

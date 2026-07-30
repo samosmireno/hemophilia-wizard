@@ -44,18 +44,19 @@ describe("router", () => {
     ["disease-background", "Hemophilia Disease Background"],
     ["treatment-landscape", "The Evolving Treatment Landscape for Hemophilia"],
     ["rebalancing-agents", "Hemostatic Rebalancing Agents"],
+    [
+      "prophylaxis-guidance",
+      "Prophylactic treatment is recommended over episodic treatment to control bleeding in patients with moderately severe/severe hemophilia",
+    ],
   ])("renders the %s chapter", (section, title) => {
     renderAt(`/education/${section}`);
     expect(heading()).toHaveTextContent(title);
   });
 
-  it.each(["fviiia-mimetics", "prophylaxis-guidance"])(
-    "renders the %s education chapter placeholder",
-    (section) => {
-      renderAt(`/education/${section}`);
-      expect(heading()).toHaveTextContent(`Education — ${section}`);
-    },
-  );
+  it.each(["fviiia-mimetics"])("renders the %s education chapter placeholder", (section) => {
+    renderAt(`/education/${section}`);
+    expect(heading()).toHaveTextContent(`Education — ${section}`);
+  });
 
   // `CHAPTERS` is looked up with `Object.hasOwn`, so an inherited Object key is
   // not a section — `in` would resolve it and then try to render it.
@@ -113,6 +114,24 @@ describe("router", () => {
       (path) => {
         renderAt(path);
         expect(backdrop("landing")).not.toBeInTheDocument();
+      },
+    );
+
+    // The same arrangement one chapter deeper: `prophylaxis-guidance` adds its
+    // own wash over the shell's gradient, and it belongs to that chapter alone —
+    // a backdrop that leaked onto the chapter beside it would be invisible in
+    // that chapter's own test, which never renders the router.
+    it("adds the prophylaxis wash at /education/prophylaxis-guidance only", () => {
+      renderAt("/education/prophylaxis-guidance");
+      expect(backdrop("prophylaxis")).toBeInTheDocument();
+      expect(backdrop("default")).toBeInTheDocument();
+    });
+
+    it.each(["/", "/education/disease-background", "/education/rebalancing-agents"])(
+      "has no prophylaxis wash at %s",
+      (path) => {
+        renderAt(path);
+        expect(backdrop("prophylaxis")).not.toBeInTheDocument();
       },
     );
   });
