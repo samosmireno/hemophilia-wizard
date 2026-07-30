@@ -3,13 +3,15 @@ import { describe, expect, it } from "vitest";
 import { SECTION_ORDER, nextOf, prevOf } from "./sectionOrder";
 
 describe("sectionOrder", () => {
-  it("is the nine-step walkthrough spine in blueprint order", () => {
+  it("is the eleven-step walkthrough spine in blueprint order", () => {
     expect([...SECTION_ORDER]).toEqual([
       "/",
       "/education/disease-background",
       "/education/treatment-landscape",
       "/education/rebalancing-agents",
       "/education/fviiia-mimetics",
+      "/education/prophylaxis-guidance",
+      "/wizard-intro",
       "/wizard",
       "/explore",
       "/resources",
@@ -25,14 +27,18 @@ describe("sectionOrder", () => {
 
   it("nextOf steps forward through the spine", () => {
     expect(nextOf("/")).toBe("/education/disease-background");
-    expect(nextOf("/education/fviiia-mimetics")).toBe("/wizard");
+    expect(nextOf("/education/fviiia-mimetics")).toBe("/education/prophylaxis-guidance");
+    expect(nextOf("/education/prophylaxis-guidance")).toBe("/wizard-intro");
+    expect(nextOf("/wizard-intro")).toBe("/wizard");
     expect(nextOf("/wizard")).toBe("/explore");
     expect(nextOf("/resources")).toBe("/survey");
   });
 
   it("prevOf steps backward through the spine", () => {
     expect(prevOf("/survey")).toBe("/resources");
-    expect(prevOf("/wizard")).toBe("/education/fviiia-mimetics");
+    expect(prevOf("/wizard")).toBe("/wizard-intro");
+    expect(prevOf("/wizard-intro")).toBe("/education/prophylaxis-guidance");
+    expect(prevOf("/education/prophylaxis-guidance")).toBe("/education/fviiia-mimetics");
     expect(prevOf("/education/disease-background")).toBe("/");
   });
 

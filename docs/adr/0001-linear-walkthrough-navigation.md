@@ -12,17 +12,19 @@ learner an obvious "what's next."
 
 ## The section order
 
-The Prev/Next spine is a fixed sequence of nine steps:
+The Prev/Next spine is a fixed sequence of eleven steps:
 
 1. `/` — Home
 2. `/education/disease-background`
 3. `/education/treatment-landscape`
 4. `/education/rebalancing-agents`
 5. `/education/fviiia-mimetics`
-6. `/wizard`
-7. `/explore`
-8. `/resources` — curated Resources panel
-9. `/survey`
+6. `/education/prophylaxis-guidance`
+7. `/wizard-intro` — hands the learner off from education into the wizard
+8. `/wizard`
+9. `/explore`
+10. `/resources` — curated Resources panel
+11. `/survey`
 
 This ordering is a structural fact the shell owns, encoded in `src/data/sectionOrder.ts`
 (the canonical array plus `prevOf` / `nextOf` resolvers). It is independent of the visual
@@ -40,7 +42,7 @@ always-visible sidebar button, and none appears in Prev/Next:
 
 This **splits** what the blueprint (and the original issue 12 / `CONTEXT.md §9`) bundled
 as one combined "Resources / References / Glossary" destination into **four** routes:
-`/resources` (curated panel, in-flow step 8) plus the three off-line pages above. Note
+`/resources` (curated panel, in-flow step 10) plus the three off-line pages above. Note
 `Acronyms` content currently lives _inside_ `CONTEXT.md §8 Glossary` and is pulled out
 into its own page as part of this split.
 

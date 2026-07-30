@@ -25,6 +25,7 @@ describe("router", () => {
   });
 
   it.each([
+    ["/wizard-intro", /Treatment Wizard — Introduction/],
     ["/wizard", /Treatment Wizard/],
     ["/explore", /Explore/],
     ["/resources", /Resources/],
@@ -48,10 +49,13 @@ describe("router", () => {
     expect(heading()).toHaveTextContent(title);
   });
 
-  it.each(["fviiia-mimetics"])("renders the %s education chapter placeholder", (section) => {
-    renderAt(`/education/${section}`);
-    expect(heading()).toHaveTextContent(`Education — ${section}`);
-  });
+  it.each(["fviiia-mimetics", "prophylaxis-guidance"])(
+    "renders the %s education chapter placeholder",
+    (section) => {
+      renderAt(`/education/${section}`);
+      expect(heading()).toHaveTextContent(`Education — ${section}`);
+    },
+  );
 
   // `CHAPTERS` is looked up with `Object.hasOwn`, so an inherited Object key is
   // not a section — `in` would resolve it and then try to render it.
@@ -119,6 +123,7 @@ describe("router", () => {
     const rule = () => document.querySelector("[data-top-rule]");
 
     it.each([
+      "/wizard-intro",
       "/wizard",
       "/explore",
       "/resources",

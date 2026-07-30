@@ -11,6 +11,7 @@ import Resources from "./Resources";
 import Survey from "./Survey";
 import TopRule from "./TopRule";
 import Wizard from "./Wizard";
+import WizardIntro from "./WizardIntro";
 
 /**
  * The app's route config (data router). `AppShell` is the layout route; every
@@ -47,6 +48,7 @@ export const routes: RouteObject[] = [
               { path: "*", element: <Navigate to="/education/disease-background" replace /> },
             ],
           },
+          { path: "wizard-intro", element: <WizardIntro /> },
           { path: "wizard", element: <Wizard /> },
           { path: "explore", element: <Explore /> },
           { path: "resources", element: <Resources /> },
