@@ -23,6 +23,17 @@
 
 import { TREATMENTS, type Treatment } from "./treatments";
 
+/**
+ * The blueprint's entry node — the line the wizard opens on (CONTEXT.md §4),
+ * verbatim but for the trailing full stop, which the source sets because it
+ * draws the node as a sentence and `/wizard-intro` renders it as a heading.
+ *
+ * Title case is the source's own; the page uppercases it in CSS, as every
+ * education chapter does with its sentence-case heading, so the accessible name
+ * stays the copy that was written rather than a shout.
+ */
+export const WIZARD_ENTRY_PROMPT = "Explore Novel Prophylactic Therapy Options for Your Patient";
+
 export type WizardHemophiliaType = "A" | "B";
 
 /** The wizard's third question — the primary reason for switching therapy. */

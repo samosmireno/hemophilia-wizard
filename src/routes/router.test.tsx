@@ -4,6 +4,7 @@ import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { ACTIVITY_TITLE } from "../data/activity";
+import { WIZARD_ENTRY_PROMPT } from "../data/wizard";
 import { routes } from "./router";
 
 function renderAt(path: string) {
@@ -24,8 +25,13 @@ describe("router", () => {
     expect(heading()).toHaveTextContent(ACTIVITY_TITLE);
   });
 
+  // Not a stub any more: the card carries the blueprint's entry-node line.
+  it("renders the wizard intro card at /wizard-intro", () => {
+    renderAt("/wizard-intro");
+    expect(heading()).toHaveTextContent(WIZARD_ENTRY_PROMPT);
+  });
+
   it.each([
-    ["/wizard-intro", /Treatment Wizard — Introduction/],
     ["/wizard", /Treatment Wizard/],
     ["/explore", /Explore/],
     ["/resources", /Resources/],
@@ -132,6 +138,24 @@ describe("router", () => {
       (path) => {
         renderAt(path);
         expect(backdrop("prophylaxis")).not.toBeInTheDocument();
+      },
+    );
+
+    // The intro card washes the same footage `/` plays, at its own opacity —
+    // which is exactly why "does it leak" is worth asserting: the two backdrops
+    // are indistinguishable in a page-level test that never renders the router.
+    it("adds the wizard-intro wash at /wizard-intro only", () => {
+      renderAt("/wizard-intro");
+      expect(backdrop("wizard-intro")).toBeInTheDocument();
+      expect(backdrop("default")).toBeInTheDocument();
+      expect(backdrop("landing")).not.toBeInTheDocument();
+    });
+
+    it.each(["/", "/wizard", "/education/prophylaxis-guidance"])(
+      "has no wizard-intro wash at %s",
+      (path) => {
+        renderAt(path);
+        expect(backdrop("wizard-intro")).not.toBeInTheDocument();
       },
     );
   });
