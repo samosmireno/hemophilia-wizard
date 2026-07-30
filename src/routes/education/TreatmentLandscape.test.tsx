@@ -228,12 +228,12 @@ describe("treatment-landscape chapter", () => {
   });
 
   /**
-   * The third card is the §7.3 class matrix, and the artboard titles its band
-   * "TABLE 1" — the one card whose heading names a figure number rather than its
-   * own subject. Asserted whole, because the temptation to "improve" it into the
-   * trigger's caption is exactly what this is here to catch.
+   * The §7.3 class matrix carries no title override, so its band takes the
+   * trigger's caption like the other two cards do — the subject of the table,
+   * not the figure number the artboard prints over it. Asserted so the pop-up
+   * and the control a reader followed to get there stay the same phrase.
    */
-  it("names the novel-therapy card as the artboard titles it", async () => {
+  it("names the novel-therapy card after its trigger", async () => {
     const user = userEvent.setup();
     render(<TreatmentLandscape />);
 
@@ -241,7 +241,7 @@ describe("treatment-landscape chapter", () => {
       screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
     );
 
-    expect(screen.getByRole("dialog")).toHaveAccessibleName("Table 1");
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Novel therapy classes for HA/HB");
   });
 
   /**

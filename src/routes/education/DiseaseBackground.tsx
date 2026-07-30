@@ -73,7 +73,7 @@ const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
       <PopupFigure
         src={bleedingUrl}
         width={720}
-        height={626}
+        height={640}
         alt="Typical bleeding manifestations in males and females with hemophilia A or B, annotated on a body diagram. Musculoskeletal bleeding, mainly the elbows, ankles, and knees, accounts for 80%. Also shown: intracranial hemorrhage; oropharyngeal cavity bleeding; epistaxis, rarely; gastrointestinal bleeding; genitourinary bleeding; heavy menstrual bleeding and postpartum hemorrhage; and easy bruising."
       />
     ),
@@ -138,7 +138,7 @@ export default function DiseaseBackground() {
           thumbSrc={cascadeThumbUrl}
           title={CASCADE_TITLE}
           surface="white"
-          className="mt-8 max-w-117.5 lg:mt-0"
+          className="mt-8 max-w-120 lg:mt-0"
         >
           <ClottingCascadeFigure />
         </ExpandableFigure>

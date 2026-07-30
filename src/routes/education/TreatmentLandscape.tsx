@@ -103,13 +103,6 @@ const ROWS: readonly [Row, Row, Row] = [
     heading: "Personalized therapy for HA/HB:",
     bullets: PERSONALIZED.body,
     label: "Novel therapy classes for HA/HB",
-    // The one card whose band is not its own subject: the artboard titles it
-    // "TABLE 1" and nothing else. Shipped as drawn — the caption on the trigger
-    // ("Novel therapy classes for HA/HB") is what tells a reader, and a screen
-    // reader user who followed it, which table this is; substituting that
-    // caption here would put copy in the band the designer did not draw. Raised
-    // with the two wording items in docs/styling.md §11.
-    title: "Table 1",
     content: <TreatmentOptionsTable />,
   },
 ];
@@ -173,7 +166,7 @@ export default function TreatmentLandscape() {
         heading, the other two level with theirs — and one rule across three
         rows beats reproducing that as a per-row nudge.
       */}
-      <div className="mt-8 grid gap-y-5 lg:grid-cols-[1fr_202px_286px] lg:items-center lg:gap-x-6">
+      <div className="mt-8 grid gap-y-5 lg:grid-cols-[1fr_200px_300px] lg:items-center lg:gap-x-6">
         {ROWS.map((row, index) => (
           <Fragment key={row.heading}>
             <div>
@@ -194,7 +187,7 @@ export default function TreatmentLandscape() {
               empty `<div>` is already invisible to assistive tech, so it
               needs no `aria-hidden` either.
             */}
-            <div className="h-41.5 w-full max-w-50.5 border-4 border-black" />
+            <div className="h-41.5 w-full max-w-50 border-4 border-black" />
 
             {/*
               Horizontal centring only — the row's `items-center` already
