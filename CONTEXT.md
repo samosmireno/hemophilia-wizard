@@ -344,15 +344,16 @@ text is in `documents/out_raw.txt` (LEFT band). Fields below feed issue 11 (educ
 Content is `[PDF-V]` unless tagged `[PPTX]`.
 
 **Architecture (per issue 01 / issue 11):** education is a **multi-chapter module** built as
-`/education/:section` subroutes, **not** a single page. The §7.x content below maps to four
+`/education/:section` subroutes, **not** a single page. The §7.x content below maps to five
 chapters:
 
-| Chapter subroute      | Source subsections              |
-| --------------------- | ------------------------------- |
-| `disease-background`  | §7.2                            |
-| `treatment-landscape` | §7.1, §7.3, §7.4                |
-| `rebalancing-agents`  | §7.6 (wizard cross-link target) |
-| `fviiia-mimetics`     | §7.5 (wizard cross-link target) |
+| Chapter subroute       | Source subsections                                    |
+| ---------------------- | ----------------------------------------------------- |
+| `disease-background`   | §7.2                                                  |
+| `treatment-landscape`  | §7.1, §7.3, §7.4 (first bullet + benefits/challenges) |
+| `rebalancing-agents`   | §7.6 (wizard cross-link target)                       |
+| `fviiia-mimetics`      | §7.5 (wizard cross-link target)                       |
+| `prophylaxis-guidance` | §7.4 prophylaxis guidance (last chapter)              |
 
 The §7.7 "Click here:" figures are **in-chapter local-state pop-ups** — not routes, and not the
 `?drug=<id>` overlay (that param is reserved for drug sheets, [§6](#6-drug-information-sheets) /

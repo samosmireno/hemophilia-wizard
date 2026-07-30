@@ -2,6 +2,7 @@ import { Navigate, useParams } from "react-router";
 
 import DiseaseBackground from "./education/DiseaseBackground";
 import FviiiaMimetics from "./education/FviiiaMimetics";
+import ProphylaxisGuidance from "./education/ProphylaxisGuidance";
 import RebalancingAgents from "./education/RebalancingAgents";
 import TreatmentLandscape from "./education/TreatmentLandscape";
 
@@ -9,7 +10,7 @@ import TreatmentLandscape from "./education/TreatmentLandscape";
 const EDUCATION_DEFAULT = "/education/disease-background";
 
 /**
- * The four chapters, keyed by their stable URL slug. This record is both the
+ * The five chapters, keyed by their stable URL slug. This record is both the
  * validity gate for `:section` and the dispatch table — one source of truth, so
  * a chapter cannot be routable without a component or vice versa.
  *
@@ -17,16 +18,17 @@ const EDUCATION_DEFAULT = "/education/disease-background";
  * their slugs are contractual. Walkthrough ORDER is not decided here — that is
  * `SECTION_ORDER` in `src/data/sectionOrder.ts`.
  *
- * Each chapter is its own component rather than one data-driven renderer: the
- * four are structurally different (this one pairs prose with a figure and a row
- * of disclosures; `treatment-landscape` carries a five-column matrix), so a
- * shared renderer would be modelling a similarity that is not there.
+ * Each chapter is its own component rather than one data-driven renderer: they
+ * are structurally different (`disease-background` pairs prose with a figure and
+ * a row of disclosures; `treatment-landscape` carries a five-column matrix), so
+ * a shared renderer would be modelling a similarity that is not there.
  */
 const CHAPTERS = {
   "disease-background": DiseaseBackground,
   "treatment-landscape": TreatmentLandscape,
   "rebalancing-agents": RebalancingAgents,
   "fviiia-mimetics": FviiiaMimetics,
+  "prophylaxis-guidance": ProphylaxisGuidance,
 } as const;
 
 type EducationSection = keyof typeof CHAPTERS;
