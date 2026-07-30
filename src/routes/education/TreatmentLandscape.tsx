@@ -39,15 +39,15 @@ interface Row {
    * The card's own heading, which is not the caption — the same split
    * `Disclosure` documents: the caption names the target from the §7.7 index
    * ("Benefits and challenges of clotting replacement therapies") while the card
-   * wears the figure's full title. Optional only because the two rows without
-   * content have no card to title yet.
+   * wears the figure's full title. Optional only because the one row without
+   * content has no card to title yet.
    */
   title?: string;
   /** The card's second band line. See `Popup`'s own `subtitle`. */
   subtitle?: string;
   /**
-   * What the `+` opens. Optional because it genuinely is: the other two rows are
-   * §7.7 targets whose artboards have not landed, and they keep the inert toggle
+   * What the `+` opens. Optional because it genuinely is: the last row is a
+   * §7.7 target whose artboard has not landed, and it keeps the inert toggle
    * `DisclosureBand` documents rather than opening an empty card.
    */
   content?: ReactNode;
@@ -81,6 +81,15 @@ const ROWS: readonly [Row, Row, Row] = [
     heading: "Non-factor therapies:",
     bullets: NFT.body,
     label: "Benefits and challenges of NFTs",
+    // A data read where the clotting row above needs a literal: that card's
+    // title is copy the source states nowhere else, while this one is its
+    // topic's own title, which the artboard reproduces exactly. (The artboard
+    // sets it in caps — CSS — and splits it as "NON- FACTOR", which is a stray
+    // space in the drawing rather than a spelling this repo should learn.)
+    title: NFT.title,
+    // No subtitle: unlike §7.4, the artboard gives this card's band one line.
+    // The class needs no scope qualifier — the two lists are about NFTs whole.
+    content: <BenefitsChallengesCard data={NFT.benefitsChallenges!} image={bloodDropUrl} />,
   },
   {
     heading: "Personalized therapy for HA/HB:",
@@ -202,8 +211,8 @@ export default function TreatmentLandscape() {
         while closed, so nothing renders early.
 
         `open` is gated on the content existing rather than on a row being
-        selected — the two rows without an artboard still flip their `+` to ✕,
-        which is the state they were in before, but summon no empty card.
+        selected — the last row, whose artboard has not landed, still flips its
+        `+` to ✕, which is the state it was in before, but summons no card.
       */}
       <Popup
         open={open?.content !== undefined}
@@ -222,10 +231,10 @@ export default function TreatmentLandscape() {
  * in a column, with a decorative figure beside them.
  *
  * A local function rather than a shared component, the shape `SeverityTable`
- * takes at the bottom of `DiseaseBackground` — the only other caller this will
- * ever have is the NFT row three lines up, whose own `benefitsChallenges` is
- * already in the data module. Both live in this file, so it has no reason to
- * become an import.
+ * takes at the bottom of `DiseaseBackground` — both callers are `ROWS` entries
+ * in this same file, and `benefitsChallenges` is authored on exactly two topics
+ * in the data module, so a third is not coming and this has no reason to become
+ * an import.
  *
  * Type is raw design values under §8's precedent: 20px body copy is off the
  * scale's `text-body` step, and `text-h4` is 20px but carries weight 600. The

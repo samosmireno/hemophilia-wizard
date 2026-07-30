@@ -113,20 +113,22 @@ describe("treatment-landscape chapter", () => {
   });
 
   /**
-   * Only the clotting row has a card. The other two keep the inert toggle
-   * `DisclosureBand` documents — the `+` flips, but nothing opens — so
-   * `aria-haspopup` is announced on exactly one trigger.
+   * The last row has no card — its artboard has not landed, so it keeps the
+   * inert toggle `DisclosureBand` documents: the `+` flips, but nothing opens.
+   * `aria-haspopup` is what must not be claimed there, and must be claimed on
+   * the two rows that do open one.
    */
-  it("advertises a dialog on the one trigger that opens one", () => {
+  it("advertises a dialog on exactly the triggers that open one", () => {
     render(<TreatmentLandscape />);
     const advertised = screen
       .getAllByRole("button")
       .filter((button) => button.getAttribute("aria-haspopup") === "dialog");
 
-    expect(advertised).toHaveLength(1);
+    expect(advertised).toHaveLength(2);
     expect(advertised[0]).toHaveAccessibleName(
       "Expand Benefits and challenges of clotting replacement therapies",
     );
+    expect(advertised[1]).toHaveAccessibleName("Expand Benefits and challenges of NFTs");
   });
 
   /**
@@ -180,18 +182,72 @@ describe("treatment-landscape chapter", () => {
   });
 
   /**
-   * The drop is ornament, unlike every other §7 figure — so it must stay out of
-   * the accessibility tree even once the card that holds it is open.
+   * The NFT card's title is its topic's own — the artboard reproduces it
+   * exactly — and it has no subtitle, unlike §7.4's. Asserting the whole
+   * accessible name is what catches the clotting card's parenthetical being
+   * generalised onto a class it does not scope.
    */
-  it("keeps the blood drop decorative", async () => {
+  it("names the NFT card with its topic title alone", async () => {
     const user = userEvent.setup();
     render(<TreatmentLandscape />);
 
-    await user.click(
-      screen.getByRole("button", {
-        name: "Expand Benefits and challenges of clotting replacement therapies",
-      }),
-    );
+    await user.click(screen.getByRole("button", { name: "Expand Benefits and challenges of NFTs" }));
+
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Non-factor Replacement Therapies");
+  });
+
+  /** The NFT half of the same verbatim-from-data guard the clotting card gets. */
+  it("renders the NFT benefits and challenges from the data module", async () => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    await user.click(screen.getByRole("button", { name: "Expand Benefits and challenges of NFTs" }));
+
+    const dialog = within(screen.getByRole("dialog"));
+    const { benefits, challenges } = topicById("nft")!.benefitsChallenges!;
+
+    for (const bullet of [...benefits, ...challenges]) {
+      expect(dialog.getByText(bullet)).toBeInTheDocument();
+    }
+    for (const heading of ["Benefits", "Challenges"]) {
+      expect(dialog.getByRole("heading", { level: 3, name: heading })).toBeInTheDocument();
+    }
+  });
+
+  /**
+   * Two rows now open a card, which is what makes the chapter's single
+   * `openIndex` load-bearing rather than a tidier spelling of two booleans:
+   * clicking the second `+` must replace the first card, not stack a second
+   * dialog or leave the first trigger showing ✕.
+   */
+  it("swaps cards rather than opening two, when the other trigger is clicked", async () => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    const clotting = "Benefits and challenges of clotting replacement therapies";
+    await user.click(screen.getByRole("button", { name: `Expand ${clotting}` }));
+    await user.click(screen.getByRole("button", { name: "Expand Benefits and challenges of NFTs" }));
+
+    // One dialog, and it is the NFT one.
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Non-factor Replacement Therapies");
+    // The trigger left behind agrees: it is back to offering "Expand".
+    expect(screen.getByRole("button", { name: `Expand ${clotting}` })).toBeInTheDocument();
+  });
+
+  /**
+   * The drop is ornament, unlike every other §7 figure — so it must stay out of
+   * the accessibility tree even once a card that holds it is open. Both cards
+   * draw the same asset, so both are asserted.
+   */
+  it.each([
+    "Benefits and challenges of clotting replacement therapies",
+    "Benefits and challenges of NFTs",
+  ])("keeps the blood drop decorative in the %s card", async (caption) => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    await user.click(screen.getByRole("button", { name: `Expand ${caption}` }));
 
     expect(screen.queryAllByRole("img")).toHaveLength(0);
   });

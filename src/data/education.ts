@@ -204,7 +204,10 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
         "Subcutaneous administration",
         "Stable generation of thrombin",
         "Long half-life",
-        "Shift disease from severe --> mild",
+        // A real arrow, not the transcription's ASCII `-->`: this string is
+        // rendered copy, the artboard draws "severe → mild", and CONTEXT.md
+        // §7.6 states it the same way.
+        "Shift disease from severe → mild",
         "Effective regardless of inhibitor status",
       ],
       challenges: [
