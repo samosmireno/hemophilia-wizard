@@ -4,7 +4,15 @@ import { PopupButton } from "mlg-components";
 import bloodDropUrl from "../../assets/images/blood_drop.webp";
 import BulletList from "../../components/BulletList";
 import Popup from "../../components/Popup";
-import { type BenefitsChallenges, type Bullet, topicById } from "../../data/education";
+import {
+  type BenefitsChallenges,
+  type Bullet,
+  type FootnoteKey,
+  TREATMENT_OPTIONS_FOOTNOTES,
+  TREATMENT_OPTIONS_MATRIX,
+  topicById,
+} from "../../data/education";
+import { cn } from "../../lib/cn";
 import { usePreloadImage } from "../../lib/preloadImage";
 
 /**
@@ -95,6 +103,14 @@ const ROWS: readonly [Row, Row, Row] = [
     heading: "Personalized therapy for HA/HB:",
     bullets: PERSONALIZED.body,
     label: "Novel therapy classes for HA/HB",
+    // The one card whose band is not its own subject: the artboard titles it
+    // "TABLE 1" and nothing else. Shipped as drawn — the caption on the trigger
+    // ("Novel therapy classes for HA/HB") is what tells a reader, and a screen
+    // reader user who followed it, which table this is; substituting that
+    // caption here would put copy in the band the designer did not draw. Raised
+    // with the two wording items in docs/styling.md §11.
+    title: "Table 1",
+    content: <TreatmentOptionsTable />,
   },
 ];
 
@@ -210,9 +226,11 @@ export default function TreatmentLandscape() {
         element already in the DOM, and the children it wraps are `undefined`
         while closed, so nothing renders early.
 
-        `open` is gated on the content existing rather than on a row being
-        selected — the last row, whose artboard has not landed, still flips its
-        `+` to ✕, which is the state it was in before, but summons no card.
+        `open` stays gated on the content existing rather than on a row being
+        selected. All three rows now carry a card, so the two conditions agree
+        today — but `Row.content` is optional precisely because a §7.7 target can
+        land ahead of its artboard, and this is what keeps that row's `+` from
+        summoning an empty card if one ever does again.
       */}
       <Popup
         open={open?.content !== undefined}
@@ -289,6 +307,176 @@ function BenefitsChallengesCard({
         height={1020}
         className="hidden h-auto w-46.5 shrink-0 md:block"
       />
+    </div>
+  );
+}
+
+/**
+ * The five column headings, as drawn. Literals rather than keys derived from
+ * `TreatmentOptionRow` — the artboard's own casing is uneven ("Treatment
+ * options" against "Mechanism of Action"), which a humanised field name would
+ * quietly regularise, and "Route of Administration" is not `route` under any
+ * transformation.
+ */
+const MATRIX_COLUMNS = [
+  "Treatment options",
+  "Mechanism of Action",
+  "Population",
+  "Indication",
+  "Route of Administration",
+] as const;
+
+/**
+ * The markers the table actually uses, in the order they first appear, deduped.
+ *
+ * Derived rather than written out as `["a", "b", "c"]`: this is what makes a
+ * marker with no footnote — or a footnote nothing points at — impossible to
+ * ship. The keys and the rows are two halves of one fact, and only one of them
+ * is allowed to state it.
+ */
+const USED_FOOTNOTES: readonly FootnoteKey[] = [
+  ...new Set(
+    TREATMENT_OPTIONS_MATRIX.map((row) => row.footnote).filter((key) => key !== undefined),
+  ),
+];
+
+/**
+ * Shared by the body's five cells. `align-middle` is the `<td>` default but not
+ * the `<th>` one, and column 1 is a row header — without it the option name
+ * would sit at the top of a four-line row while everything beside it centres.
+ */
+const MATRIX_CELL = "px-2 py-1.5 align-middle";
+
+/**
+ * The hairline between cells. Inferred, like `SeverityTable`'s: the export draws
+ * a flat #A0A0A0 rule the palette has no token for, and `black/30` over the
+ * body gradient resolves within a point of it — close enough that reproducing
+ * the grey exactly would only buy a raw hex in a file that has none.
+ */
+const MATRIX_RULE = "border-black/30";
+
+/**
+ * `TREATMENT_OPTIONS_MATRIX` as the §7.7 "Table 1" pop-up draws it: five classes
+ * against mechanism / population / indication / route, under one pale header
+ * pill, with the markers resolved beneath.
+ *
+ * A local function beside `BenefitsChallengesCard`, the shape `SeverityTable`
+ * takes in `disease-background` — one caller, one `ROWS` entry in this same
+ * file, and a second is not coming.
+ *
+ * **A real `<table>`, and column 1 is a `<th scope="row">`.** Unlike the
+ * severity card — whose pale bars read as pills and had to be argued back into a
+ * table — this is a matrix on its face. What is worth stating is the row header:
+ * "SC" in isolation means nothing, and `scope="row"` is what lets a screen
+ * reader announce it as "Rebalancing: siRNA, Route of Administration, SC".
+ *
+ * `border-separate` with zero spacing, again as `SeverityTable`: it is what lets
+ * the five header cells touch and share one `bg-white/50` bar while only the
+ * outer two round, so the row paints as a single pill.
+ *
+ * Type is raw design values under §8's precedent, and the three sizes are
+ * measured off the export rather than guessed: 20px headings, 16px in the three
+ * middle columns, and 24px in the two outer ones — the drawing genuinely sets
+ * the option name and the route larger than the prose between them. None of the
+ * three lands on a scale step at the weight drawn (`text-h4` and `text-h3` both
+ * carry 600 where this is 400), which is why they are stated raw.
+ */
+function TreatmentOptionsTable() {
+  return (
+    // `-mt-2` cancels `Popup`'s own `py-2` so the header pill meets the crimson
+    // band, which is how the export draws it — flush at the top, inset at the
+    // sides, so the pill reads as tucked under the band rather than floating
+    // below it.
+    <div>
+      <table className="w-full table-fixed border-separate border-spacing-0 text-center text-black">
+        <thead>
+          <tr>
+            {MATRIX_COLUMNS.map((column, index) => (
+              <th
+                key={column}
+                scope="col"
+                className={cn(
+                  "bg-white/50 px-2 py-3 text-[22px] leading-tight font-normal",
+                  index === 0 && "rounded-l-2xl",
+                  index === MATRIX_COLUMNS.length - 1 && "rounded-r-2xl",
+                )}
+              >
+                {column}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {TREATMENT_OPTIONS_MATRIX.map((row, index) => {
+            // Every cell of every row but the first carries the rule above it,
+            // rather than the row below carrying one beneath: `border-separate`
+            // does not collapse adjacent borders, so stating it on one side is
+            // what keeps a single hairline between rows and none under the last.
+            const rule = index > 0 && cn("border-t", MATRIX_RULE);
+            const column = cn("border-l", MATRIX_RULE);
+
+            return (
+              <tr key={row.option}>
+                <th
+                  scope="row"
+                  className={cn(MATRIX_CELL, "text-[22px] leading-tight font-normal", rule)}
+                >
+                  {row.option}
+                  {row.footnote && <sup>{row.footnote}</sup>}
+                </th>
+                <td className={cn(MATRIX_CELL, "text-[16px] leading-tight", column, rule)}>
+                  {row.moa}
+                </td>
+                <td className={cn(MATRIX_CELL, "text-[16px] leading-tight", column, rule)}>
+                  {row.population}
+                </td>
+                <td className={cn(MATRIX_CELL, "text-[16px] leading-tight", column, rule)}>
+                  {/* Stacked, not joined: the two indications on the first row
+                      are separate statements in the export, which is why
+                      `indication` is a list. `<span className="block">` rather
+                      than a `<ul>` — a single-entry list on the other four rows
+                      would announce "list of 1 item" four times over. */}
+                  {row.indication.map((line) => (
+                    <span key={line} className="block">
+                      {line}
+                    </span>
+                  ))}
+                </td>
+                <td className={cn(MATRIX_CELL, "text-[22px] leading-tight", column, rule)}>
+                  {row.route}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      {/* `list-none` with the marker in the text: the letters are the join to
+          the `<sup>`s above, so they are content, not a counter. An `<ol
+          type="a">` would draw the same glyphs and let them drift from the keys
+          the rows actually name.
+
+          14px/300 is the export's, and so is `leading-none` — the block is set
+          solid there. Both are raw for the usual reason: the scale's smallest
+          step is 12px, and it carries weight 500. */}
+      <ul className="mt-4 list-none text-[14px] leading-none font-light text-black">
+        {USED_FOOTNOTES.map((key) => {
+          const note = TREATMENT_OPTIONS_FOOTNOTES[key];
+
+          return (
+            <li key={key}>
+              {key}. {typeof note === "string" ? note : note.text}
+              {typeof note !== "string" && (
+                <ul className="list-disc pl-10">
+                  {note.children.map((child) => (
+                    <li key={child}>{child}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

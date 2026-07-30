@@ -2,7 +2,12 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-import { topicById } from "../../data/education";
+import {
+  type FootnoteKey,
+  TREATMENT_OPTIONS_FOOTNOTES,
+  TREATMENT_OPTIONS_MATRIX,
+  topicById,
+} from "../../data/education";
 import TreatmentLandscape from "./TreatmentLandscape";
 
 describe("treatment-landscape chapter", () => {
@@ -113,10 +118,11 @@ describe("treatment-landscape chapter", () => {
   });
 
   /**
-   * The last row has no card — its artboard has not landed, so it keeps the
-   * inert toggle `DisclosureBand` documents: the `+` flips, but nothing opens.
-   * `aria-haspopup` is what must not be claimed there, and must be claimed on
-   * the two rows that do open one.
+   * All three rows now open a card, so `aria-haspopup` belongs on all three.
+   * The assertion stays written as "exactly the triggers that open one" rather
+   * than collapsing to a count of the buttons: `Row.content` is still optional,
+   * and a §7.7 target that lands ahead of its artboard must go back to claiming
+   * nothing rather than advertising a dialog that never appears.
    */
   it("advertises a dialog on exactly the triggers that open one", () => {
     render(<TreatmentLandscape />);
@@ -124,11 +130,14 @@ describe("treatment-landscape chapter", () => {
       .getAllByRole("button")
       .filter((button) => button.getAttribute("aria-haspopup") === "dialog");
 
-    expect(advertised).toHaveLength(2);
-    expect(advertised[0]).toHaveAccessibleName(
+    const expected = [
       "Expand Benefits and challenges of clotting replacement therapies",
-    );
-    expect(advertised[1]).toHaveAccessibleName("Expand Benefits and challenges of NFTs");
+      "Expand Benefits and challenges of NFTs",
+      "Expand Novel therapy classes for HA/HB",
+    ];
+
+    expect(advertised).toHaveLength(expected.length);
+    expected.forEach((name, index) => expect(advertised[index]).toHaveAccessibleName(name));
   });
 
   /**
@@ -191,7 +200,9 @@ describe("treatment-landscape chapter", () => {
     const user = userEvent.setup();
     render(<TreatmentLandscape />);
 
-    await user.click(screen.getByRole("button", { name: "Expand Benefits and challenges of NFTs" }));
+    await user.click(
+      screen.getByRole("button", { name: "Expand Benefits and challenges of NFTs" }),
+    );
 
     expect(screen.getByRole("dialog")).toHaveAccessibleName("Non-factor Replacement Therapies");
   });
@@ -201,7 +212,9 @@ describe("treatment-landscape chapter", () => {
     const user = userEvent.setup();
     render(<TreatmentLandscape />);
 
-    await user.click(screen.getByRole("button", { name: "Expand Benefits and challenges of NFTs" }));
+    await user.click(
+      screen.getByRole("button", { name: "Expand Benefits and challenges of NFTs" }),
+    );
 
     const dialog = within(screen.getByRole("dialog"));
     const { benefits, challenges } = topicById("nft")!.benefitsChallenges!;
@@ -211,6 +224,109 @@ describe("treatment-landscape chapter", () => {
     }
     for (const heading of ["Benefits", "Challenges"]) {
       expect(dialog.getByRole("heading", { level: 3, name: heading })).toBeInTheDocument();
+    }
+  });
+
+  /**
+   * The third card is the §7.3 class matrix, and the artboard titles its band
+   * "TABLE 1" — the one card whose heading names a figure number rather than its
+   * own subject. Asserted whole, because the temptation to "improve" it into the
+   * trigger's caption is exactly what this is here to catch.
+   */
+  it("names the novel-therapy card as the artboard titles it", async () => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    await user.click(
+      screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
+    );
+
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Table 1");
+  });
+
+  /**
+   * The matrix verbatim from the data module, one row at a time — the same
+   * from-the-data guard the two benefits cards get, so a copy edit lands in one
+   * place. Read by row rather than by cell text alone: `within(row)` is what
+   * says "Prophylaxis" appears in the row it belongs to and not merely somewhere
+   * on the card, which a flat `getByText` over four identical strings could not.
+   */
+  it("renders every treatment-options row from the data module", async () => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    await user.click(
+      screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
+    );
+    const dialog = within(screen.getByRole("dialog"));
+
+    for (const { option, moa, population, indication, route } of TREATMENT_OPTIONS_MATRIX) {
+      // `name` matches the row's accessible name, which the row header opens
+      // with — so it also asserts the `<th scope="row">` is a header at all.
+      const row = within(dialog.getByRole("row", { name: new RegExp(`^${option}`) }));
+
+      for (const text of [moa, population, route, ...indication]) {
+        expect(row.getByText(text), `${option}: ${text}`).toBeInTheDocument();
+      }
+    }
+  });
+
+  /**
+   * The five headings are literals in the chapter — the artboard's casing is
+   * uneven and "Route of Administration" is not `route` under any
+   * transformation — so this is what catches them being derived from the row
+   * type and quietly regularised.
+   */
+  it("heads the treatment-options table with the artboard's five column names", async () => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    await user.click(
+      screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
+    );
+
+    expect(
+      within(screen.getByRole("dialog"))
+        .getAllByRole("columnheader")
+        .map((cell) => cell.textContent),
+    ).toEqual([
+      "Treatment options",
+      "Mechanism of Action",
+      "Population",
+      "Indication",
+      "Route of Administration",
+    ]);
+  });
+
+  /**
+   * Every marker the table draws resolves to a footnote, and every footnote is
+   * pointed at — the pairing the chapter derives rather than writes out. Footnote
+   * b's two branches are asserted as a nested list because that is the shape the
+   * data module holds them in: flattened to siblings, a screen reader reads four
+   * footnotes where the export draws three.
+   */
+  it("resolves each footnote marker the treatment-options table draws", async () => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    await user.click(
+      screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
+    );
+    const dialog = within(screen.getByRole("dialog"));
+
+    for (const key of ["a", "b", "c"] as FootnoteKey[]) {
+      const note = TREATMENT_OPTIONS_FOOTNOTES[key];
+      const text = typeof note === "string" ? note : note.text;
+      const item = dialog.getByText(`${key}.`, { exact: false, selector: "li" });
+
+      expect(item).toHaveTextContent(text);
+      if (typeof note !== "string") {
+        expect(
+          within(item)
+            .getAllByRole("listitem")
+            .map((li) => li.textContent),
+        ).toEqual(note.children);
+      }
     }
   });
 
@@ -226,7 +342,9 @@ describe("treatment-landscape chapter", () => {
 
     const clotting = "Benefits and challenges of clotting replacement therapies";
     await user.click(screen.getByRole("button", { name: `Expand ${clotting}` }));
-    await user.click(screen.getByRole("button", { name: "Expand Benefits and challenges of NFTs" }));
+    await user.click(
+      screen.getByRole("button", { name: "Expand Benefits and challenges of NFTs" }),
+    );
 
     // One dialog, and it is the NFT one.
     expect(screen.getAllByRole("dialog")).toHaveLength(1);

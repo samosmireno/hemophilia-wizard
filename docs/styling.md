@@ -995,6 +995,44 @@ artboard is the authority for on-screen copy, and raised for the designer rather
 silently corrected (contrast the export's "FACOTOR", which is an unambiguous typo and
 is not reproduced).
 
+**The "Table 1" card.** The third `+` opens CONTEXT.md §7.3's class matrix, and the
+same rule settles four more items on it.
+
+The band reads **"TABLE 1"** — the only card whose title names a figure number rather
+than its own subject, and therefore the only dialog whose accessible name says nothing
+about what is in it. Shipped as drawn: the trigger's caption ("Novel therapy classes
+for HA/HB") is what a reader followed to get there, so the context exists a beat
+earlier in the reading order. Worth a designer's second look all the same.
+
+`TREATMENT_OPTIONS_MATRIX` is **reconciled with the artboard, not with §7.3**. It began
+as a transcription of PPTX slide 7 and compressed it into table shorthand — `↑ FVIII by
+2 IU/dL per IU/kg`, `HA/HB`, `→` — which was right for a record of the source and wrong
+the moment the strings became on-screen copy. The export spells all of it out, so the
+data module now does too, and §7.3 keeps the source's own wording. (Same call the §7.6
+`severe --> mild` edit made, in the same direction.)
+
+Three drawn strings are **not** reproduced, on the "FACOTOR" precedent: "anti–THPI"
+(the same row's MOA cell says TFPI), a second "IU/dl" in a cell that writes "IU/dL"
+either side of it, and "inter-individiual".
+
+One divergence is deliberate and **open**: the export gives AAV gene therapy the
+population "Hemophilia A/B without inhibitors", which contradicts both §7.3 and the MOA
+cell beside it — an _F9_ transgene is hemophilia B. Not a typo, so not silently fixed
+either; held at B, because a table that tells a clinician the class is indicated for HA
+is a worse error to ship than a stale cell, and raised for the designer.
+
+**Its type is measured, not assumed.** Three sizes off the export, none of which lands
+on a scale step at the weight drawn: 20px column headings, 16px in the three middle
+columns, 24px in the two outer ones — the drawing genuinely sets the option name and
+the route larger than the prose between them. Footnotes are 14px/300 set solid
+(`leading-none`), which is the designer's own inspector value. The `text-h4`/`text-h3`
+steps are 20 and 26 but carry weight 600, so all five are raw under §8's precedent.
+
+The hairline between cells is **inferred**, as `SeverityTable`'s is: the export draws a
+flat `#A0A0A0` the palette has no token for, and `black/30` over the body gradient
+resolves within a point of it — close enough that matching the grey exactly would only
+buy a raw hex in a file that has none.
+
 ---
 
 ## 12. Layout geometry

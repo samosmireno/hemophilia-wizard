@@ -329,57 +329,98 @@ export interface TreatmentOptionRow {
   option: string;
   moa: string;
   population: string;
-  indication: string;
+  /**
+   * One entry per indication, not one semicolon-joined sentence — the same call
+   * `SeverityRow.manifestations` makes, for the same reason: the §7.7 pop-up
+   * stacks these as separate lines, so the split is the content's own shape
+   * rather than something the renderer has to guess back out of punctuation.
+   * Only the first row has two.
+   */
+  indication: readonly string[];
   route: string;
   /** Footnote marker keyed into TREATMENT_OPTIONS_FOOTNOTES. */
   footnote?: FootnoteKey;
 }
 
+/**
+ * The rows as the §7.7 "Table 1" pop-up draws them.
+ *
+ * **Reconciled with the artboard, not with CONTEXT.md §7.3.** The transcription
+ * this started as compressed the source into table shorthand — `↑ FVIII by 2
+ * IU/dL per IU/kg`, `HA/HB`, `→` — which was right while these strings were a
+ * record of PPTX slide 7 and wrong the moment they became on-screen copy. The
+ * artboard spells all of it out, and the artboard is the authority for what the
+ * screen says (docs/styling.md §11), so the shorthand is expanded here rather
+ * than re-expanded by the renderer. §7.3 keeps the source's own wording.
+ *
+ * Three drawn strings are **not** reproduced, on the "FACOTOR" precedent — an
+ * unambiguous slip is a slip, not copy: the export's "anti–THPI" (the same row's
+ * MOA says TFPI), its second "IU/dl", and "inter-individiual" in footnote c.
+ *
+ * One divergence is deliberate and open: the export gives AAV gene therapy the
+ * population "Hemophilia A/B without inhibitors", which contradicts the MOA cell
+ * beside it (an F9 transgene is hemophilia B) and CONTEXT.md §7.3. Held at B and
+ * raised for the designer.
+ */
 export const TREATMENT_OPTIONS_MATRIX: readonly TreatmentOptionRow[] = [
   {
     option: "FVIII/FIX concentrates",
-    moa: "↑ FVIII by 2 IU/dL per IU/kg; ↑ FIX by 1 IU/dL per IU/kg",
-    population: "HA/HB without inhibitors",
-    indication: "Prophylaxis; treatment of bleeding episodes and surgery",
+    moa: "Increase FVIII levels by 2 IU/dL per IU/kg and FIX levels by 1 IU/dL per IU/kg",
+    population: "Hemophilia A/B without inhibitors",
+    indication: ["Prophylaxis", "Treatment of bleeding episodes and surgery"],
     route: "IV",
     footnote: "a",
   },
   {
     option: "FVIII mimetics",
-    moa: "Mimics FVIII activity; 1st-generation equivalent to FVIII ~10–12 IU/dL",
-    population: "HA with/without inhibitors",
-    indication: "Prophylaxis",
+    moa: "Mimics activity of FVIII 1st generation equivalent to FVIII ~10–12 IU/dL",
+    population: "Hemophilia A with/without inhibitors",
+    indication: ["Prophylaxis"],
     route: "SC",
     footnote: "b",
   },
   {
     option: "Rebalancing: siRNA",
-    moa: "Reduces antithrombin; increases thrombin generation",
-    population: "HA/HB with/without inhibitors",
-    indication: "Prophylaxis",
+    moa: "Reduced antithrombin; increases thrombin generation",
+    population: "Hemophilia A/B with/without inhibitors",
+    indication: ["Prophylaxis"],
     route: "SC",
     footnote: "b",
   },
   {
     option: "Rebalancing: anti-TFPI",
     moa: "Inhibits TFPI; increases thrombin generation",
-    population: "HA/HB with/without inhibitors",
-    indication: "Prophylaxis",
+    population: "Hemophilia A/B with/without inhibitors",
+    indication: ["Prophylaxis"],
     route: "SC",
     footnote: "b",
   },
   {
     option: "AAV gene therapy",
     moa: "Recombinant AAV vector delivers a functional copy of the F9 gene into hepatocytes",
-    population: "HB without inhibitors",
-    indication: "Long-term prophylaxis / treatment break",
+    population: "Hemophilia B without inhibitors",
+    indication: ["Long-term prophylaxis/treatment break"],
     route: "IV",
     footnote: "c",
   },
 ];
 
-export const TREATMENT_OPTIONS_FOOTNOTES: Record<FootnoteKey, string> = {
-  a: "EHL recombinant factors use pegylation or fusion to albumin or Fc fragments to extend half-life (fusion proteins ↑ half-life 1.5–6-fold).",
-  b: "Breakthrough bleeds: without inhibitors → treat with FVIII/FIX concentrates; with inhibitors → treat with bypassing agents.",
-  c: "Responses show inter-individual variability and uncertain duration.",
+/**
+ * The three markers resolved, under the table.
+ *
+ * `Bullet` rather than a plain string because footnote b genuinely has a nested
+ * level — the export draws its two branches as a sub-list under "For
+ * breakthrough bleeds:", which is the shape `NestedBullet` exists to hold and
+ * the reason it is not a `→`-joined sentence any more.
+ */
+export const TREATMENT_OPTIONS_FOOTNOTES: Record<FootnoteKey, Bullet> = {
+  a: "EHL recombinant factors use pegylation or fusion to albumin or Fc fragments to extend factor half-life; fusion proteins increase half-life by 1.5- to 6-fold",
+  b: {
+    text: "For breakthrough bleeds:",
+    children: [
+      "Hemophilia A or B without inhibitors; treat with FVIII/FIX concentrates",
+      "Hemophilia A or B with inhibitors; treat with bypassing agents",
+    ],
+  },
+  c: "Responses are associated with inter-individual variability and uncertain duration",
 };

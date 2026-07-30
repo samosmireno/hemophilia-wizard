@@ -152,7 +152,7 @@ export default function Popup({
           two can never disagree. */}
       <div
         className={cn(
-          "flex max-h-[95dvh] min-h-[min(520px,95dvh)] w-[min(1066px,92vw)] flex-col overflow-hidden rounded-[40px] border-5 border-brand-crimson-50 shadow-popup",
+          "flex max-h-[95dvh] min-h-[min(520px,95dvh)] w-[min(1024px,92vw)] flex-col overflow-hidden rounded-[40px] border-5 border-brand-crimson-50 shadow-popup",
           surface === "white" ? "bg-white" : "bg-popup",
         )}
       >
