@@ -284,13 +284,21 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * rendered by slicing it at an index — which is a fact about a layout stored
    * as an offset into an array. The split states it instead.
    *
+   * **The split put §7.6's block title on the wrong half, and this is the
+   * correction.** It read "Hemostatic Rebalancing Agents in Treatment of HA/HB"
+   * — which is the heading §7.6 sets over the *mechanism* prose, not over these
+   * two bullets — and the chapter had to carry a `HEADING` literal to drop the
+   * scope qualifier the artboard does not draw. Both halves of that are gone:
+   * the qualified title moved to `rebalancing-mechanisms`, whose pop-up wears
+   * it, and this is now the string the chapter's `<h1>` actually shows.
+   *
    * The children are composed from `REBALANCING_AGENTS` rather than written out
    * here for the reason recorded on that array: the chapter colours two of them
    * and not the third, and the two halves of that must not be able to drift.
    */
   {
     id: "rebalancing-agents",
-    title: "Hemostatic Rebalancing Agents in Treatment of HA/HB",
+    title: "Hemostatic Rebalancing Agents",
     body: [
       "Hemostatic rebalancing agents are NFTs administered by SC injection",
       {
@@ -302,31 +310,51 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
   /**
    * The other half of the split above: how the three agents act, which is what
    * the §7.7 "Mechanisms of hemostatic rebalancing agents within the coagulation
-   * cascade" figure is about.
+   * cascade" click-through is about.
    *
-   * **Nothing renders this yet.** The figure is image-borne (CONTEXT.md §7.7)
-   * and its asset has not landed, so the chapter's `+` opens nothing. The prose
-   * lives here rather than in the chapter because it is content either way, and
-   * because this is the shape the card will read when it exists.
+   * That target opens **two** cards, and this topic supplies both. This `body`
+   * is the first — the prose card, headed by the `title` below. The second is
+   * the `figures[0]` diagram, which the chapter titles with a literal of its own
+   * because a figure's title is stated rather than derived (the same call
+   * `disease-background` makes for all three of its cards).
+   *
+   * **`title` is §7.6's block heading, which sits over this prose in the
+   * source** — "Hemostatic rebalancing agents in treatment of HA/HB — enhance
+   * thrombin generation by targeting endogenous anticoagulant pathways…". It
+   * arrived here from `rebalancing-agents`, which held it only because that is
+   * where the split left it; see the correction recorded there.
    *
    * The id is not in the §7.7 index — that index names click-through targets,
-   * and this is the content behind one of them. `title` is the figure's own
-   * name from §7.6, so the eventual card has a heading without inventing one.
+   * and this is the content behind one of them.
    *
-   * Flat, though two of the four bullets lead into the two beneath them: the
-   * source punctuates rather than indents, and no design has drawn this yet.
-   * Same rule the `nft` classes bullet was held to — it stayed flat until the
-   * artboard showed it nested.
+   * **The two lead-ins are `NestedBullet`s now, which is what this comment used
+   * to be waiting for.** It read: "flat, though two of the four bullets lead
+   * into the two beneath them — the source punctuates rather than indents, and
+   * no design has drawn this yet… it stayed flat until the artboard showed it
+   * nested." The artboard has shown it, and drawn something stronger than an
+   * indent: each lead-in is a heading over its own list. The trailing colons go
+   * with the flattening — they were the punctuation standing in for the indent,
+   * so keeping them would set a heading that ends in a colon it no longer needs.
    */
   {
     id: "rebalancing-mechanisms",
-    title: "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade",
+    title: "Hemostatic Rebalancing Agents in Treatment of HA/HB",
     body: [
       "Hemostatic rebalancing agents enhance thrombin generation by targeting endogenous anticoagulant pathways, including TFPI, AT, and the APC/protein S system",
-      "Anti-TFPI monoclonal antibodies: TFPI limits coagulation by inhibiting FXa and tissue factor–FVIIa complex",
-      "Concizumab and marstacimab selectively bind the K2 domain of TFPI, reducing TFPI-mediated inhibition of FXa and enabling FXa generation by the FVIIa–TF pathway, promoting thrombin generation, clot formation, and hemostasis in HA/HB",
-      "AT-directed siRNA: AT neutralizes thrombin and FXa, thereby limiting clot formation",
-      "Fitusiran uses RNA interference to reduce hepatic AT production, restoring thrombin generation and rebalancing hemostasis",
+      {
+        text: "Anti-TFPI monoclonal antibodies",
+        children: [
+          "TFPI limits coagulation by inhibiting FXa and tissue factor–FVIIa complex",
+          "Concizumab and marstacimab selectively bind the K2 domain of TFPI, reducing TFPI-mediated inhibition of FXa and enabling FXa generation by the FVIIa–TF pathway, promoting thrombin generation, clot formation, and hemostasis in HA/HB",
+        ],
+      },
+      {
+        text: "AT-directed siRNA",
+        children: [
+          "AT neutralizes thrombin and FXa, thereby limiting clot formation",
+          "Fitusiran uses RNA interference to reduce hepatic AT production, restoring thrombin generation and rebalancing hemostasis",
+        ],
+      },
     ],
     figures: [
       "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade (APC = activated protein C; AT = antithrombin; TFPI = tissue factor pathway inhibitor)",

@@ -757,6 +757,8 @@ narrower than the 1165px content column, so it stays centred within it.
 | 14  | `--color-agent-mab` (`#003d93`) is a sixth hue: it derives from no brand ramp, and the nearest steps are a different colour rather than a different step. Transcribed verbatim pending a designer answer on whether the agent classes are meant to be brand colours at all. Its pair, `--color-agent-sirna`, is `crimson-50` exactly.                                                                                                                                                                  | §11                   |
 | 15  | The artboards disagree on the disclosure-caption colour: `#074655` on the first two, `lagoon-75` (`#076278`) on `rebalancing-agents`. All three chapters use `--color-popup-caption`, the first value, pending a designer answer.                                                                                                                                                                                                                                                                      | §11                   |
 | 16  | `rebalancing-agents` draws three figure boxes under a caption telling the reader to click them, but §7.7 names no target for any of the three and the export draws "PLACEHOLDER" in all of them. Needs the designer to say what a box opens.                                                                                                                                                                                                                                                           | §11                   |
+| 17  | The mechanisms prose card glosses only `AT`, but its own copy introduces `TFPI` and `APC` as well; the figure card behind it glosses only `TFPI`. Shipped with all three on the prose card (§11), which also normalises the export's "AT=" to the "TFPI = " spacing it uses one card later. The alternative reading is that the two cards are meant as one and the gloss is split deliberately — needs the designer.                                                                                   | §11                   |
+| 18  | `NavArrowButton` and `Button` are not `forwardRef`, so `ref` does not typecheck on either (`PopupButton` is). That is what blocks focus management when the mechanisms card swaps steps — there is no handle to focus. Package change, tracked in `.scratch/mlg-reskin/`.                                                                                                                                                                                                                              | §11, mlg-reskin       |
 
 ---
 
@@ -1115,10 +1117,71 @@ a token with the other half a bare palette reference would read as coincidence.
 
 **What the chapter does not do**, deliberately: the three boxes are empty reserved
 boxes (§7.7 marks all 24 figures image-borne, and the export draws its own
-"PLACEHOLDER" in them, so the designer has not placed them either), and the `+` opens
-nothing. The caption above the boxes therefore instructs a click that does nothing —
-it ships as drawn because this pass is the layout, and what a box opens is a question
-§7.7 does not answer.
+"PLACEHOLDER" in them, so the designer has not placed them either). The caption above
+the boxes therefore instructs a click that does nothing — it ships as drawn because
+that pass was the layout, and what a box opens is a question §7.7 does not answer.
+Item 16 stays open. The `+` beside them no longer opens nothing; see below.
+
+#### The mechanisms click-through: two cards, one dialog
+
+Its §7.7 target is the first in this codebase that opens **two** cards in sequence —
+the mechanism prose, then the diagram behind its "View mechanism" button, with a
+`NavArrowButton` back. Both are one `Popup` whose title and children come from a
+`"prose" | "figure"` step, rather than two dialogs handing off: the dialog is never
+closed and reopened as the reader steps, so the platform's focus restoration fires
+once, on the way out, onto the `+`. ✕, ESC and a backdrop click therefore all mean
+_closed_ from either card, and reopening starts at the first — the `+` names the
+target as a whole, not whichever card the reader left on.
+
+**Its prose is sectioned, which is what restructured the data.** The export draws the
+lead as a paragraph and each mechanism class as a crimson heading over its own
+bullets, where `rebalancing-mechanisms` held five flat strings with the two lead-ins
+carrying trailing colons. They are `NestedBullet`s now — the shape that module said it
+was holding out for until an artboard showed the nesting — so the card dispatches on
+the `Bullet` union rather than splitting on punctuation or slicing at an index.
+
+**Its type is measured off the 2000px export and is approximate**, that being a raster
+rather than Figma: ~26px for the lead set tight, ~20px for the bullets, 32px bold for
+the two headings, 14px/300 solid for the footnote. Only the headings land on a scale
+step (`text-h2` exactly); the rest are raw under §8's precedent, and the 20px is
+`BenefitsChallengesCard`'s own pop-up body value reused rather than re-derived.
+
+The CTA is the package `Button` with `py-2` against its own `py-[18px]` — the export
+draws ~353×49 where the component computes ~358×68, so the width agrees and the height
+does not. The override is the one its doc invites.
+
+**One deliberate, open divergence.** The export glosses only `AT` under the prose card,
+but that card's own copy introduces `TFPI` (its first heading is "Anti-TFPI monoclonal
+antibodies") and `APC` (its lead names "the APC/protein S system") — so as drawn it
+defines one of the three terms it uses. It ships with all three, in
+`figures[0]`'s wording and order, which also normalises the export's "AT=" to the
+"TFPI = " spacing the very next card uses. Raised for the designer, not silently
+settled: the alternative reading is that the two cards are meant to be read as one and
+the gloss is split across them on purpose.
+
+**No focus management between the cards**, which is a package limitation rather than a
+choice: `NavArrowButton` and `Button` are not `forwardRef`, so `ref` does not typecheck
+on either (only `PopupButton` is), and there is no handle to move focus to when the
+previous step's control unmounts. The browser's own behaviour ships instead — focus
+drops to `<body>` (measured in Chrome, not to the `<dialog>`), and since `showModal()`
+has made the rest of the document inert, the next Tab lands on the new card's own
+control. Degraded, not trapped. The gap is logged in `.scratch/mlg-reskin/`.
+
+**Verified in Chrome at 1440×800 and 390×780.** The figure lands at exactly 886×430
+from a 1772×860 file, and its card does not scroll at 1440 (574px of content in 574px
+of body). The prose card does scroll, which it must — it is ~660px of copy.
+
+One thing the suite could not have caught, and the reason the footnote row carries the
+three width classes it does: the prose card's gloss is ~530px of ink, so with the CTA
+it overruns the 886px body by ~25px and a plain `flex-wrap` broke the line — putting
+the button bottom-**left**, where the export draws it bottom-right. Fixed by letting
+the footnote wrap its own text instead (`min-w-0 flex-1 basis-80`), with `ms-auto` on
+the action for the phone, where the two genuinely cannot share a line. jsdom applies no
+Tailwind, so this was invisible to `npm test` in both directions.
+
+**Pre-existing and untouched:** at 390px the card's content column is 220px — `Popup`'s
+`px-16` against a `92vw` card — so 26px lead copy sets seven words to the line. Every
+card in the app has this; it is a `Popup` question rather than a chapter one.
 
 ---
 
@@ -1481,6 +1544,7 @@ sizes.
 | `bleeding_manifestations_diagram.webp` | 720      | 1440×1252 | same cap                                         |
 | `clotting_cascade_diagram.webp`        | 610      | 1220×650  | card body 938 − `gap-6`, at the grid's 2/3 share |
 | `clotting-cascade-thumb.webp`          | 470      | 940×538   | the thumbnail's own `max-w-117.5`                |
+| `hemostatic_mechanisms_diagram.webp`   | 886      | 1772×860  | the card body: 1024 − `border-5` − `px-16`       |
 
 2x covers retina and stops there. The three that needed it were shipped at their
 designer-export resolution — 2868×2492, 2988×1591, 1894×1084 — which is 4–6x the
@@ -1488,6 +1552,14 @@ drawn size, i.e. 16–36x the pixels to decode for no visible gain. Re-encoded a
 q82, which is indistinguishable from the source at display scale on this line art
 (checked at 3x zoom on the cascade's smallest labels) and takes the three from
 384K to 246K.
+
+The fourth arrived the same way and was re-encoded on the same rule: 3469×1683
+(5.8MP) at ~3.9x its drawn width, `cwebp -q 82 -resize 1772 0`, 67K → 40K. Its
+drawn width is the only one in the table that is not a designer number — the
+diagram fills the card, so it is whatever `Popup`'s body is wide, and that is
+derived rather than measured. It is also the only one that carries alpha; the
+diagram is line art on transparency, so it sits on the card's gradient the way
+the artboard draws it rather than on a white rectangle of its own.
 
 **Decode cost is the reason, not bytes.** A pop-up's picture has to be rastered
 in the frame the card opens, and a 7.1MP source is enough work to miss it — the

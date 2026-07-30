@@ -226,3 +226,63 @@ data module, which carries no display fields.
 - styling.md §9 items 9 and 14–16 are open. Item 9 is the live one: this chapter
   transcribes its type where the other two snap to the scale, so the three no longer
   render the same, and closing it means one call applied backwards to all three.
+
+**2026-07-30 — `rebalancing-agents` mechanisms click-through (two chained cards).**
+
+The chapter's `+` opens now. Its §7.7 target is the first in the codebase that is
+**two cards deep**: the mechanism prose, then the coagulation-cascade diagram behind
+its "View mechanism" CTA, with a `NavArrowButton` back. Geometry, type and the
+divergences are in docs/styling.md §11; this records the model decisions.
+
+**One `Popup` with a `"prose" | "figure"` step, not two dialogs.** The dialog is never
+closed and reopened as the reader steps between the cards, so the platform's focus
+restoration fires exactly once — on the way out, onto the `+`. It follows that ✕, ESC
+and a backdrop click all mean _closed_ from either card, and that reopening starts at
+the first: the `+` names the §7.7 target as a whole, not whichever card the reader
+happened to leave on. The steps are a `Record` over the union, exhaustive by
+construction like the chapter's `MECHANISM_TONE`. The trigger becomes controlled for
+`treatment-landscape`'s stated reason — uncontrolled, it would keep showing ✕ after a
+card closed by ESC.
+
+**§7.6's block title was on the wrong topic, and this moved it.** The previous pass
+split `rebalancing-agents` in two and left "Hemostatic Rebalancing Agents in Treatment
+of HA/HB" on the half that holds the chapter's two bullets — but §7.6 sets that heading
+over the _mechanism_ prose, which is what the artboard confirms by putting it on the
+prose card's band. The tell was already in the code: the chapter needed a `HEADING`
+literal purely to drop a scope qualifier its topic should never have carried. The title
+moved to `rebalancing-mechanisms`, `rebalancing-agents` took the string the `<h1>`
+actually shows, and the literal and its comment are gone. `router.test.tsx` already
+pinned that heading, so nothing moved but the source of it.
+
+**The mechanism prose became `NestedBullet`s**, which is the change its own comment was
+holding out for ("it stayed flat until the artboard showed it nested"). The artboard
+shows something stronger than an indent — each lead-in is a heading over its own list —
+so the card dispatches on the `Bullet` union: a `string` is the lead paragraph, a
+`NestedBullet` is a section. The trailing colons go with the flattening. That is what
+keeps the card from splitting on punctuation or slicing at an index.
+
+**The figure card's title is a chapter literal**, not a data read, which is how all
+three of `disease-background`'s figure cards state theirs — a figure's title is stated
+rather than derived. `figures[0]` holds that string plus the abbreviation gloss in
+parentheses, and recovering half of a caption by splitting it is the derivation the
+data module argues against everywhere else. `figures` is untouched.
+
+**The asset was re-encoded** from 3469×1683 to 1772×860 at q82 (67K → 40K), per §13's
+2x rule and on the precedent of the other three. Its drawn width, 886, is the only one
+in that table that is derived rather than measured: the diagram fills the card, so it
+is whatever `Popup`'s body is wide.
+
+**Not met by this pass**, deliberately:
+
+- **No focus management between the cards.** `NavArrowButton` and `Button` are not
+  `forwardRef`, so `ref` does not typecheck on either and there is no handle to focus
+  when the previous step's control unmounts. The browser's behaviour ships instead —
+  focus drops to `<body>` (measured in Chrome, not the `<dialog>`), and the rest of
+  the document is already inert, so the next Tab lands on the new card's control.
+  Logged as styling.md §9 item 18 and in `.scratch/mlg-reskin/`.
+- **The prose card glosses all three abbreviations** where the export glosses only AT,
+  because that card's own copy introduces TFPI and APC too. A deliberate divergence,
+  raised as §9 item 17 rather than settled.
+- The three figure boxes are still inert; item 16 is untouched by this and stays open.
+- §7.6's NXT007/Inno8 block still renders nowhere, and glossary cross-links (issue 12)
+  are still unwired.

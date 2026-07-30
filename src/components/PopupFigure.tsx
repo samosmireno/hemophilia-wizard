@@ -41,6 +41,13 @@
  * card that wants a subtitle needs this number re-measured, not just the prop
  * threaded through.
  *
+ * **A caller may also put chrome in the body**, which the height cap does not
+ * know about: `rebalancing-agents` puts a footnote and a back arrow under the
+ * picture, so its card starts scrolling a little sooner than 10rem implies. That
+ * is a scroll rather than a wrongly-reserved box, and the alternative — every
+ * caller subtracting its own footer — would make the number stale for the two
+ * that have none. So it stays measured off `Popup` alone.
+ *
  * Two maxima and no fitting mode: given `width`/`height` that are `auto`, the
  * browser scales the image down to satisfy whichever constraint binds first and
  * preserves the aspect ratio itself — the box never needs to letterbox because

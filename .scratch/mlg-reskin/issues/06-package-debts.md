@@ -193,3 +193,40 @@ cannot say otherwise". When `Button` gets its `render`, that is worth applying t
 the whole package in one pass rather than one component per page built — the next
 candidate is `NavArrowButton`, whose Prev/Next are genuinely actions today but
 would be links the moment the walkthrough gets shareable step URLs.
+
+## Debt 6 — `NavArrowButton` and `Button` are not `forwardRef`
+
+Found 2026-07-30, building the `rebalancing-agents` mechanisms click-through
+(app-buildout issue 11). That §7.7 target opens two cards inside one `<dialog>`,
+and stepping between them unmounts the control the reader just used — so focus
+has to be moved deliberately, or it falls to the dialog and the reader is
+dropped at an unannounced point.
+
+There is no handle to move it to. `ref` does not typecheck on either component:
+
+```
+error TS2322: Property 'ref' does not exist on type 'IntrinsicAttributes & NavArrowButtonProps'.
+error TS2322: Property 'ref' does not exist on type 'IntrinsicAttributes & ButtonProps'.
+```
+
+`PopupButton` is a `ForwardRefExoticComponent` and the other four are plain
+function components. Under React 19 a `ref` prop would in fact reach the
+`<button>` at runtime — it lands in `...props` and both components spread — but
+`npm run build` runs `tsc -b`, so it cannot ship.
+
+**Not the same family as 1, 2, 4 and 5.** Those are "the component decides what
+it renders and the consumer cannot say otherwise". This one is narrower and
+cheaper: the elements are right, the consumer just cannot reach them. Two props
+types gain `ref`, or all four non-forwarding components do it in one pass, which
+is the better shape — `Button` is the next most likely to need it, being the one
+a consumer would want to focus or measure.
+
+**Shipped without it.** `rebalancing-agents` relies on the browser's own
+behaviour: stepping unmounts the focused control and focus drops to `<body>`
+(measured in Chrome — not to the `<dialog>`, which is the intuitive guess and the
+wrong one). `showModal()` has already made the rest of the document inert, so the
+next Tab lands on the new card's own control. Degraded, not trapped. Also logged
+as docs/styling.md §9 item 18.
+
+Worth pairing with debt 5 when `Button` gets its `render` — same component, same
+release, and both are "let the consumer in".
