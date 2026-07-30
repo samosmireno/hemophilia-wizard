@@ -42,18 +42,16 @@ describe("router", () => {
   it.each([
     ["disease-background", "Hemophilia Disease Background"],
     ["treatment-landscape", "The Evolving Treatment Landscape for Hemophilia"],
+    ["rebalancing-agents", "Hemostatic Rebalancing Agents"],
   ])("renders the %s chapter", (section, title) => {
     renderAt(`/education/${section}`);
     expect(heading()).toHaveTextContent(title);
   });
 
-  it.each(["rebalancing-agents", "fviiia-mimetics"])(
-    "renders the %s education chapter placeholder",
-    (section) => {
-      renderAt(`/education/${section}`);
-      expect(heading()).toHaveTextContent(`Education — ${section}`);
-    },
-  );
+  it.each(["fviiia-mimetics"])("renders the %s education chapter placeholder", (section) => {
+    renderAt(`/education/${section}`);
+    expect(heading()).toHaveTextContent(`Education — ${section}`);
+  });
 
   // `CHAPTERS` is looked up with `Object.hasOwn`, so an inherited Object key is
   // not a section — `in` would resolve it and then try to render it.

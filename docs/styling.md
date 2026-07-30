@@ -749,11 +749,14 @@ narrower than the 1165px content column, so it stays centred within it.
 | 6   | No semantic layer yet. `bg-surface`, `text-heading`, etc. do not exist; the app reads raw brand steps in the meantime.                                                                                                                                                                                                                                                                                                                                                                                 | app-buildout issue 02 |
 | 7   | The inner gradient's second stop is off-scale (`rgba(114.61, 213.07, 191.53)`, dE .042 from `teal-25`) while the other three stops are exact palette. Probably meant to be `teal-25`; kept literal pending a designer answer.                                                                                                                                                                                                                                                                          | §6                    |
 | 8   | The landing footage does not loop — it is a continuous dolly-in, 46.5/255 apart end to end. Ping-ponging it is a workaround; **ask the designer for an 8–12 s clip that loops cleanly**. That would halve the asset and remove the direction reversal.                                                                                                                                                                                                                                                 | §7, ADR 0002          |
-| 9   | `disease-background` renders at the §2 type scale, but the reference measures ~32px sub-headings, ~18px body and ~22px captions against the scale's 26/16/20. Needs the designer's sizes, then a scale-vs-raw-values call.                                                                                                                                                                                                                                                                             | §11                   |
+| 9   | The references do not agree with the §2 scale **or with each other**: `disease-background` measures ~32px sub-headings, ~18px body and ~22px captions against the scale's 26/16/20, while `rebalancing-agents` measures ~24px body and ~25px captions. **The three chapters now answer it differently** — the first two render at the scale, `rebalancing-agents` transcribes a raw `text-[26px]` (§11). Needs the designer's sizes, then one call applied to all three.                               | §11                   |
 | 10  | The chapter is specified to fit one screen and currently does not (818px at 1440×800). Wants one rule across all four chapters rather than per-page constants.                                                                                                                                                                                                                                                                                                                                         | §11                   |
 | 11  | Four of the eight vertical gaps are ink-to-ink measurements off the reference PNG rather than the designer's box gaps, so they render slightly loose.                                                                                                                                                                                                                                                                                                                                                  | §11                   |
 | 12  | The pop-up export has **no scrim** — nothing dims the page behind a dialog that traps focus. The shipped `rgb(0 0 0 / .5)` is inferred, like §4.3's tooltip and §4.5's sidebar. The card's own 55%-black shadow was drawn against Figma's dark canvas and does much less work over the light `bg-page`.                                                                                                                                                                                                | §13                   |
 | 13  | The pop-up title is 45.47px, off the §2 scale, and ships as a raw value under §8's precedent. Same open question as item 9 — if the designer's sizes arrive for the chapters, this wants deciding with them rather than separately.                                                                                                                                                                                                                                                                    | §13                   |
+| 14  | `--color-agent-mab` (`#003d93`) is a sixth hue: it derives from no brand ramp, and the nearest steps are a different colour rather than a different step. Transcribed verbatim pending a designer answer on whether the agent classes are meant to be brand colours at all. Its pair, `--color-agent-sirna`, is `crimson-50` exactly.                                                                                                                                                                  | §11                   |
+| 15  | The artboards disagree on the disclosure-caption colour: `#074655` on the first two, `lagoon-75` (`#076278`) on `rebalancing-agents`. All three chapters use `--color-popup-caption`, the first value, pending a designer answer.                                                                                                                                                                                                                                                                      | §11                   |
+| 16  | `rebalancing-agents` draws three figure boxes under a caption telling the reader to click them, but §7.7 names no target for any of the three and the export draws "PLACEHOLDER" in all of them. Needs the designer to say what a box opens.                                                                                                                                                                                                                                                           | §11                   |
 
 ---
 
@@ -1032,6 +1035,90 @@ The hairline between cells is **inferred**, as `SeverityTable`'s is: the export 
 flat `#A0A0A0` the palette has no token for, and `black/30` over the body gradient
 resolves within a point of it — close enough that matching the grey exactly would only
 buy a raw hex in a file that has none.
+
+### `rebalancing-agents`
+
+The third designed chapter (`src/routes/education/RebalancingAgents.tsx`), from a
+**1440 × 800** artboard like the other two — derived the same way, the crimson rule
+measuring 13.7 on the 2000px export against §10's 14.
+
+Its shape is unlike either predecessor: no grid. Prose, then a centred row of three
+reserved figure boxes under a caption, then one "Click here:" `+` — and that last row
+puts the caption to the **left** of the button, where `DisclosureBand` and
+`treatment-landscape` both stack it underneath.
+
+**Geometry**, all measured off the export and stated in canvas px:
+
+| Thing                | Value     | Drawn     | Note                                    |
+| -------------------- | --------- | --------- | --------------------------------------- |
+| box                  | 224 × 192 | 227 × 185 | `border-4`; the export's stroke is 3.6  |
+| gap between boxes    | 141       | 141       | the group is **963** wide               |
+| group centre         | x = 720   | x = 720   | the canvas centre, not the column's 696 |
+| boxes → caption      | 16        | 16        |                                         |
+| caption → bottom row | 80        | 80        |                                         |
+| caption → `+`        | 24        | 38        | the `+` is `size-16.25`, drawn 62       |
+
+Two of those are shipped off the drawn value on purpose, and both follow from the type
+below being transcribed rather than snapped: the boxes are squared up to whole scale
+steps (`h-48`/`max-w-56`) and the bottom row's gap is tightened to `gap-x-6`, which is
+what keeps the chapter on one screen once the prose is set at 26px. The group width
+stays the drawn 963, so the row and the bottom caption still share their left edge.
+
+The group **centres on the content column**, not on the canvas. The export centres it
+at x=720, ~24px right of the column's 696 — the same offset §11 records for
+`disease-background`'s severity band, resolved the same way and for the same reason.
+The bottom row is aligned to the group's left edge rather than the column's, which is
+why the group width is a named constant in the chapter: three things measure against
+it and have to agree.
+
+The caption under the boxes is **wider than the boxes** — 1082 of ink against the
+group's 963, overhanging both sides — so it is centred on the column at full width
+rather than constrained to the group.
+
+**It fits one screen.** 800px exactly at 1440×800, verified in Chromium, so §9 item 10
+stays a `disease-background` problem.
+
+**Its body type is transcribed, not snapped — the first chapter to do so.**
+Cap-height measurements put this export at ~24px body copy and ~25px captions, where
+the `disease-background` reference measured 18 and 22: the same elements, a third
+apart between two artboards, which is what makes §9 item 9 a spread rather than a
+single offset.
+
+So the bullets ship at a raw `text-[26px]` over `BulletList`'s `text-body` base, and
+the three agents at `font-semibold` under it. 26 is the measurement rounded to the
+`text-h3` step's size, taken raw rather than as `text-h3` because that step carries
+weight 600 where the prose is drawn at 400 — §8's precedent, the same call the
+treatment-options table makes for all five of its sizes. The captions need no such
+value: they are `text-h3` outright, and 26 against the drawn 25 is inside the
+measurement.
+
+This is the divergence §9 item 9 has been holding open, decided in one direction for
+one chapter. `disease-background` and `treatment-landscape` still render at the scale,
+so the item stays open — what it now records is that the three chapters no longer
+agree, and that this one is the reference for how a transcription looks when the
+designer's numbers do arrive.
+
+**The caption colour also disagrees between artboards.** This one samples `#076278` —
+`lagoon-75` exactly — where the earlier ones gave `#074655`, the value
+`--color-popup-caption` is derived from. The chapter uses the existing token, so all
+three chapters' captions stay one colour, and the difference is a designer question
+rather than a second answer in the codebase.
+
+**`--color-agent-mab` / `--color-agent-sirna`.** The artboard colours the three agents
+by mechanism class: the two anti-TFPI mABs in `#003d93`, the AT-directed siRNA in
+`crimson-50`. The crimson is exact. The blue is the one value in `tokens.css` that is
+neither a scale step nor derived from one — the nearest steps, `lagoon-75` (`#076278`)
+and `slate-75` (`#2e4056`), are a different hue rather than a different step, so it is
+transcribed verbatim under the §3/§4 rule and raised (§9 item 14). The two are named as
+a pair because the mapping is one fact, agent class to colour, and half of it stated as
+a token with the other half a bare palette reference would read as coincidence.
+
+**What the chapter does not do**, deliberately: the three boxes are empty reserved
+boxes (§7.7 marks all 24 figures image-borne, and the export draws its own
+"PLACEHOLDER" in them, so the designer has not placed them either), and the `+` opens
+nothing. The caption above the boxes therefore instructs a click that does nothing —
+it ships as drawn because this pass is the layout, and what a box opens is a question
+§7.7 does not answer.
 
 ---
 

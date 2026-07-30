@@ -54,6 +54,57 @@ export interface EducationTopic {
   figures?: string[];
 }
 
+/**
+ * The mechanism class an agent belongs to. A union rather than a string: the
+ * `rebalancing-agents` chapter draws the two classes in two different colours,
+ * so a typo here would silently fall through to the wrong one — and this is
+ * what makes a third class a compile error in the chapter rather than an agent
+ * that renders in nobody's colour.
+ */
+export type RebalancingMechanism = "anti-TFPI mAB" | "AT-directed siRNA";
+
+/** §7.6's three FDA-approved hemostatic rebalancing agents. */
+export interface RebalancingAgent {
+  name: string;
+  mechanism: RebalancingMechanism;
+}
+
+/**
+ * The three agents, split into name and mechanism rather than kept as the one
+ * semicolon-joined string §7.6 transcribes — a bespoke row type beside
+ * `SEVERITY_TABLE` and `TREATMENT_OPTIONS_MATRIX`, for the same reason those
+ * two have one.
+ *
+ * **The split is what joins the copy to its colour.** The `rebalancing-agents`
+ * artboard sets the two anti-TFPI mABs in blue and the AT-directed siRNA in
+ * crimson, so the colour is a function of `mechanism` — a fact about the agent,
+ * which is why it is modelled here, while the colours themselves stay in the
+ * chapter (this module carries no display fields). Held as one flat string, the
+ * chapter could only recover that by matching on the prose, and rewording a
+ * bullet would silently drop a colour.
+ *
+ * Declared above `EDUCATION_TOPICS` rather than beside its two siblings at the
+ * foot of the file because the `rebalancing-agents` topic composes its nested
+ * bullets from it at module init.
+ */
+export const REBALANCING_AGENTS: readonly RebalancingAgent[] = [
+  { name: "Concizumab", mechanism: "anti-TFPI mAB" },
+  { name: "Marstacimab", mechanism: "anti-TFPI mAB" },
+  { name: "Fitusiran", mechanism: "AT-directed siRNA" },
+];
+
+/**
+ * One agent as the source writes it — "Concizumab: anti-TFPI mAB".
+ *
+ * Exported because it has two callers and they must agree exactly: the topic
+ * below builds its nested bullets from it, and the chapter builds the lookup
+ * that colours them by the same string. Composed in either place separately,
+ * a change to the separator would leave the colours matching nothing.
+ */
+export function rebalancingAgentLabel({ name, mechanism }: RebalancingAgent): string {
+  return `${name}: ${mechanism}`;
+}
+
 export const EDUCATION_TOPICS: readonly EducationTopic[] = [
   {
     id: "evolving-landscape",
@@ -220,18 +271,62 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       ],
     },
   },
+  /**
+   * §7.6's class overview, as the `rebalancing-agents` chapter draws it: two
+   * bullets, the second carrying the three agents.
+   *
+   * **This topic was split when that design landed.** It used to hold all of
+   * §7.6's prose in one flat `body` — the two bullets below, the four
+   * TFPI/AT-pathway sentences now in `rebalancing-mechanisms`, and the three
+   * agents as one semicolon-joined string. The artboard draws the two halves in
+   * two different places (these bullets on the chapter, the mechanism prose
+   * behind the "Mechanisms…" figure), so one topic could only have been
+   * rendered by slicing it at an index — which is a fact about a layout stored
+   * as an offset into an array. The split states it instead.
+   *
+   * The children are composed from `REBALANCING_AGENTS` rather than written out
+   * here for the reason recorded on that array: the chapter colours two of them
+   * and not the third, and the two halves of that must not be able to drift.
+   */
   {
     id: "rebalancing-agents",
     title: "Hemostatic Rebalancing Agents in Treatment of HA/HB",
     body: [
-      "Hemostatic rebalancing agents enhance thrombin generation by targeting endogenous anticoagulant pathways, including TFPI, AT, and the APC/protein S system",
       "Hemostatic rebalancing agents are NFTs administered by SC injection",
-      "FDA-approved agents are indicated for prophylaxis of HA and HB, with and without inhibitors",
+      {
+        text: "FDA-approved agents are indicated for prophylaxis of HA and HB, with and without inhibitors",
+        children: REBALANCING_AGENTS.map(rebalancingAgentLabel),
+      },
+    ],
+  },
+  /**
+   * The other half of the split above: how the three agents act, which is what
+   * the §7.7 "Mechanisms of hemostatic rebalancing agents within the coagulation
+   * cascade" figure is about.
+   *
+   * **Nothing renders this yet.** The figure is image-borne (CONTEXT.md §7.7)
+   * and its asset has not landed, so the chapter's `+` opens nothing. The prose
+   * lives here rather than in the chapter because it is content either way, and
+   * because this is the shape the card will read when it exists.
+   *
+   * The id is not in the §7.7 index — that index names click-through targets,
+   * and this is the content behind one of them. `title` is the figure's own
+   * name from §7.6, so the eventual card has a heading without inventing one.
+   *
+   * Flat, though two of the four bullets lead into the two beneath them: the
+   * source punctuates rather than indents, and no design has drawn this yet.
+   * Same rule the `nft` classes bullet was held to — it stayed flat until the
+   * artboard showed it nested.
+   */
+  {
+    id: "rebalancing-mechanisms",
+    title: "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade",
+    body: [
+      "Hemostatic rebalancing agents enhance thrombin generation by targeting endogenous anticoagulant pathways, including TFPI, AT, and the APC/protein S system",
       "Anti-TFPI monoclonal antibodies: TFPI limits coagulation by inhibiting FXa and tissue factor–FVIIa complex",
       "Concizumab and marstacimab selectively bind the K2 domain of TFPI, reducing TFPI-mediated inhibition of FXa and enabling FXa generation by the FVIIa–TF pathway, promoting thrombin generation, clot formation, and hemostasis in HA/HB",
       "AT-directed siRNA: AT neutralizes thrombin and FXa, thereby limiting clot formation",
       "Fitusiran uses RNA interference to reduce hepatic AT production, restoring thrombin generation and rebalancing hemostasis",
-      "Concizumab: anti-TFPI mAB; Marstacimab: anti-TFPI mAB; Fitusiran: AT-directed siRNA",
     ],
     figures: [
       "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade (APC = activated protein C; AT = antithrombin; TFPI = tissue factor pathway inhibitor)",

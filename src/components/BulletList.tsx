@@ -19,9 +19,24 @@ import { cn } from "../lib/cn";
 export default function BulletList({
   items,
   className,
+  childClassName,
 }: {
   items: readonly Bullet[];
   className?: string;
+  /**
+   * Classes for one nested child, chosen per child.
+   *
+   * A function rather than a string because the one caller that needs it —
+   * `rebalancing-agents`, which draws its two anti-TFPI mABs in blue and its
+   * AT-directed siRNA in crimson — needs the children to differ from each
+   * other. Returning nothing leaves a child styled like every other, which is
+   * what every other caller gets by omitting the prop.
+   *
+   * The child's *text* stays the caller's, not this component's: it is handed
+   * back the string it authored, so the decision is made on content it already
+   * knows rather than on a position in an array.
+   */
+  childClassName?: (child: string) => string | undefined;
 }) {
   return (
     <ul className={cn("list-disc pl-6 text-body text-black", className)}>
@@ -33,7 +48,9 @@ export default function BulletList({
             {item.text}
             <ul className="list-disc ps-7">
               {item.children.map((child) => (
-                <li key={child}>{child}</li>
+                <li key={child} className={childClassName?.(child)}>
+                  {child}
+                </li>
               ))}
             </ul>
           </li>

@@ -162,3 +162,67 @@ now draw the same list, and the second copy would have been verbatim.
 - Glossary cross-links (issue 12) are not wired.
 - styling.md §9 items 9–11 and §12's 1024px cliff stay open; this chapter makes the
   cliff the wider of the two cases (220px of prose against 250px).
+
+**2026-07-30 — `rebalancing-agents` first pass (design applied).**
+
+The third of the four chapters, from a 1440×800 artboard like the other two. No grid
+this time: prose, a centred row of three reserved figure boxes under a caption, and
+one "Click here:" `+` whose caption sits to its **left** — an arrangement no other
+chapter has. Geometry, the colour sampling and the browser verification are in
+docs/styling.md §11. It fits one screen (800px exactly at 1440×800, verified in
+Chromium), so §9 item 10 stays a `disease-background` problem.
+
+**Unlike the first two, its body type is transcribed rather than snapped to the §2
+scale** — a raw `text-[26px]`, because this export sets prose a third larger than
+`disease-background`'s did and the gap had stopped being roundable. Two geometry values
+follow from that and are shipped off the drawn numbers: the boxes square up to whole
+scale steps (224×192 against the drawn 227×185) and the bottom row's gap tightens to
+24 from 38, which is what keeps the chapter on one screen at the larger type. §9 item
+9 is now a question the three chapters answer differently, which is the state it should
+be in when the designer's sizes arrive.
+
+Three more things worth recording beyond the layout:
+
+**The `rebalancing-agents` topic was split in two.** It held all of §7.6's prose in one
+flat `body`; the artboard draws two of those bullets on the chapter and none of the
+other five, which are the TFPI/AT-pathway mechanism sentences belonging to the
+"Mechanisms…" figure. One topic could only have been rendered by slicing it at an
+index — a fact about a layout stored as an offset into an array — so the mechanism
+prose moved to a new `rebalancing-mechanisms` topic, titled with §7.6's own figure
+name. Nothing renders it yet; it is what the `+` will open when the asset lands. The
+id is deliberately not in the §7.7 index: that index names click-through targets, and
+this is the content behind one.
+
+**`REBALANCING_AGENTS` is a new bespoke row type**, beside `SEVERITY_TABLE` and
+`TREATMENT_OPTIONS_MATRIX`. The artboard colours the three agents by mechanism class
+(two anti-TFPI mABs blue, one AT-directed siRNA crimson), so the colour is a function
+of the agent, not of its position — held as §7.6's one semicolon-joined string, the
+chapter could only recover that by matching on prose, and a reword would silently drop
+a colour. `mechanism` is a union, which makes a fourth class a compile error in the
+chapter rather than an agent rendered in no colour. The composed label
+(`"Concizumab: anti-TFPI mAB"`) has one implementation, `rebalancingAgentLabel`, called
+by both the data module and the chapter's tone lookup.
+
+**`BulletList` gained an optional per-child class hook** — a function, because this
+caller needs the children to differ from each other. Colour itself stays out of the
+data module, which carries no display fields.
+
+**Not met by this pass**, deliberately:
+
+- **Nothing on this chapter opens.** The `+` is an uncontrolled `PopupButton` with no
+  `Popup` mounted and no `aria-haspopup`; the figure it names is image-borne and its
+  asset has not landed. Same placeholder state `treatment-landscape` shipped in.
+- **The three boxes are inert** — no assets, and §7.7 names no target for any of them.
+  **The caption above them says "click on the boxes"**, so the chapter currently
+  instructs a click that does nothing. It ships as drawn because this pass is the
+  layout; raised as styling.md §9 item 16.
+- **§7.6's NXT007/Inno8 block renders nowhere.** This issue assigns the whole of §7.6
+  to this chapter, but the artboard draws no such block, and the `emerging-mimetics`
+  topic has no design. "All education content present" stays open for this chapter.
+- The artboard's "homeostatic rebalancing agents" is not reproduced — a different word
+  from hemostatic, and §7.6/§7.7 write it correctly. Same call as `disease-background`'s
+  unreproduced "FACOTOR".
+- Glossary cross-links (issue 12) are not wired.
+- styling.md §9 items 9 and 14–16 are open. Item 9 is the live one: this chapter
+  transcribes its type where the other two snap to the scale, so the three no longer
+  render the same, and closing it means one call applied backwards to all three.

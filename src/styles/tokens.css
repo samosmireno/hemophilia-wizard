@@ -143,6 +143,25 @@
     var(--color-brand-lagoon-100)
   );
 
+  /* The two mechanism classes of §7.6's hemostatic rebalancing agents, which
+     the `rebalancing-agents` artboard draws in two colours: the anti-TFPI mABs
+     in blue, the AT-directed siRNA in crimson. A PAIR, named together, because
+     the mapping is one fact — agent class to colour — and half of it stated as
+     a token and half as a bare palette reference would read as a coincidence.
+
+     The blue is the one value in this file that is neither a scale step nor
+     derived from one. Sampled #003d93, and off every ramp by a distance no
+     mapping here comes close to: the nearest steps are lagoon-75 (#076278) and
+     slate-75 (#2e4056), both a different hue rather than a different step. So
+     it is transcribed verbatim, per the §3/§4 rule, and raised as an open item
+     (docs/styling.md §9) rather than rounded into the palette. It is a token
+     anyway so there is one place to change when the designer rules on it.
+
+     Named outside `brand-` (that namespace is the raw scale) and outside `ui-`
+     (that one belongs to mlg-components), as --color-popup-caption is. */
+  --color-agent-mab: #003d93;
+  --color-agent-sirna: var(--color-brand-crimson-50);
+
   /* The pale fill behind the annotation notes beside a §7.7 figure — the two
      callouts the clotting-cascade export draws to the left of the diagram.
      Sampled #d0eae6, which is not a scale step but sits almost exactly between
