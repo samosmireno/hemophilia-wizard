@@ -1,6 +1,7 @@
 import { type ReactNode, useState } from "react";
 
 import { cn } from "../lib/cn";
+import Lightbox from "./Lightbox";
 import Popup from "./Popup";
 
 /**
@@ -36,18 +37,35 @@ export default function ExpandableFigure({
   thumbSrc,
   title,
   surface,
+  variant = "card",
   className,
   children,
 }: {
   /** The closed state: the same figure with the pop-up's ✕ cropped out. */
   thumbSrc: string;
-  /** The figure's own heading — the card's title, and the trigger's name. */
+  /** The figure's own heading — the expansion's title, and the trigger's name. */
   title: string;
-  /** Passed through to `Popup`; see its own `surface` prop. */
+  /** Passed through to `Popup`; see its own `surface` prop. Ignored when bare. */
   surface?: "gradient" | "white";
+  /**
+   * What the expansion looks like.
+   *
+   * `"card"` is the §7.7 pop-up — crimson band, border, the title painted. Right
+   * where the expansion is a destination with a name and content of its own: the
+   * clotting cascade rebuilds annotations as markup over its diagram, and the
+   * band is what says which figure you are looking at.
+   *
+   * `"bare"` is the picture on the scrim and nothing else. Right where the
+   * expansion IS the thumbnail, larger — chrome there announces a new place for
+   * a gesture that went nowhere — and where the trigger already sits inside a
+   * card, since two bands and two ✕ stacked read as two things to dismiss.
+   *
+   * Both are modal and both close three ways; only the drawing differs.
+   */
+  variant?: "card" | "bare";
   /** The thumbnail's layout box. The radius and the clip are not negotiable. */
   className?: string;
-  /** The card's body. */
+  /** The expansion's body. */
   children?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -95,9 +113,20 @@ export default function ExpandableFigure({
         </span>
       </button>
 
-      <Popup open={open} title={title} surface={surface} onClose={() => setOpen(false)}>
-        {children}
-      </Popup>
+      {/*
+        Mounted either way — the effect that calls `showModal()` needs the
+        element in the DOM — and only one of the two ever exists, so a figure
+        cannot be half-open in both presentations.
+      */}
+      {variant === "bare" ? (
+        <Lightbox open={open} title={title} onClose={() => setOpen(false)}>
+          {children}
+        </Lightbox>
+      ) : (
+        <Popup open={open} title={title} surface={surface} onClose={() => setOpen(false)}>
+          {children}
+        </Popup>
+      )}
     </>
   );
 }

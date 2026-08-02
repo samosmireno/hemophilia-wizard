@@ -54,15 +54,13 @@ describe("router", () => {
       "prophylaxis-guidance",
       "Prophylactic treatment is recommended over episodic treatment to control bleeding in patients with moderately severe/severe hemophilia",
     ],
+    ["fviiia-mimetics", "FVIIIa-Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis"],
   ])("renders the %s chapter", (section, title) => {
     renderAt(`/education/${section}`);
     expect(heading()).toHaveTextContent(title);
   });
 
-  it.each(["fviiia-mimetics"])("renders the %s education chapter placeholder", (section) => {
-    renderAt(`/education/${section}`);
-    expect(heading()).toHaveTextContent(`Education — ${section}`);
-  });
+  // All five chapters are designed; the placeholder list this sat beside is gone.
 
   // `CHAPTERS` is looked up with `Object.hasOwn`, so an inherited Object key is
   // not a section — `in` would resolve it and then try to render it.

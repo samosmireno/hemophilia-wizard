@@ -193,6 +193,19 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "Emerging FVIIIa-mimetic therapies, including denecimig/Mim8, are being developed to further optimize hemostatic activity while improving dosing convenience",
     ],
   },
+  /**
+   * §7.5's approved agent, as its pop-up card draws it: three bullets beside the
+   * MOA diagram.
+   *
+   * **The MOA sentence used to be a fourth bullet here** and now lives in
+   * `emicizumab-moa` below. That is the `rebalancing-mechanisms` split, for the
+   * same reason: the card does not draw it, and prose an artboard omits gets
+   * moved rather than cut off by an index in the chapter — an inserted or
+   * reordered bullet would otherwise silently change which copy is dropped.
+   *
+   * `figures` still names the diagram, unchanged; that caption is now also the
+   * split topic's `title`, which is what the enlarged figure card wears.
+   */
   {
     id: "emicizumab-overview",
     title: "Emicizumab (FDA-approved)",
@@ -200,9 +213,27 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "Recombinant, humanized BsAb; IgG4 immunoglobulin combines two binding fragments for FIXa and FX",
       "FDA-approved for prophylaxis of HA, with or without inhibitors in newborns or older patients",
       "Administered subcutaneously on a monthly, bimonthly, or weekly schedule",
-      "FVIIIa-mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
     ],
     figures: ["Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa"],
+  },
+  /**
+   * The diagram beside the bullets above, and the one sentence describing it.
+   *
+   * `title` is `emicizumab-overview.figures[0]` verbatim rather than a reference
+   * to it: a figure's title is *stated* in this codebase, not derived (see
+   * `MECHANISM_FIGURE_TITLE` in the `rebalancing-agents` chapter). The two being
+   * equal is the point — this topic is that figure — but stating it means the
+   * caption list stays a caption list and nothing has to index into it.
+   *
+   * `body` is one bullet because the source authors one. It renders under the
+   * enlarged diagram, which is the only place it is drawn at all.
+   */
+  {
+    id: "emicizumab-moa",
+    title: "Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa",
+    body: [
+      "FVIIIa-mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
+    ],
   },
   {
     id: "denecimig-overview",
@@ -360,18 +391,45 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade (APC = activated protein C; AT = antithrombin; TFPI = tissue factor pathway inhibitor)",
     ],
   },
+  /**
+   * §7.6's two investigational agents, **one topic per agent**.
+   *
+   * They were a single `emerging-mimetics` topic, holding all six bullets and
+   * both figure captions, while nothing rendered them. The `fviiia-mimetics`
+   * artboard settles the filing: it draws NXT007 and Inno8 as two separate `+`
+   * disclosures inside its own panel, and the designer has drawn a card behind
+   * each (Pop ups 12 and 13) — so they are two targets, not one, and they belong
+   * to §7.5's chapter rather than §7.6's. CONTEXT.md §7.5 records the move.
+   *
+   * The split is clean at the source: the six bullets were already four about
+   * NXT007 followed by two about Inno8, and `figures` already named one diagram
+   * per agent. Nothing is rephrased — the leading "NXT007:" / "Inno8:" stay on
+   * the bullets that carry them, as the source writes them.
+   *
+   * `title` is each card's own heading, not the chapter's caption for it: the
+   * panel labels the buttons "NXT007" and "Inno8" flat, where Pop up 13 heads
+   * its card "Inno8: Oral FVIIIa Mimetic for HA". The same caption-vs-title
+   * split `Disclosure` documents.
+   */
   {
-    id: "emerging-mimetics",
-    title: "Investigational FVIIIa-mimetic therapies in early-stage development",
+    id: "nxt007-overview",
+    title: "NXT007",
     body: [
       "NXT007: Next-generation BsAb engineered by modifying emicizumab to enhance hemostasis in HA",
       "NXT007 is derived from emicizumab heavy-chain regions and incorporates two distinct light chains with charged-residue mutations designed to optimize antibody chain pairing and cofactor activity",
       "In vitro studies demonstrated that NXT007-treated plasma samples achieved coagulation activity equivalent to 100 IU/dL FVIII in a tissue factor–triggered thrombin generation assay",
       "NXT007 ongoing clinical trials: NXTAGE study (jRCT2080224835); WP44714 study (NCT05987449)",
+    ],
+    figures: ["NXT007 BsAb Structure"],
+  },
+  {
+    id: "inno8-overview",
+    title: "Inno8: Oral FVIIIa Mimetic for HA",
+    body: [
       "Inno8: Novel VHH-based FVIIIa-mimetic; once-daily oral treatment of HA",
       "Inno8 is currently under evaluation in nonrandomized open-label phase 1 VOYAGER2 trial (NCT07220564)",
     ],
-    figures: ["NXT007 BsAb Structure", "Inno8 Mechanism of Action"],
+    figures: ["Inno8 Mechanism of Action"],
   },
 ];
 

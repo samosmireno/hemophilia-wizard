@@ -103,4 +103,31 @@ describe("ExpandableFigure", () => {
       `Expand ${TITLE}`,
     );
   });
+
+  /**
+   * `variant="bare"` swaps the §7.7 card for `Lightbox` — the picture on the
+   * scrim with no band and no border.
+   *
+   * The pair is the fact worth pinning. Losing the heading is the point; keeping
+   * the *name* is what stops that being a regression, because with no band there
+   * is no visible text left for the dialog to be named from, and `Lightbox` has
+   * to label it directly. Everything else — ESC, the backdrop, the ✕ — is
+   * `ModalLayer`'s and is tested through the card above.
+   */
+  it("expands bare on request: no heading, still named, still closable", async () => {
+    render(
+      <ExpandableFigure thumbSrc="/thumb.webp" title={TITLE} variant="bare">
+        <img src="/figure.webp" alt={ALT} />
+      </ExpandableFigure>,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: `Expand ${TITLE}` }));
+
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+    expect(dialog()).toHaveAccessibleName(TITLE);
+    expect(dialog()).toHaveAttribute("open");
+
+    await userEvent.click(screen.getByRole("button", { name: `Close ${TITLE}` }));
+    expect(dialog()).not.toHaveAttribute("open");
+  });
 });

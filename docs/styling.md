@@ -755,10 +755,12 @@ narrower than the 1165px content column, so it stays centred within it.
 | 12  | The pop-up export has **no scrim** — nothing dims the page behind a dialog that traps focus. The shipped `rgb(0 0 0 / .5)` is inferred, like §4.3's tooltip and §4.5's sidebar. The card's own 55%-black shadow was drawn against Figma's dark canvas and does much less work over the light `bg-page`.                                                                                                                                                                                                | §13                   |
 | 13  | The pop-up title is 45.47px, off the §2 scale, and ships as a raw value under §8's precedent. Same open question as item 9 — if the designer's sizes arrive for the chapters, this wants deciding with them rather than separately.                                                                                                                                                                                                                                                                    | §13                   |
 | 14  | `--color-agent-mab` (`#003d93`) is a sixth hue: it derives from no brand ramp, and the nearest steps are a different colour rather than a different step. Transcribed verbatim pending a designer answer on whether the agent classes are meant to be brand colours at all. Its pair, `--color-agent-sirna`, is `crimson-50` exactly.                                                                                                                                                                  | §11                   |
-| 15  | The artboards disagree on the disclosure-caption colour: `#074655` on the first two, `lagoon-75` (`#076278`) on `rebalancing-agents`. All three chapters use `--color-popup-caption`, the first value, pending a designer answer.                                                                                                                                                                                                                                                                      | §11                   |
+| 15  | The artboards disagree on the disclosure-caption colour: `#074655` on the first two, `lagoon-75` (`#076278`) on `rebalancing-agents` **and now `fviiia-mimetics`** — so it is 2 v 2 and the tie is no longer breakable by weight of evidence. All four chapters use `--color-popup-caption`, the first value, pending a designer answer.                                                                                                                                                               | §11                   |
 | 16  | `rebalancing-agents` draws three figure boxes under a caption telling the reader to click them, but §7.7 names no target for any of the three and the export draws "PLACEHOLDER" in all of them. Needs the designer to say what a box opens.                                                                                                                                                                                                                                                           | §11                   |
 | 17  | The mechanisms prose card glosses only `AT`, but its own copy introduces `TFPI` and `APC` as well; the figure card behind it glosses only `TFPI`. Shipped with all three on the prose card (§11), which also normalises the export's "AT=" to the "TFPI = " spacing it uses one card later. The alternative reading is that the two cards are meant as one and the gloss is split deliberately — needs the designer.                                                                                   | §11                   |
 | 18  | `NavArrowButton` and `Button` are not `forwardRef`, so `ref` does not typecheck on either (`PopupButton` is). That is what blocks focus management when the mechanisms card swaps steps — there is no handle to focus. Package change, tracked in `.scratch/mlg-reskin/`.                                                                                                                                                                                                                              | §11, mlg-reskin       |
+| 19  | `--background-image-emerging-panel`'s mint (`#c6eee5`) is dE .0136 from `color-mix(teal-25 30%, teal-0)` — between the ~.002 every derived token clears and the .042 that made item 7 literal, so the file's own rule does not decide it. Shipped literal; ask the designer whether it is meant to be a teal step.                                                                                                                                                                                     | §11                   |
+| 20  | `fviiia-mimetics` ships four `+` disclosures that open nothing. The designer HAS drawn all four cards (Pop ups 10–13, prose + a vector MOA diagram each); they need exporting as SVG and building. Not a design question — outstanding work.                                                                                                                                                                                                                                                           | §11                   |
 
 ---
 
@@ -1253,6 +1255,104 @@ crop offset in the export, on imagery with high local variance). At 390 the chap
 fits one screen with the stepped-down heading, and the wash stays put while it does —
 `fixed`, so it does not stretch with the document the way a `<main>` background would.
 
+### `fviiia-mimetics`
+
+The fifth designed chapter (`src/routes/education/FviiiaMimetics.tsx`), from Figma
+artboard `67:803` ("education box 4"), **1440 × 800** like the others. A two-tone
+heading, four bullets, and a bottom half split between two disclosures at the left and
+a shadowed corner panel at the right carrying two more.
+
+Type, off the artboard:
+
+| Ink                      | Drawn                | Ships as                      |
+| ------------------------ | -------------------- | ----------------------------- |
+| heading, 2 lines         | 52px/57.2, Barlow Bd | `text-h2`, `lg:text-h1`       |
+| heading → bullets        | 32px                 | `mt-8` — the designer's value |
+| bullets                  | 26px/32, DM Sans 400 | `text-[26px] leading-tight`   |
+| agent captions           | 26px/30, wt 900/500  | `text-[26px] leading-7.5`     |
+| panel heading & captions | 26px/26, wt 900      | `text-[26px] leading-6.5`     |
+
+The bullets are raw for the §8 reason the other chapters record, and the captions for
+the same one — 26px is `text-h3`'s size at weights the scale does not carry. Tracking
+is drawn at 0.608px on 26px (0.0234em); `tracking-wide` is 0.025em, within 0.04px, so
+it ships on the scale rather than as an arbitrary value.
+
+**The heading steps down to `text-h2` below `lg`, the second chapter to need it.** Nine
+words at 52px take six lines and 328px of a 390 × 780 phone — 42% of the screen before
+the first bullet, measured in Chrome. Same invented comfort value as
+`prophylaxis-guidance`'s, for the same reason and stated the same way.
+
+`leading-7.5` / `leading-6.5` are the spacing scale's canonical forms of 30px and 26px,
+not arbitrary values. Do **not** take the linter's suggestion of `leading-below-rule` for
+the first: that token is `TopRule`'s band plus the designer's 16px (§12) and equals 30px
+by coincidence, so using it would assert a relationship that does not exist.
+
+**The export shows five bullets and the chapter renders four.** Figma broke the fourth
+sentence across two `<li>`s at the measure; the topic's `body` is the source and the
+chapter test pins the count, so the drawing cannot be transcribed over it.
+
+#### Three two-toned strings
+
+The first chapter to paint one string in two colours, and it does it three times:
+
+| String           | Lead                           | Tail                           |
+| ---------------- | ------------------------------ | ------------------------------ |
+| `<h1>`           | `crimson-50`, to the colon     | `slate-100`                    |
+| Emicizumab label | `slate-100` wt 900, to the `(` | `--color-popup-caption` wt 500 |
+| Denecimig label  | `slate-100` wt 900, to the `:` | `--color-popup-caption` wt 500 |
+
+`#d63a52` and `#111d2e` are `crimson-50` and `slate-100` exactly. The boundary is found
+by punctuation in the chapter (`splitTitle`) rather than stored beside the copy: the two
+halves concatenate back to the source string, so this moves a paint boundary and never
+drops content — which is what separates it from the derivation `rebalancing-agents`
+argues against. Colon is tried before paren because the Denecimig title contains both
+and the paren comes first in the string; the chapter test pins that.
+
+#### The corner panel
+
+`--background-image-emerging-panel` + `--shadow-emerging-panel`, declared as a pair
+because they are one drawn object. The shadow is cast **up and left**
+(`-20px -1px 47.2px -22px`) — the panel sits in the page's bottom-right corner, so those
+are the only two edges facing the page.
+
+**The mint is transcribed, and this is the borderline case §3/§4 leaves open rather than
+a clear one.** Sampled `#c6eee5`. Measured in OKLab: `color-mix(teal-25 30%, teal-0)` is
+dE **.0136**, and `--color-figure-note` is dE **.0157**. Both are an order of magnitude
+above the ~.002 every derived token in `tokens.css` clears, and well under the .042 that
+sent §6's gradient stop to a literal — so it ships literal on the stricter reading and is
+raised as open item 19. Reusing `--color-figure-note` was the third option and was
+rejected for welding a callout fill and a panel gradient to one value.
+
+**Geometry.** 675 × 350 at (653, 450) on the canvas: right edge at 1328 = 1440 − the
+112px gutter, so it stays inside the content column and breaks no shell padding, and
+bottom edge flush with the canvas. The chapter reaches that bottom edge with `grow`
+inside `AppShell`'s `flex flex-1 flex-col` wrapper — which is `lg:pb-0`, so the content
+box already ends at the viewport bottom. It **stretches** past the drawn 350px on a
+taller viewport rather than detaching from the corner; its content stays vertically
+centred, which the artboard's equal 87px above and below already implies.
+
+The radius steps **117px → 60px below `lg`**. 117 is drawn on a 675px panel where it
+reads as a corner; on a 320px phone it eats a third of the width. An invented comfort
+value like the small-screen gutters and `prophylaxis-guidance`'s stepped heading — the
+canvas is 1440 and nobody has drawn a phone.
+
+#### Four disclosures, none of which open yet
+
+Not `DisclosureBand`: that is a 3-tuple by type, drawn as an arch over three centred
+columns, and this is four in two groups of two with the caption to the **left** of the
+button (`rebalancing-agents`' arrangement, not the stacked one). The chapter composes
+`PopupButton` directly.
+
+The designer has drawn a card behind each — Pop ups **10** (Emicizumab), **11**
+(Denecimig), **12** (NXT007), **13** (Inno8), each 1152 × 660, prose plus a
+**vector-drawn** MOA diagram. None of those assets exists yet, so this pass is the page:
+the buttons toggle to ✕, mutually exclusive, and `aria-haspopup` is withheld for the
+reason `DisclosureBand` makes it conditional. That is the state `rebalancing-agents`
+shipped in before `05d7efb`. Open item 20.
+
+A stray 355 × 19 vector at (997, 214) on the artboard renders as nothing in the export
+and overshoots the text block's right edge; treated as leftover and not reproduced.
+
 ---
 
 ## 12. Layout geometry
@@ -1404,6 +1504,84 @@ stays centred on the card rather than in the space left beside the button.
 x=156, i.e. its centre sits **20.19px left of the card's**. That is a hand-drag,
 not a rule — 1.9% of the card width — and replicating an asymmetric nudge would
 make it look intentional. Centred instead.
+
+**The band opts four abbreviations out of its own `uppercase`.** `FVIIIa`,
+`BsAbs`, `FIXa`, `FXa` — see `src/lib/preserveCase.tsx`. Shouted whole, the
+Emicizumab MOA caption reads "INTERACTIONS WITH FIX/FIXA AND FX/FXA" and loses
+the only thing distinguishing an activated factor from its zymogen, which is the
+one fact that caption exists to state. Same call the `fviiia-mimetics` `<h1>`
+already made; the helper is now shared by both.
+
+It changes **painted glyphs only**. The band's `<h2>` and `<p>` carry an
+`aria-label` of the raw `title`/`subtitle`, because the accessible-name algorithm
+joins each element's contribution with a separating space and would otherwise
+announce "FIX/ FIXa ". A title with no cased term renders as one text node and
+the label is a no-op, so it is unconditional rather than a special case.
+
+### Two presentations of one modal
+
+The `<dialog>` itself — scrim, ESC, backdrop click, focus trap, scroll lock — is
+`ModalLayer`. Two components dress it:
+
+| Component  | Draws                                          | For                                              |
+| ---------- | ---------------------------------------------- | ------------------------------------------------ |
+| `Popup`    | crimson band, border, ✕, scroll region         | a §7.7 click-through — a destination with a name |
+| `Lightbox` | nothing; content on the scrim, ✕ in the corner | an enlargement — the thing you clicked, bigger   |
+
+`ExpandableFigure` picks between them with `variant`. The clotting cascade stays
+a card: it rebuilds annotations as markup and the band says which figure you are
+looking at. The §7.5 MOA diagram is `variant="bare"` — chrome there announces a
+new place for a gesture that went nowhere, and its trigger already lives inside a
+card whose band and ✕ would then be stacked under a second pair.
+
+`Lightbox` names its dialog with `aria-label`, since it paints no heading to be
+named from. Its content column is `w-fit` so a caption can be centred on the
+picture — which means **prose inside it must not widen the column**: a
+paragraph's max-content is its longest unbroken line, wider than most figures, so
+callers set `w-0 min-w-full` on it.
+
+### A card over a card
+
+`fviiia-mimetics`' Emicizumab pop-up puts an `ExpandableFigure` in its body, so
+its MOA diagram opens a **second `<dialog>` nested inside the first** — and
+closing that one has to leave the card standing.
+
+Two of the three routes fall out of what was already here. **ESC did not**, and
+that is the one worth reading before touching this:
+
+- **ESC needed handling ahead of the platform.** Chrome routes a dialog's Escape
+  through a CloseWatcher, and nested dialogs land in a single close-watcher
+  _group_ — one Escape closes every dialog in the group. Measured in Chromium:
+  one `cancel` fired, on the inner dialog, and both ended up shut. `onCancel`
+  cannot fix that, because the outer never gets a `cancel` to preventDefault.
+
+  So `ModalLayer` takes the keydown itself: `preventDefault` (a close request is
+  only processed if the keydown was not cancelled, which removes the group from
+  the platform's hands) plus `stopPropagation` (so an enclosing layer does not
+  see the same keypress bubble past), then `onClose`. Both calls are needed;
+  dropping either reinstates the bug in a different way. `onCancel` stays as the
+  fallback for browsers with no CloseWatcher, and for jsdom.
+
+- **The inner backdrop is not the outer backdrop.** The inner `<dialog>` is a
+  DOM descendant of the outer layer, so its click bubbles there; the outer's
+  `event.target === event.currentTarget` guard is what rejects it. That guard was
+  written for a text-selection drag (see `Popup`) and this is its second job.
+- **Scroll lock nests correctly.** The inner effect captures `overflow: hidden`
+  as its "previous" value and restores it on close, leaving the outer's own
+  cleanup to restore the real one.
+
+The thumbnail sits on a white panel inside the gradient card because
+`emicizumab.webp` carries a white background, which reads as a stray rectangle
+anywhere else. The enlargement needs no such panel — on the scrim the asset's
+own white _is_ the surface.
+
+**`PopupFigure` gained a `reserve` prop here.** Its height cap is `95dvh` less
+the chrome around it, defaulted to 10rem measured off `Popup` — so a caller that
+puts anything under the picture gets pushed into a scroll. The MOA sentence went
+below the fold entirely at 1440 × 900 before this existed. The bare enlargement
+passes `9rem`, which is a different 9-ish from the default: no crimson band to
+subtract, but the layer's padding, the caption's gap and two lines of prose. The
+three existing callers pass nothing and render identically.
 
 ### The body gradient — `--background-image-popup`
 

@@ -1,7 +1,9 @@
-import { type ReactNode, useEffect, useId, useRef } from "react";
+import { type ReactNode, useId } from "react";
 import { PopupButton } from "mlg-components";
 
 import { cn } from "../lib/cn";
+import { preserveCase } from "../lib/preserveCase";
+import ModalLayer from "./ModalLayer";
 
 /**
  * The crimson band's horizontal padding, shared by the title and the subtitle.
@@ -20,19 +22,11 @@ const BAND_INSET = "px-[clamp(5.5rem,7vw,6.25rem)]";
  * Figma `144:431` ("Pop 8"), 1066×645 on the 1440 canvas. Geometry and the two
  * deliberate deviations from the export are in docs/styling.md §13.
  *
- * **A real `<dialog>` opened with `showModal()`**, not a positioned div. Three
- * things come from the platform rather than from code here: the focus trap, the
- * top layer, and focus restoration on close. The top layer is what makes this
- * work at all in its first caller — `DisclosureBand` wraps its content in
- * `isolate` + `overflow-hidden` to clip the arch, and any in-flow panel large
- * enough to be this card would be cut by it. A modal dialog escapes every
- * ancestor's clipping and stacking context by definition, so it also clears
- * `TopRule`'s `z-30` band and the sidebar's z-40/z-50 chrome without owning a
- * z-index of its own.
- *
- * **`open` is the single source of truth.** The `cancel` handler below
- * preventDefaults, so the element never closes itself behind React's back — ESC
- * routes through `onClose` like every other close, and the two cannot disagree.
+ * **This is the card, not the modal.** The `<dialog>`, its scrim, ESC, the
+ * backdrop click and the scroll lock are all `ModalLayer`'s — see there for why
+ * each is shaped the way it is. What is left here is the crimson band, the
+ * border, the ✕ and the scroll region: the presentation a §7.7 click-through
+ * wears. `Lightbox` is the other one.
  */
 export default function Popup({
   open,
@@ -70,76 +64,14 @@ export default function Popup({
   surface?: "gradient" | "white";
   children?: ReactNode;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const subtitleId = useId();
 
-  /**
-   * Guards the backdrop click against a text selection that starts inside the
-   * card and ends outside it: a click event's target is the *common ancestor*
-   * of its mousedown and mouseup, which for that drag is the dialog itself —
-   * indistinguishable from a real backdrop click without remembering where the
-   * press landed.
-   */
-  const pressedBackdrop = useRef(false);
-
-  useEffect(() => {
-    const dialog = ref.current;
-    if (!dialog) return;
-    // Guarded both ways: showModal() on an already-open dialog throws, and
-    // React may re-run this effect without `open` having actually changed.
-    if (open && !dialog.open) dialog.showModal();
-    else if (!open && dialog.open) dialog.close();
-  }, [open]);
-
-  /**
-   * `showModal()` makes everything behind the dialog inert, but does not stop
-   * the page scrolling under it — the one thing in issue 03's list the platform
-   * does not hand us.
-   */
-  useEffect(() => {
-    if (!open) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [open]);
-
   return (
-    // The element itself is a transparent, viewport-filling layer rather than
-    // the card, so a click anywhere outside the card is a click on *it* — the
-    // ::backdrop pseudo-element is not an event target, so a dialog sized to
-    // its own content has no way to hear one. The scrim shows through.
-    //
-    // Two classes here fight the UA stylesheet's `dialog` rules, and BOTH are
-    // load-bearing — dropping either one reproduces a bug this already had:
-    //
-    // - `hidden open:grid`, never a bare `grid`. The UA hides a closed dialog
-    //   with `dialog:not([open]) { display: none }`, and ANY author `display`
-    //   beats a UA one regardless of specificity — so a bare `grid` leaves an
-    //   empty, unclosable card painted over the page from first render.
-    // - `size-full`, because the UA sizes a dialog `width/height: fit-content`.
-    //   `inset-0` cannot defeat that (insets only stretch an element whose size
-    //   is `auto`), so without it the layer shrinks onto the card and pins
-    //   itself to the top-left instead of centring in the viewport.
-    <dialog
-      ref={ref}
-      // A space-separated id list, not `cn()`: that helper runs tailwind-merge,
-      // which is entitled to reorder or drop tokens it recognises — harmless
-      // for classes, silent breakage for an accessible name.
+    <ModalLayer
+      open={open}
+      onClose={onClose}
       aria-labelledby={subtitle ? `${titleId} ${subtitleId}` : titleId}
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onMouseDown={(event) => {
-        pressedBackdrop.current = event.target === event.currentTarget;
-      }}
-      onClick={(event) => {
-        if (pressedBackdrop.current && event.target === event.currentTarget) onClose();
-      }}
-      className="fixed inset-0 m-0 hidden size-full max-h-none max-w-none place-items-center border-0 bg-transparent p-0 backdrop:bg-black/50 open:grid"
     >
       {/* `min()` rather than the drawn 1066px: the card is a content container
           and the app runs down to 375px. `overflow-hidden` is what clips the
@@ -165,14 +97,31 @@ export default function Popup({
               own 65px plus the 22px inset, so the two never overlap. Type is
               raw design values per §8's precedent; the scale has no 45.5px
               step. */}
+          {/*
+            `preserveCase` is what stops the `uppercase` below destroying an
+            abbreviation the band is there to state — "EMICIZUMAB MOA:
+            INTERACTIONS WITH FIX/FIXA AND FX/FXA" loses the only thing telling a
+            zymogen from its activated form. See `lib/preserveCase`.
+
+            **`aria-label` is required, not belt-and-braces.** The helper splits
+            the title into text nodes and spans, and the accessible-name
+            algorithm joins each element's contribution with a separating space —
+            so the name this `id` supplies would drift to "FIX/ FIXa " and the
+            dialog would announce itself with it. Labelling from the `title` prop
+            states the one string the fragments are made of, so `aria-labelledby`
+            on the dialog resolves to exactly what the caller passed. A title
+            carrying no cased term renders as a single text node and the label is
+            then a no-op, which is why it is unconditional.
+          */}
           <h2
             id={titleId}
+            aria-label={title}
             className={cn(
               BAND_INSET,
               "text-center font-display text-[clamp(1.375rem,3.157vw,2.25rem)] leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase",
             )}
           >
-            {title}
+            {preserveCase(title)}
           </h2>
 
           {/* Same inset as the title, so the two lines share one centre and one
@@ -182,12 +131,15 @@ export default function Popup({
           {subtitle && (
             <p
               id={subtitleId}
+              // Same treatment and the same reason as the title above: this line
+              // is `uppercase` too, and it joins the accessible name.
+              aria-label={subtitle}
               className={cn(
                 BAND_INSET,
                 "mt-1 text-center font-display text-h4 font-medium tracking-wide text-white uppercase",
               )}
             >
-              {subtitle}
+              {preserveCase(subtitle)}
             </p>
           )}
 
@@ -206,6 +158,6 @@ export default function Popup({
             `max-h-[85dvh]` and this never scrolls. */}
         <div className="min-h-0 flex-1 overflow-y-auto px-16 py-2">{children}</div>
       </div>
-    </dialog>
+    </ModalLayer>
   );
 }

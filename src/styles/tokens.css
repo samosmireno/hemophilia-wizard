@@ -162,6 +162,28 @@
   --color-agent-mab: #003d93;
   --color-agent-sirna: var(--color-brand-crimson-50);
 
+  /* The corner panel that closes the `fviiia-mimetics` chapter — the shadowed
+     block carrying the two investigational agents. A PAIR: the gradient and the
+     shadow are one drawn object, and the shadow is what reads it as lifted off
+     the page rather than painted on it.
+
+     The mint is TRANSCRIBED, not derived, and this is the borderline case the
+     §3/§4 rule leaves open rather than a clear one. Sampled #c6eee5. Measured
+     against the ramp: color-mix(teal-25 30%, teal-0) lands at dE .0136 OKLab
+     and --color-figure-note is dE .0157 away — both an order of magnitude above
+     the ~.002 every derived token in this file clears, and well under the .042
+     that sent the page gradient's stop to a literal. It stays literal on the
+     stricter reading, and is raised as an open item (docs/styling.md §9)
+     alongside --color-agent-mab. Reusing --color-figure-note was the third
+     option and was rejected for welding two unrelated elements to one value.
+
+     Shadow cast UP and LEFT (negative x and y) with a -22px spread: the panel
+     sits in the page's bottom-right corner, so the only edges that can throw
+     one are the two facing the content. In @theme, not :root — Tailwind inlines
+     --shadow-* at build time (§1). */
+  --background-image-emerging-panel: linear-gradient(117.03deg, #ffffff 21.12%, #d3f1e9 91.03%);
+  --shadow-emerging-panel: -20px -1px 47.2px -22px rgba(0, 0, 0, 0.25);
+
   /* The pale fill behind the annotation notes beside a §7.7 figure — the two
      callouts the clotting-cascade export draws to the left of the diagram.
      Sampled #d0eae6, which is not a scale step but sits almost exactly between

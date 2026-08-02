@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -89,6 +89,46 @@ describe("Popup", () => {
     expect(screen.getByText(SUBTITLE)).toHaveClass("text-h4", "font-medium");
   });
 
+  /**
+   * The band is `uppercase`, and a plain transform destroys the abbreviations it
+   * is often made of: `FVIIIa` is factor VIII *activated* and `FIXa` is factor
+   * IX activated, neither of which survives being shouted — the caption below
+   * would read "FIX/FIXA AND FX/FXA" and stop distinguishing an activated factor
+   * from its zymogen.
+   *
+   * The accessible name is asserted in the same test on purpose: the spans that
+   * opt those terms out are themselves what would corrupt it, because the
+   * accessible-name algorithm joins each element's contribution with a space.
+   * The band's `aria-label` is what holds the two facts together, and only
+   * asserting them together can catch one being fixed at the other's expense.
+   */
+  it("keeps cased abbreviations out of the band's uppercase, and out of its name", () => {
+    const cased = "Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa";
+    render(
+      <Popup open title={cased} onClose={vi.fn()}>
+        <p>body</p>
+      </Popup>,
+    );
+
+    const heading = screen.getByRole("heading", { name: cased });
+    for (const term of ["FIXa", "FXa"]) {
+      expect(within(heading).getByText(term)).toHaveClass("normal-case");
+    }
+    expect(dialog()).toHaveAccessibleName(cased);
+  });
+
+  /** A title with nothing to protect is one text node, and names the card. */
+  it("leaves a title with no cased term whole", () => {
+    render(
+      <Popup open title={TITLE} onClose={vi.fn()}>
+        <p>body</p>
+      </Popup>,
+    );
+
+    expect(screen.getByRole("heading", { name: TITLE })).toHaveTextContent(TITLE);
+    expect(dialog()).toHaveAccessibleName(TITLE);
+  });
+
   it("closes on the ✕", async () => {
     const onClose = vi.fn();
     render(
@@ -101,6 +141,44 @@ describe("Popup", () => {
     await userEvent.click(screen.getByRole("button", { name: `Close ${TITLE}` }));
 
     expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  /**
+   * ESC is handled on `keydown`, ahead of the platform's own close watcher —
+   * Chrome groups nested dialogs into one watcher and closes them together, so
+   * `onCancel` alone cannot dismiss just the topmost (see `ModalLayer`).
+   *
+   * The cancelled default is the assertion that matters: it is what takes the
+   * close request away from the browser, and a handler that called `onClose`
+   * without it would close the layer *and* let the group close too.
+   */
+  it("routes ESC through onClose and cancels the platform's own close", () => {
+    const onClose = vi.fn();
+    render(
+      <Popup open title={TITLE} onClose={onClose}>
+        <p>body</p>
+      </Popup>,
+    );
+
+    const escaped = fireEvent.keyDown(dialog(), { key: "Escape" });
+
+    expect(onClose).toHaveBeenCalledOnce();
+    // `fireEvent` returns false when a handler called preventDefault.
+    expect(escaped).toBe(false);
+  });
+
+  /** Any other key is none of this component's business. */
+  it("ignores keys that are not ESC", () => {
+    const onClose = vi.fn();
+    render(
+      <Popup open title={TITLE} onClose={onClose}>
+        <p>body</p>
+      </Popup>,
+    );
+
+    fireEvent.keyDown(dialog(), { key: "Enter" });
+
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   /**

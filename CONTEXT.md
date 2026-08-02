@@ -9,7 +9,8 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-07-27 (full re-scan of `[PDF-V]` as a diagram, not just text — traced
+- **Last reviewed:** 2026-07-31 (the `fviiia-mimetics` artboard refiled §7.6's two investigational
+  agents onto §7.5 — see both sections); previously 2026-07-27 (full re-scan of `[PDF-V]` as a diagram, not just text — traced
   branch connections, color-coding, and all 32 pop-up notes, see [§4](#4-treatment-wizard-flow-main-engine);
   plus a `[PPTX]` re-scan that completed the education content in [§7](#7-education-content))
 - **How to update:** when a source file changes, update the affected section and keep its
@@ -347,13 +348,13 @@ Content is `[PDF-V]` unless tagged `[PPTX]`.
 `/education/:section` subroutes, **not** a single page. The §7.x content below maps to five
 chapters:
 
-| Chapter subroute       | Source subsections                                    |
-| ---------------------- | ----------------------------------------------------- |
-| `disease-background`   | §7.2                                                  |
-| `treatment-landscape`  | §7.1, §7.3, §7.4 (first bullet + benefits/challenges) |
-| `rebalancing-agents`   | §7.6 (wizard cross-link target)                       |
-| `fviiia-mimetics`      | §7.5 (wizard cross-link target)                       |
-| `prophylaxis-guidance` | §7.4 prophylaxis guidance (last chapter)              |
+| Chapter subroute       | Source subsections                                                |
+| ---------------------- | ----------------------------------------------------------------- |
+| `disease-background`   | §7.2                                                              |
+| `treatment-landscape`  | §7.1, §7.3, §7.4 (first bullet + benefits/challenges)             |
+| `rebalancing-agents`   | §7.6 NFTs + rebalancing agents (wizard cross-link target)         |
+| `fviiia-mimetics`      | §7.5, incl. the investigational agents (wizard cross-link target) |
+| `prophylaxis-guidance` | §7.4 prophylaxis guidance (last chapter)                          |
 
 The §7.7 "Click here:" figures are **in-chapter local-state pop-ups** — not routes, and not the
 `?drug=<id>` overlay (that param is reserved for drug sheets, [§6](#6-drug-information-sheets) /
@@ -432,7 +433,11 @@ inter-individual variability and uncertain duration.
 - **Emicizumab (FDA-approved).** Recombinant humanized BsAb; **IgG4** immunoglobulin combining two
   binding fragments for FIXa and FX. FDA-approved for prophylaxis of HA ±inhibitors in newborns or
   older; SC monthly/bimonthly/weekly. MOA: binds activated FIXa and FX, enhancing catalytic
-  efficiency of FIXa in converting FX on activated platelets.
+  efficiency of FIXa in converting FX on activated platelets. `[BUILD]` the MOA sentence is
+  modelled as its own topic (`emicizumab-moa`, titled with the figure caption below), because the
+  card draws the other three bullets beside the diagram and this one under it — the same split as
+  `rebalancing-mechanisms`. Figure: "Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa"
+  (image), which the card shows as a thumbnail that enlarges over the card when clicked.
 - **Denecimig (Mim8, investigational — under FDA review).** Monovalent anti-FIXa arm enhances FIXa
   proteolytic activity to facilitate FX activation, thrombin generation, and clot formation.
   Pre-clinical: **Mim8 potency up to 18-fold greater** than an emicizumab-equivalent analog.
@@ -440,6 +445,18 @@ inter-individual variability and uncertain duration.
   submitted for routine prophylaxis in adult & pediatric HA ±inhibitors, supported by the phase 3
   **FRONTIER** program: FRONTIER2 (SC monthly/weekly, >12 yr), FRONTIER3 (monthly/weekly, >1 yr),
   FRONTIER4 (OLE). See also drug sheet [§6](#6-drug-information-sheets).
+- **Investigational FVIIIa-mimetic therapies in early-stage development** (moved here from §7.6,
+  2026-07-31): the source lists these under the NFT block, but the `fviiia-mimetics` artboard
+  draws them on this chapter — in its own corner panel, with a separate click-through per agent —
+  which is the filing the app follows. `[BUILD]` models them as one topic per agent
+  (`nxt007-overview`, `inno8-overview`).
+  - **NXT007** — next-generation BsAb engineered by modifying emicizumab (derived from emicizumab
+    heavy-chain regions with two distinct light chains carrying charged-residue mutations to
+    optimize chain pairing/cofactor activity). In vitro, NXT007-treated plasma achieved coagulation
+    activity equivalent to **100 IU/dL FVIII** in a TF-triggered thrombin-generation assay. Trials:
+    NXTAGE (jRCT2080224835), WP44714 (NCT05987449).
+  - **Inno8** — novel **VHH-based, once-daily oral** FVIIIa-mimetic for HA; under evaluation in the
+    nonrandomized open-label phase 1 **VOYAGER2** trial (NCT07220564).
 
 ### 7.6 Non-factor replacement therapies (NFTs) & hemostatic rebalancing agents
 
@@ -457,14 +474,10 @@ inter-individual variability and uncertain duration.
     reduce hepatic AT production, restoring thrombin generation and rebalancing hemostasis.
   - Figure: "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade" (image; APC =
     activated protein C, AT = antithrombin, TFPI = tissue factor pathway inhibitor).
-- **Investigational FVIIIa-mimetic therapies in early-stage development:**
-  - **NXT007** — next-generation BsAb engineered by modifying emicizumab (derived from emicizumab
-    heavy-chain regions with two distinct light chains carrying charged-residue mutations to
-    optimize chain pairing/cofactor activity). In vitro, NXT007-treated plasma achieved coagulation
-    activity equivalent to **100 IU/dL FVIII** in a TF-triggered thrombin-generation assay. Trials:
-    NXTAGE (jRCT2080224835), WP44714 (NCT05987449).
-  - **Inno8** — novel **VHH-based, once-daily oral** FVIIIa-mimetic for HA; under evaluation in the
-    nonrandomized open-label phase 1 **VOYAGER2** trial (NCT07220564).
+- **Investigational FVIIIa-mimetic therapies in early-stage development** — the source lists NXT007
+  and Inno8 in this block, but they are FVIIIa mimetics, not rebalancing agents, and the design
+  files them on the §7.5 chapter. Moved to [§7.5](#75-fviiia-mimetic-bsabs-approved--emerging-agents-for-ha)
+  (2026-07-31); this line records where they came from.
 
 ### 7.7 Click-through pop-up index `[PDF-V]`
 

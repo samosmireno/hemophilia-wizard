@@ -41,12 +41,14 @@
  * card that wants a subtitle needs this number re-measured, not just the prop
  * threaded through.
  *
- * **A caller may also put chrome in the body**, which the height cap does not
+ * **A caller may also put chrome in the body**, which the default cap does not
  * know about: `rebalancing-agents` puts a footnote and a back arrow under the
- * picture, so its card starts scrolling a little sooner than 10rem implies. That
- * is a scroll rather than a wrongly-reserved box, and the alternative — every
- * caller subtracting its own footer — would make the number stale for the two
- * that have none. So it stays measured off `Popup` alone.
+ * picture, so its card starts scrolling a little sooner than 10rem implies. A
+ * footnote losing its last line to a scroll is a nuisance; a caller whose chrome
+ * is the *point* — `fviiia-mimetics` sets the MOA sentence under the diagram —
+ * loses it below the fold entirely. Hence `reserve`: the default stays measured
+ * off `Popup` alone, so the callers with no chrome are unaffected, and a caller
+ * that has some states its own budget rather than discovering it as a scrollbar.
  *
  * Two maxima and no fitting mode: given `width`/`height` that are `auto`, the
  * browser scales the image down to satisfy whichever constraint binds first and
@@ -75,6 +77,7 @@ export default function PopupFigure({
   alt,
   width,
   height,
+  reserve = "10rem",
 }: {
   src: string;
   alt: string;
@@ -82,13 +85,26 @@ export default function PopupFigure({
   width: number;
   /** The asset's natural height in px. */
   height: number;
+  /**
+   * How much of the card's `95dvh` is NOT this picture, as a CSS length.
+   *
+   * The default is `Popup`'s chrome alone — a measured 117px band plus the body
+   * region's 16px of `py-2`, rounded up to 10rem so a title wrapping to a third
+   * line still does not push the picture into a scroll. Raise it by whatever the
+   * caller puts in the body beside the figure; see the note above.
+   */
+  reserve?: string;
 }) {
   return (
     <img
       src={src}
       alt={alt}
-      style={{ aspectRatio: `${width} / ${height}`, maxWidth: `min(${width}px, 100%)` }}
-      className="mx-auto max-h-[calc(95dvh-10rem)]"
+      style={{
+        aspectRatio: `${width} / ${height}`,
+        maxWidth: `min(${width}px, 100%)`,
+        maxHeight: `calc(95dvh - ${reserve})`,
+      }}
+      className="mx-auto"
     />
   );
 }
