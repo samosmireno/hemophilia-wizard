@@ -34,16 +34,86 @@ import { TREATMENTS, type Treatment } from "./treatments";
  */
 export const WIZARD_ENTRY_PROMPT = "Explore Novel Prophylactic Therapy Options for Your Patient";
 
+/**
+ * The `/wizard` artboard's own title, and the label of the `/wizard-intro`
+ * button that leads there — one constant so the button cannot name a
+ * destination the destination does not call itself.
+ *
+ * Sentence case, uppercased in CSS at both call sites, as every heading in the
+ * app is. Nowhere in CONTEXT.md: the blueprint has no such screen title, so this
+ * is artboard copy, transcribed.
+ */
+export const WIZARD_INPUT_TITLE = "Input patient characteristics";
+
+/**
+ * The three question prompts as the artboard sets them, which is NOT how the
+ * blueprint phrases them (CONTEXT.md §4):
+ *
+ * | | blueprint | artboard |
+ * | --- | --- | --- |
+ * | type | "Does the patient have Hemophilia A or Hemophilia B?" | "Disease type" |
+ * | inhibitors | "Does the patient have inhibitors?" | "Does the patient have inhibitors" |
+ * | reason | "Primary reason for switching therapy?" | "…for considering a treatment option?" |
+ *
+ * The artboard wins for anything rendered; the blueprint's wording stays the
+ * domain vocabulary and is what §4.2's 32 note titles are written against (they
+ * still say "…is the primary reason for switching therapies"). Verbatim
+ * transcription includes the inconsistent punctuation — the inhibitor prompt
+ * carries no question mark on the artboard and the reason prompt does.
+ */
+export const WIZARD_QUESTIONS = {
+  type: "Disease type",
+  inhibitors: "Does the patient have inhibitors",
+  reason: "What is the primary reason for considering a treatment option?",
+} as const;
+
 export type WizardHemophiliaType = "A" | "B";
+
+/** The two answers to Q1, in the artboard's left-to-right order. */
+export const HEMOPHILIA_TYPES: { id: WizardHemophiliaType; label: string }[] = [
+  { id: "A", label: "Hemophilia A" },
+  { id: "B", label: "Hemophilia B" },
+];
 
 /** The wizard's third question — the primary reason for switching therapy. */
 export type SwitchReason = "bleeding-control" | "adherence" | "treatment-burden" | "monitoring";
 
-export const SWITCH_REASONS: { id: SwitchReason; label: string }[] = [
-  { id: "bleeding-control", label: "Improving bleeding control" },
-  { id: "adherence", label: "Increased adherence" },
-  { id: "treatment-burden", label: "Reduced treatment burden" },
-  { id: "monitoring", label: "Reduced monitoring requirement" },
+export interface SwitchReasonOption {
+  id: SwitchReason;
+  /** What the wizard screen renders: the artboard's imperative phrasing. */
+  label: string;
+  /**
+   * The blueprint's own gerund phrasing (CONTEXT.md §4). Kept beside the label
+   * rather than dropped because it is the wording the source uses everywhere
+   * else — the §4.2 note titles and the leaf's "Novel therapies to consider if
+   * [reason] is the primary reason for switching therapies:" header — so the
+   * pages that render those need this form, not the button's.
+   */
+  sourceLabel: string;
+}
+
+/**
+ * Order here is the blueprint's (CONTEXT.md §4.1's matrix reads in it). The
+ * artboard lays the four out in a 2×2 grid in a *different* reading order; that
+ * is a layout fact and lives on the page, not in the data.
+ */
+export const SWITCH_REASONS: SwitchReasonOption[] = [
+  {
+    id: "bleeding-control",
+    label: "Improve bleeding control",
+    sourceLabel: "Improving bleeding control",
+  },
+  { id: "adherence", label: "Increase adherence", sourceLabel: "Increased adherence" },
+  {
+    id: "treatment-burden",
+    label: "Reduce treatment burden",
+    sourceLabel: "Reduced treatment burden",
+  },
+  {
+    id: "monitoring",
+    label: "Reduce monitoring requirement",
+    sourceLabel: "Reduced monitoring requirement",
+  },
 ];
 
 /** Scenario = hemophilia type + inhibitor status. Four in total. */

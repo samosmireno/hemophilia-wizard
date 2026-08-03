@@ -21,6 +21,14 @@ export const SECTION_ORDER = [
   "/education/prophylaxis-guidance",
   "/wizard-intro",
   "/wizard",
+  // The wizard is three steps of the walkthrough, not one: the questions, the
+  // therapeutic classes for the answered scenario, then the curated leaf. They
+  // are on the spine so Prev/Next walks them like any other step — and because
+  // the two beyond the questions guard themselves, `AppSidebar` disables Next on
+  // `/wizard` until the answers are complete, so the arrow and the page's own
+  // Submit button always agree. See `docs/adr/0003-session-scoped-wizard-answers.md`.
+  "/wizard/scenario",
+  "/wizard/therapies",
   "/explore",
   "/resources",
   "/survey",

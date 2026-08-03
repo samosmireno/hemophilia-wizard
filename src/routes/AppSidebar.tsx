@@ -11,6 +11,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router";
 
 import { SECTION_ORDER, nextOf, prevOf, type SectionPath } from "../data/sectionOrder";
+import { useWizardAnswers } from "../state/wizardAnswers";
 
 /**
  * The app's persistent navigation (issue 18), implementing the linear
@@ -71,6 +72,19 @@ export default function AppSidebar() {
   // nothing — the reference pages have no successor.
   const spineBack = onSpine ? prevOf(pathname) : undefined;
   const front = onSpine ? nextOf(pathname) : undefined;
+
+  /**
+   * The walkthrough's one gated step. `/wizard` is followed by two pages that
+   * exist only for an answered scenario, so until all three answers are in,
+   * Next is dead and the page's own Submit button is the way forward — the two
+   * say the same thing rather than offering a gated route and an ungated one.
+   *
+   * This is the only route-specific fact in the sidebar, and the reason it is
+   * here rather than in the pages: the arrow is the sidebar's, and a page cannot
+   * disable it. See `docs/adr/0003-session-scoped-wizard-answers.md`.
+   */
+  const { complete: wizardComplete } = useWizardAnswers();
+  const gatedByWizard = pathname === "/wizard" && !wizardComplete;
   // Off the spine Prev always has somewhere to go — the remembered step, or the
   // `/` it is seeded with — so it is only ever dead at the head of the
   // walkthrough. Deciding it this way also keeps the ref out of render, where
@@ -105,10 +119,10 @@ export default function AppSidebar() {
         if (target) void navigate(target);
       }}
       onFront={() => {
-        if (front) void navigate(front);
+        if (front && !gatedByWizard) void navigate(front);
       }}
       backDisabled={backDisabled}
-      frontDisabled={front === undefined}
+      frontDisabled={front === undefined || gatedByWizard}
     />
   );
 }

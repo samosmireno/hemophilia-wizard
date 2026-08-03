@@ -1,0 +1,192 @@
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { RouterProvider, createMemoryRouter } from "react-router";
+import { describe, expect, it } from "vitest";
+
+import { nextOf } from "../data/sectionOrder";
+import { SWITCH_REASONS, WIZARD_INPUT_TITLE, WIZARD_QUESTIONS } from "../data/wizard";
+import { seedWizardAnswers } from "../test/setup";
+import { routes } from "./router";
+
+/**
+ * Mounted through the app's own `routes` rather than as a bare component, unlike
+ * `wizardIntro.test.tsx`: the answers live in a provider in `AppShell` and the
+ * pages beyond are guarded by a layout route, so the wiring under test only
+ * exists when the real tree is rendered.
+ */
+function renderAt(path: string) {
+  const router = createMemoryRouter(routes, { initialEntries: [path] });
+  render(<RouterProvider router={router} />);
+  return router;
+}
+
+const at = (router: ReturnType<typeof renderAt>) => router.state.location.pathname;
+const radio = (name: RegExp | string) => screen.getByRole("radio", { name });
+const submit = () => screen.getByRole("button", { name: "Submit inputs" });
+
+/** Answer all three questions through the UI, as a learner would. */
+async function answerAll(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(radio("Hemophilia B"));
+  await user.click(radio("Yes"));
+  await user.click(radio("Increase adherence"));
+}
+
+describe("wizard — patient characteristics", () => {
+  it("titles the page with the artboard's heading, uppercased in CSS", () => {
+    renderAt("/wizard");
+    const title = screen.getByRole("heading", { level: 1 });
+
+    expect(title).toHaveAccessibleName(WIZARD_INPUT_TITLE);
+    expect(title).toHaveClass("uppercase");
+  });
+
+  it("asks the three questions as named groups", () => {
+    renderAt("/wizard");
+
+    for (const question of Object.values(WIZARD_QUESTIONS)) {
+      expect(screen.getByRole("group", { name: question })).toBeInTheDocument();
+    }
+  });
+
+  /**
+   * The reason buttons read left-to-right, top-to-bottom in the artboard's own
+   * order, which is NOT `SWITCH_REASONS`' (the blueprint's). Asserted as DOM
+   * order because that is also the tab and screen-reader order — the two must be
+   * the one the design draws.
+   */
+  it("lays the four reasons out in the artboard's reading order", () => {
+    renderAt("/wizard");
+
+    const reasons = screen
+      .getByRole("group", { name: WIZARD_QUESTIONS.reason })
+      .querySelectorAll("input[type=radio]");
+
+    expect([...reasons].map((input) => (input as HTMLInputElement).value)).toEqual([
+      "bleeding-control",
+      "monitoring",
+      "adherence",
+      "treatment-burden",
+    ]);
+  });
+
+  /** The screen renders the artboard's imperative labels, not the source's gerunds. */
+  it("labels the reasons with the artboard's wording", () => {
+    renderAt("/wizard");
+
+    for (const reason of SWITCH_REASONS) {
+      expect(radio(reason.label)).toBeInTheDocument();
+      expect(screen.queryByRole("radio", { name: reason.sourceLabel })).not.toBeInTheDocument();
+    }
+  });
+
+  /** YES/NO is the artboard shouting, so it is a class — the copy stays Yes/No. */
+  it("shouts the inhibitor answers in CSS, not in the copy", () => {
+    renderAt("/wizard");
+
+    expect(radio("Yes").closest("label")).toHaveClass("uppercase");
+  });
+
+  describe("the submit gate", () => {
+    it("is disabled until all three questions are answered", async () => {
+      const user = userEvent.setup();
+      renderAt("/wizard");
+
+      expect(submit()).toBeDisabled();
+      await user.click(radio("Hemophilia B"));
+      expect(submit()).toBeDisabled();
+      await user.click(radio("Yes"));
+      expect(submit()).toBeDisabled();
+      await user.click(radio("Increase adherence"));
+      expect(submit()).toBeEnabled();
+    });
+
+    it("closes again when an answer is cleared", async () => {
+      const user = userEvent.setup();
+      renderAt("/wizard");
+      await answerAll(user);
+
+      await user.click(radio("Yes")); // picking the chosen option clears it
+
+      expect(radio("Yes")).not.toBeChecked();
+      expect(submit()).toBeDisabled();
+    });
+
+    /**
+     * Written against `nextOf` rather than the literal `/wizard/scenario`, for
+     * the reason `wizardIntro.test.tsx` gives: this is the assertion that the
+     * button and the sidebar's Next arrow read one spine, and a hard-coded path
+     * would pass even if the page stopped consulting the order.
+     */
+    it("submits to the next walkthrough step", async () => {
+      const user = userEvent.setup();
+      const router = renderAt("/wizard");
+      await answerAll(user);
+
+      await user.click(submit());
+
+      expect(at(router)).toBe(nextOf("/wizard"));
+    });
+  });
+
+  /**
+   * The answers outlive the page — the reason they are in a provider above the
+   * shell rather than in this route's own state. Going forward and coming back
+   * must find the form as it was left.
+   */
+  it("keeps the answers when the learner leaves and returns", async () => {
+    const user = userEvent.setup();
+    const router = renderAt("/wizard");
+    await answerAll(user);
+    await user.click(submit());
+
+    await user.click(screen.getByRole("link", { name: "Wizard" }));
+
+    expect(at(router)).toBe("/wizard");
+    expect(radio("Hemophilia B")).toBeChecked();
+    expect(radio("Yes")).toBeChecked();
+    expect(radio("Increase adherence")).toBeChecked();
+  });
+
+  it("restores answers stored by an earlier visit in the same session", () => {
+    seedWizardAnswers({ type: "A", hasInhibitors: false, reason: "monitoring" });
+    renderAt("/wizard");
+
+    expect(radio("Hemophilia A")).toBeChecked();
+    expect(radio("No")).toBeChecked();
+    expect(radio("Reduce monitoring requirement")).toBeChecked();
+  });
+});
+
+/**
+ * The other half of the gate: the sidebar's arrow is disabled (asserted in
+ * `sidebar.test.tsx`), and these two pages refuse to render for a session that
+ * has no scenario — which is what a reload, a bookmark or a pasted link is.
+ */
+describe("wizard — the pages past the questions", () => {
+  it.each(["/wizard/scenario", "/wizard/therapies"])(
+    "sends a cold %s back to the questions",
+    (path) => {
+      const router = renderAt(path);
+
+      expect(at(router)).toBe("/wizard");
+      expect(screen.getByRole("heading", { level: 1 })).toHaveAccessibleName(WIZARD_INPUT_TITLE);
+    },
+  );
+
+  it.each([
+    ["/wizard/scenario", "Therapeutic classes to consider"],
+    ["/wizard/therapies", "Novel therapies to consider"],
+  ])("renders %s for an answered session", (path, title) => {
+    seedWizardAnswers();
+    const router = renderAt(path);
+
+    expect(at(router)).toBe(path);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveAccessibleName(title);
+  });
+
+  it("resolves junk under /wizard to the wizard, not to the landing page", () => {
+    const router = renderAt("/wizard/nonsense");
+
+    expect(at(router)).toBe("/wizard");
+  });
+});

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 
 import BrandLoop from "../components/BrandLoop";
 import { nextOf } from "../data/sectionOrder";
-import { WIZARD_ENTRY_PROMPT } from "../data/wizard";
+import { WIZARD_ENTRY_PROMPT, WIZARD_INPUT_TITLE } from "../data/wizard";
 
 /**
  * `/wizard-intro` — the step that hands the learner off from the last education
@@ -81,8 +81,12 @@ export default function WizardIntro() {
         {/*
           The label is the artboard's, not the blueprint's — it names this
           button's destination (the wizard's patient questions) and exists
-          nowhere in CONTEXT.md, so it is a literal here exactly as `Landing`'s
-          "LET'S GET STARTED" is.
+          nowhere in CONTEXT.md. Unlike `Landing`'s "LET'S GET STARTED", though,
+          it is not a literal: `/wizard` titles itself with the same words, so
+          the two read one constant and the button cannot end up naming a
+          destination the destination does not call itself. Uppercase is the
+          class, as everywhere else — which also means the accessible name is now
+          the sentence case it was written in.
 
           Unlike `Landing`, the type and padding are the package's own defaults:
           the artboard's button measures 26px type in a 549 × 56px pill, and
@@ -111,10 +115,10 @@ export default function WizardIntro() {
           `.scratch/mlg-reskin/issues/06-package-debts.md` debt 5).
         */}
         <Button
-          className="mt-8 px-[clamp(2rem,4.4vw,4rem)] py-[clamp(0.75rem,1.25vw,1.125rem)] text-[clamp(1rem,1.8vw,1.625rem)] leading-5"
+          className="mt-8 px-[clamp(2rem,4.4vw,4rem)] py-[clamp(0.75rem,1.25vw,1.125rem)] text-[clamp(1rem,1.8vw,1.625rem)] leading-5 uppercase"
           onClick={() => void navigate(next)}
         >
-          INPUT PATIENT CHARACTERISTICS
+          {WIZARD_INPUT_TITLE}
         </Button>
       </section>
     </>

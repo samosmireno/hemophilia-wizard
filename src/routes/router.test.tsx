@@ -4,7 +4,7 @@ import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { ACTIVITY_TITLE } from "../data/activity";
-import { WIZARD_ENTRY_PROMPT } from "../data/wizard";
+import { WIZARD_ENTRY_PROMPT, WIZARD_INPUT_TITLE } from "../data/wizard";
 import { routes } from "./router";
 
 function renderAt(path: string) {
@@ -31,8 +31,14 @@ describe("router", () => {
     expect(heading()).toHaveTextContent(WIZARD_ENTRY_PROMPT);
   });
 
+  // The wizard's question screen is built (its two follow-on routes are covered
+  // in `wizard.test.tsx`, which can put answers in session state).
+  it("renders the wizard's patient questions at /wizard", () => {
+    renderAt("/wizard");
+    expect(heading()).toHaveAccessibleName(WIZARD_INPUT_TITLE);
+  });
+
   it.each([
-    ["/wizard", /Treatment Wizard/],
     ["/explore", /Explore/],
     ["/resources", /Resources/],
     ["/survey", /Survey/],
@@ -197,7 +203,7 @@ describe("router", () => {
     const user = userEvent.setup();
     const router = renderAt("/");
     await user.click(screen.getByRole("link", { name: "Wizard" }));
-    expect(heading()).toHaveTextContent(/Treatment Wizard/);
+    expect(heading()).toHaveAccessibleName(WIZARD_INPUT_TITLE);
     expect(router.state.location.pathname).toBe("/wizard");
   });
 });

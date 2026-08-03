@@ -1860,3 +1860,106 @@ Card, open, at 1440:
 At 390 the grid stacks to one column and the card scrolls (668 vs 601), which is
 the intended degradation — the notes stay legible at full width rather than being
 scaled down with the picture, which is precisely what the flat raster could not do.
+
+---
+
+## 14. Wizard option buttons
+
+`src/components/OptionGroup.tsx` is `/wizard`'s answer control: a legend over a
+2-column grid of wide pills, exactly one choosable per group. Reference is the
+two `/wizard` artboard exports — one with nothing chosen, one with all three
+questions answered — which between them draw every state the design has.
+
+### It is `Button`'s skin, referenced rather than copied
+
+Sampling both exports returns package values exactly, not approximations of them:
+
+| State                                          | Fill                    | Label     |
+| ---------------------------------------------- | ----------------------- | --------- |
+| Group unanswered                               | `#d63a52` = crimson-50  | white     |
+| Chosen                                         | `#1a5a4c` = **teal-75** | white     |
+| Passed over (a sibling in the group is chosen) | `#8f1a2d` = crimson-75  | `#939393` |
+| Submit                                         | `#0a94ae` = lagoon-50   | white     |
+
+Two of the three are `Button`'s own skin (§4.2): the untouched group is its
+resting pair, and — the interesting one — **a passed-over option is its _press_
+pair**, `--color-ui-btn-bg-active` over `--color-ui-btn-fg-active`, used as a
+resting state. So the component references those tokens rather than restating
+the hexes, and a change to the Button skin moves the wizard with it.
+
+Only the chosen fill is new, hence `--color-choice-selected` (an alias of
+teal-75, named so the fact has one home) and `--color-choice-selected-hover`.
+
+### Three states are drawn; hover, press, focus and disabled are not
+
+Both artboard frames are at rest, so the interactive states are filled in by
+derivation rather than invention, following the model the Button skin (§4.2)
+already states: **the ground lifts on hover and pushes one step darker on press.**
+
+| Option           | Resting              | Hover                             | Press                |
+| ---------------- | -------------------- | --------------------------------- | -------------------- |
+| Group unanswered | crimson-50 / white   | `#f73150` / teal-0 (Button's own) | crimson-75 / #939393 |
+| Passed over      | crimson-75 / #939393 | crimson-50 / white (lifts)        | crimson-75 / #939393 |
+| Chosen           | teal-75 / white      | `--color-choice-selected-hover`   | teal-100 / white     |
+
+Two of those need a word:
+
+- **Passed over, hovered** lifts to the resting crimson-50 pair — "you can pick
+  me". It is the only invented _behaviour_ here, and its press then needs no rule
+  of its own: it shares the unanswered pill's `active:` declaration and lands on
+  the colour it already rests at, so pressing it simply drops the hover lift.
+- **Chosen, pressed** is teal-100, which is the same one-step move down the ramp
+  that crimson-50 → crimson-75 is on the Button. Hence
+  `--color-choice-selected-active`.
+
+**Focus** is `Button`'s inset 3px `--color-ui-btn-ring`, drawn on the label
+because the `<input>` is `sr-only` (a 1px clip) and a ring on it would be
+invisible.
+
+> **It must be `has-[:focus-visible]:`, never `peer-focus-visible:`.** Tailwind
+> compiles the `peer-*` variants to a **sibling** combinator, and here the input
+> is a **child** of the label it styles — so the peer form matches nothing. It
+> fails completely silently: the class sits in the markup, `:focus-visible` is on
+> the input, and `outline-style` computes to `none`. The wizard shipped that way
+> for one round; it was caught by reading `getComputedStyle` in a browser, and
+> could not have been caught by a class-name assertion in jsdom.
+
+**Submit, disabled** is the package's `disabled:opacity-ui-disabled`. Note the
+artboard draws Submit at full lagoon in _both_ frames, including the one where
+nothing is answered, so this state has no reference at all — see §9.
+
+### Geometry, and the two sizes that are not what they look like
+
+On the 1440 canvas: pills **425 × 56**, `rounded-lg` (8px), 20px between columns
+and 16px between rows, in an **870px** block; legends `text-h2` (32px) in teal-75,
+10px above their pills; groups 24px apart; Submit 223 × 56, right-aligned to the
+block, 32px under it.
+
+The block is centred on the content column (x 261–1131 at 1440) where the artboard
+draws it 13px right of that (275–1144) — the same tolerance `WizardIntro` records
+for centring on the padded box rather than the canvas.
+
+**Label type is 24px, not the `Button`'s 26.** Cap height cannot separate the two
+at this size (JPEG antialiasing is ±1px, which is ±1.5px of type), so it was
+settled by matching rendered string widths against the export's ink: "Hemophilia
+A" is 153px drawn and renders at 153px at 24px (166 at 26px), and the longest
+label, "Reduce monitoring requirement", is 365 against 369 (400 at 26px) — i.e. at
+26px it no longer fits a 425px pill on one line. **Submit keeps 26px**, which its
+own label confirms: 173px drawn, 176px rendered.
+
+**The line box is `leading-tight` (30px), where the design's is 20px.** The
+padding absorbs the difference — 30 + 2×13 = 56, the drawn height — so nothing
+moves where the design applies. It only shows below `md`, where the grid is one
+column and the labels wrap: at 24px in a 20px box, wrapped lines collide, which
+is the same trap `Button`'s own comment records about its 26px type.
+
+### Verified in a browser
+
+At 1440 every row lands within 2px of the artboard (pills at y 226/351/511/583
+against 227/350/509/581, Submit 671 against 669), all four fills compute to the
+sampled values above, every hover and press in the table resolves to the value it
+should, the focus ring computes to `solid 3px rgb(13,46,38) @-3px`, and the third
+legend breaks where the designer broke it —
+which needs `max-w-[700px]` on the legend, the midpoint of the 589–809px window
+in which the drawn break survives. At 390 the grid stacks, the document does not
+scroll sideways, and wrapped labels stay legible.

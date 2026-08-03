@@ -9,7 +9,8 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-03 (the NXT007 artboard split `nxt007-structure` off the overview and
+- **Last reviewed:** 2026-08-03 (the `/wizard` artboard: Q1/Q3 renamed on screen, the flow split
+  into three routes — see §4); previously 2026-08-03 (the NXT007 artboard split `nxt007-structure` off the overview and
   dropped the agent prefix from its bullets — see §7.5); previously 2026-08-03 (the Denecimig
   artboard split `denecimig-moa` off the overview and
   authored a class-level MOA bullet §7.5 files under emicizumab — see §7.5); previously 2026-07-31
@@ -139,6 +140,24 @@ Entry node (purple diamond): **"Explore Novel Prophylactic Therapy Options for Y
 
 4 scenarios total (A/B × ±inhibitors); each has its own slide `[PPTX]` slides 1–4:
 "Hemophilia A Without/With Inhibitors", "Hemophilia B Without/With Inhibitors".
+
+> **The app renames Q1 and Q3 `[BUILD]`.** The `/wizard` artboard sets the questions as
+> **"Disease type"**, **"Does the patient have inhibitors"** (no question mark) and **"What is
+> the primary reason for considering a treatment option?"**, and its four answer buttons in the
+> imperative — _Improve_ bleeding control, _Increase_ adherence, _Reduce_ treatment burden,
+> _Reduce_ monitoring requirement — laid out 2×2 in the order bleeding · monitoring · adherence
+> · burden. The blueprint wording above stays the domain vocabulary and is what
+> [§4.2](#42-scenario-specific-considerations--strategies-notes)'s 32 note titles are written
+> against ("…is the primary reason for **switching therapies**"); both forms are carried in
+> `wizard.ts` → `SWITCH_REASONS[].label` (artboard, rendered) and `.sourceLabel` (blueprint).
+> This is a copy decision on one screen, not a change to the source content.
+>
+> **The flow is three app routes `[BUILD]`.** `/wizard` collects the three answers behind a
+> Submit button; `/wizard/scenario` is the "Therapeutic classes to consider" box below;
+> `/wizard/therapies` the leaf ([§4.1](#41-recommendation-matrix-scenario--reason--agents)–4.2).
+> All three are walkthrough steps, and the answers are held for the browsing session only —
+> rationale in `docs/adr/0003-session-scoped-wizard-answers.md`. The last two are placeholders
+> so far.
 
 Blueprint layout note (verified 2026-07-27 by rendering the diagram): the canvas is split by a
 **dashed horizontal midline explicitly labelled "hemophilia B" (top) / "hemophilia A" (bottom)** —

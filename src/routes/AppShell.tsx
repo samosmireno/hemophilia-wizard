@@ -1,5 +1,6 @@
 import { Outlet } from "react-router";
 
+import { WizardAnswersProvider } from "../state/WizardAnswersProvider";
 import AppSidebar from "./AppSidebar";
 
 /**
@@ -78,7 +79,20 @@ import AppSidebar from "./AppSidebar";
  */
 export default function AppShell() {
   return (
-    <>
+    /*
+      The wizard's three answers are held here, above BOTH `<main>` and the
+      sidebar — the sidebar needs them to know whether Next may leave `/wizard`,
+      and the wizard's own three routes need them to outlive a detour to
+      `/glossary`. This layout route never unmounts, which is what makes that
+      work (the same property `AppSidebar`'s `lastSpinePath` ref relies on).
+
+      It is the one piece of route knowledge in the shell, and it is deliberate
+      rather than a lapse of the rule the backdrop comment below states: a
+      provider is not a branch on `pathname`, it holds no wizard logic, and every
+      alternative placement puts it below one of its two consumers. See
+      `docs/adr/0003-session-scoped-wizard-answers.md`.
+    */
+    <WizardAnswersProvider>
       <div
         aria-hidden="true"
         data-page-backdrop="default"
@@ -90,6 +104,6 @@ export default function AppShell() {
         </div>
       </main>
       <AppSidebar />
-    </>
+    </WizardAnswersProvider>
   );
 }

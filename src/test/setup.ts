@@ -8,7 +8,33 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, vi } from "vitest";
 
+import type { WizardAnswers } from "../state/wizardAnswers";
+import { ANSWERS_STORAGE_KEY } from "../state/wizardAnswers";
+
 afterEach(cleanup);
+
+/**
+ * The wizard's answers outlive a render — they are in `sessionStorage`, which
+ * jsdom shares across every test in a file. Without this, one test answering the
+ * wizard silently un-gates `/wizard/scenario` for the next.
+ */
+beforeEach(() => sessionStorage.clear());
+
+/**
+ * Put a complete (or partial) set of wizard answers in session state, as though
+ * the learner had already filled the form in. Writes the store rather than
+ * driving the UI, because the tests that need it — the sidebar's spine walk, the
+ * pages past the gate — are not about the form.
+ *
+ * Call before rendering: `WizardAnswersProvider` reads the store once, in a lazy
+ * initializer.
+ */
+export function seedWizardAnswers(answers: Partial<WizardAnswers> = {}) {
+  sessionStorage.setItem(
+    ANSWERS_STORAGE_KEY,
+    JSON.stringify({ type: "A", hasInhibitors: false, reason: "bleeding-control", ...answers }),
+  );
+}
 
 /**
  * jsdom 25 implements `<dialog>`'s `open` attribute but neither `showModal()`

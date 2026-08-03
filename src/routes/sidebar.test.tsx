@@ -4,7 +4,7 @@ import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { SECTION_ORDER } from "../data/sectionOrder";
-import { setViewport } from "../test/setup";
+import { seedWizardAnswers, setViewport } from "../test/setup";
 import { routes } from "./router";
 
 function renderAt(path: string) {
@@ -30,7 +30,15 @@ const JUMPS = [
 const OFF_LINE = ["/glossary", "/acronyms", "/references"] as const;
 
 describe("sidebar — walkthrough spine", () => {
+  /**
+   * Both walks need an answered wizard. Two of the thirteen steps are the pages
+   * past `/wizard`, which only exist for a scenario: without answers Next is
+   * dead on `/wizard` and `WizardGate` bounces the two beyond it back there. The
+   * gate itself is asserted below and in `wizard.test.tsx`; here it is a
+   * precondition, so that these two stay tests of the spine.
+   */
   it("steps Next through the whole section order", async () => {
+    seedWizardAnswers();
     const user = userEvent.setup();
     const router = renderAt(SECTION_ORDER[0]);
 
@@ -41,6 +49,7 @@ describe("sidebar — walkthrough spine", () => {
   });
 
   it("steps Prev back through the whole section order", async () => {
+    seedWizardAnswers();
     const user = userEvent.setup();
     const router = renderAt(SECTION_ORDER[SECTION_ORDER.length - 1]);
 
@@ -48,6 +57,31 @@ describe("sidebar — walkthrough spine", () => {
       await user.click(button("Previous"));
       expect(at(router)).toBe(expected);
     }
+  });
+
+  /**
+   * The arrow and the page's Submit button are one gate, not two — the reason
+   * this lives in the sidebar's suite is that the coupling runs the wrong way to
+   * be visible from the page: `AppSidebar` owns the arrow, so only it can
+   * disable it.
+   */
+  it("disables Next on /wizard until the answers are complete", async () => {
+    const user = userEvent.setup();
+    const router = renderAt("/wizard");
+
+    expect(button("Next")).toBeDisabled();
+    await user.click(button("Next"));
+    expect(at(router)).toBe("/wizard");
+  });
+
+  it("enables Next on /wizard once the answers are complete", async () => {
+    seedWizardAnswers();
+    const user = userEvent.setup();
+    const router = renderAt("/wizard");
+
+    expect(button("Next")).toBeEnabled();
+    await user.click(button("Next"));
+    expect(at(router)).toBe("/wizard/scenario");
   });
 
   it("disables Prev at the first step", () => {
@@ -124,6 +158,10 @@ describe("sidebar — off-line reference pages", () => {
   });
 
   it("Prev remembers the most recent step across several detours", async () => {
+    // Answered, so the second leg can move forward off `/wizard` — and so the
+    // remembered step is a guarded one, which is the case worth covering: the
+    // gate must not fire on the way back into it.
+    seedWizardAnswers();
     const user = userEvent.setup();
     const router = renderAt("/wizard");
 
@@ -131,10 +169,10 @@ describe("sidebar — off-line reference pages", () => {
     await user.click(button("Previous"));
     expect(at(router)).toBe("/wizard");
 
-    await user.click(button("Next")); // /wizard -> /explore
+    await user.click(button("Next")); // /wizard -> /wizard/scenario
     await user.click(link("References"));
     await user.click(button("Previous"));
-    expect(at(router)).toBe("/explore");
+    expect(at(router)).toBe("/wizard/scenario");
   });
 
   it.each(OFF_LINE)("Prev falls back to Home on a cold %s", async (path) => {

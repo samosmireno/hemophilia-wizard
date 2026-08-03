@@ -197,6 +197,29 @@
     var(--color-brand-teal-0)
   );
 
+  /* ─── Wizard option buttons (docs/styling.md §14) ─────────────────────────
+     `OptionGroup`'s chosen state — the one colour the `/wizard` artboard adds
+     to the Button skin it otherwise reuses. Sampled #1a5a4c, which is
+     --color-brand-teal-75 exactly, so it is a reference rather than a literal;
+     it is named here anyway because "the chosen answer is teal-75" is a design
+     fact with one place to change, not a coincidence at the call site.
+
+     The hover and press steps are DERIVED, not drawn: the artboard has no such
+     frame, so they follow the model the Button skin already states one ramp over
+     (§4.2) — hover lifts (96% of the resting step with 4% of the -25 tint, the
+     --color-ui-arrow-bg-hover recipe), press pushes to the next darker step.
+     teal-75 → teal-100 is the same one-step move crimson-50 → crimson-75 is on
+     the Button. Named outside `brand-` (the raw scale) and outside `ui-`
+     (mlg-components' namespace), as --color-popup-caption and --color-agent-mab
+     are. */
+  --color-choice-selected: var(--color-brand-teal-75);
+  --color-choice-selected-hover: color-mix(
+    in oklab,
+    var(--color-brand-teal-75) 96%,
+    var(--color-brand-teal-25)
+  );
+  --color-choice-selected-active: var(--color-brand-teal-100);
+
   /* ─── Layout geometry (docs/styling.md §12) ───────────────────────────────
      The shell's padding, as the facts it is made of. Each value below comes
      from OUTSIDE `AppShell` — the designer's 1440 canvas, the top rule, or the
