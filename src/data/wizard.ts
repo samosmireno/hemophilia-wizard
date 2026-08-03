@@ -181,32 +181,109 @@ export const RECOMMENDATIONS: Record<ScenarioKey, Record<SwitchReason, string[]>
  * "Recombinant FVIII concentrates" are both clotting factor replacement).
  */
 export interface ClassesToConsider {
+  /**
+   * The `/wizard/scenario` artboard's own `<h1>` — the scenario named in full.
+   *
+   * Sentence case, uppercased in CSS at the one call site, as every heading in
+   * the app is. Not composed from `HEMOPHILIA_TYPES` and the inhibitor answer:
+   * see `lead` below, whose four values prove the screens are transcribed rather
+   * than templated, and this is the same four screens' other half.
+   */
+  title: string;
+  /**
+   * The sentence above the class list, as the artboard sets it.
+   *
+   * **Carries inline markup** — the polarity word is italic on all four screens,
+   * written `_with_` / `_without_` and rendered through `formatInline` (ADR
+   * 0004). That emphasis is not decorative: it is the one word distinguishing
+   * two otherwise near-identical sentences, and the branch the screen turns on.
+   *
+   * **Transcribed, not templated, and HB +inhibitors is why.** Three screens
+   * read "Therapeutic classes to consider for prophylaxis of …"; that one reads
+   * "Therapeutic **options** for prophylaxis of …", because its list is a single
+   * class rather than a choice between several. A template would have quietly
+   * normalised that away.
+   */
+  lead: string;
   /** Verbatim class labels listed in the box. */
   classes: string[];
+  /**
+   * The line by the illustration boxes, telling the learner they open.
+   *
+   * Two distinct sentences across the four screens, again not derivable: the
+   * three multi-box screens say "Click on the boxes below to learn more about
+   * each type of therapy", and the one single-box screen abandons that phrasing
+   * for the app's "Click here:" idiom and names the class outright. (The
+   * blueprint hedged with "Click on the box(es) below" — CONTEXT.md §4 — where
+   * the artboard rewrote the sentence instead.)
+   *
+   * WHERE it is drawn is not here: above the boxes on the multi-box screens,
+   * below the single one. That is a layout fact and lives on the page, the same
+   * split `Wizard.tsx` records for `REASON_READING_ORDER`.
+   */
+  caption: string;
   /** Scenario-specific caveat (only HB +inhibitors carries one). */
   caveat?: string;
 }
 
 /**
+ * The caption the three multi-box screens share, stated once.
+ *
+ * A constant rather than three copies of the same sentence, because they ARE the
+ * same sentence: the artboards draw one line of copy on three screens, and a
+ * reword that reached two of them would be a bug the type system cannot see.
+ * `B-with` states its own inline, which is what makes it visible as the
+ * exception it is.
+ */
+const BOXES_CAPTION = "Click on the boxes below to learn more about each type of therapy";
+
+/**
  * scenario → the class-level guidance box shown before the reason question.
- * Verbatim from `[PDF-V]` CENTER band (`documents/out_raw.txt`).
+ * `classes` and `caveat` are verbatim from `[PDF-V]` CENTER band
+ * (`documents/out_raw.txt`); `title`, `lead` and `caption` are the four
+ * `/wizard/scenario` artboards, which the blueprint has no equivalent of.
+ *
+ * **Double spaces in the exports are not transcribed.** "for  prophylaxis" on
+ * the HA +inhibitors lead and "TO LEARN  MORE" in the shared caption are
+ * justification artifacts of the drawn text block, not authored spacing — the
+ * same call `disease-background` makes for the export's "FACOTOR".
  */
 export const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
   "A-without": {
+    title: "Hemophilia A without inhibitors",
+    lead: "Therapeutic classes to consider for prophylaxis of HA _without_ inhibitors",
     classes: [
       "Recombinant FVIII concentrates",
       "Factor VIIIa mimetics",
       "Hemostatic rebalancing agents",
     ],
+    caption: BOXES_CAPTION,
   },
   "A-with": {
-    classes: ["Factor VIIIa mimetic", "Hemostatic rebalancing agent"],
+    title: "Hemophilia A with inhibitors",
+    lead: "Therapeutic classes to consider for prophylaxis of HA _with_ inhibitors",
+    /**
+     * **"agents" is the artboard's; `[PDF-V]` sets it singular.** The artboard is
+     * the filing authority for anything rendered — the call `fviiia-mimetics`
+     * records twice for its own copy — and the singular reads as a source slip
+     * rather than a distinction, since the same list's FIRST item is deliberately
+     * singular here where `A-without`'s is plural.
+     */
+    classes: ["Factor VIIIa mimetic", "Hemostatic rebalancing agents"],
+    caption: BOXES_CAPTION,
   },
   "B-without": {
+    title: "Hemophilia B without inhibitors",
+    lead: "Therapeutic classes to consider for prophylaxis of HB _without_ inhibitors",
     classes: ["Hemostatic rebalancing agents", "FIX prophylaxis", "Gene therapy"],
+    caption: BOXES_CAPTION,
   },
   "B-with": {
+    title: "Hemophilia B with inhibitors",
+    // "options", where the other three say "classes to consider" — see `lead`.
+    lead: "Therapeutic options for prophylaxis of HB _with_ inhibitors",
     classes: ["Hemostatic rebalancing agents"],
+    caption: "Click here: information on hemostatic rebalancing agents",
     caveat:
       "Note: Bypassing agents (aPCC, rFVIIa) can manage breakthrough bleeds in patients with inhibitors, but sustained prophylaxis with these agents remains challenging",
   },

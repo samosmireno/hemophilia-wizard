@@ -4,7 +4,12 @@ import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { nextOf } from "../data/sectionOrder";
-import { SWITCH_REASONS, WIZARD_INPUT_TITLE, WIZARD_QUESTIONS } from "../data/wizard";
+import {
+  CLASSES_TO_CONSIDER,
+  SWITCH_REASONS,
+  WIZARD_INPUT_TITLE,
+  WIZARD_QUESTIONS,
+} from "../data/wizard";
 import { seedWizardAnswers } from "../test/setup";
 import { routes } from "./router";
 
@@ -173,8 +178,15 @@ describe("wizard — the pages past the questions", () => {
     },
   );
 
+  /**
+   * `seedWizardAnswers`' default is HA without inhibitors, so the scenario page
+   * wears that screen's heading. It comes from the data module rather than as a
+   * literal — the four titles are transcribed copy, and `scenario.test.tsx` is
+   * where they are asserted against each branch. Here the only claim is that the
+   * gate lets an answered session through.
+   */
   it.each([
-    ["/wizard/scenario", "Therapeutic classes to consider"],
+    ["/wizard/scenario", CLASSES_TO_CONSIDER["A-without"].title],
     ["/wizard/therapies", "Novel therapies to consider"],
   ])("renders %s for an answered session", (path, title) => {
     seedWizardAnswers();

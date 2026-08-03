@@ -64,6 +64,41 @@ describe("wizard class boxes", () => {
       expect(CLASSES_TO_CONSIDER[scenario].caveat).toBeUndefined();
     }
   });
+
+  /**
+   * The three fields the `/wizard/scenario` artboards added. The type already
+   * makes them required, so this asserts what a type cannot: that they are not
+   * blank, and that the emphasis the four leads exist to carry is actually in
+   * them.
+   */
+  it("name their scenario and lead with the polarity word emphasised", () => {
+    for (const scenario of ALL_SCENARIOS) {
+      const box = CLASSES_TO_CONSIDER[scenario];
+
+      expect(box.title, scenario).not.toHaveLength(0);
+      expect(box.caption, scenario).not.toHaveLength(0);
+
+      // `_with_` on the two +inhibitor screens, `_without_` on the two others —
+      // matched with the delimiters, so a lead that lost its markup fails here
+      // rather than rendering an un-emphasised sentence nobody notices.
+      const polarity = scenario.endsWith("-with") ? "_with_" : "_without_";
+      expect(box.lead, scenario).toContain(polarity);
+    }
+  });
+
+  /**
+   * Transcribed, not templated — the reason the artboard copy is four literals
+   * rather than a format string. If a future edit collapses these onto one
+   * pattern, this is the test that objects.
+   */
+  it("keep HB-with-inhibitors' 'Therapeutic options' wording", () => {
+    expect(CLASSES_TO_CONSIDER["B-with"].lead).toMatch(/^Therapeutic options for/);
+    for (const scenario of ["A-without", "A-with", "B-without"] as ScenarioKey[]) {
+      expect(CLASSES_TO_CONSIDER[scenario].lead, scenario).toMatch(
+        /^Therapeutic classes to consider for/,
+      );
+    }
+  });
 });
 
 describe("education", () => {

@@ -9,7 +9,9 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-03 (the `/wizard` artboard: Q1/Q3 renamed on screen, the flow split
+- **Last reviewed:** 2026-08-03 (the four `/wizard/scenario` artboards: per-scenario titles, leads
+  and captions, and the plural "rebalancing agents" on HA +inhib — see §4); previously 2026-08-03
+  (the `/wizard` artboard: Q1/Q3 renamed on screen, the flow split
   into three routes — see §4); previously 2026-08-03 (the NXT007 artboard split `nxt007-structure` off the overview and
   dropped the agent prefix from its bullets — see §7.5); previously 2026-08-03 (the Denecimig
   artboard split `denecimig-moa` off the overview and
@@ -156,8 +158,8 @@ Entry node (purple diamond): **"Explore Novel Prophylactic Therapy Options for Y
 > Submit button; `/wizard/scenario` is the "Therapeutic classes to consider" box below;
 > `/wizard/therapies` the leaf ([§4.1](#41-recommendation-matrix-scenario--reason--agents)–4.2).
 > All three are walkthrough steps, and the answers are held for the browsing session only —
-> rationale in `docs/adr/0003-session-scoped-wizard-answers.md`. The last two are placeholders
-> so far.
+> rationale in `docs/adr/0003-session-scoped-wizard-answers.md`. `/wizard/therapies` is still a
+> placeholder.
 
 Blueprint layout note (verified 2026-07-27 by rendering the diagram): the canvas is split by a
 **dashed horizontal midline explicitly labelled "hemophilia B" (top) / "hemophilia A" (bottom)** —
@@ -178,13 +180,51 @@ shown before the reason question) `[PDF-V]`:
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **HB +inhib** | Hemostatic rebalancing agents. _Note: Bypassing agents (aPCC, rFVIIa) can manage breakthrough bleeds in patients with inhibitors, but sustained prophylaxis with these agents remains challenging._ |
 | **HB −inhib** | Hemostatic rebalancing agents · FIX prophylaxis · Gene therapy                                                                                                                                      |
-| **HA +inhib** | Factor VIIIa mimetic · Hemostatic rebalancing agent                                                                                                                                                 |
+| **HA +inhib** | Factor VIIIa mimetic · Hemostatic rebalancing agents ᴮ                                                                                                                                              |
 | **HA −inhib** | Recombinant FVIII concentrates · Factor VIIIa mimetics · Hemostatic rebalancing agents                                                                                                              |
+
+ᴮ `[BUILD]` **the artboard sets this one plural where `[PDF-V]` sets it singular** ("Hemostatic
+rebalancing agent"). The app renders the plural, on the standing rule that the artboard is the
+filing authority where the two disagree — the same call recorded for the `fviiia-mimetics` cards'
+copy. Note the first item in the same list _is_ singular on both, deliberately.
 
 Each box carries the annotation _"Click on the box(es) below to learn more about each type of
 therapy"_ and links to the class-level education pop-ups. Encoded in `[BUILD]` `src/data/wizard.ts`
-→ `CLASSES_TO_CONSIDER[scenario]` (`{ classes: string[]; caveat? }`, verbatim labels — not the
-`TreatmentClass` enum, since the source phrases the same class differently per scenario).
+→ `CLASSES_TO_CONSIDER[scenario]` (verbatim labels — not the `TreatmentClass` enum, since the
+source phrases the same class differently per scenario).
+
+> **The four scenario screens carry copy the blueprint has no equivalent of `[BUILD]`.** Each
+> `/wizard/scenario` artboard states its scenario as the page title ("Hemophilia B with
+> inhibitors"), opens with a lead sentence, and captions the illustration boxes — so
+> `CLASSES_TO_CONSIDER[scenario]` gained `title`, `lead` and `caption` beside `classes` and
+> `caveat`. They are transcribed rather than templated, because the four disagree:
+>
+> - **HB +inhib leads with "Therapeutic _options_ for prophylaxis of HB _with_ inhibitors"**,
+>   where the other three read "Therapeutic _classes to consider_ for prophylaxis of …" — its
+>   list is a single class rather than a choice among several.
+> - **HB +inhib also replaces the shared caption** with the app's "Click here:" idiom, naming the
+>   class outright: _"Click here: information on hemostatic rebalancing agents"_. The blueprint
+>   hedged with "box(es)"; the artboard rewrote the sentence instead. The other three share one
+>   caption verbatim.
+> - **The polarity word is italic on all four leads** — `_with_` / `_without_`, which is the one
+>   word distinguishing two otherwise near-identical sentences. Carried as inline markup in the
+>   string and rendered through `formatInline`; see
+>   `docs/adr/0004-inline-emphasis-in-transcribed-copy.md`.
+>
+> Where the caption is _drawn_ is not in the data: above the boxes on the three multi-box screens,
+> below the single one. That is a layout fact and lives on the page.
+>
+> **The boxes open nothing.** They ship as reserved rectangles at the drawn size. The
+> per-scenario therapeutic-class illustration panels are image-borne
+> ([§7.7](#77-click-through-pop-up-index)) and no asset exists for any of them, and of the five
+> distinct class labels only two — FVIIIa mimetics and hemostatic rebalancing agents — have an
+> education chapter to point at; "Gene therapy" has no chapter, pop-up or authored copy anywhere.
+> So the caption is an instruction that does not yet work, the same state
+> `education/rebalancing-agents` is in. Wiring needs the designer to say what a box opens.
+
+`[BUILD]` **Known drift:** `treatment-wizard-demo.html` mirrors `CLASSES_TO_CONSIDER` and still
+carries the singular "Hemostatic rebalancing agent", plus none of the three new fields. The demo
+composes its own headings and does not render these screens, so it was left alone deliberately.
 
 ### 4.1 Recommendation matrix (scenario × reason → agents) `[PDF-V]`
 
@@ -658,7 +698,7 @@ Post-use survey (note: source labels two items "Question 2" — likely a typo fo
 | Interactive demo (both engines)       | `treatment-wizard-demo.html` (repo root)             | ✅ standalone; logic mirrors the TS modules (incl. `CLASSES_TO_CONSIDER`)               |
 | Per-drug info sheets data             | `src/data/drug-sheets.ts`                            | ✅ built, type-checks (7 sheets; see [§6](#6-drug-information-sheets))                  |
 | Education / glossary / refs / survey  | `src/data/{education,glossary,references,survey}.ts` | ✅ built, type-checks (issue 00)                                                        |
-| Content join/coverage tests           | `src/data/content.test.ts`                           | ✅ 12 tests pass                                                                        |
+| Content join/coverage tests           | `src/data/content.test.ts`                           | ✅ 14 tests pass                                                                        |
 | React UI (wizard + table + sheets)    | —                                                    | ⬜ not built                                                                            |
 
 **Open decisions:**
