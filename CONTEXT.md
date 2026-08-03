@@ -9,7 +9,9 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-07-31 (the `fviiia-mimetics` artboard refiled §7.6's two investigational
+- **Last reviewed:** 2026-08-03 (the Denecimig artboard split `denecimig-moa` off the overview and
+  authored a class-level MOA bullet §7.5 files under emicizumab — see §7.5); previously 2026-07-31
+  (the `fviiia-mimetics` artboard refiled §7.6's two investigational
   agents onto §7.5 — see both sections); previously 2026-07-27 (full re-scan of `[PDF-V]` as a diagram, not just text — traced
   branch connections, color-coding, and all 32 pop-up notes, see [§4](#4-treatment-wizard-flow-main-engine);
   plus a `[PPTX]` re-scan that completed the education content in [§7](#7-education-content))
@@ -445,6 +447,22 @@ inter-individual variability and uncertain duration.
   submitted for routine prophylaxis in adult & pediatric HA ±inhibitors, supported by the phase 3
   **FRONTIER** program: FRONTIER2 (SC monthly/weekly, >12 yr), FRONTIER3 (monthly/weekly, >1 yr),
   FRONTIER4 (OLE). See also drug sheet [§6](#6-drug-information-sheets).
+  `[BUILD]` the first two sentences are modelled as their own topic (`denecimig-moa`, titled with
+  the figure caption below), because the card draws them under the diagram and the rest beside it —
+  the same split as `emicizumab-overview`/`emicizumab-moa`. The FRONTIER trials are modelled as a
+  nested level under the bullet that introduces them, which is how both this section and the card
+  subordinate them. Figure: "Mechanism of Action for Denecimig (Mim8): FVIIIa-mimetic BsAb"
+  (image), shown as a thumbnail that enlarges bare over the card; **its heading is baked into the
+  raster**, so unlike the emicizumab diagram the caption is image-borne text and reachable only
+  through `alt`.
+  `[BUILD]` **the card opens with a bullet this section does not author** — "FVIIIa-mimetic BsAb:
+  Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on
+  activated platelets", which is verbatim the sentence §7.5 gives _emicizumab_. The artboard draws
+  it as a class-level statement of what a FVIIIa-mimetic BsAb does, and the artboard is the filing
+  authority where it and `[PDF-V]` disagree — the same call recorded for the investigational panel
+  below. Transcribed into `denecimig-overview` rather than shared with `emicizumab-moa` as one
+  constant: two agents state the same class fact from two sources, and a card reading the _other_
+  agent's topic would let an edit to emicizumab's copy silently rewrite this one.
 - **Investigational FVIIIa-mimetic therapies in early-stage development** (moved here from §7.6,
   2026-07-31): the source lists these under the NFT block, but the `fviiia-mimetics` artboard
   draws them on this chapter — in its own corner panel, with a separate click-through per agent —

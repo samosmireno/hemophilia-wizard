@@ -235,20 +235,72 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "FVIIIa-mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
     ],
   },
+  /**
+   * §7.5's investigational agent, as its pop-up card draws it: four bullets at
+   * the left, the MOA panel and its two sentences at the right.
+   *
+   * **Two of the source's bullets moved to `denecimig-moa` below**, which is the
+   * `emicizumab-overview` split one topic up, for the same reason and with the
+   * same consequence: the card draws them under the diagram rather than beside
+   * it, and prose that renders somewhere else gets *moved* rather than sliced
+   * off this array by an index. Insert a bullet here and nothing silently
+   * changes column.
+   *
+   * **The first bullet is the artboard's, not `[PDF-V]`'s.** §7.5 authors this
+   * sentence for emicizumab (it is `emicizumab-moa`'s whole body) and gives
+   * denecimig the monovalent-arm sentence instead; the card nonetheless opens
+   * with it, as a class-level statement of what a FVIIIa-mimetic BsAb does.
+   * Transcribed here rather than shared with `emicizumab-moa` as one constant —
+   * two agents state the same class fact, and a card reading the *other* agent's
+   * topic would make an edit to emicizumab's copy silently rewrite this one. The
+   * artboard is the filing authority where it and the source disagree, which is
+   * the call CONTEXT.md §7.5 already records for the investigational panel.
+   *
+   * The FRONTIER trials are a `NestedBullet` because they are subordinate to the
+   * bullet that ends in a colon — the source subordinates them too ("supported
+   * by the phase 3 FRONTIER program: FRONTIER2 …"), so flat siblings were a
+   * modelling miss the artboard made visible rather than a change of content.
+   */
   {
     id: "denecimig-overview",
     title: "Denecimig (Mim8): Investigational; currently under FDA review",
     body: [
-      "A monovalent anti-FIXa arm enhances FIXa proteolytic activity to facilitate FX activation and subsequent thrombin generation and clot formation",
-      "Pre-clinical studies demonstrated Mim8 potency up to 18-fold greater than emicizumab-equivalent analog",
+      "FVIIIa-mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
       "BLA submitted for use as routine prophylaxis in adult and pediatric patients with HA with or without inhibitors",
-      "FDA submission supported by results from the phase 3 FRONTIER clinical program:",
-      "FRONTIER2: Denecimig SC administered monthly or weekly in patients >12 years of age",
-      "FRONTIER3: Denecimig monthly or weekly in patients >1 year of age",
-      "FRONTIER4: OLE",
+      {
+        text: "FDA submission supported by results from the phase 3 FRONTIER clinical program:",
+        children: [
+          "FRONTIER2: Denecimig SC administered monthly or weekly in patients >12 years of age",
+          "FRONTIER3: Denecimig monthly or weekly in patients >1 year of age",
+          "FRONTIER4: OLE",
+        ],
+      },
       "Tiered dosing based on body weight avoids dose calculations, reduces treatment burden, and minimizes medication waste",
     ],
     figures: ["Mechanism of Action for Denecimig (Mim8): FVIIIa-mimetic BsAb"],
+  },
+  /**
+   * The MOA panel in the Denecimig card, and the two sentences drawn beneath it.
+   *
+   * `title` is `denecimig-overview.figures[0]` verbatim rather than a reference
+   * to it — a figure's title is *stated* in this codebase, not derived, for the
+   * reason `emicizumab-moa` records.
+   *
+   * **Unlike `emicizumab-moa`, this title is also painted in the asset.** The
+   * heading is baked into `denecimig.webp`'s pixels, so what this string does
+   * here is name the figure for the trigger and the enlargement's accessible
+   * name; the chapter does not draw it a second time.
+   *
+   * `body` is two bullets because the card draws two under the panel. Both are
+   * §7.5's own prose, moved off `denecimig-overview` rather than copied.
+   */
+  {
+    id: "denecimig-moa",
+    title: "Mechanism of Action for Denecimig (Mim8): FVIIIa-mimetic BsAb",
+    body: [
+      "A monovalent anti-FIXa arm enhances FIXa proteolytic activity to facilitate FX activation and subsequent thrombin generation and clot formation",
+      "Pre-clinical studies demonstrated Mim8 potency up to 18-fold greater than emicizumab-equivalent analog",
+    ],
   },
   /**
    * §7.6's benefits/challenges pair, and — since the `treatment-landscape`

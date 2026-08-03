@@ -1,13 +1,14 @@
 import { type ReactNode, useState } from "react";
 import { PopupButton } from "mlg-components";
 
+import denecimigUrl from "../../assets/images/denecimig.webp";
 import emicizumabUrl from "../../assets/images/emicizumab.webp";
 import BulletList from "../../components/BulletList";
 import ExpandableFigure from "../../components/ExpandableFigure";
 import Popup from "../../components/Popup";
 import PopupFigure from "../../components/PopupFigure";
 import { topicById } from "../../data/education";
-import { usePreloadImage } from "../../lib/preloadImage";
+import { usePreloadImages } from "../../lib/preloadImage";
 import { preserveCase } from "../../lib/preserveCase";
 
 /**
@@ -26,6 +27,7 @@ const CHAPTER = topicById("fviiia-mimetics")!;
 const EMICIZUMAB = topicById("emicizumab-overview")!;
 const EMICIZUMAB_MOA = topicById("emicizumab-moa")!;
 const DENECIMIG = topicById("denecimig-overview")!;
+const DENECIMIG_MOA = topicById("denecimig-moa")!;
 
 /**
  * The Emicizumab card's heading — a **literal**, because the band draws
@@ -38,6 +40,19 @@ const DENECIMIG = topicById("denecimig-overview")!;
  * pair — the status is what the button is *for*, not what the card is about.
  */
 const CARD_TITLE = "Emicizumab";
+
+/**
+ * The Denecimig card's heading, and a literal for exactly the reason above: the
+ * band draws "DENECIMIG (MIM8)" where the topic's title carries "Investigational;
+ * currently under FDA review" as well. Same pair on the way in — "Expand Denecimig
+ * (Mim8): Investigational; currently under FDA review" on the `+`, "Denecimig
+ * (Mim8)" on the dialog.
+ *
+ * **No `preserveCase` term is needed for `Mim8`.** The band's `uppercase` renders
+ * it "MIM8", which is what the artboard draws — unlike `FVIIIa` or `BsAb`, the 8
+ * is not a case distinction that carries meaning.
+ */
+const DENECIMIG_CARD_TITLE = "Denecimig (Mim8)";
 
 /**
  * The MOA diagram is image-borne (CONTEXT.md §7.7) — its four factor labels
@@ -62,6 +77,39 @@ const MOA_FIGURE_ALT =
  * numbers because it reserves the box from them before the image decodes.
  */
 const MOA_FIGURE = { width: 704, height: 734 } as const;
+
+/**
+ * The Denecimig panel's description — and it opens with the panel's **heading**,
+ * which the other figure's does not have to.
+ *
+ * `denecimig.webp` carries its crimson title in the pixels, so that line is
+ * image-borne exactly as the factor labels are (CONTEXT.md §7.7) and `alt` is the
+ * only route to it. Stating it here is what stops the chapter drawing it twice:
+ * `denecimig-moa.title` names the figure for the trigger and the enlargement's
+ * accessible name, and nothing paints it.
+ *
+ * The rest is the **pathway**, not the structure — the drawing is a left-to-right
+ * sequence ending in a clot, where the emicizumab diagram is a static set of
+ * bindings. Neither is a house style the other should be edited into; each says
+ * what its own picture shows.
+ */
+const DENECIMIG_FIGURE_ALT =
+  "Diagram titled “Mechanism of Action for Denecimig (Mim8): FVIIIa-mimetic BsAb”. " +
+  "Mim8, a Y-shaped bispecific antibody, binds factor IXa and factor X on an activated " +
+  "platelet surface and bridges them, converting factor X to factor Xa. Factor Xa with " +
+  "factor Va then converts factor II to factor IIa, which forms a blood clot.";
+
+/**
+ * The panel's drawn size, and its aspect ratio.
+ *
+ * Half of `denecimig.webp`'s 3852 × 2464, per the rule `PopupFigure` states —
+ * but note this asset is **not** the 2× export the rule was written for: the
+ * panel is drawn at ~450px in the card, so the file is nearer 8×. Half is still
+ * the right number to pass, because it is the widest this raster can be painted
+ * at 2× density; it simply never binds here, and the height cap is what settles
+ * the enlargement. The ratio is what the reservation actually needs.
+ */
+const DENECIMIG_FIGURE = { width: 1926, height: 1232 } as const;
 
 /**
  * The corner panel's heading — a **literal**, because no topic holds it any
@@ -118,12 +166,11 @@ const [HEADING_LEAD, HEADING_TAIL] = splitTitle(CHAPTER.title);
  * `DisclosureBand`'s reason: two open at once is not a state worth being able to
  * represent, and opening one closes the others by construction.
  *
- * **Only `emicizumab` opens a card so far.** The designer has drawn one behind
- * each of these four (Pop ups 10–13) and has delivered this one; the other three
- * assets are here but their layouts are not — denecimig and Inno8 are landscape
- * rasters where this one is near-square, so they are almost certainly not this
- * drawing and are not guessed at. Those three buttons therefore still toggle and
- * nothing more, which is the content-less case `DisclosureBand` already models.
+ * **Two of the four open a card.** The designer has drawn one behind each of
+ * these four (Pop ups 10–13) and has delivered two; NXT007's and Inno8's assets
+ * are here but their layouts are not, and are not guessed at. Those two buttons
+ * therefore still toggle and nothing more, which is the content-less case
+ * `DisclosureBand` already models.
  *
  * `aria-haspopup` follows the same split, for the reason it is conditional
  * there: announcing a dialog that will not appear is worse than announcing
@@ -139,17 +186,17 @@ export default function FviiiaMimetics() {
   const toggle = (id: OpenId) => (next: boolean) => setOpenId(next ? id : null);
 
   /**
-   * The MOA diagram is **two cards deep** — it lives inside the Emicizumab
-   * card's `ExpandableFigure`, and that card's children do not exist until the
-   * `+` is clicked — so nothing requests it during the chapter's own load and a
-   * cold figure opens to an empty box that jumps once the picture lands (see
+   * Both MOA diagrams are **two cards deep** — each lives inside its agent
+   * card's `ExpandableFigure`, and those cards' children do not exist until the
+   * `+` is clicked — so nothing requests them during the chapter's own load and
+   * a cold figure opens to an empty box that jumps once the picture lands (see
    * `PopupFigure`). Warmed from here, the nearest scope that stays mounted,
    * exactly as the other chapters warm theirs.
    *
-   * One URL for both uses: the in-card thumbnail and the enlargement are the
-   * same file, so the thumbnail is warm on the same call.
+   * One URL per card, not two: each card's in-card thumbnail and its
+   * enlargement are the same file, so both uses are warm on the same call.
    */
-  usePreloadImage(emicizumabUrl);
+  usePreloadImages([emicizumabUrl, denecimigUrl]);
 
   return (
     <section aria-labelledby="chapter-heading" className="flex flex-1 flex-col">
@@ -236,6 +283,7 @@ export default function FviiiaMimetics() {
             label={DENECIMIG.title}
             open={openId === "denecimig"}
             onToggle={toggle("denecimig")}
+            hasCard
           />
         </ul>
 
@@ -262,12 +310,23 @@ export default function FviiiaMimetics() {
         nested figure dialog do not exist until the reader asks for them — which
         is exactly why the preload above is needed.
 
-        Only one of the four ids has a card, so this is a conditional rather than
-        the exhaustive `Record` `rebalancing-agents` keys by step. A `Record` over
-        `OpenId` would demand three entries nobody has drawn.
+        Two sibling mounts rather than one `Popup` reading a `Record` keyed by
+        `OpenId` — the exhaustive shape `rebalancing-agents` uses for its steps.
+        A `Record` here would demand two entries nobody has drawn, and at two
+        cards the indirection would only move each card's title a hop away from
+        the card it belongs to. Only one can ever be up: `showModal()` makes the
+        rest of the document inert, so the other trigger is unreachable.
       */}
       <Popup open={openId === "emicizumab"} title={CARD_TITLE} onClose={() => setOpenId(null)}>
         {openId === "emicizumab" && <EmicizumabCard />}
+      </Popup>
+
+      <Popup
+        open={openId === "denecimig"}
+        title={DENECIMIG_CARD_TITLE}
+        onClose={() => setOpenId(null)}
+      >
+        {openId === "denecimig" && <DenecimigCard />}
       </Popup>
     </section>
   );
@@ -361,6 +420,96 @@ function EmicizumabCard() {
           {EMICIZUMAB_MOA.body[0] as string}
         </p>
       </ExpandableFigure>
+    </div>
+  );
+}
+
+/**
+ * Pop up 11: the four drawn bullets at the left, the MOA panel and its two
+ * sentences at the right.
+ *
+ * **`items-start`, where `EmicizumabCard` centres.** That card is a short bullet
+ * stack against a near-square picture with no shared baseline; this one has two
+ * columns of nearly equal height whose first lines the artboard aligns, so
+ * centring would only introduce a drift that grows with the measure.
+ *
+ * Below `lg` it stacks prose-first, for `EmicizumabCard`'s reason: at 375px the
+ * drawn split leaves the figure column narrower than the `+` that opened the
+ * card, and a diagram unreadable at phone width is answered by enlarging rather
+ * than by a wider column.
+ *
+ * 20px bullets — the established pop-up body value, shared with `EmicizumabCard`,
+ * `MechanismsCard` and `BenefitsChallengesCard`. This card is denser than any of
+ * them (four bullets and a nested three beside a panel) and will scroll sooner on
+ * a short viewport; that is `Popup`'s scroll region doing its job, and reusing
+ * the value is what keeps two cards a reader opens in sequence one size.
+ */
+function DenecimigCard() {
+  return (
+    <div className="flex flex-col items-start gap-8 py-6 lg:flex-row lg:gap-6">
+      <BulletList items={DENECIMIG.body} className="flex-1 text-[20px] leading-[1.6]" />
+
+      {/*
+        The right column: the panel, then the two sentences under it. `w-112` is
+        the drawn ~450px, the same number `EmicizumabCard` lands on from a
+        different artboard — 540 of the 1065px content column there, 448 of
+        `Popup`'s 896 here, leaving the left column the 424 it is drawn at.
+
+        **A fixed width with `shrink-0`, not `flex-1 basis-112`.** That pair is
+        what `EmicizumabCard` writes, but it means "448 *plus a share of what is
+        left*" — and both columns growing splits the free space between them, so
+        the left one settles ~210px narrower than drawn and this card's four
+        bullets wrap to twice their height. It is invisible there only because
+        the figure carries a `max-w-112` that caps the overgrown column back
+        down; here the panel would happily fill it.
+      */}
+      <div className="flex w-full flex-col gap-3 lg:w-112 lg:shrink-0">
+        {/*
+          **No white panel in markup**, which is the one structural difference
+          from `EmicizumabCard`: `denecimig.webp` carries the white surface, the
+          crimson heading and the rounded corners in its own pixels, with real
+          alpha outside the radius. A `bg-white rounded-3xl p-4` wrapper here
+          would paint a second, larger corner around the first.
+
+          `rounded-2xl` is therefore about the BUTTON, not the picture — it is
+          what clips the hover wash to the corner the asset already has, at the
+          ~16px that radius comes to at the drawn width. It wins over the
+          component's `rounded-xl` by tailwind-merge, as its doc invites.
+        */}
+        <ExpandableFigure
+          thumbSrc={denecimigUrl}
+          title={DENECIMIG_MOA.title}
+          // **Bare**, and for `EmicizumabCard`'s reason plus one of its own: the
+          // enlargement is the same picture, and this raster paints its own
+          // heading, so a crimson band over it would state the title twice.
+          variant="bare"
+          className="rounded-2xl"
+        >
+          {/*
+            The picture alone on the scrim — no caption, where the emicizumab
+            enlargement carries one. That sentence renders nowhere else; these
+            two do, in the card immediately behind this layer, so repeating them
+            would shrink the diagram the reader clicked to see bigger.
+
+            `reserve` is 5rem against the 10rem default, and it is a different
+            subtraction: the default is `Popup`'s band and body padding, none of
+            which is here. What IS here is `Lightbox`'s own `p-4 sm:p-8` — 64px
+            at `sm` — rounded up so the ✕ in the corner keeps its clearance.
+          */}
+          <PopupFigure
+            src={denecimigUrl}
+            alt={DENECIMIG_FIGURE_ALT}
+            width={DENECIMIG_FIGURE.width}
+            height={DENECIMIG_FIGURE.height}
+            reserve="5rem"
+          />
+        </ExpandableFigure>
+
+        {/* `denecimig-moa`'s whole body, read rather than sliced — see the topic.
+            Black on the card's gradient, as the left column is: this list is in
+            the card, not on the scrim. */}
+        <BulletList items={DENECIMIG_MOA.body} className="text-[20px] leading-[1.6]" />
+      </div>
     </div>
   );
 }
