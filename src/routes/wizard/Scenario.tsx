@@ -39,8 +39,9 @@ import { isComplete, useWizardAnswers } from "../../state/wizardAnswers";
  * inside this screen's own measured spread, and the same reserved box on both
  * pages that have one.
  *
- * Three boxes plus two gaps is 919px against the 1168px content column, so the
- * row fits with room to spare at the design width.
+ * The gap is `gap-x-30` — 120px, the scale step next to that measured 119. Three
+ * boxes plus two gaps is 921px against the 1168px content column, so the row fits
+ * with room to spare at the design width.
  */
 const BOX = "h-[185px] w-full max-w-[227px] shrink-0 border-4 border-black lg:shrink";
 
@@ -81,7 +82,7 @@ export default function Scenario() {
     sits in, to honour a number the design did not mean to state.
   */
   const boxes = (
-    <div className="flex flex-col items-center gap-8 lg:flex-row lg:justify-center lg:gap-x-[119px]">
+    <div className="flex flex-col items-center gap-8 lg:flex-row lg:justify-center lg:gap-x-30">
       {/*
         Empty `<div>`s rather than `<img>`s without a `src`, and rather than
         buttons — `rebalancing-agents` records the reasoning: a broken image
@@ -140,9 +141,11 @@ export default function Scenario() {
       )}
 
       {/*
-        `mt-41` is the drawn 164px from the last line of prose to the top of the
-        block, which the exports agree on across all four screens even where
-        their box geometry does not.
+        `mt-40` is 160px, against the 164 the exports draw from the last line of
+        prose to the top of this block — a gap the four screens agree on even
+        where their box geometry does not. Rounded to the whole scale step when
+        this file's spacing was normalised; the rhythm it reproduces is the
+        artboard's, four pixels tighter.
       */}
       {/*
         `flex-col-reverse` rather than a branch that renders the two in the other
@@ -155,7 +158,7 @@ export default function Scenario() {
         when a column reverses, so a `mt-8` on the boxes would open its gap above
         them on the screen that flips and leave the caption sitting flush.
       */}
-      <div className={cn("mt-41 flex flex-col gap-8", captionBelow && "flex-col-reverse")}>
+      <div className={cn("mt-40 flex flex-col gap-8", captionBelow && "flex-col-reverse")}>
         {caption}
         {boxes}
       </div>

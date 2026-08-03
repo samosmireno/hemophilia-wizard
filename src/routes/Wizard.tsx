@@ -143,11 +143,14 @@ export default function Wizard() {
 
         {/*
           Right-aligned to the pill grid, not to the content column — hence the
-          same `max-w-[870px] mx-auto` box the groups use. `mt-8` is the drawn
-          32px, fill to fill, which needs no leading correction between two
-          buttons.
+          same `max-w-225 mx-auto` box the groups use. That coupling is the
+          point, not the number: whatever `OptionGroup` caps itself at, this has
+          to match, or the button stops landing on the grid's right edge.
+
+          `mt-8` is the drawn 32px, fill to fill, which needs no leading
+          correction between two buttons.
         */}
-        <div className="mx-auto mt-8 flex max-w-[870px] justify-end">
+        <div className="mx-auto mt-8 flex max-w-225 justify-end">
           {/*
             The package's `Button`, re-grounded in lagoon. Only the three ground
             colours are overridden (tailwind-merge, so the caller wins); type,
@@ -156,9 +159,13 @@ export default function Wizard() {
             press steps are derived the way §4.1's crimson pair is — lifted with
             the -25 tint, pressed to the -75 step.
 
-            `px-[25px] leading-5` are measured: the artboard draws a 223 × 56
+            `px-6 leading-5` come from measurement: the artboard draws a 223 × 56
             pill around a 173px label, where the package's own `px-16` would make
-            it 301px wide. The type size is the package's 26px untouched.
+            it 301px wide. The drawn padding was 25 and went to the nearest scale
+            step; at 24 a side the pill renders 224 × 56 in a browser, which is
+            the drawn 223 to within the ~4px this font runs wider than the export
+            (the same discrepancy the pill labels above record). The type size is
+            the package's 26px untouched.
 
             `disabled` is the real attribute, not `aria-disabled`: the gate is
             visible in the three unanswered groups above it, so a focusable
@@ -167,7 +174,7 @@ export default function Wizard() {
           <Button
             type="submit"
             disabled={!complete}
-            className="bg-brand-lagoon-50 px-[25px] leading-5 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75"
+            className="bg-brand-lagoon-50 px-6 leading-5 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75"
           >
             Submit inputs
           </Button>

@@ -60,19 +60,25 @@ export default function OptionGroup<T extends string>({
 
   return (
     /*
-      Capped at the pill block's own 870px and centred, rather than left to fill
-      the content column: the artboard's third question breaks across two lines
-      ("WHAT IS THE PRIMARY REASON FOR / CONSIDERING A TREATMENT OPTION?"), which
-      only happens if the legend is measured against the buttons under it. At the
-      column's full 1168px it sets on one line and the block loses the shape the
-      design draws.
+      Capped near the pill block's own width and centred, rather than left to
+      fill the content column: the artboard's third question breaks across two
+      lines ("WHAT IS THE PRIMARY REASON FOR / CONSIDERING A TREATMENT OPTION?"),
+      which only happens if the legend is measured against the buttons under it.
+      At the column's full 1168px it sets on one line and the block loses the
+      shape the design draws.
+
+      `max-w-225` is 900px against the artboard's drawn 870 — a whole spacing
+      step in place of the measured value, taken when the arbitrary values in
+      this file were moved onto the scale. The 30px is spent on the pills (see
+      the grid below); the line break this cap exists to protect is governed by
+      the legend's own narrower cap and is unaffected.
 
       `min-w-0` because a `<fieldset>` carries `min-inline-size: min-content` in
       the UA stylesheet, which Tailwind's preflight does not reset — without it
       the grid inside refuses to shrink below its widest label and the page
       scrolls sideways on a phone.
     */
-    <fieldset className={cn("mx-auto max-w-[870px] min-w-0", className)}>
+    <fieldset className={cn("mx-auto max-w-225 min-w-0", className)}>
       {/*
         32px bold uppercase in teal-75, measured off the artboard (cap height 23
         on the 1440 canvas ÷ DM Sans' 0.70 cap ratio = 33px, i.e. `text-h2`).
@@ -92,15 +98,20 @@ export default function OptionGroup<T extends string>({
         and the pills: ink-to-ink measures 15px, which is that gap once the line
         box's descender space is taken off (docs/styling.md §11).
       */}
-      <legend className="mx-auto mb-2.5 w-full max-w-[700px] text-center font-sans text-h2 text-brand-teal-75 uppercase">
+      <legend className="mx-auto mb-2.5 w-full max-w-175 text-center font-sans text-h2 text-brand-teal-75 uppercase">
         {legend}
       </legend>
 
       {/*
-        The artboard draws two 425px columns 20px apart, rows 16px apart, in the
-        870px the fieldset above caps. Fluid rather than fixed: 870px only fits
-        at the design canvas (at 1024px the shell's content box is 752px wide),
-        so the grid lands on exactly 425 × 56 at 1440 and shrinks below it.
+        The artboard draws two 425px columns 20px apart, rows 16px apart, in a
+        870px block. Fluid rather than fixed: that width only fits at the design
+        canvas (at 1024px the shell's content box is 752px wide), so the grid
+        takes what the fieldset gives it and shrinks below that.
+
+        Which means the pills are **440 × 56 at 1440, not the drawn 425 × 56** —
+        the fieldset's cap rounded up to 900 and the two columns split the extra
+        30px between them. The row is still two equal pills 20px apart, which is
+        what the design is saying; it is 15px wider per pill than it was drawn.
 
         One column under `md`, where two would leave ~140px per pill. Nobody has
         drawn a phone, so this is an invented comfort value, as the shell's small
@@ -115,10 +126,14 @@ export default function OptionGroup<T extends string>({
               key={option.id}
               className={cn(
                 /*
-                  `min-h-14` (56px), not `h-14`: 24px type in a 30px line box on
-                  13px of padding is what makes the pill 56px at the design
-                  width, and a label that wraps in a narrower column has to grow
-                  the pill rather than overflow it.
+                  `min-h-14` (56px), not `h-14`: a label that wraps in a narrower
+                  column has to grow the pill rather than overflow it.
+
+                  It is also what holds the drawn 56px now that the padding is
+                  `py-3`. 24px type in a 30px line box on the artboard's 13px of
+                  padding came to exactly 56; on 12px it comes to 54, and the
+                  minimum floors it back to 56. Same pill, arrived at by the
+                  `min-h` rather than by the padding adding up.
 
                   The design's own line box is 20px, and it is deliberately NOT
                   used, for the reason the package's `Button` records about its
@@ -146,8 +161,8 @@ export default function OptionGroup<T extends string>({
                   a 4px difference between this font's metrics and the export's.
                   24px keeps it on one line as drawn, with room to spare.
                 */
-                "flex min-h-14 cursor-pointer items-center justify-center rounded-lg px-6 py-[13px]",
-                "text-center text-[24px] leading-tight font-semibold break-words",
+                "flex min-h-14 cursor-pointer items-center justify-center rounded-lg px-6 py-3",
+                "text-center text-[24px] leading-tight font-semibold wrap-break-word",
                 "shadow-ui-btn transition-[background-color,color] duration-120 ease-out",
                 /*
                   Three resting skins, two of them the package's own:
@@ -191,7 +206,7 @@ export default function OptionGroup<T extends string>({
                   simply never paints — which is why this is verified in a browser
                   (docs/styling.md §14) rather than by asserting the class.
                 */
-                "has-[:focus-visible]:outline-[3px] has-[:focus-visible]:-outline-offset-[3px] has-[:focus-visible]:outline-ui-btn-ring",
+                "has-focus-visible:outline-[3px] has-focus-visible:outline-offset-[-3px] has-focus-visible:outline-ui-btn-ring",
                 optionClassName,
               )}
             >

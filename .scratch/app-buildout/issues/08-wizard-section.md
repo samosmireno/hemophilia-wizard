@@ -94,8 +94,17 @@ What shipped:
 - `BulletList` gained a `format` seam for it, defaulting to the plain string.
 
 Verified in Chromium at 1440 across all four scenarios, not just jsdom: boxes land at
-227 × 185 with the drawn 119px gaps, the 164px prose-to-block rhythm is exact, the caption
-flips below the boxes on the single-box screen, and no screen scrolls horizontally.
+227 × 185, the caption flips below the boxes on the single-box screen, and no screen
+scrolls horizontally.
+
+**Spacing was then normalised onto the Tailwind scale**, which moved four measured values
+by a step: the box gap 119 → 120 (`gap-x-30`), the prose-to-block rhythm 164 → 160
+(`mt-40`), and on `/wizard` the Submit padding 25 → 24 (`px-6`) and the pill padding
+13 → 12 (`py-3`). One moved further: `OptionGroup`'s cap went 870 → 900 (`max-w-225`),
+which the two grid columns absorb, so **the answer pills now draw 440 × 56 against the
+artboard's 425 × 56** — same two-equal-pills-20px-apart shape, 15px wider each. All five
+comments were rewritten to state the values in the file rather than the ones measured off
+the export. Worth a look at the styling gate alongside the two divergences below.
 
 Against this issue's acceptance criteria — unchanged from the comment above. This page is
 the class-level step, not the leaf; `recommend()` is still not called by any page.
