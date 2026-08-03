@@ -16,14 +16,22 @@ import { type ReactNode } from "react";
  * stops containing a term simply matches nothing, where a position would
  * silently exempt the wrong letter.
  *
+ * **`Inno8` is here for a different reason than the other four**, and the
+ * distinction is worth keeping straight: nothing about it is *destroyed* by being
+ * shouted — it is a product name, and "INNO8" loses no meaning the way "FIXA"
+ * does. It is here because the Pop up 13 artboard draws it cased inside a band
+ * that shouts everything else, so preserving it is transcription rather than
+ * repair. That is the same authority the sibling card's `Mim8` is decided on and
+ * lands the other way: the designer shouts that one, so it is not listed.
+ *
  * **Ordered longest-first, and that ordering is load-bearing.** A regex
  * alternation is first-match-wins at a given offset, so a prefix listed ahead of
  * the term it prefixes strands the remainder outside the span — add `BsAb`
  * before `BsAbs` and you reproduce the export's own "BsAbS". Nothing in the
- * current four collides (`FIXa` contains `IXa`, not `FXa`), but the next term
+ * current five collides (`FIXa` contains `IXa`, not `FXa`), but the next term
  * added has to keep the sort.
  */
-const CASED_TERMS: readonly string[] = ["FVIIIa", "BsAbs", "FIXa", "FXa"];
+const CASED_TERMS: readonly string[] = ["FVIIIa", "BsAbs", "Inno8", "FIXa", "FXa"];
 
 /**
  * Hoisted rather than rebuilt per call — the parts are constant, and this runs

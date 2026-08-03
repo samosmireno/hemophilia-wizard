@@ -477,10 +477,10 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * are rephrased and is the artboard's own doing: the card's crimson band
    * already says NXT007, so it draws "Next-generation BsAb engineered by…" and
    * "Ongoing clinical trials:" flat rather than naming the agent three times on
-   * one card. `inno8-overview` keeps its prefix, because nobody has drawn that
-   * card yet and the source is still the only authority on it. (The artboard sets
-   * "Next- generation" — the same PDF soft-hyphen artifact this module's header
-   * says it strips, so it is one word here.)
+   * one card. `inno8-overview` sheds its two the same way, for the same reason
+   * and on the same authority; see there. (The artboard sets "Next- generation" —
+   * the same PDF soft-hyphen artifact this module's header says it strips, so it
+   * is one word here.)
    *
    * The two trials are a `NestedBullet` because the artboard subordinates them
    * under a bullet ending in a colon — the same shape `denecimig-overview` gives
@@ -526,12 +526,34 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "NXT007 is derived from emicizumab heavy-chain regions and incorporates two distinct light chains with charged-residue mutations designed to optimize antibody chain pairing and cofactor activity",
     ],
   },
+  /**
+   * The second investigational agent — Pop up 13, and the whole of that card:
+   * two bullets across the top, the MOA panel beneath them.
+   *
+   * **No figure topic split off**, where the other three overviews each gave one
+   * up. That split exists to hold prose the card draws somewhere other than
+   * beside the bullets, and this card draws none: the panel is the last thing in
+   * it. The figure's caption stays in `figures` and the chapter states its own
+   * heading for it, which is how every figure card in this codebase is titled.
+   *
+   * **Both "Inno8" prefixes are dropped**, which is `nxt007-overview`'s call one
+   * card later and on the same authority: the crimson band already reads "Inno8:
+   * Oral FVIIIa Mimetic for HA", so the artboard draws "Novel VHH-based…" and
+   * "Currently under evaluation…" rather than naming the agent three times on one
+   * card. The comment above used to say this topic kept its prefix *because
+   * nobody had drawn the card yet* — the card is drawn now, and the artboard is
+   * the filing authority where it and `[PDF-V]` disagree.
+   *
+   * `title` is the card's own heading and not the panel's caption for it, which
+   * is the caption-vs-title split `Disclosure` documents: the button says "Inno8"
+   * flat.
+   */
   {
     id: "inno8-overview",
     title: "Inno8: Oral FVIIIa Mimetic for HA",
     body: [
-      "Inno8: Novel VHH-based FVIIIa-mimetic; once-daily oral treatment of HA",
-      "Inno8 is currently under evaluation in nonrandomized open-label phase 1 VOYAGER2 trial (NCT07220564)",
+      "Novel VHH-based FVIIIa-mimetic; once-daily oral treatment of HA",
+      "Currently under evaluation in nonrandomized open-label phase 1 VOYAGER2 trial (NCT07220564)",
     ],
     figures: ["Inno8 Mechanism of Action"],
   },

@@ -9,6 +9,7 @@ const CHAPTER = topicById("fviiia-mimetics")!;
 const EMICIZUMAB = topicById("emicizumab-overview")!;
 const DENECIMIG = topicById("denecimig-overview")!;
 const NXT007 = topicById("nxt007-overview")!;
+const INNO8 = topicById("inno8-overview")!;
 /** The figure topics split out of the three overviews; see the data module. */
 const MOA = topicById("emicizumab-moa")!;
 const DENECIMIG_MOA = topicById("denecimig-moa")!;
@@ -27,6 +28,7 @@ describe("fviiia-mimetics chapter", () => {
     expect(topicById("emicizumab-overview")).toBeDefined();
     expect(topicById("denecimig-overview")).toBeDefined();
     expect(topicById("nxt007-overview")).toBeDefined();
+    expect(topicById("inno8-overview")).toBeDefined();
   });
 
   it("renders the chapter title in title case, not the uppercase it displays", () => {
@@ -139,27 +141,27 @@ describe("fviiia-mimetics chapter", () => {
   });
 
   /**
-   * `aria-haspopup` is a promise, and one of the four still cannot keep it —
-   * announcing a dialog that never appears is worse than announcing nothing,
-   * which is the reason `DisclosureBand` makes the attribute conditional too.
+   * `aria-haspopup` is a promise, and with Pop up 13 built all four disclosures
+   * can finally keep it. This chapter shipped three commits with the attribute
+   * withheld from whichever card did not exist yet — announcing a dialog that
+   * never appears is worse than announcing nothing, which is the reason
+   * `DisclosureBand` makes it conditional too.
    *
-   * Both halves in one test because the pair is the fact: the attribute tracks
-   * which disclosures actually have a card, so the fourth card wired in without
-   * its `hasCard` fails here rather than shipping silent.
+   * Still asserted on all four rather than deleted as trivially true: what it
+   * pins is that the attribute tracks the cards, so a fifth agent's disclosure
+   * added ahead of its card fails here rather than shipping a silent promise.
    */
-  it("promises a dialog only where one opens", () => {
+  it("promises a dialog on every disclosure that opens one", () => {
     render(<FviiiaMimetics />);
 
     for (const name of [
       `Expand ${EMICIZUMAB.title}`,
       `Expand ${DENECIMIG.title}`,
       "Expand NXT007",
+      "Expand Inno8",
     ]) {
       expect(screen.getByRole("button", { name })).toHaveAttribute("aria-haspopup", "dialog");
     }
-    expect(screen.getByRole("button", { name: "Expand Inno8" })).not.toHaveAttribute(
-      "aria-haspopup",
-    );
   });
 });
 
@@ -671,6 +673,160 @@ describe("the NXT007 card", () => {
 
     await user.click(disclosure("Expand NXT007"));
     expect(dialogs()[1]).not.toHaveAttribute("open");
+    expect(card()).toHaveAttribute("open");
+  });
+});
+
+/**
+ * Pop up 13 — the last of the four, and the chapter's fourth `Popup`.
+ *
+ * Three empty mounts precede it while it is open, so the dialogs are [emicizumab
+ * (empty), denecimig (empty), nxt007 (empty), inno8, inno8's figure] in DOM
+ * order.
+ */
+describe("the Inno8 card", () => {
+  const dialogs = () => screen.getAllByRole("dialog", { hidden: true });
+  const card = () => dialogs()[3];
+  const figure = () => dialogs()[4];
+
+  /** The source's caption for the diagram, stated in the chapter; see there. */
+  const FIGURE_TITLE = "Inno8 Mechanism of Action";
+
+  /** The panel's disclosure — see the NXT007 block, which needs the same scope. */
+  const disclosure = (name: string) =>
+    within(screen.getByRole("region", { name: PANEL_HEADING })).getByRole("button", { name });
+
+  const open = async (user: ReturnType<typeof userEvent.setup>) => {
+    render(<FviiiaMimetics />);
+    await user.click(disclosure("Expand Inno8"));
+  };
+
+  /**
+   * **No figure topic split off this overview**, where the other three cards each
+   * needed one. This card draws no prose under its panel, so there is nothing to
+   * move; asserted as an absence because the split is the pattern a reader of the
+   * other three would expect to find repeated here.
+   */
+  it("reads one topic, with no figure topic split off it", () => {
+    expect(topicById("inno8-overview")).toBeDefined();
+    expect(topicById("inno8-moa")).toBeUndefined();
+  });
+
+  /**
+   * The caption-vs-title split at its widest in this chapter: the `+` says
+   * "Inno8" and the band says what Inno8 is. Pinned on both sides — the panel's
+   * caption is a chapter literal and the band reads the topic, so nothing else
+   * would notice the two converging.
+   */
+  it("opens a dialog named by the topic, not by the panel's one-word caption", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    expect(card()).toHaveAccessibleName("Inno8: Oral FVIIIa Mimetic for HA");
+    expect(INNO8.title).toBe("Inno8: Oral FVIIIa Mimetic for HA");
+    expect(disclosure("Close Inno8")).toBeInTheDocument();
+  });
+
+  /**
+   * The band shouts everything except the agent's name, which is what the
+   * artboard draws — so "Inno8" is carried in its own element to opt out of the
+   * `uppercase`, exactly as `FVIIIa` is. Nothing about this is assertable by
+   * reading text: `uppercase` is a CSS transform, and the element is the only
+   * mechanism.
+   *
+   * The sibling card lands the other way on the same authority — the designer
+   * shouts "MIM8" — which is why this is worth pinning rather than reading as a
+   * general rule about product names.
+   */
+  it("keeps Inno8 and FVIIIa out of the band's uppercase transform", async () => {
+    const user = userEvent.setup();
+    await open(user);
+    const band = within(card()).getByRole("heading", { name: INNO8.title });
+
+    for (const term of ["Inno8", "FVIIIa"]) {
+      expect(within(band).getByText(term)).toHaveClass("normal-case");
+    }
+  });
+
+  /**
+   * Two bullets, both of which the artboard strips an "Inno8" off — the call
+   * `NXT007` records one card earlier, and on the same authority.
+   *
+   * A prefix assertion rather than two literals, for that card's reason: what
+   * would actually go wrong is someone "restoring" the source's wording, and this
+   * fails on that without also failing on a copy edit inside the sentence.
+   */
+  it("renders both bullets with the agent prefix the band already states dropped", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    expect(INNO8.body).toHaveLength(2);
+    for (const bullet of INNO8.body) {
+      const text = typeof bullet === "string" ? bullet : bullet.text;
+      expect(text.startsWith("Inno8")).toBe(false);
+      expect(within(card()).getByText(text)).toBeInTheDocument();
+    }
+    // The card names the agent exactly once, in its band.
+    expect(within(card()).getByRole("heading", { name: INNO8.title })).toBeInTheDocument();
+  });
+
+  /**
+   * The panel is a control, named the way every other expandable figure is — and
+   * named from the *source's* caption rather than the thirteen-word heading baked
+   * into the raster, which reaches the reader through `alt` instead.
+   */
+  it("offers the diagram as an expandable figure", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    expect(screen.getByRole("button", { name: `Expand ${FIGURE_TITLE}` })).toBeInTheDocument();
+    expect(INNO8.figures?.[0]).toBe(FIGURE_TITLE);
+  });
+
+  /**
+   * The enlargement is **bare** — the picture on the scrim, no band and no
+   * second ✕ — and still named, which is `Lightbox` labelling the dialog
+   * directly where there is no heading to name it from.
+   */
+  it("enlarges bare, but still named", async () => {
+    const user = userEvent.setup();
+    await open(user);
+    await user.click(screen.getByRole("button", { name: `Expand ${FIGURE_TITLE}` }));
+
+    expect(within(figure()).queryByRole("heading")).not.toBeInTheDocument();
+    expect(figure()).toHaveAccessibleName(FIGURE_TITLE);
+  });
+
+  /**
+   * The nesting guarantee, on this card as on the other three: enlarging the
+   * panel and dismissing it leaves the reader on the card, not back on the
+   * chapter.
+   */
+  it("closes the enlarged diagram without closing the card behind it", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    await user.click(screen.getByRole("button", { name: `Expand ${FIGURE_TITLE}` }));
+    expect(figure()).toHaveAttribute("open");
+    expect(card()).toHaveAttribute("open");
+
+    fireEvent.keyDown(figure(), { key: "Escape" });
+
+    expect(figure()).not.toHaveAttribute("open");
+    expect(card()).toHaveAttribute("open");
+    expect(disclosure("Close Inno8")).toBeInTheDocument();
+  });
+
+  /** The four cards cannot be up at once; see the Denecimig block's own pin. */
+  it("closes the NXT007 card when Inno8 is opened", async () => {
+    const user = userEvent.setup();
+    render(<FviiiaMimetics />);
+
+    await user.click(disclosure("Expand NXT007"));
+    expect(dialogs()[2]).toHaveAttribute("open");
+
+    await user.click(disclosure("Expand Inno8"));
+    expect(dialogs()[2]).not.toHaveAttribute("open");
     expect(card()).toHaveAttribute("open");
   });
 });

@@ -3,6 +3,7 @@ import { PopupButton } from "mlg-components";
 
 import denecimigUrl from "../../assets/images/denecimig.webp";
 import emicizumabUrl from "../../assets/images/emicizumab.webp";
+import inno8Url from "../../assets/images/inno8.webp";
 import nxt007Url from "../../assets/images/nxt007.webp";
 import BulletList from "../../components/BulletList";
 import ExpandableFigure from "../../components/ExpandableFigure";
@@ -31,6 +32,7 @@ const DENECIMIG = topicById("denecimig-overview")!;
 const DENECIMIG_MOA = topicById("denecimig-moa")!;
 const NXT007_OVERVIEW = topicById("nxt007-overview")!;
 const NXT007_STRUCTURE = topicById("nxt007-structure")!;
+const INNO8_OVERVIEW = topicById("inno8-overview")!;
 
 /**
  * The Emicizumab card's heading — a **literal**, because the band draws
@@ -147,6 +149,69 @@ const NXT007_FIGURE_ALT =
 const NXT007_FIGURE = { width: 1088, height: 696 } as const;
 
 /**
+ * The Inno8 panel's heading — a **literal**, and the only one of the four this
+ * chapter has to state itself.
+ *
+ * The other three read a topic's `title`, because each of those cards splits a
+ * figure topic off its overview to hold the prose drawn under the diagram. This
+ * card draws no such prose (see `inno8-overview`), so there is no second topic
+ * and the caption lives in `inno8-overview.figures[0]`. Stated rather than read
+ * from that array for the reason `rebalancing-agents` records: a figure's title
+ * is stated in this codebase, not derived — `figures` is the source's index of
+ * what a topic illustrates, and indexing into it to title a control couples the
+ * card to an array position.
+ *
+ * **The source's caption, not the one painted in the raster.** The asset carries
+ * "Inno8: Novel Factor VIII Mimetic Bispecific Binder Engineered for Oral
+ * Administration" in its own pixels — thirteen words, which as "Expand …" is a
+ * control name nobody wants read to them. The painted line is reached through
+ * `alt` instead, exactly as on the other two baked-heading panels.
+ */
+const INNO8_FIGURE_TITLE = "Inno8 Mechanism of Action";
+
+/**
+ * The Inno8 panel's description — and, like Denecimig's and NXT007's, it opens
+ * with the panel's own painted heading (CONTEXT.md §7.7). Here that matters more
+ * than on either of those: this heading is the one line of the card that says
+ * what Inno8 *is* mechanistically, and `INNO8_FIGURE_TITLE` above deliberately
+ * does not repeat it.
+ *
+ * **Three panels, described as three**, where the other two diagrams are one
+ * picture each. The drawing is a left-to-right sequence — the binder and what its
+ * two arms do, then the bridge it forms on the membrane, then the cleavage that
+ * releases FXa — and its annotations are the whole content: this is the card's
+ * only account of the mechanism, since the two bullets beside it cover the route
+ * of administration and the trial instead.
+ *
+ * The second annotation reads "Anti-FIXa VHH" against the FX arm, where the arm
+ * it labels is the anti-FX one. That is **as drawn**, and it is not repaired
+ * here: this description transcribes the picture, and a reader comparing the two
+ * should find them the same. Recorded in CONTEXT.md §7.5 as a source defect.
+ */
+const INNO8_FIGURE_ALT =
+  "Diagram titled “Inno8: Novel Factor VIII Mimetic Bispecific Binder Engineered for Oral " +
+  "Administration”, in three panels. At the left, Inno8 — two linked heavy-chain-only VHH " +
+  "domains — sits between factor IX and factor X with a double-headed arrow to each: one VHH " +
+  "binds the serum FIXa serine protease domain, the other binds the FX activation peptide so " +
+  "that FXa is released upon activation, and Inno8 itself is about five times smaller than an " +
+  "IgG antibody, with conjugated fatty acids that bind serum albumin to extend its half-life. " +
+  "In the centre, those two domains bridge FIXa and FX on a membrane surface. At the right, an " +
+  "arrow leads to FIXa cleaving FX: FXa is freed, and a crossed reverse arrow marks the released " +
+  "FX activation peptide (FX AP) as not rebinding.";
+
+/**
+ * The panel's drawn size, and its aspect ratio.
+ *
+ * Half of `inno8.webp`'s 5224 × 2012, per the rule `PopupFigure` states — and, as
+ * with the other two baked-heading assets, this file is not the 2× export that
+ * rule was written for: the panel is drawn at ~886px in the card, so it is nearer
+ * 6×. Half is still the right number to pass, because it is the widest this
+ * raster can be painted at 2× density; here neither cap binds and it is the
+ * card's own width that settles the picture.
+ */
+const INNO8_FIGURE = { width: 2612, height: 1006 } as const;
+
+/**
  * The corner panel's heading — a **literal**, because no topic holds it any
  * more: it was `emerging-mimetics`' title, and splitting that topic per agent
  * left the group name with nothing to hang on. Stated here the way every other
@@ -209,16 +274,14 @@ const [HEADING_LEAD, HEADING_TAIL] = splitTitle(CHAPTER.title);
  * `DisclosureBand`'s reason: two open at once is not a state worth being able to
  * represent, and opening one closes the others by construction.
  *
- * **Three of the four open a card.** The designer has drawn one behind each of
- * these four (Pop ups 10–13) and has delivered three; Inno8's asset is here but
- * its layout is not, and is not guessed at. That one button therefore still
- * toggles and nothing more, which is the content-less case `DisclosureBand`
- * already models.
+ * **All four open a card** as of Pop up 13 — the designer drew one behind each
+ * of these (Pop ups 10–13) and all four are now built.
  *
- * `aria-haspopup` follows the same split, for the reason it is conditional
- * there: announcing a dialog that will not appear is worse than announcing
- * nothing. Hence `hasCard` on `Disclosure` below rather than the attribute
- * hard-coded on all four — one `false` left is still one promise not made.
+ * `hasCard` on `Disclosure` below is therefore `true` at every call site today,
+ * and it stays a prop rather than being inlined: what it gates is
+ * `aria-haspopup`, and that attribute is a promise a disclosure can only make
+ * once its card exists. This chapter spent three commits with one of the four
+ * unable to keep it. A fifth agent arrives the same way.
  */
 type OpenId = "emicizumab" | "denecimig" | "nxt007" | "inno8";
 
@@ -239,7 +302,7 @@ export default function FviiiaMimetics() {
    * One URL per card, not two: each card's in-card thumbnail and its
    * enlargement are the same file, so both uses are warm on the same call.
    */
-  usePreloadImages([emicizumabUrl, denecimigUrl, nxt007Url]);
+  usePreloadImages([emicizumabUrl, denecimigUrl, nxt007Url, inno8Url]);
 
   return (
     <section aria-labelledby="chapter-heading" className="flex flex-1 flex-col">
@@ -343,6 +406,7 @@ export default function FviiiaMimetics() {
             label={INNO8}
             open={openId === "inno8"}
             onToggle={toggle("inno8")}
+            hasCard
           />
         </EmergingPanel>
       </div>
@@ -382,6 +446,15 @@ export default function FviiiaMimetics() {
         onClose={() => setOpenId(null)}
       >
         {openId === "nxt007" && <Nxt007Card />}
+      </Popup>
+
+      {/* The longest band in the chapter, and the one that keeps a cased term the
+          designer did not shout: `preserveCase` carries "Inno8" through the
+          band's `uppercase` because the artboard draws it that way — see the
+          term list, where this is the one entry that is transcription rather than
+          repair. */}
+      <Popup open={openId === "inno8"} title={INNO8_OVERVIEW.title} onClose={() => setOpenId(null)}>
+        {openId === "inno8" && <Inno8Card />}
       </Popup>
     </section>
   );
@@ -652,6 +725,80 @@ function Nxt007Card() {
           {NXT007_STRUCTURE.body[0] as string}
         </p>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Pop up 13: the two drawn bullets across the top, the MOA panel beneath them.
+ *
+ * **A column, where the other three cards are two columns.** Not a simplification
+ * of them — it is what the artboard draws, and the reason it can: this panel is
+ * 2.6:1 where the other three diagrams are between 1:1 and 1.6:1, so a 448px
+ * half-card would paint it 172px tall and its annotations unreadable. Given the
+ * full 886 the picture gets its drawn height and the two bullets, which are one
+ * line each at this measure, cost the 64px above it.
+ *
+ * That also means **no `lg:` breakpoint anywhere here.** The other three cards
+ * carry one because their drawn split has to become a stack on a phone; this one
+ * is already stacked, and it narrows to 375px by doing exactly what it does at
+ * 1440.
+ *
+ * 20px bullets — the established pop-up body value, shared with the other three
+ * cards. `leading-[1.6]` with them, where the artboard sets these two lines
+ * tighter at ~1.2: this card has the vertical room to spare (two bullets against
+ * NXT007's three plus a nested pair), and two cards a reader opens in sequence
+ * should be one size. The same call `DenecimigCard` records for the size itself.
+ */
+function Inno8Card() {
+  return (
+    <div className="flex flex-col gap-3 py-6">
+      <BulletList items={INNO8_OVERVIEW.body} className="text-[20px] leading-[1.6]" />
+
+      {/*
+        **No white panel in markup**, as on the Denecimig and NXT007 cards:
+        `inno8.webp` carries the white surface, the crimson heading and the
+        rounded corners in its own pixels, with real alpha outside the radius, so
+        a `bg-white rounded-3xl p-4` wrapper would paint a second, larger corner
+        around the first. Measured, the artboard's panel is 1086 × 417 against the
+        file's 5224 × 2012 — the same ratio to within a pixel, so it IS the
+        asset's own box.
+
+        `rounded-3xl` is therefore about the BUTTON, not the picture — it clips
+        the hover wash to the corner the asset already has. The baked radius is
+        145px of 5224, which at the drawn 886 comes to ~25px; this step is 24.
+
+        No width class at all, where the other two cards set `w-112` on a column:
+        this panel is the card's full measure, which is what `ExpandableFigure`'s
+        own `w-full` already gives it.
+      */}
+      <ExpandableFigure
+        thumbSrc={inno8Url}
+        title={INNO8_FIGURE_TITLE}
+        // **Bare**, for the reasons all three other cards record: the enlargement
+        // is the same picture the reader just clicked, and this raster paints its
+        // own heading, so a crimson band over it would state a title twice.
+        variant="bare"
+        className="rounded-3xl"
+      >
+        {/*
+          The picture alone on the scrim, with no caption — and here that is not
+          a choice between two sentences the way it is on the other cards, since
+          this one draws no prose under its panel at all.
+
+          `reserve` is 5rem, the same subtraction the other two bare enlargements
+          make: none of `Popup`'s chrome is here, and what is is `Lightbox`'s own
+          `p-4 sm:p-8` — 64px at `sm` — rounded up so the ✕ keeps its corner
+          clearance. At 2.6:1 it is the width that binds anyway.
+        */}
+        <PopupFigure
+          src={inno8Url}
+          alt={INNO8_FIGURE_ALT}
+          width={INNO8_FIGURE.width}
+          height={INNO8_FIGURE.height}
+          reserve="5rem"
+        />
+      </ExpandableFigure>
     </div>
   );
 }

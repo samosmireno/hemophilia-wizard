@@ -760,7 +760,7 @@ narrower than the 1165px content column, so it stays centred within it.
 | 17  | The mechanisms prose card glosses only `AT`, but its own copy introduces `TFPI` and `APC` as well; the figure card behind it glosses only `TFPI`. Shipped with all three on the prose card (§11), which also normalises the export's "AT=" to the "TFPI = " spacing it uses one card later. The alternative reading is that the two cards are meant as one and the gloss is split deliberately — needs the designer.                                                                                   | §11                   |
 | 18  | `NavArrowButton` and `Button` are not `forwardRef`, so `ref` does not typecheck on either (`PopupButton` is). That is what blocks focus management when the mechanisms card swaps steps — there is no handle to focus. Package change, tracked in `.scratch/mlg-reskin/`.                                                                                                                                                                                                                              | §11, mlg-reskin       |
 | 19  | `--background-image-emerging-panel`'s mint (`#c6eee5`) is dE .0136 from `color-mix(teal-25 30%, teal-0)` — between the ~.002 every derived token clears and the .042 that made item 7 literal, so the file's own rule does not decide it. Shipped literal; ask the designer whether it is meant to be a teal step.                                                                                                                                                                                     | §11                   |
-| 20  | `fviiia-mimetics` ships four `+` disclosures that open nothing. The designer HAS drawn all four cards (Pop ups 10–13, prose + a vector MOA diagram each); they need exporting as SVG and building. Not a design question — outstanding work.                                                                                                                                                                                                                                                           | §11                   |
+| 20  | ~~`fviiia-mimetics` ships four `+` disclosures that open nothing.~~ **Closed.** All four cards (Pop ups 10–13) are built; the diagrams arrived as rasters rather than the SVG exports this item asked for, which is why three of them carry their heading in their own pixels. Kept as a row rather than deleted, so the numbering below it does not shift.                                                                                                                                            | §11                   |
 
 ---
 
@@ -1336,19 +1336,31 @@ reads as a corner; on a 320px phone it eats a third of the width. An invented co
 value like the small-screen gutters and `prophylaxis-guidance`'s stepped heading — the
 canvas is 1440 and nobody has drawn a phone.
 
-#### Four disclosures, none of which open yet
+#### Four disclosures, and the four cards behind them
 
 Not `DisclosureBand`: that is a 3-tuple by type, drawn as an arch over three centred
 columns, and this is four in two groups of two with the caption to the **left** of the
 button (`rebalancing-agents`' arrangement, not the stacked one). The chapter composes
 `PopupButton` directly.
 
-The designer has drawn a card behind each — Pop ups **10** (Emicizumab), **11**
-(Denecimig), **12** (NXT007), **13** (Inno8), each 1152 × 660, prose plus a
-**vector-drawn** MOA diagram. None of those assets exists yet, so this pass is the page:
-the buttons toggle to ✕, mutually exclusive, and `aria-haspopup` is withheld for the
-reason `DisclosureBand` makes it conditional. That is the state `rebalancing-agents`
-shipped in before `05d7efb`. Open item 20.
+The designer drew a card behind each — Pop ups **10** (Emicizumab), **11** (Denecimig),
+**12** (NXT007), **13** (Inno8), each 1152 × 660, prose plus an MOA diagram — and all
+four are built. They are **not** the vector exports item 20 asked for: the diagrams
+arrived as rasters, and three of the four bake their crimson heading, white surface and
+corner radius into the pixels with real alpha. That is why those three take no white
+panel in markup and are described through `alt`; only the emicizumab diagram, whose
+asset is a bare picture on white, gets a `bg-white rounded-3xl` wrapper.
+
+Three cards split their columns left/right. **Pop up 13 is a single column** — bullets
+across the top, panel beneath — because its panel is 2.6:1 where the other three
+diagrams run between 1:1 and 1.6:1: given half the card it would be painted 172px tall
+and its annotations unreadable. It is therefore the one card with no `lg:` breakpoint,
+since it is already stacked at 1440 and narrows by doing the same thing.
+
+The band on that card keeps **`Inno8` cased** while shouting the rest, which is what the
+artboard draws — the fifth entry in `preserveCase`'s term list and the only one there for
+transcription rather than to save an abbreviation's meaning. The sibling card lands the
+other way on the same authority: the designer shouts `MIM8`.
 
 A stray 355 × 19 vector at (997, 214) on the artboard renders as nothing in the export
 and overshoots the text block's right edge; treated as leftover and not reproduced.

@@ -487,9 +487,26 @@ inter-individual variability and uncertain duration.
     bullets ("NXT007: Next-generation BsAb…", "NXT007 ongoing clinical trials:"). The band above
     already names the agent, and the artboard is the filing authority where it and `[PDF-V]`
     disagree — the same call recorded for the panel itself and for the denecimig card's opening
-    bullet. `inno8-overview` keeps its prefix, because that card is not drawn yet.
+    bullet. `inno8-overview` sheds its own two the same way; see below.
   - **Inno8** — novel **VHH-based, once-daily oral** FVIIIa-mimetic for HA; under evaluation in the
     nonrandomized open-label phase 1 **VOYAGER2** trial (NCT07220564).
+    `[BUILD]` **no figure topic is split off this overview**, unlike the other three agents': Pop up
+    13 draws its two bullets across the top and the panel beneath them, with no prose under the
+    picture, so there is nothing to move. The figure's caption stays in `figures` and the chapter
+    states its own title for the control.
+    `[BUILD]` **the card drops the "Inno8" prefix** the source puts in front of both bullets
+    ("Inno8: Novel VHH-based…", "Inno8 is currently under evaluation…") — the same call as NXT007's
+    and on the same authority, since the band above reads "Inno8: Oral FVIIIa Mimetic for HA".
+    Figure: "Inno8 Mechanism of Action" (image), shown as a thumbnail that enlarges bare over the
+    card; **its heading is baked into the raster** as denecimig's and NXT007's are, and here the
+    painted line ("Inno8: Novel Factor VIII Mimetic Bispecific Binder Engineered for Oral
+    Administration") is both longer than the caption and the card's only statement of the
+    mechanism — so `alt` carries the whole three-panel drawing.
+    `[SOURCE DEFECT]` the figure labels **both** VHH arms "Anti-FIXa VHH", where the right-hand one
+    annotates the anti-FX arm ("binds to FX activation peptide → FXa release upon activation"). It
+    is image-borne, so it cannot be corrected without re-drawing the asset; the `alt` transcribes it
+    as drawn rather than silently repairing it, so a reader comparing the two finds them the same.
+    Worth raising with the designer.
 
 ### 7.6 Non-factor replacement therapies (NFTs) & hemostatic rebalancing agents
 
