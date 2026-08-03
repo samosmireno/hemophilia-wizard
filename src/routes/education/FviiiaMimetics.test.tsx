@@ -8,9 +8,11 @@ import FviiiaMimetics from "./FviiiaMimetics";
 const CHAPTER = topicById("fviiia-mimetics")!;
 const EMICIZUMAB = topicById("emicizumab-overview")!;
 const DENECIMIG = topicById("denecimig-overview")!;
-/** The figure topics split out of the two overviews; see the data module. */
+const NXT007 = topicById("nxt007-overview")!;
+/** The figure topics split out of the three overviews; see the data module. */
 const MOA = topicById("emicizumab-moa")!;
 const DENECIMIG_MOA = topicById("denecimig-moa")!;
+const NXT007_STRUCTURE = topicById("nxt007-structure")!;
 
 /** The panel's group heading — a chapter literal, no topic holds it. */
 const PANEL_HEADING = "Investigational FVIIIa-mimetic therapies in early-stage development:";
@@ -24,6 +26,7 @@ describe("fviiia-mimetics chapter", () => {
     expect(topicById("fviiia-mimetics")).toBeDefined();
     expect(topicById("emicizumab-overview")).toBeDefined();
     expect(topicById("denecimig-overview")).toBeDefined();
+    expect(topicById("nxt007-overview")).toBeDefined();
   });
 
   it("renders the chapter title in title case, not the uppercase it displays", () => {
@@ -110,44 +113,53 @@ describe("fviiia-mimetics chapter", () => {
   });
 
   /**
-   * One open at a time. Asserted on the two that still open no card, so the ✕
-   * is the whole of their open state: `DisclosureBand` makes the same guarantee,
-   * and the two agent cards read this state rather than replacing it.
+   * One open at a time — the disclosures' own state, which the cards read rather
+   * than replace.
+   *
+   * Scoped to the panel, and that is not decoration: NXT007's card is the one
+   * whose band draws exactly the panel's caption for it, so with the card up the
+   * document holds two buttons named "Close NXT007" — this disclosure and the
+   * card's ✕. `within(panel)` is what keeps this asserting on the disclosure.
    */
   it("shows at most one disclosure open at a time", async () => {
     const user = userEvent.setup();
     render(<FviiiaMimetics />);
+    const panel = screen.getByRole("region", { name: PANEL_HEADING });
 
-    await user.click(screen.getByRole("button", { name: "Expand NXT007" }));
-    expect(screen.getByRole("button", { name: "Close NXT007" })).toBeInTheDocument();
+    await user.click(within(panel).getByRole("button", { name: "Expand NXT007" }));
+    expect(within(panel).getByRole("button", { name: "Close NXT007" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Expand Inno8" }));
-    expect(screen.getByRole("button", { name: "Close Inno8" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Expand NXT007" })).toBeInTheDocument();
+    await user.click(within(panel).getByRole("button", { name: "Expand Inno8" }));
+    expect(within(panel).getByRole("button", { name: "Close Inno8" })).toBeInTheDocument();
+    expect(within(panel).getByRole("button", { name: "Expand NXT007" })).toBeInTheDocument();
 
     // Clicking the open one closes it, leaving all four shut.
-    await user.click(screen.getByRole("button", { name: "Close Inno8" }));
+    await user.click(within(panel).getByRole("button", { name: "Close Inno8" }));
     expect(screen.queryByRole("button", { name: /^Close / })).not.toBeInTheDocument();
   });
 
   /**
-   * `aria-haspopup` is a promise, and two of the four still cannot keep it —
+   * `aria-haspopup` is a promise, and one of the four still cannot keep it —
    * announcing a dialog that never appears is worse than announcing nothing,
    * which is the reason `DisclosureBand` makes the attribute conditional too.
    *
    * Both halves in one test because the pair is the fact: the attribute tracks
-   * which disclosures actually have a card, so a third card wired in without its
-   * `hasCard` fails here rather than shipping silent.
+   * which disclosures actually have a card, so the fourth card wired in without
+   * its `hasCard` fails here rather than shipping silent.
    */
   it("promises a dialog only where one opens", () => {
     render(<FviiiaMimetics />);
 
-    for (const name of [`Expand ${EMICIZUMAB.title}`, `Expand ${DENECIMIG.title}`]) {
+    for (const name of [
+      `Expand ${EMICIZUMAB.title}`,
+      `Expand ${DENECIMIG.title}`,
+      "Expand NXT007",
+    ]) {
       expect(screen.getByRole("button", { name })).toHaveAttribute("aria-haspopup", "dialog");
     }
-    for (const name of ["Expand NXT007", "Expand Inno8"]) {
-      expect(screen.getByRole("button", { name })).not.toHaveAttribute("aria-haspopup");
-    }
+    expect(screen.getByRole("button", { name: "Expand Inno8" })).not.toHaveAttribute(
+      "aria-haspopup",
+    );
   });
 });
 
@@ -335,7 +347,8 @@ describe("the Emicizumab card", () => {
  * The indices shift by one against the Emicizumab block above, and that shift is
  * the structure rather than an accident: the Emicizumab card mounts first and
  * stands empty while this one is open, so the dialogs are [emicizumab (empty),
- * denecimig, denecimig's figure] in DOM order.
+ * denecimig, denecimig's figure, nxt007 (empty)] in DOM order. The empty mounts
+ * that come *after* cannot move these two.
  */
 describe("the Denecimig card", () => {
   const dialogs = () => screen.getAllByRole("dialog", { hidden: true });
@@ -491,6 +504,173 @@ describe("the Denecimig card", () => {
 
     await user.click(screen.getByRole("button", { name: `Expand ${DENECIMIG.title}` }));
     expect(dialogs()[0]).not.toHaveAttribute("open");
+    expect(card()).toHaveAttribute("open");
+  });
+});
+
+/**
+ * Pop up 12 — the third delivered card, and the chapter's third `Popup`.
+ *
+ * Two empty mounts precede it while it is open, so the dialogs are [emicizumab
+ * (empty), denecimig (empty), nxt007, nxt007's figure] in DOM order.
+ */
+describe("the NXT007 card", () => {
+  const dialogs = () => screen.getAllByRole("dialog", { hidden: true });
+  const card = () => dialogs()[2];
+  const figure = () => dialogs()[3];
+
+  /**
+   * The panel's disclosure, not the card's ✕ — the two share the name "Close
+   * NXT007" once the card is up, which is the collision the chapter's own
+   * one-open-at-a-time test scopes around.
+   */
+  const disclosure = (name: string) =>
+    within(screen.getByRole("region", { name: PANEL_HEADING })).getByRole("button", { name });
+
+  const open = async (user: ReturnType<typeof userEvent.setup>) => {
+    render(<FviiiaMimetics />);
+    await user.click(disclosure("Expand NXT007"));
+  };
+
+  it("resolves the structure topic split out of the overview", () => {
+    expect(topicById("nxt007-structure")).toBeDefined();
+  });
+
+  /**
+   * **The one card whose band and whose `+` say the same thing.** The other two
+   * agents shed a regulatory status on the way into the dialog; this one has none
+   * to shed, so the caption-vs-title split collapses — and that collapse is worth
+   * pinning, because it is what makes "Close NXT007" ambiguous in the document
+   * and would otherwise be rediscovered as a flaky query.
+   */
+  it("opens a dialog named exactly as the panel's caption for it", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    expect(card()).toHaveAccessibleName("NXT007");
+    expect(NXT007.title).toBe("NXT007");
+    expect(screen.getAllByRole("button", { name: "Close NXT007" })).toHaveLength(2);
+  });
+
+  /**
+   * Three bullets at the left, and the split's one sentence under the diagram.
+   *
+   * The counts are the fact under test, as on both other cards: each column
+   * renders a `body` whole, so a bullet reappearing on the wrong side means the
+   * split leaked rather than that a card grew a line. The sentence is pinned to
+   * the figure column rather than merely absent from the left — the point of the
+   * split is that it moved, not that it was dropped.
+   */
+  it("renders three bullets at the left and the structure sentence under the panel", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    expect(NXT007.body).toHaveLength(3);
+    expect(NXT007_STRUCTURE.body).toHaveLength(1);
+
+    for (const bullet of NXT007.body) {
+      const text = typeof bullet === "string" ? bullet : bullet.text;
+      expect(within(card()).getByText(text)).toBeInTheDocument();
+    }
+    expect(within(card()).getByText(NXT007_STRUCTURE.body[0] as string)).toBeInTheDocument();
+  });
+
+  /**
+   * The two trials are a real sub-list, not two indented siblings — a screen
+   * reader announces the nesting's depth and count, which is why `NestedBullet`
+   * exists rather than a CSS class on positions 3–4.
+   */
+  it("nests the two trials under the bullet that introduces them", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    const trials = NXT007.body[2];
+    expect(typeof trials).not.toBe("string");
+    if (typeof trials === "string") return;
+
+    const item = within(card()).getByText(trials.text).closest("li")!;
+    for (const child of trials.children) {
+      expect(within(item).getByText(child)).toBeInTheDocument();
+    }
+    expect(trials.children).toHaveLength(2);
+  });
+
+  /**
+   * The artboard drops the "NXT007" the source puts in front of two of these
+   * bullets, because the band already says it. Pinned as a prefix assertion
+   * rather than as two literals: what would actually go wrong is someone
+   * "restoring" the source's wording, and this fails on that without also
+   * failing on a copy edit inside the sentence.
+   */
+  it("drops the agent prefix the card's band already states", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    for (const bullet of NXT007.body) {
+      const text = typeof bullet === "string" ? bullet : bullet.text;
+      expect(text.startsWith("NXT007")).toBe(false);
+    }
+    // The card names the agent exactly once, in its band.
+    expect(within(card()).getByRole("heading", { name: "NXT007" })).toBeInTheDocument();
+  });
+
+  /** The panel is a control, named the way every other expandable figure is. */
+  it("offers the structure diagram as an expandable figure", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    expect(
+      screen.getByRole("button", { name: `Expand ${NXT007_STRUCTURE.title}` }),
+    ).toBeInTheDocument();
+  });
+
+  /**
+   * The enlargement is **bare and carries no caption** — the picture alone, as on
+   * the Denecimig card and for its two reasons: the raster paints its own
+   * heading, so a band would state the title twice, and the sentence beneath is
+   * already in the card behind the scrim.
+   */
+  it("enlarges bare, with no caption repeated from the card", async () => {
+    const user = userEvent.setup();
+    await open(user);
+    await user.click(screen.getByRole("button", { name: `Expand ${NXT007_STRUCTURE.title}` }));
+
+    expect(within(figure()).queryByRole("heading")).not.toBeInTheDocument();
+    expect(figure()).toHaveAccessibleName(NXT007_STRUCTURE.title);
+    expect(
+      within(figure()).queryByText(NXT007_STRUCTURE.body[0] as string),
+    ).not.toBeInTheDocument();
+  });
+
+  /**
+   * The nesting guarantee, on this card as on the other two: enlarging the panel
+   * and dismissing it leaves the reader on the card, not back on the chapter.
+   */
+  it("closes the enlarged diagram without closing the card behind it", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    await user.click(screen.getByRole("button", { name: `Expand ${NXT007_STRUCTURE.title}` }));
+    expect(figure()).toHaveAttribute("open");
+    expect(card()).toHaveAttribute("open");
+
+    fireEvent.keyDown(figure(), { key: "Escape" });
+
+    expect(figure()).not.toHaveAttribute("open");
+    expect(card()).toHaveAttribute("open");
+    expect(disclosure("Close NXT007")).toBeInTheDocument();
+  });
+
+  /** The three cards cannot be up at once; see the Denecimig block's own pin. */
+  it("closes the Denecimig card when NXT007 is opened", async () => {
+    const user = userEvent.setup();
+    render(<FviiiaMimetics />);
+
+    await user.click(screen.getByRole("button", { name: `Expand ${DENECIMIG.title}` }));
+    expect(dialogs()[1]).toHaveAttribute("open");
+
+    await user.click(disclosure("Expand NXT007"));
+    expect(dialogs()[1]).not.toHaveAttribute("open");
     expect(card()).toHaveAttribute("open");
   });
 });

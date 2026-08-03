@@ -9,7 +9,9 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-03 (the Denecimig artboard split `denecimig-moa` off the overview and
+- **Last reviewed:** 2026-08-03 (the NXT007 artboard split `nxt007-structure` off the overview and
+  dropped the agent prefix from its bullets — see §7.5); previously 2026-08-03 (the Denecimig
+  artboard split `denecimig-moa` off the overview and
   authored a class-level MOA bullet §7.5 files under emicizumab — see §7.5); previously 2026-07-31
   (the `fviiia-mimetics` artboard refiled §7.6's two investigational
   agents onto §7.5 — see both sections); previously 2026-07-27 (full re-scan of `[PDF-V]` as a diagram, not just text — traced
@@ -473,6 +475,19 @@ inter-individual variability and uncertain duration.
     optimize chain pairing/cofactor activity). In vitro, NXT007-treated plasma achieved coagulation
     activity equivalent to **100 IU/dL FVIII** in a TF-triggered thrombin-generation assay. Trials:
     NXTAGE (jRCT2080224835), WP44714 (NCT05987449).
+    `[BUILD]` the "derived from emicizumab" sentence is modelled as its own topic
+    (`nxt007-structure`, titled with the figure caption below), because Pop up 12 draws it under the
+    diagram and the rest beside it — the same split as `emicizumab-overview`/`emicizumab-moa`. The
+    id does not end `-moa` because the figure is a **structure**, not a mechanism. The two trials
+    are modelled as a nested level under the bullet that introduces them, which is how both the
+    source and the card subordinate them. Figure: "NXT007 BsAb Structure" (image), shown as a
+    thumbnail that enlarges bare over the card; **its heading is baked into the raster**, as
+    denecimig's is, so the caption is image-borne text reachable only through `alt`.
+    `[BUILD]` **the card drops the "NXT007" prefix** the source puts in front of two of these
+    bullets ("NXT007: Next-generation BsAb…", "NXT007 ongoing clinical trials:"). The band above
+    already names the agent, and the artboard is the filing authority where it and `[PDF-V]`
+    disagree — the same call recorded for the panel itself and for the denecimig card's opening
+    bullet. `inno8-overview` keeps its prefix, because that card is not drawn yet.
   - **Inno8** — novel **VHH-based, once-daily oral** FVIIIa-mimetic for HA; under evaluation in the
     nonrandomized open-label phase 1 **VOYAGER2** trial (NCT07220564).
 

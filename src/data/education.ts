@@ -455,24 +455,76 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    *
    * The split is clean at the source: the six bullets were already four about
    * NXT007 followed by two about Inno8, and `figures` already named one diagram
-   * per agent. Nothing is rephrased — the leading "NXT007:" / "Inno8:" stay on
-   * the bullets that carry them, as the source writes them.
+   * per agent.
    *
    * `title` is each card's own heading, not the chapter's caption for it: the
    * panel labels the buttons "NXT007" and "Inno8" flat, where Pop up 13 heads
    * its card "Inno8: Oral FVIIIa Mimetic for HA". The same caption-vs-title
    * split `Disclosure` documents.
+   *
+   * ---
+   *
+   * This first topic is Pop up 12's **left column**: the three bullets the card
+   * draws beside the structure diagram.
+   *
+   * **A fourth bullet moved to `nxt007-structure` below**, which is the
+   * `emicizumab-overview` and `denecimig-overview` split a third time and for the
+   * same reason: the card draws the "derived from emicizumab" sentence UNDER the
+   * diagram rather than beside it, and prose that renders somewhere else gets
+   * moved rather than sliced off this array by an index.
+   *
+   * **Both "NXT007" prefixes are dropped**, which is the one place these topics
+   * are rephrased and is the artboard's own doing: the card's crimson band
+   * already says NXT007, so it draws "Next-generation BsAb engineered by…" and
+   * "Ongoing clinical trials:" flat rather than naming the agent three times on
+   * one card. `inno8-overview` keeps its prefix, because nobody has drawn that
+   * card yet and the source is still the only authority on it. (The artboard sets
+   * "Next- generation" — the same PDF soft-hyphen artifact this module's header
+   * says it strips, so it is one word here.)
+   *
+   * The two trials are a `NestedBullet` because the artboard subordinates them
+   * under a bullet ending in a colon — the same shape `denecimig-overview` gives
+   * the FRONTIER program, and the same reading of a source that already wrote
+   * them after a colon.
    */
   {
     id: "nxt007-overview",
     title: "NXT007",
     body: [
-      "NXT007: Next-generation BsAb engineered by modifying emicizumab to enhance hemostasis in HA",
-      "NXT007 is derived from emicizumab heavy-chain regions and incorporates two distinct light chains with charged-residue mutations designed to optimize antibody chain pairing and cofactor activity",
+      "Next-generation BsAb engineered by modifying emicizumab to enhance hemostasis in HA",
       "In vitro studies demonstrated that NXT007-treated plasma samples achieved coagulation activity equivalent to 100 IU/dL FVIII in a tissue factor–triggered thrombin generation assay",
-      "NXT007 ongoing clinical trials: NXTAGE study (jRCT2080224835); WP44714 study (NCT05987449)",
+      {
+        text: "Ongoing clinical trials:",
+        children: ["NXTAGE study (jRCT2080224835)", "WP44714 study (NCT05987449)"],
+      },
     ],
     figures: ["NXT007 BsAb Structure"],
+  },
+  /**
+   * The structure diagram in the NXT007 card, and the sentence drawn beneath it.
+   *
+   * `title` is `nxt007-overview.figures[0]` verbatim rather than a reference to
+   * it — a figure's title is *stated* in this codebase, not derived, for the
+   * reason `emicizumab-moa` records.
+   *
+   * **A structure, not an MOA**, which is why this id does not end `-moa` like
+   * the other two: the picture is what NXT007 is built out of (heavy chains,
+   * light chains, the charge mutations at their interfaces), not what it does.
+   *
+   * Like `denecimig-moa` and unlike `emicizumab-moa`, **this title is also
+   * painted in the asset** — `nxt007.webp` carries the crimson heading in its
+   * own pixels, so what this string does here is name the figure for the trigger
+   * and the enlargement's accessible name; the card does not draw it twice.
+   *
+   * `body` is one bullet because the card draws one sentence under the panel,
+   * moved off `nxt007-overview` rather than copied.
+   */
+  {
+    id: "nxt007-structure",
+    title: "NXT007 BsAb Structure",
+    body: [
+      "NXT007 is derived from emicizumab heavy-chain regions and incorporates two distinct light chains with charged-residue mutations designed to optimize antibody chain pairing and cofactor activity",
+    ],
   },
   {
     id: "inno8-overview",
