@@ -429,9 +429,17 @@ export default function FviiiaMimetics() {
         {openId === "emicizumab" && <EmicizumabCard />}
       </Popup>
 
+      {/* The one card in this chapter off `default`. It is the densest of the
+          four — four bullets and a nested three in the left column, beside a
+          panel and its own two sentences — and at `default` the left column is
+          the drawn 424, where those bullets wrap far past the artboard's line
+          count and the card scrolls on the design canvas itself. `wide` spends
+          the extra 336px entirely on that column (the panel is a fixed `w-112`),
+          which is the dimension the overflow is in. See docs/styling.md §13. */}
       <Popup
         open={openId === "denecimig"}
         title={DENECIMIG_CARD_TITLE}
+        width="wide"
         onClose={() => setOpenId(null)}
       >
         {openId === "denecimig" && <DenecimigCard />}
@@ -556,6 +564,10 @@ function EmicizumabCard() {
  * Pop up 11: the four drawn bullets at the left, the MOA panel and its two
  * sentences at the right.
  *
+ * **The chapter's one `wide` card** — see the `Popup` that mounts it. The extra
+ * width is all left column, so the arithmetic below is against a 1222px body
+ * rather than the 886 the other three cards get.
+ *
  * **`items-start`, where `EmicizumabCard` centres.** That card is a short bullet
  * stack against a near-square picture with no shared baseline; this one has two
  * columns of nearly equal height whose first lines the artboard aligns, so
@@ -580,18 +592,19 @@ function DenecimigCard() {
       {/*
         The right column: the panel, then the two sentences under it. `w-112` is
         the drawn ~450px, the same number `EmicizumabCard` lands on from a
-        different artboard — 540 of the 1065px content column there, 448 of
-        `Popup`'s 896 here, leaving the left column the 424 it is drawn at.
+        different artboard — 540 of the 1065px content column there, 448 here.
 
         **A fixed width with `shrink-0`, not `flex-1 basis-112`.** That pair is
         what `EmicizumabCard` writes, but it means "448 *plus a share of what is
-        left*" — and both columns growing splits the free space between them, so
-        the left one settles ~210px narrower than drawn and this card's four
-        bullets wrap to twice their height. It is invisible there only because
-        the figure carries a `max-w-112` that caps the overgrown column back
-        down; here the panel would happily fill it.
+        left*" — and this card is the chapter's `wide` one, so what is left is
+        336px more than the artboard has: a growing panel would take most of it
+        and paint `denecimig.webp` well past the size it was drawn at. Fixed, the
+        whole of the extra width lands in the left column, which is where the
+        four bullets that motivated `wide` actually are — 750px against the drawn
+        424. (`EmicizumabCard` gets away with the growing pair only because its
+        figure carries a `max-w-112` that caps the overgrown column back down.)
       */}
-      <div className="flex w-full flex-col gap-3 lg:w-112 lg:shrink-0">
+      <div className="flex w-full flex-col gap-3 lg:w-145 lg:shrink-0">
         {/*
           **No white panel in markup**, which is the one structural difference
           from `EmicizumabCard`: `denecimig.webp` carries the white surface, the

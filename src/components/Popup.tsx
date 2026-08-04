@@ -22,17 +22,18 @@ export type PopupWidth = "narrow" | "default" | "wide";
  * body which outgrows its card is a one-word change rather than a new literal.
  *
  * `default` is what every card shipped at before the scale existed and what all
- * but one still ship at. **It is load-bearing beyond this file**: the §7.6
- * hemostatic-mechanisms asset is stored at exactly this card's body width
- * (1024 − `border-5` − `px-16` = 886), so moving it goes stale in the direction
- * of a softened raster. See docs/styling.md §13.
+ * but three still ship at. **It reaches beyond this file**: the §7.6
+ * hemostatic-mechanisms asset is stored at the body width this step used to have
+ * (1024 − `border-5` − `px-16` = 886). The step is now 1140, so that body is
+ * 1002 and the raster upscales — styling open item 29, and the reason to move
+ * this number deliberately. See docs/styling.md §13.
  *
  * `narrow` and `wide` are measured and picked respectively, and the difference
  * is worth knowing: 869 is the narrowest of the three widths the designer drew
- * across the seven §6 drug sheets, so it is transcribed. 1360 is not drawn
- * anywhere — it is the widest card that still floats over the 1440 canvas rather
- * than taking it over (40px of page either side), chosen for the §5 comparison
- * table's nine columns, which at `default` get 113px each.
+ * across the seven §6 drug sheets, and 860 is that reading nudged. 1360 is not
+ * drawn anywhere — it is the widest card that still floats over the 1440 canvas
+ * rather than taking it over (40px of page either side), chosen for the §5
+ * comparison table's nine columns, which at `default` get 126px each.
  *
  * **`wide` alone is `96vw`, and that is the whole point of the number.** At
  * `92vw` the viewport term would bind first at 1440 (1324.8 < 1360) and the card
@@ -40,8 +41,8 @@ export type PopupWidth = "narrow" | "default" | "wide";
  * 1416.7px, so below that the percentage governs, as it does for the other two.
  */
 const CARD_WIDTH: Record<PopupWidth, string> = {
-  narrow: "w-[min(869px,92vw)]",
-  default: "w-[min(1024px,92vw)]",
+  narrow: "w-[min(860px,92vw)]",
+  default: "w-[min(1140px,92vw)]",
   wide: "w-[min(1360px,96vw)]",
 };
 

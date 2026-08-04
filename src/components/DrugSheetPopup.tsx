@@ -77,7 +77,7 @@ export default function DrugSheetPopup({
  */
 function DrugSheetBody({ sheet }: { sheet: DrugSheet }) {
   return (
-    <div className="py-6">
+    <div className="py-1">
       <Section heading={sheet.classHeading ?? "Class/Target"} items={sheet.classTarget} first />
       <Section heading="Indication" items={sheet.indication} />
       <Section heading="Dosage and Administration" items={sheet.dosing} />
@@ -141,12 +141,12 @@ function Section({
       <h3
         className={cn(
           "text-[20px] leading-[1.6] font-bold text-brand-crimson-50",
-          !first && "mt-3",
+          !first && "mt-1",
         )}
       >
         {heading}:
       </h3>
-      <BulletList items={items} className="mt-2 text-[20px] leading-[1.6]" />
+      <BulletList items={items} className="text-[20px] leading-normal" />
     </>
   );
 }

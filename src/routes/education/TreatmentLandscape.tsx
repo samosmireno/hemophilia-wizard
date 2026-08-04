@@ -3,7 +3,7 @@ import { PopupButton } from "mlg-components";
 
 import bloodDropUrl from "../../assets/images/blood_drop.webp";
 import BulletList from "../../components/BulletList";
-import Popup from "../../components/Popup";
+import Popup, { type PopupWidth } from "../../components/Popup";
 import {
   type BenefitsChallenges,
   type Bullet,
@@ -54,6 +54,13 @@ interface Row {
   /** The card's second band line. See `Popup`'s own `subtitle`. */
   subtitle?: string;
   /**
+   * Which step of `Popup`'s width scale this row's card wears. Per-row rather
+   * than per-page because the three rows share one `Popup` — the width is a
+   * property of what is open, so it travels with the row like `title` does.
+   * Absent means `Popup`'s own `default`.
+   */
+  width?: PopupWidth;
+  /**
    * What the `+` opens. Optional because it genuinely is: the last row is a
    * §7.7 target whose artboard has not landed, and it keeps the inert toggle
    * `DisclosureBand` documents rather than opening an empty card.
@@ -97,6 +104,7 @@ const ROWS: readonly [Row, Row, Row] = [
     title: NFT.title,
     // No subtitle: unlike §7.4, the artboard gives this card's band one line.
     // The class needs no scope qualifier — the two lists are about NFTs whole.
+    width: "narrow",
     content: <BenefitsChallengesCard data={NFT.benefitsChallenges!} image={bloodDropUrl} />,
   },
   {
@@ -229,6 +237,7 @@ export default function TreatmentLandscape() {
         open={open?.content !== undefined}
         title={open?.title ?? open?.label ?? ""}
         subtitle={open?.subtitle}
+        width={open?.width}
         onClose={() => setOpenIndex(null)}
       >
         {open?.content}

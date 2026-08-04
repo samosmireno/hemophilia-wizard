@@ -349,7 +349,7 @@ function MechanismsCard({ onViewMechanism }: { onViewMechanism: () => void }) {
             {item}
           </p>
         ) : (
-          <section key={item.text} className="mt-8">
+          <section key={item.text} className="mt-6">
             <h3 className="text-h2 font-bold text-brand-crimson-50">{item.text}</h3>
             <BulletList items={item.children} className="mt-4 text-[20px] leading-[1.6]" />
           </section>

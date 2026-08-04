@@ -769,6 +769,7 @@ narrower than the 1165px content column, so it stays centred within it.
 | 26  | `/explore`'s class labels fit a letter-spacing of **0.036em** across all four strings — between `tracking-wide` (0.025em) and `tracking-wider` (0.05em), and on no step at all. Shipped `tracking-wide`, which renders the longest label 353 → 344px. One tracking rule across every display heading in the app beat an exact bespoke value on a centred label that shifts no layout, but it is the designer's to confirm. Same shape as item 9 — a size/spacing question the file answers off the scale.                                                                                                                                                                                         | §17                   |
 | 27  | ~~`Popup` is too narrow for the §5 comparison table's nine columns.~~ **Half closed.** `Popup` now has a three-step `width` scale and the table's card takes `wide` (1360px), so the columns get ~136px instead of ~113 and the card is no longer the binding constraint. What remains is not a card question: 1360px is not a phone, so the grid still wants a horizontal scroll region inside the card, which is issue 09's own acceptance criterion and is decided against a body that exists. **1360 is a picked number, not a drawn one** — no artboard shows this card, so if the designer draws the table the width is theirs to overrule.                                                 | §13, §17, ADR 0007    |
 | 28  | ~~The pop-up title caps at 36px against the drawn 45.47, and the band's padding is `py-5` against the drawn 12.~~ **Closed 2026-08-04, in code.** Both shipped wrong from the component's first commit and neither was visible, because they cancelled: 20 + (2 × 37) + 20 = 114px of band against the drawn 118. Corrected to the drawn values in both cases; three titles gain a line, none reaches three, the two-line band lands at 117, and `PopupFigure`'s `reserve` — documented against a 117px band it was not getting — becomes correct. The band also gained a `min-h-[65px]` floor, which is the ✕'s own height rather than a design value. Verified on twenty cards at 1440 and 390. | §13                   |
+| 29  | **Two of the three `Popup` widths moved on 2026-08-04 and neither new number is drawn**: `narrow` 869 → 860 and `default` 1024 → **1140**. The consequence is the one the default was documented as protecting — `hemostatic_mechanisms_diagram.webp` is stored at 1772px for a drawn 886, which was exactly the old body, and the body is now 1002. The asset did not move with it, so the §7.6 figure is painted ~13% past its stored width. Either re-export it at 2004px or return the default to 1024; the widths are the designer's, and the raster follows them.                                                                                                                           | §13, §7.6             |
 
 ---
 
@@ -1545,28 +1546,32 @@ than a `className` the caller composes, because the widths are a closed set the
 design supports and not a dimension each card invents — a body that fits no step
 is a conversation with the designer, not a fourth literal.
 
-| Step      |   px | Body¹ | Source                                        |
-| --------- | ---: | ----: | --------------------------------------------- |
-| `narrow`  |  869 |   731 | the narrowest of the seven §6 drug sheets     |
-| `default` | 1024 |   886 | everything, and the §7.6 asset's stored width |
-| `wide`    | 1360 |  1222 | chosen for the §5 table's nine columns        |
+| Step      |   px | Body¹ | Source                                 |
+| --------- | ---: | ----: | -------------------------------------- |
+| `narrow`  |  860 |   722 | 869 off the §6 drug sheets, then − 9   |
+| `default` | 1140 |  1002 | everything that has not asked for more |
+| `wide`    | 1360 |  1222 | chosen for the §5 table's nine columns |
 
 ¹ the step less `border-5` and `px-16`: `w − 10 − 128`.
 
-**`default` is the one that cannot move.** `hemostatic_mechanisms_diagram.webp`
-is stored at 1772px for a drawn width of 886 — which is this step's body, exactly
-— because that figure fills its card rather than being drawn to a size of its
-own (see the asset table below). Widen the default and the raster upscales;
-narrow it and the stored file is bigger than it needs to be. The number also has
-no artboard behind it: the drawn card is 1066 and the shipped one has been 1024
-since the §7.3 commit narrowed it.
+**Two of the three moved on 2026-08-04**, and what is below is written against
+where they landed rather than where they were derived. `narrow` was 869 and
+`default` 1024; both were adjusted in a spacing pass over the cards, and neither
+860 nor 1140 has an artboard behind it. That is open item 29, and it has one
+concrete consequence: `hemostatic_mechanisms_diagram.webp` is stored at 1772px
+for a drawn width of 886, which was the old default's body exactly, because that
+figure fills its card rather than being drawn to a size of its own (see the asset
+table below). At 1140 the body is 1002, so the raster now upscales. The default
+never had an artboard either — the drawn card is 1066 — but it did have that
+asset, and the asset did not follow it.
 
-**`narrow` is transcribed and `wide` is picked**, and the difference is the point
-of this paragraph. §16 records that the seven drug-sheet artboards draw their
-cards at 1136, 1064 and **869** — the designer sized each sheet to its own
-content, which is the closest thing in the file to a statement that a pop-up may
-be narrower than the default. 869 is that statement's low end. 1360 has no such
-backing: it is the widest card that still floats over the 1440 canvas rather than
+**`narrow` started transcribed and `wide` is picked**, and the difference is
+worth keeping. §16 records that the seven drug-sheet artboards draw their cards
+at 1136, 1064 and **869** — the designer sized each sheet to its own content,
+which is the closest thing in the file to a statement that a pop-up may be
+narrower than the default, and 869 was that statement's low end. 860 is that
+number nudged; the provenance is still the drug sheets. 1360 has no such backing
+at all: it is the widest card that still floats over the 1440 canvas rather than
 taking it over, at 40px of page either side.
 
 **`wide` is the only step at `96vw`, and that is the number doing the work.** At
@@ -1574,21 +1579,40 @@ taking it over, at 40px of page either side.
 the card would never once reach the width it is named for. The two terms cross at
 1416.7px; below that the percentage governs, as it does for the other two steps.
 
-**`narrow` has no caller.** It ships as the third step of a scale rather than in
-response to a card, which is the opposite of the posture this repo takes for
-features (`TreatmentOptionsTable`: "one caller, and a second is not coming"). The
-distinction is that a size scale is a vocabulary, not a feature: the cost of the
-unused step is one line in a lookup, and the cost of not having it is the next
-short card either sitting in 1024px of gradient or inventing its own width. The
-number is measured, so it is not a guess awaiting a designer either.
+**Three callers are off `default`: two take `wide` and one takes `narrow`.**
 
-**The one caller off `default` is `/explore`'s comparison-table card**, and it is
-set there ahead of the grid it is for — so the placeholder is measured in the box
-the table will actually land in rather than a box it will have to be re-fitted
-to. Nine columns get 136px at `wide` against 113 at `default`. That does not by
-itself make item 27 go away: 136px is a readable column and a phone still is not
-1360px wide, so the grid will want a horizontal scroll region inside the card
-regardless. What `wide` settles is that the card is not the binding constraint.
+`narrow`'s caller is §7.4's non-factor-therapies card on
+`/education/treatment-landscape` — the middle of that chapter's three
+"Click here:" rows, and the one whose two lists are shortest. Set by client
+direction 2026-08-04 rather than off an artboard: no drawing of this card exists
+at any width, so it is the same kind of call the drug sheets record, where the
+designer sized each card to its own content. It is also what the step was
+measured for and had been waiting on — 869 is the low end of that statement, and
+this is the first card short enough to want it.
+
+The chapter's three rows share **one** `Popup` (mutual exclusion is a fact about
+the group, not about any button), so the width travels on `Row` beside `title`
+and `subtitle` rather than being set at the `<Popup>` call. The other two rows
+are unaffected and stay at `default`.
+
+The two `wide` callers are the ones the extra 336px was picked for. The first is
+`/explore`'s comparison-table card. It is set there ahead of the grid it is for — so the placeholder is
+measured in the box the table will actually land in rather than a box it will
+have to be re-fitted to. Nine columns get 136px at `wide` against 113 at
+`default`. That does not by itself make item 27 go away: 136px is a readable
+column and a phone still is not 1360px wide, so the grid will want a horizontal
+scroll region inside the card regardless. What `wide` settles is that the card is
+not the binding constraint.
+
+The second is §7.5's Denecimig card (Pop up 11), and it is the first use of the
+step for a reason other than a table. That card is the densest of the chapter's
+four — four bullets with a nested three in the left column, beside a fixed 448px
+panel carrying its own two sentences — and at `default` the left column is the
+drawn ~424px, where the bullets wrap past the artboard's line count and the card
+engages `Popup`'s scroll region on the 1440 canvas itself. Because the panel is
+`w-112 shrink-0`, the whole of `wide`'s extra 336px lands in the prose column
+(424 → 750), which is the dimension the overflow is in. The panel is unaffected,
+so `denecimig.webp` is still painted at the size it was drawn at.
 
 ### The title
 

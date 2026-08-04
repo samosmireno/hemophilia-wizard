@@ -142,8 +142,8 @@ describe("Popup", () => {
     const card = () => dialog().firstElementChild!;
 
     it.each([
-      ["narrow", "w-[min(869px,92vw)]"],
-      ["default", "w-[min(1024px,92vw)]"],
+      ["narrow", "w-[min(860px,92vw)]"],
+      ["default", "w-[min(1140px,92vw)]"],
       ["wide", "w-[min(1360px,96vw)]"],
     ] as const)("draws the %s card", (width, expected) => {
       render(
@@ -156,10 +156,12 @@ describe("Popup", () => {
     });
 
     /**
-     * The step every card but the §5 table sits on, and the one the §7.6
-     * hemostatic-mechanisms asset is stored against: it is encoded at 1772px for
-     * a drawn 886, which is this width less the border and the body gutters. A
-     * default that moved would soften that raster with the whole suite green.
+     * The step every card sits on that has not asked for another, and the one
+     * the §7.6 hemostatic-mechanisms asset is stored against — it is encoded at
+     * 1772px for a drawn 886. That used to be exactly this width less the border
+     * and the body gutters; the step moved 1024 → 1140 on 2026-08-04, so the
+     * body is now 1002 and the asset is the one thing that did not follow. See
+     * styling open item 29.
      */
     it("is the default width when the caller says nothing", () => {
       render(
@@ -168,7 +170,7 @@ describe("Popup", () => {
         </Popup>,
       );
 
-      expect(card()).toHaveClass("w-[min(1024px,92vw)]");
+      expect(card()).toHaveClass("w-[min(1140px,92vw)]");
     });
 
     /**
