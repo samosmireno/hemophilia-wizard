@@ -133,25 +133,26 @@ export default function Explore() {
         `self-center` because the section is a flex column — the button is
         content-width and would otherwise stretch across the whole band.
 
-        **The clamps are what make `leading-5` safe**, and they are not optional —
-        `WizardIntro` records the trap: 24px type in a 20px line box overlaps
-        itself the moment the label wraps, which is why `Landing` refuses the
-        trick outright. The size only leaves its 1rem floor above ~960px viewport
-        width, and at every width where this label wraps it is set at 16px, i.e.
-        inside a 20px box. Verified at 375px, where it wraps to three lines.
-
-        All three clamps land on their maxima at 1440 — 1.667vw is 24px, 4.4vw
-        exceeds the 4rem cap, 1.25vw is 18px — so the artboard renders untouched
-        and nothing is restated for its own sake. The two padding clamps are
-        `WizardIntro`'s values verbatim, since both buttons are the package's own
+        The three values are the drawn ones — 24px type, 64/18px padding —
+        `WizardIntro`'s verbatim, since both buttons are the package's own
         `px-16 py-[18px]` at the canvas.
+
+        **`leading-5` is now unsafe and knowingly so.** All three were `clamp()`s
+        until 2026-08-04, and this comment used to record that the clamp was what
+        made the tight leading work: the size only left its 1rem floor above
+        ~960px, so at every width where the label wrapped it was 16px inside a
+        20px box. Fixed at 24px that no longer holds — the label is taller than
+        its own line box at every width, and at 375 it wraps to four lines with
+        the descenders sitting into the caps below. `Landing` refuses the trick
+        outright and uses `leading-tight`; that is the fix here too if the
+        cramping is not wanted. Styling open item 33.
 
         A control that opens a dialog, so it is a `<button>` by rights rather than
         by the `Button`-has-no-`href` compromise `Landing` and `WizardIntro` both
         accept.
       */}
       <Button
-        className="mt-6 self-center px-[clamp(2rem,4.4vw,4rem)] py-[clamp(0.75rem,1.25vw,1.125rem)] text-[clamp(1rem,1.667vw,1.5rem)] leading-5"
+        className="mt-6 self-center px-16 py-4.5 text-2xl leading-5"
         aria-haspopup="dialog"
         onClick={() => setTableOpen(true)}
       >

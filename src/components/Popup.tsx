@@ -10,8 +10,13 @@ import ModalLayer from "./ModalLayer";
  * Stated once because the two must agree: it is what keeps both lines centred
  * on the card *and* clear of the ✕, and a band whose lines disagree on their
  * inset reads as one of them being off-centre.
+ *
+ * `clamp(5.5rem,7vw,6.25rem)` until 2026-08-04, now the 100px maximum flat. The
+ * 88px floor it lost was the phone case: at 375 the card is 345px wide, so the
+ * band now spends 200 of it on padding and leaves 145 for the title. Styling
+ * open item 33.
  */
-const BAND_INSET = "px-[clamp(5.5rem,7vw,6.25rem)]";
+const BAND_INSET = "px-25";
 
 /** Which of the three card widths a caller wants. See `CARD_WIDTH`. */
 export type PopupWidth = "narrow" | "default" | "wide";
@@ -150,8 +155,10 @@ export default function Popup({
             one-line band (its own is two lines at 118px), so there is no drawn
             floor to transcribe; the honest one is the height of the thing the
             band has to contain. It is the same 65 `BAND_INSET` is built from.
-            Nothing at 1440 reaches it — a one-line band is 71px — and it binds
-            only where the clamp is at its 22px floor, i.e. on a phone.
+            Nothing at 1440 reaches it — a one-line band is 74px at `text-5xl`.
+            It used to bind only where the title's `clamp()` sat at its 22px
+            floor, i.e. on a phone; with the title fixed at 48px (2026-08-04) the
+            band is taller everywhere and the floor is inert. Open item 33.
 
             `flex flex-col justify-center` is what makes that floor invisible:
             the ✕ is centred by `top-1/2`, so without it the title would sit at
@@ -186,7 +193,7 @@ export default function Popup({
             aria-label={title}
             className={cn(
               BAND_INSET,
-              "text-center font-display text-[clamp(1.375rem,3.157vw,2.842rem)] leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase",
+              "text-center font-display text-5xl leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase",
             )}
           >
             {preserveCase(title)}

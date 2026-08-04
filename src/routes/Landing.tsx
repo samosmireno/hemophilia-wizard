@@ -15,12 +15,20 @@ import { nextOf } from "../data/sectionOrder";
  * Glossary, and ADR 0001 makes the app a linear walkthrough in which `/` is
  * step 0 — a card grid would be a second, competing navigation.
  *
- * Type sizes are the design's raw Tailwind steps (60 / 128 / 36 / 24px) rather
- * than the `text-5xl`…`text-xs` scale, which tops out at 48px. They are
- * wrapped in `clamp()` so the composition holds together on a phone: each one
- * reaches the design's exact value at ~1440px and stops there. The headline's
- * leading is the design's 96px expressed as the ratio 0.75 — a fixed leading is
- * meaningless once the size moves. See docs/styling.md §8.
+ * Type sizes are the design's own 60 / 128 / 36 / 24px, and all four land on a
+ * Tailwind step exactly: `text-6xl`, `text-9xl`, `text-4xl`, `text-2xl`.
+ *
+ * **These were `clamp()`s until 2026-08-04 and are now fixed sizes**, which is a
+ * deliberate call and a costly one on a phone. The clamps existed so the
+ * composition held together below the canvas — each reached the drawn value at
+ * ~1440 and floored on a phone (the headline at 2.5rem, i.e. 40px against 128).
+ * Without them the 128px headline sets "The Future Is Now:" in four lines at
+ * 375px, fills the viewport, pushes the CTA under the sidebar's bottom bar and
+ * makes the page scroll (853px against 800). Measured, not predicted. See
+ * styling open item 33.
+ *
+ * The headline's leading stays the ratio 0.75 rather than the drawn 96px, which
+ * costs nothing now the size is fixed and keeps the two in step if it moves again.
  */
 export default function Landing() {
   const navigate = useNavigate();
@@ -43,20 +51,16 @@ export default function Landing() {
       >
         {/* Outside the <h1>: the activity code identifies the CME activity, it
             is not part of its title. */}
-        <p className="font-display text-[clamp(1.5rem,4.2vw,3.75rem)] leading-none font-normal">
-          {ACTIVITY_CODE}
-        </p>
+        <p className="font-display text-6xl leading-none font-normal">{ACTIVITY_CODE}</p>
         {/* One heading, split into two typographic halves — so the accessible
             name is the whole title, exactly as `ACTIVITY_TITLE` spells it. */}
         <h1 id="landing-heading" className="mt-2 max-w-280 font-display">
-          <span className="block text-[clamp(2.5rem,9vw,8rem)] leading-[0.75] font-bold">
-            {ACTIVITY_TITLE_LEAD}
-          </span>{" "}
+          <span className="block text-9xl leading-[0.75] font-bold">{ACTIVITY_TITLE_LEAD}</span>{" "}
           {/* The space is load-bearing, not formatting: without a text node
               between the two block spans the heading's accessible name runs the
               halves together. CSS discards white space between block boxes, so
               it costs no line box. */}
-          <span className="mt-3 block text-[clamp(1.125rem,2.5vw,2.25rem)] leading-tight font-normal text-balance">
+          <span className="mt-3 block text-4xl leading-tight font-normal text-balance">
             {ACTIVITY_TITLE_TAIL}
           </span>
         </h1>
@@ -69,11 +73,14 @@ export default function Landing() {
 
           The component is a single fixed scale (`px-16 py-[18px] text-[26px]`),
           which is 370px wide at a 24px label — wider than a 375px phone once the
-          shell's padding is taken off. So the size is overridden with the same
-          `clamp()` treatment as the hero above it, tuned to land on the design's
-          24px type and 64/18px padding at ~1440px. A CTA that stayed fixed while
-          the headline over it scaled would drift out of proportion at every
-          width between.
+          shell's padding is taken off. The override is the design's own 24px
+          type and 64/18px padding, which is what the package ships less 2px of
+          label.
+
+          **This was a `clamp()` until 2026-08-04.** It floored at 1rem so the
+          button stayed inside a phone; fixed at 24px it wraps to three lines at
+          375 and, with the taller headline above it, lands under the sidebar's
+          bottom bar. Styling open item 33.
 
           `leading-tight` is restated rather than inherited: tailwind-merge
           treats a font-size utility as resetting line-height, so passing a
@@ -83,7 +90,7 @@ export default function Landing() {
           overlaps itself the moment it wraps.
         */}
         <Button
-          className="mt-12 px-[clamp(2rem,4.4vw,4rem)] py-[clamp(0.75rem,1.25vw,1.125rem)] text-[clamp(1rem,1.7vw,1.5rem)] leading-tight lg:mt-20"
+          className="mt-12 px-16 py-4.5 text-2xl leading-tight lg:mt-20"
           onClick={() => void navigate(next)}
         >
           LET’S GET STARTED

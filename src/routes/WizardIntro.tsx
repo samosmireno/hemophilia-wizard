@@ -56,9 +56,11 @@ export default function WizardIntro() {
           which is the old `h1` step's own ratio one size up). Raw rather than a scale
           step under docs/styling.md §8's precedent: the scale tops out at 52px
           and this card is set well above it, the same call `Landing` makes for
-          its hero. `clamp()` for the same reason as there — 5vw reaches the
-          design's 72px at exactly 1440 and stops, so the card holds together on
-          a phone instead of taking the whole screen.
+          its hero. 72px is `text-7xl` exactly.
+
+          **This was a `clamp()` until 2026-08-04**, floored at 2.5rem so the
+          card held together below the canvas instead of taking the whole screen.
+          Fixed at 72px it no longer does; styling open item 33.
 
           `max-w-3xl` (768px) is what reproduces the artboard's line breaks —
           "EXPLORE NOVEL / PROPHYLACTIC THERAPY / OPTIONS FOR YOUR PATIENT" —
@@ -73,7 +75,7 @@ export default function WizardIntro() {
         */}
         <h1
           id="wizard-intro-heading"
-          className="max-w-3xl font-display text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.05] font-bold text-brand-crimson-50 uppercase"
+          className="max-w-3xl font-display text-7xl leading-[1.05] font-bold text-brand-crimson-50 uppercase"
         >
           {WIZARD_ENTRY_PROMPT}
         </h1>
@@ -88,20 +90,28 @@ export default function WizardIntro() {
           class, as everywhere else — which also means the accessible name is now
           the sentence case it was written in.
 
-          Unlike `Landing`, the type and padding are the package's own defaults:
-          the artboard's button measures 26px type in a 549 × 56px pill, and
-          `Button` ships `text-[26px] px-16 py-[18px]`, which is 545 × 56 here.
-          So the `clamp()`s below only bend the phone case and land on the
-          component's own values at 1440 — the artboard renders untouched and
-          nothing is restated for its own sake.
+          Unlike `Landing`, the padding is the package's own default: the
+          artboard's button measures 26px type in a 549 × 56px pill, and `Button`
+          ships `text-[26px] px-16 py-[18px]`, which was 545 × 56 here. The type
+          is now `text-2xl` (24px), rounded onto the scale on 2026-08-04, so the
+          label is 2px under both the drawing and the package.
+          The values below are the component's own, so the artboard renders
+          untouched and nothing is restated for its own sake. They were `clamp()`s
+          until 2026-08-04, which bent only the phone case.
 
           `leading-5` is the exception, and it is the design's: 26px type in a
           20px line box is what makes the pill 56px rather than the 68px the
           component's `leading-tight` gives. `Landing` deliberately does NOT do
-          this, because there a wrapped label would overlap itself — the reason
-          it is safe here is the clamp. The size only leaves its 1rem floor above
-          ~889px viewport width, and at every width where the label wraps it is
-          set at 16px, i.e. inside a 20px box. Passing it is also mandatory
+          this, because there a wrapped label would overlap itself.
+
+          **What made it safe here was the clamp, and the clamp is gone.** The
+          size used to leave its 1rem floor only above ~889px, so wherever the
+          label wrapped it was 16px inside a 20px box. Fixed at 26px the label is
+          taller than its line box at every width and wraps to four lines at 375.
+          `leading-tight`, as `Landing` uses, is the fix if that is not wanted —
+          at the cost of the drawn 56px pill. Styling open item 33.
+
+          Passing it is also mandatory
           rather than optional: tailwind-merge treats a `text-*` class as
           resetting line-height, so the size alone would drop the component's
           leading and the label would inherit whatever is around it.
@@ -115,7 +125,7 @@ export default function WizardIntro() {
           `.scratch/mlg-reskin/issues/06-package-debts.md` debt 5).
         */}
         <Button
-          className="mt-8 px-[clamp(2rem,4.4vw,4rem)] py-[clamp(0.75rem,1.25vw,1.125rem)] text-[clamp(1rem,1.8vw,1.625rem)] leading-5 uppercase"
+          className="mt-8 px-16 py-4.5 text-2xl leading-5 uppercase"
           onClick={() => void navigate(next)}
         >
           {WIZARD_INPUT_TITLE}
