@@ -96,8 +96,29 @@ export default function ProphylaxisGuidance() {
           `text-2xl`, which is 26px at weight 600 where this is 400.
           `rebalancing-agents` sets its bullets at the same 26px for the same
           reason.
+
+          **One step down below `lg` (2026-08-04).** This chapter and
+          `rebalancing-agents` are the two whose body copy has anywhere to go:
+          §11 pins the other three at 16px because that is a legibility floor,
+          and these two transcribe their body at 24, so each has exactly one
+          step to give. 20 is that step, not a collapse onto the other chapters'
+          value — the divergence open item 9 is holding stays where it was.
+
+          The argument here is **proportion**, not fit. The `<h1>` above already
+          drops 48 → 30 below `lg` (§2), so a body left at 24 renders 0.8 × the
+          heading on a phone where the artboard draws it 0.5 ×; at 20 it is
+          back to 0.67. Nothing overflows either way — this is a comfort call of
+          the grade §2 distinguishes from the `<h1>`'s, which is a correctness
+          one — and the chapter fits one screen at 375 × 667 under both readings
+          (~460px of ink against 557px of box), so the step buys hierarchy
+          rather than room.
+
+          `leading-tight` is stated once and covers both steps: a Tailwind v4
+          `leading-*` sets `--tw-leading` and every `text-<size>` resolves its
+          line box through that property, so the ramp reads it rather than
+          replacing it (§8). 25px at 20 and 30px at 24, both the drawn 1.25.
         */}
-        <BulletList items={BODY} className="mt-8 text-2xl leading-tight" />
+        <BulletList items={BODY} className="mt-8 text-xl leading-tight lg:text-2xl" />
       </section>
     </>
   );

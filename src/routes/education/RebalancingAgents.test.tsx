@@ -13,6 +13,9 @@ import RebalancingAgents from "./RebalancingAgents";
 /** The caption beside the `+`, which is also its accessible name. */
 const CAPTION = "Mechanisms of hemostatic rebalancing agents within the coagulation cascade";
 
+/** The line under the three reserved boxes. */
+const BOXES_CAPTION = "Click on the boxes to learn more about hemostatic rebalancing agents";
+
 /** The first card's heading — §7.6's block title, which now lives on its prose. */
 const PROSE_TITLE = "Hemostatic Rebalancing Agents in Treatment of HA/HB";
 
@@ -161,6 +164,79 @@ describe("rebalancing-agents chapter", () => {
     expect(screen.queryAllByRole("button")).toHaveLength(1);
   });
 
+  /**
+   * The 2026-08-04 responsive pass ramped the **gap** and left the boxes alone.
+   * `lg:gap-x-35.25` put the drawn 141px gap into the column that had just lost
+   * 175px to the gutter step, so the row turned on 202px too wide and the boxes
+   * shrank to 157 × 192 — 30% under drawn, and portrait where the artboard draws
+   * landscape.
+   *
+   * Both halves are pinned, because either alone reopens it: the `lg` gap must
+   * stay at the derived 40 (3 × 224 + 2 × 40 = 752, the `lg` column exactly, so
+   * the row turns on where the boxes fit it at full size), and the box must keep
+   * its drawn `h-48`/`max-w-56` at every width. A `max-w-*` on the box would let
+   * a future gap change resume shrinking it silently, which is why the size is
+   * asserted here rather than inferred from the row fitting.
+   *
+   * jsdom computes no layout, so a class string is the only thing here that can
+   * fail; the pixel arithmetic behind these values is unverified (open item 39).
+   */
+  it("ramps the box row's gap rather than the boxes, which stay drawn-size at every width", () => {
+    const { container } = render(<RebalancingAgents />);
+    const boxes = [...container.querySelectorAll("div.border-4")];
+
+    expect(boxes).toHaveLength(REBALANCING_AGENTS.length);
+    for (const box of boxes) {
+      expect(box).toHaveClass("h-48", "max-w-56", "shrink-0", "lg:shrink");
+    }
+
+    expect(boxes[0].parentElement).toHaveClass(
+      "flex-col",
+      "lg:flex-row",
+      "lg:gap-x-10",
+      "xl:gap-x-35.25",
+    );
+  });
+
+  /**
+   * Every transcribed size on the chapter steps down one below `lg`, page and
+   * card alike — asserted in one test because the sizes are one decision (§11's
+   * ramp table) rather than six.
+   *
+   * **This is one of the two chapters whose body copy ramps**, with
+   * `prophylaxis-guidance`. §11 pins the other three at 16px because that is a
+   * legibility floor with nowhere down to go; these two transcribe their body at
+   * 24 off the same measurement (open item 9), so each has exactly one step to
+   * give. The card's lead lands on the same 20px the page bullets do — the card
+   * body is 303px at 375 against the page's own 311px column, so it may not set
+   * larger type than the page that opened it.
+   */
+  it("steps every transcribed size down one below lg, page and card alike", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<RebalancingAgents />);
+
+    expect(container.querySelector("section > ul")).toHaveClass("text-xl", "lg:text-2xl");
+    expect(screen.getByText(BOXES_CAPTION)).toHaveClass("text-xl", "lg:text-2xl");
+    expect(screen.getByText(CAPTION)).toHaveClass("text-xl", "lg:text-2xl");
+
+    const card = within(await openProseCard(user));
+    const [lead] = MECHANISMS.body;
+    expect(card.getByText(lead as string)).toHaveClass("text-xl", "lg:text-2xl");
+
+    for (const bullet of MECHANISMS.body) {
+      if (typeof bullet === "string") continue;
+
+      expect(card.getByRole("heading", { level: 3, name: bullet.text })).toHaveClass(
+        "text-2xl",
+        "lg:text-3xl",
+      );
+      expect(card.getByText(bullet.children[0], { selector: "li" }).parentElement).toHaveClass(
+        "text-base",
+        "lg:text-xl",
+      );
+    }
+  });
+
   // The `+` opens a card now, so it advertises one. This is what has to stay in
   // step with the target actually having content behind it.
   it("advertises a dialog on the trigger that opens one", () => {
@@ -252,6 +328,34 @@ describe("rebalancing-agents chapter", () => {
     const card = within(await openProseCard(user));
 
     expect(card.getByRole("button", { name: "View mechanism" })).toBeInTheDocument();
+  });
+
+  /**
+   * The CTA ramps its inset and its type, which it did not until 2026-08-04: the
+   * package ships `px-16` around `text-[26px]`, computing ~358px against a card
+   * body of 303px at 375. It never overflowed — `max-w-full` and `break-words`
+   * are the component's — so nothing failed; the label just wrapped into the
+   * 175px left inside a 303px box.
+   *
+   * The `px-*` steps are the ones `Landing`'s hero CTA already puts on this same
+   * component, reused rather than reinvented. `lg:text-2xl` is asserted because
+   * it is the one value in these passes that moves the **canvas** — it finishes
+   * §2's 26 → 24 migration on the last 26 this chapter had — and `py-2.5` is
+   * what holds the drawn 49px height across that step.
+   */
+  it("ramps the CTA's inset and type so it fits the card body it lives in", async () => {
+    const user = userEvent.setup();
+    render(<RebalancingAgents />);
+    const card = within(await openProseCard(user));
+
+    expect(card.getByRole("button", { name: "View mechanism" })).toHaveClass(
+      "px-8",
+      "sm:px-12",
+      "lg:px-16",
+      "text-xl",
+      "lg:text-2xl",
+      "py-2.5",
+    );
   });
 
   /**

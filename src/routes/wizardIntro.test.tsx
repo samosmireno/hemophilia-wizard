@@ -48,6 +48,71 @@ describe("wizard intro card", () => {
   });
 
   /**
+   * The 2026-08-04 responsive pass: the heading takes a three-step ramp instead
+   * of the fixed 72px the clamp removal left it at.
+   *
+   * All three steps are pinned, because each answers a different question and
+   * any one of them alone would let the others drift. `text-4xl` at base is set
+   * by the unbreakable word — "PROPHYLACTIC" is ~397px of Barlow Condensed
+   * uppercase at 72px, against a 311px column at 375 and a 256px one at 320 —
+   * and `lg:text-7xl` is the drawn size arriving one breakpoint earlier than
+   * `Landing`'s does, which the 729px drawn line inside a 752px column is what
+   * permits (§8).
+   *
+   * The line height is asserted on every step for the reason it is written on
+   * every step: one would do, so a step that lost it would still render 1.05
+   * from the others' `--tw-leading` and nothing would look wrong until someone
+   * edited the one that still carried it.
+   *
+   * jsdom computes no layout, so a class string is the only thing here that can
+   * fail; the ink widths above are arithmetic (open item 41).
+   */
+  it("ramps the heading in three steps, restating its line height on each", () => {
+    renderIntro();
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveClass(
+      "text-4xl/[1.05]",
+      "sm:text-5xl/[1.05]",
+      "lg:text-7xl/[1.05]",
+      "max-w-3xl",
+    );
+  });
+
+  /**
+   * The CTA's inset, type and line box all ramp — the last of the regressions
+   * open item 33 recorded when every `clamp()` in the app was replaced by its
+   * own maximum.
+   *
+   * The line box is the half worth pinning hardest. `leading-5` is the design's
+   * 20px box around 24px type, which is what makes the drawn pill 56px rather
+   * than 68, and it is safe **only** where the label does not wrap; below `lg`
+   * this 29-character label does, so those steps take `/tight` instead. A ramp
+   * that carried `leading-5` down with it would put overlapping caps on a phone,
+   * which is the exact bug this closes and one that has shipped twice.
+   *
+   * The inset steps are `Landing`'s, reused rather than invented — 128px of
+   * `px-16` around ~257px of 16px label is a 321px pill in a 311px column.
+   *
+   * jsdom computes no layout, so a class string is the only thing here that can
+   * fail; the label widths are estimates (open item 41).
+   */
+  it("ramps the CTA's inset and type, and keeps the drawn 20px line box at lg alone", () => {
+    renderIntro();
+
+    expect(screen.getByRole("button", { name: /input patient characteristics/i })).toHaveClass(
+      "px-8",
+      "py-3",
+      "text-base/tight",
+      "sm:px-12",
+      "sm:py-3.5",
+      "sm:text-xl/tight",
+      "lg:px-16",
+      "lg:py-4.5",
+      "lg:text-2xl/5",
+    );
+  });
+
+  /**
    * The CTA is `nextOf("/wizard-intro")`, not the literal `/wizard`: this is the
    * assertion that the button and the sidebar's Next arrow read one spine. It is
    * written against `nextOf` for that reason — hard-coding `/wizard` here would

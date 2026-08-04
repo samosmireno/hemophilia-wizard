@@ -227,7 +227,14 @@ export default function RebalancingAgents() {
       */}
       <BulletList
         items={AGENTS.body}
-        className="mt-8 text-2xl"
+        // One step down below `lg`, the ramp §11 records for every chapter.
+        // **This chapter and `prophylaxis-guidance` are the two where body copy
+        // has anywhere down to go**: §11's table pins the other three at 16px
+        // because that is a legibility floor, and these two transcribe their
+        // body at 24 off the same measurement (open item 9). 20 is a step, not a
+        // collapse onto the other chapters' value — it leaves the divergence
+        // item 9 is holding open exactly where it was.
+        className="mt-8 text-xl lg:text-2xl"
         // `font-bold` for every child, tone for the class it belongs to: the
         // weight is the same on all three, so it is stated once here rather
         // than folded into both entries of MECHANISM_TONE.
@@ -253,11 +260,42 @@ export default function RebalancingAgents() {
           it needs the designer to say what a box opens, which §7.7 does not.
           Unaffected by the `+` below now opening: these boxes are not that
           target.
+
+          **The gap ramps, and the boxes never do (2026-08-04).** `lg:gap-x-35.25`
+          used to put the drawn gap into a column that had just lost 175px to
+          the gutter step (§12), so the pixel that turned the row on was the
+          pixel that made it too wide: 3 × 224 + 2 × 141 = 954 against a 752px
+          column, and the boxes shrank to **157 × 192** — 30% under the drawn
+          width, and portrait where the artboard draws landscape.
+
+          The fix is a middle step in the gap alone. **40 is derived**: it is the
+          largest gap that lets three drawn-width boxes fill the `lg` column
+          exactly (3 × 224 + 2 × 40 = 752). So the row turns on precisely where
+          the boxes fit it at full size, and the drawn 141 returns at `xl`, where
+          the drawn 962 group does. The box is 224 × 192 at every width the row
+          exists at, and at every width it does not.
+
+          Below `lg` it stacks, at the same size. That is three 192px boxes and
+          two 32px gaps — 640px of empty bordered rectangle on a phone, between
+          the prose and a caption that says "click on the boxes" — and it is the
+          accepted cost of not reserving the wrong size, which is
+          `treatment-landscape`'s own rule for the same object. It is bounded by
+          open item 16: these boxes are placeholders for assets §7.7 has not
+          named, and the answer to that question is the answer to this one.
         */}
-        <div className={cn(GROUP, "flex flex-col items-center gap-8 lg:flex-row lg:gap-x-35.25")}>
+        <div
+          className={cn(
+            GROUP,
+            "flex flex-col items-center gap-8 lg:flex-row lg:gap-x-10 xl:gap-x-35.25",
+          )}
+        >
           {REBALANCING_AGENTS.map((agent) => (
             <div
               key={agent.name}
+              // `shrink-0` in the stack keeps the height off the main axis;
+              // `lg:shrink` in the row is what brings a `w-full` basis down to
+              // the track, and at `lg` it lands on exactly 224 — the gap above
+              // is chosen so that `max-w-56` never has to clamp it.
               className="h-48 w-full max-w-56 shrink-0 border-4 border-black lg:shrink"
             />
           ))}
@@ -268,7 +306,7 @@ export default function RebalancingAgents() {
           1082px of ink against the group's 963, so it overhangs both sides on
           the artboard, and the two share a centre line.
         */}
-        <p className="mt-4 text-center text-2xl font-bold text-popup-caption uppercase">
+        <p className="mt-4 text-center text-xl font-bold text-popup-caption uppercase lg:text-2xl">
           {BOXES_CAPTION}
         </p>
 
@@ -280,10 +318,23 @@ export default function RebalancingAgents() {
 
           `flex-wrap` rather than an `lg:` switch: the only thing that has to
           give below the canvas is the button dropping under the caption, and
-          the row does that on its own.
+          the row does that on its own. It does not, in the event — at 375 the
+          caption shrinks to 311 − 24 − 65 = 222px and the two still share the
+          line, which is well clear of its 150px min-content ("rebalancing" at
+          20px bold). The wrap is the guard, not the shipped behaviour.
+
+          `mt-20` does not ramp. It is one of §11's eight vertical gaps, which
+          are deliberately left unramped pending one one-screen rule across all
+          four chapters (open item 10) rather than answered per page.
         */}
         <div className={cn(GROUP, "mt-20 flex flex-wrap items-start gap-x-6 gap-y-4")}>
-          <p className="max-w-135 text-2xl font-bold text-popup-caption">{MECHANISMS_LABEL}</p>
+          {/* One step down below `lg`, which lands this on the same
+              `text-xl lg:text-2xl` the other three chapters' disclosure
+              captions take — so all four now agree on caption size as well as
+              on colour (`--color-popup-caption`, open item 15). */}
+          <p className="max-w-135 text-xl font-bold text-popup-caption lg:text-2xl">
+            {MECHANISMS_LABEL}
+          </p>
 
           {/*
             **Controlled**, where this was uncontrolled while it opened nothing.
@@ -342,19 +393,35 @@ export default function RebalancingAgents() {
  * `text-2xl` step is 26px at weight 600, where this is 400) and so is the second
  * — it is `BenefitsChallengesCard`'s own pop-up body value, reused because it is
  * the same fact. The headings land on `text-3xl` exactly.
+ *
+ * **All three step down below `lg`, and the bullets' step is derived rather than
+ * picked** — the derivation `BenefitsChallengesCard` records, which lands on the
+ * same value here because it is the same card. `Popup` is `min(1140px, 92vw)`
+ * inside a `border-5` with `px-4 sm:px-8 lg:px-16`, so at 375 the body is
+ * 345 − 10 − 32 = **303px**, eight pixels narrower than the page's own 311px
+ * column. A card cannot set larger body type than the page that opened it in a
+ * narrower measure, so the bullets land on `text-base` and the lead lands on
+ * exactly the 20px the page bullets ramp to — not a step below them, and not a
+ * step above.
  */
 function MechanismsCard({ onViewMechanism }: { onViewMechanism: () => void }) {
   return (
     <div className="py-6">
       {MECHANISMS.body.map((item) =>
         typeof item === "string" ? (
-          <p key={item} className="text-2xl leading-tight text-black">
+          <p key={item} className="text-xl leading-tight text-black lg:text-2xl">
             {item}
           </p>
         ) : (
           <section key={item.text} className="mt-6">
-            <h3 className="text-3xl font-bold text-brand-crimson-50">{item.text}</h3>
-            <BulletList items={item.children} className="mt-4 text-xl leading-[1.6]" />
+            <h3 className="text-2xl font-bold text-brand-crimson-50 lg:text-3xl">{item.text}</h3>
+            {/*
+              One `leading-[1.6]` covers both steps: a Tailwind v4 `leading-*`
+              sets `--tw-leading`, and every `text-<size>` resolves its
+              line-height through that property, so the ramp reads it rather
+              than replacing it. See `SeverityTable`'s manifestation lists.
+            */}
+            <BulletList items={item.children} className="mt-4 text-base leading-[1.6] lg:text-xl" />
           </section>
         ),
       )}
@@ -362,16 +429,51 @@ function MechanismsCard({ onViewMechanism }: { onViewMechanism: () => void }) {
       <CardFooter note={MECHANISM_ABBREVIATIONS}>
         {/*
           The package CTA, whose doc invites the override: "`cn` is
-          tailwind-merge, so your classes win." `py-2` against its own
-          `py-[18px]` is the drawn height — ~49px on the export against the
-          package default's ~68 — and the width needs no override, the two
-          agreeing to within about 5px at this label length.
+          tailwind-merge, so your classes win."
+
+          **It was the one thing on this chapter that did not fit its own card.**
+          The package ships `px-16` (128px of inset) around `text-[26px]`, which
+          computes ~358px wide — against a card body of 345 − 10 − 32 = **303px**
+          at 375. It never overflowed, because the component carries `max-w-full`
+          and `break-words`, but it survived by wrapping "VIEW MECHANISM" into
+          the 175px left over inside a 303px box. A CTA that is 92% inset is not
+          a CTA.
+
+          So it takes the ramp `Landing`'s hero CTA already puts on this same
+          component (§8), reusing its first three inset steps rather than
+          inventing a scale for one button. At 375 that is 64 + ~177 = **241px**,
+          which leaves 62px of the card body over.
+
+          | Viewport | Card body | Inset | Type |  Button |
+          | -------- | --------: | ----: | ---: | ------: |
+          | 375      |       303 |    64 |   20 |  ~241px |
+          | 640      |       515 |    96 |   20 |  ~273px |
+          | 1024     |       804 |   128 |   24 |  ~340px |
+          | 1440     |      1002 |   128 |   24 |  ~340px |
+
+          **`lg:text-2xl` moves the canvas, and it is the only thing in the
+          2026-08-04 responsive passes that does.** The package's `text-[26px]`
+          is the last 26 on this chapter — §11 records the prose moving 26 → 24
+          on the §2 migration the same day, and this survived only because it is
+          the package's default rather than a value this file chose. The cost is
+          the one item 31 names for `/explore`'s `<h1>`: the button renders ~340
+          against the drawn 353, where the package's own 358 was within 5. The
+          alternative — ramping the inset alone — leaves 26px type over 16px
+          bullets on a phone, which is the disproportion §2's ramp exists to fix.
+
+          `py-2.5` replaces `py-2`, and it is what holds the drawn height across
+          that type step: 10 + 10 + 24 × 1.25 = **50px** against the export's 49,
+          where `py-2` would have given 46. Below `lg` the same value gives 45px,
+          which clears the 44px the ✕'s own ramp lands on (§13).
 
           Sentence case with `uppercase` in CSS, as the component's doc requires
           ("casing is the caller's copy decision") and as every other shouted
           string in this codebase does, so the accessible name stays readable.
         */}
-        <Button className="py-2 uppercase" onClick={onViewMechanism}>
+        <Button
+          className="px-8 py-2.5 text-xl uppercase sm:px-12 lg:px-16 lg:text-2xl"
+          onClick={onViewMechanism}
+        >
           View mechanism
         </Button>
       </CardFooter>
@@ -386,6 +488,17 @@ function MechanismsCard({ onViewMechanism }: { onViewMechanism: () => void }) {
  * `Popup`'s `min(1024px, 92vw)` less its `border-5` and its `px-16` — and the
  * asset is stored at 2× that, per docs/styling.md §13. It arrived at 3469×1683,
  * ~3.9× drawn, and was re-encoded on the precedent of the other three.
+ *
+ * **The 2026-08-04 responsive pass deliberately left it alone.** `PopupFigure`
+ * caps at `min(886px, 100%)`, so on a 375px phone this paints at 303×147 — a
+ * fourteen-label coagulation cascade at a third of drawn size, which is the
+ * densest figure in the app and therefore the least legible there. That is a
+ * `PopupFigure` question, not a chapter one: the same cap governs
+ * `disease-background`'s two diagrams and all four of `fviiia-mimetics`', and
+ * the scroll-region answer the tables took (§11) would have to be taken for all
+ * seven at once or not at all. `MECHANISM_FIGURE_ALT` below is the route to what
+ * the diagram says either way, which is why it is as long as it is. Raised as
+ * open item 38 rather than answered here.
  */
 function MechanismFigureCard({ onBack }: { onBack: () => void }) {
   return (

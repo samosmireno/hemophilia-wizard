@@ -66,6 +66,32 @@ describe("prophylaxis-guidance chapter", () => {
   });
 
   /**
+   * The 2026-08-04 responsive pass, which is one line on this chapter: the
+   * bullets step 24 → 20 below `lg` and nothing else moves. There is no grid, no
+   * figure, no table and no card here — the `<h1>`'s own ramp is §2's app-wide
+   * rule and predates this pass — so the whole of it is asserted in one test.
+   *
+   * Both halves matter. The `lg:` value is the transcription (26px measured off
+   * the export, `text-2xl` since weight stopped travelling with a size), and the
+   * base value is the step that keeps the body under the stepped-down heading
+   * rather than level with it: at 24 against a 30px `<h1>` the phone renders a
+   * hierarchy the artboard draws at 2 ×.
+   *
+   * `leading-tight` is asserted alongside because it is stated once for both
+   * steps — a `text-*` that arrived without it would silently take Tailwind's
+   * own 1.4 at `text-xl`, which is not the drawn 1.25 at either size.
+   *
+   * jsdom computes no layout, so a class string is the only thing here that can
+   * fail; the arithmetic behind the step is unverified (open item 41).
+   */
+  it("steps the bullets down one below lg, keeping one line height across both", () => {
+    const { container } = render(<ProphylaxisGuidance />);
+
+    expect(container.querySelector("ul")).toHaveClass("text-xl", "lg:text-2xl", "leading-tight");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveClass("text-3xl", "lg:text-5xl");
+  });
+
+  /**
    * The wash is wallpaper: it carries nothing the two bullets do not, so it is
    * decorative and must stay out of the accessibility tree. `alt=""` gives the
    * `presentation` role, so a role query sees no image at all — this fails if

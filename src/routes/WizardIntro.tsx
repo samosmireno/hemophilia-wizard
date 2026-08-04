@@ -60,7 +60,35 @@ export default function WizardIntro() {
 
           **This was a `clamp()` until 2026-08-04**, floored at 2.5rem so the
           card held together below the canvas instead of taking the whole screen.
-          Fixed at 72px it no longer does; styling open item 33.
+          Fixed at 72px it did not, and it took a three-step ramp the same day —
+          36 / 48 / 72, all named steps, no `clamp()` and no arbitrary size.
+          `Landing`'s hero is the shape being followed (§8) and the reason is the
+          same: a hero is one composition that must survive a column it was never
+          drawn for, where a chapter heading is a single line failing on a single
+          word.
+
+          **The drawn size arrives at `lg`, not `xl` as `Landing`'s does**, and
+          the difference is the cap below rather than a different rule. The
+          drawn last line measures 729px against a 752px column at 1024, so the
+          composition the artboard draws fits the first breakpoint that has to
+          hold it — where `Landing`'s ~1000px headline does not, and waits for
+          `xl`'s 1008. 1024 is where the sidebar becomes a rail and the gutter
+          takes 175px away (§12); this page is one of the few that can pay it.
+
+          | Viewport | Column | Step | `PROPHYLACTIC` |
+          | -------- | -----: | ---: | -------------: |
+          | 320      |    256 |   36 |         ~199px |
+          | 375      |    311 |   36 |         ~199px |
+          | 640      |    544 |   48 |         ~265px |
+          | 1024     |    752 |   72 |         ~397px |
+          | 1440     |   1168 |   72 |         ~397px |
+
+          The word is what sets the base step, exactly as in §2's `<h1>` table:
+          Barlow Condensed uppercase cannot break, so a 12-letter word at 72px is
+          ~397px of unbreakable ink against a 311px phone column. `text-5xl` (48)
+          clears 375 but not the 256px column a 320px phone gives — ~265 against
+          256 — so the base step is `text-4xl`, one further down than the fit at
+          375 alone would ask for.
 
           `max-w-3xl` (768px) is what reproduces the artboard's line breaks —
           "EXPLORE NOVEL / PROPHYLACTIC THERAPY / OPTIONS FOR YOUR PATIENT" —
@@ -68,14 +96,25 @@ export default function WizardIntro() {
           729px and the first two words plus "PROPHYLACTIC" would run to ~830px,
           so any cap between those two wraps exactly where the designer did.
           768px is the midpoint of that window, i.e. the setting least likely to
-          flip a line if the font rounds differently than measured.
+          flip a line if the font rounds differently than measured. It is inert
+          below `xl`, where the content column is the narrower of the two — and
+          the column stays inside that window at `lg` (752), which is the other
+          half of why the drawn size can arrive there.
+
+          Line-height is restated on every step rather than left as one
+          `leading-[1.05]`. One would do — a Tailwind v4 `leading-*` sets
+          `--tw-leading` and each `text-<size>` reads it back — and §8 keeps the
+          restatement anyway on the hero this page is modelled on, for the reason
+          it gives there: three sizes reading one property at a distance is what
+          goes wrong silently when someone edits one line. The ratio rather than
+          the drawn 74.9px, because the size now moves twice.
 
           Uppercase is CSS, not copy — the accessible name stays the title case
           the blueprint writes, as on every education chapter.
         */}
         <h1
           id="wizard-intro-heading"
-          className="max-w-3xl font-display text-7xl leading-[1.05] font-bold text-brand-crimson-50 uppercase"
+          className="max-w-3xl font-display text-4xl/[1.05] font-bold text-brand-crimson-50 uppercase sm:text-5xl/[1.05] lg:text-7xl/[1.05]"
         >
           {WIZARD_ENTRY_PROMPT}
         </h1>
@@ -90,42 +129,69 @@ export default function WizardIntro() {
           class, as everywhere else — which also means the accessible name is now
           the sentence case it was written in.
 
-          Unlike `Landing`, the padding is the package's own default: the
-          artboard's button measures 26px type in a 549 × 56px pill, and `Button`
-          ships `text-[26px] px-16 py-[18px]`, which was 545 × 56 here. The type
-          is now `text-2xl` (24px), rounded onto the scale on 2026-08-04, so the
-          label is 2px under both the drawing and the package.
-          The values below are the component's own, so the artboard renders
-          untouched and nothing is restated for its own sake. They were `clamp()`s
-          until 2026-08-04, which bent only the phone case.
+          At the canvas the padding is the package's own default: the artboard's
+          button measures 26px type in a 549 × 56px pill, and `Button` ships
+          `text-[26px] px-16 py-[18px]`, which was 545 × 56 here. The type is now
+          `text-2xl` (24px), rounded onto the scale on 2026-08-04, so the label is
+          2px under both the drawing and the package.
 
-          `leading-5` is the exception, and it is the design's: 26px type in a
-          20px line box is what makes the pill 56px rather than the 68px the
-          component's `leading-tight` gives. `Landing` deliberately does NOT do
-          this, because there a wrapped label would overlap itself.
+          **Below `lg` those values were the app's last live regression from the
+          clamp removal, and this closes it** (open item 33, which named this
+          button and `/explore`'s as the two remaining). The label is 29
+          characters — "Input patient characteristics", against `Landing`'s 17 —
+          so at 24px it is ~385px of ink, and the package's `px-16` puts 128px of
+          inset around it. That is a 513px pill in a 311px column at 375, which
+          did not overflow (the component carries `max-w-full` and `break-words`)
+          but wrapped into the 183px left over: three lines of 24px type in a
+          20px line box, i.e. lines that overlap each other's caps. §14 records
+          the identical trap on the wizard's option pills.
 
-          **What made it safe here was the clamp, and the clamp is gone.** The
-          size used to leave its 1rem floor only above ~889px, so wherever the
-          label wrapped it was 16px inside a 20px box. Fixed at 26px the label is
-          taller than its line box at every width and wraps to four lines at 375.
-          `leading-tight`, as `Landing` uses, is the fix if that is not wanted —
-          at the cost of the drawn 56px pill. Styling open item 33.
+          So the inset and the type ramp together, on `Landing`'s own steps (§8)
+          rather than a scale invented for one button — three of them here
+          against its four, because the drawn values arrive at `lg` with the
+          heading above:
 
-          Passing it is also mandatory
-          rather than optional: tailwind-merge treats a `text-*` class as
-          resetting line-height, so the size alone would drop the component's
-          leading and the label would inherit whatever is around it.
+          | Viewport | Column | Inset | Type | Label ink |    Pill |
+          | -------- | -----: | ----: | ---: | --------: | ------: |
+          | 375      |    311 |    64 |   16 |     ~257 |  2 lines |
+          | 640      |    544 |    96 |   20 |     ~321 |  ~417px |
+          | 1024     |    752 |   128 |   24 |     ~385 |  ~513px |
+          | 1440     |   1168 |   128 |   24 |     ~385 |  ~513px |
+
+          The base step lands within ~10px of the column either way — 321 against
+          311 — so whether the label sets in one line or two is inside the
+          estimate's error bar, and **that is what the line box has to survive**.
+
+          `leading-5` is the design's: 24px type in a 20px line box is what makes
+          the pill 56px rather than the 68px the component's `leading-tight`
+          gives. It is safe only where the label does not wrap, which is why it
+          is now `lg:` alone — written as the `/5` modifier so it travels with
+          the size it belongs to. Below that the steps take `/tight`, which is
+          `Landing`'s call for the same reason ("a wrapped label would overlap
+          itself"), and it costs nothing drawn: the drawn height is a 1440 fact
+          and 16px in a 20px box is a taller line box, not a shorter one. The
+          pill is 44px at 375 on one line and 64 on two, 53 at `sm`, and the
+          drawn 56 from `lg` up.
+
+          Passing a line height at all is mandatory rather than optional:
+          tailwind-merge treats a `text-*` class as resetting line-height, so the
+          size alone would drop the component's leading and the label would
+          inherit whatever is around it. The `/…` modifier per step is what puts
+          a value back at each one.
 
           `mt-8` is the 32px gap: ink-to-ink the artboard measures 40px from the
           heading's cap bottom to the button's top edge, which is 32px once the
-          last line box's descender space is taken off (docs/styling.md §11).
+          last line box's descender space is taken off (docs/styling.md §11). It
+          does not ramp — the vertical gaps are being left alone until one rule
+          covers them (open item 10), and 32px is small enough that the phone
+          case is not what is asking.
 
           A destination rendered as a `<button>` — same cost and same accepted
           trade-off as `Landing`'s CTA (`Button` has no `href`;
           `.scratch/mlg-reskin/issues/06-package-debts.md` debt 5).
         */}
         <Button
-          className="mt-8 px-16 py-4.5 text-2xl leading-5 uppercase"
+          className="mt-8 px-8 py-3 text-base/tight uppercase sm:px-12 sm:py-3.5 sm:text-xl/tight lg:px-16 lg:py-4.5 lg:text-2xl/5"
           onClick={() => void navigate(next)}
         >
           {WIZARD_INPUT_TITLE}
