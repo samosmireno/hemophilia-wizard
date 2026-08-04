@@ -118,6 +118,39 @@ describe("treatment-landscape chapter", () => {
   });
 
   /**
+   * The three-step grid, asserted as class strings because jsdom computes no
+   * layout — there is no width here to measure, so this is the only thing that
+   * can fail.
+   *
+   * The three steps answer three different questions at three different
+   * breakpoints, which is exactly why a dropped variant would be invisible:
+   * `sm` puts the figure beside its own `+` under full-width prose, and `xl` is
+   * the drawn three-track layout. **`xl` and not `lg` is the fix for §12's
+   * 1024px cliff** — at `lg` the fixed tracks turned on in the same pixel the
+   * gutter took 175px away, leaving the prose 204px — so a variant sliding back
+   * to `lg` would silently reopen the thing this was written to close.
+   */
+  it("turns the figure/disclosure pairing on at sm and the drawn three tracks at xl", () => {
+    const { container } = render(<TreatmentLandscape />);
+
+    expect(container.querySelector("section > div.grid")).toHaveClass(
+      "gap-y-10",
+      "sm:grid-cols-[200px_1fr]",
+      "sm:gap-x-6",
+      "xl:grid-cols-[1fr_200px_300px]",
+      "xl:items-center",
+      "xl:gap-y-5",
+    );
+
+    // The prose spanning both tracks is what puts the other two cells on the
+    // row beneath rather than beside it. The whole two-up rests on this class,
+    // and it is per-row, so all three are checked.
+    for (const heading of screen.getAllByRole("heading", { level: 2 })) {
+      expect(heading.parentElement).toHaveClass("sm:col-span-2", "xl:col-span-1");
+    }
+  });
+
+  /**
    * All three rows now open a card, so `aria-haspopup` belongs on all three.
    * The assertion stays written as "exactly the triggers that open one" rather
    * than collapsing to a count of the buttons: `Row.content` is still optional,
@@ -296,6 +329,39 @@ describe("treatment-landscape chapter", () => {
       "Indication",
       "Route of Administration",
     ]);
+  });
+
+  /**
+   * The table scrolls sideways rather than reflowing — `SeverityTable`'s answer,
+   * which open item 27 calls a precedent. Three separable things can break it,
+   * so all three are asserted:
+   *
+   * - the wrapper is a plain `div`, because `overflow-x-auto` on a table box
+   *   does nothing at all — a table is not a scroll container;
+   * - the floor lives on the `<table>`, not on the wrapper, or the wrapper just
+   *   shrinks with the card and never scrolls;
+   * - the footnote list stays **outside** the wrapper. It is prose that wraps
+   *   fine, and dragging it sideways with the grid would be a scroll region
+   *   doing a job nobody asked for.
+   */
+  it("scrolls the treatment-options grid sideways without taking the footnotes with it", async () => {
+    const user = userEvent.setup();
+    render(<TreatmentLandscape />);
+
+    await user.click(
+      screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
+    );
+    const dialog = within(screen.getByRole("dialog"));
+    const table = dialog.getByRole("table");
+
+    expect(table).toHaveClass("min-w-165");
+    expect(table.parentElement?.tagName).toBe("DIV");
+    expect(table.parentElement).toHaveClass("overflow-x-auto");
+
+    // Footnote (a)'s own list item, reached from the marker the rows point at.
+    const footnotes = dialog.getByText("a.", { exact: false, selector: "li" }).closest("ul");
+    expect(footnotes).not.toBeNull();
+    expect(table.parentElement?.contains(footnotes!)).toBe(false);
   });
 
   /**

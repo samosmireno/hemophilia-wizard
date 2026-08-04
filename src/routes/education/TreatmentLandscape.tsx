@@ -166,23 +166,66 @@ export default function TreatmentLandscape() {
         that pairing when a bullet is added or the viewport narrows.
 
         Track widths are the artboard's, measured at its 1440 canvas and stated
-        as the residue of the content column: 1168 − 32 − 202 − 32 − 286 leaves
-        the prose 616px, which puts the figure at x=760 and the caption's right
-        edge on the column's own at x=1280. All three are `lg:` only — below
-        that the grid collapses and DOM order stacks each row's three parts.
+        as the residue of the content column: 1168 − 24 − 200 − 24 − 300 leaves
+        the prose 620px, which puts the figure at x=768 and the caption's right
+        edge on the column's own at x=1280.
 
-        `items-center` throughout: all three cells centre on their row's own
+        **Three tracks from `xl`, not `lg`, since 2026-08-04**, which is the fix
+        `disease-background` took the same day for the same cliff (§12): the
+        gutter steps 48 → 112 at 1024, so the pixel that turns the fixed tracks
+        on is the pixel that takes 175px away, and the prose column landed at
+        752 − 48 − 500 = **204px**. It does not recover until 1280. The split now
+        waits for the column that can hold it, and between 1024 and 1279 the
+        chapter is a single 752px column — wider than the grid ever gave the
+        prose there, so the stack is the better composition and not a fallback.
+
+        **Two tracks in between**, which is what stops that stack running nine
+        blocks deep to 1279: the prose spans the full width and the figure sits
+        beside its own `+` underneath. Implicit placement does all of it — a
+        `col-span-2` item takes a row of its own, so the next two fill the row
+        below without a single explicit line number. Still one grid, so the
+        pairing above is as true at 640 as at 1440.
+
+        `sm` is invented, and stated as such per §12's rule: no canvas exists
+        below 1440. It is where the arithmetic clears — 544 − 24 − 200 leaves the
+        caption cell 320px, which holds a 65px `+` and three lines of `text-xl`
+        with room over. Below it everything stacks, which is right for a phone.
+
+        `items-center` from `xl`: all three cells centre on their row's own
         height, so whichever of prose / figure / caption is tallest sets the
         row and the other two sit level with its middle. The artboard's own
         alignment is inconsistent — the first figure sits ~30px above its
         heading, the other two level with theirs — and one rule across three
         rows beats reproducing that as a per-row nudge.
+
+        The row gap ramps because the two-up gives it a second job. At `xl` it
+        separates three rows and nothing else; below, it separates a row's prose
+        from a row's own figure *as well as* row from row, so at one value the
+        three blocks stop reading as three. 40/20 is this page's own, not part of
+        §11's eight — those are 1440 gaps deliberately left unramped pending one
+        one-screen rule, and this one does not exist at 1440.
       */}
-      <div className="mt-8 grid gap-y-5 lg:grid-cols-[1fr_200px_300px] lg:items-center lg:gap-x-6">
+      <div className="mt-8 grid gap-y-10 sm:grid-cols-[200px_1fr] sm:gap-x-6 xl:grid-cols-[1fr_200px_300px] xl:items-center xl:gap-y-5">
         {ROWS.map((row, index) => (
           <Fragment key={row.heading}>
-            <div>
-              <h2 className="text-3xl font-bold tracking-wide text-black">{row.heading}</h2>
+            {/*
+              Full width wherever the grid has two tracks, its own track at
+              `xl`. `col-span-2` is what puts the figure and the `+` on the row
+              beneath rather than beside the prose — see the grid's comment.
+            */}
+            <div className="sm:col-span-2 xl:col-span-1">
+              {/* One step down below `lg`, the ramp §11 records for every
+                  chapter's sub-headings. At 30px in a 311px phone column the
+                  hierarchy collapses onto the 16px body size; one step
+                  restores it. `lg`, not `xl` — this is §2's app-wide type
+                  ramp, which is a different question from where the grid
+                  turns on and is answered at a different breakpoint. */}
+              <h2 className="text-2xl font-bold tracking-wide text-black lg:text-3xl">
+                {row.heading}
+              </h2>
+              {/* Body copy is the one thing that does not ramp: 16px is a
+                  legibility floor and open item 9 records the reference as
+                  ~18px, so there is nowhere down to go. */}
               <BulletList items={row.bullets} className="mt-4" />
             </div>
 
@@ -198,14 +241,34 @@ export default function TreatmentLandscape() {
               broken image and takes an `alt` it has nothing to say in. An
               empty `<div>` is already invisible to assistive tech, so it
               needs no `aria-hidden` either.
+
+              **Neither dimension ramps.** The box exists to hold the track open
+              at the drawn size so dropping in a real asset does not re-cut the
+              grid, and a smaller reserved box reserves the wrong thing. 200px
+              is 64% of a 311px phone column, which is wide but not crowding.
+
+              `mx-auto` needs no variant: from `sm` up the box's track is
+              exactly 200px, so the auto margins resolve to zero and the class
+              is inert. It does its whole job in the phone stack, where
+              `max-w-50` would otherwise leave 111px of dead column beside it —
+              the same left-flush problem §11 records for `disease-background`'s
+              figure, which needs `xl:mx-0` only because its own track is wider
+              than the box.
             */}
-            <div className="h-41.5 w-full max-w-50 border-4 border-black" />
+            <div className="mx-auto h-41.5 w-full max-w-50 border-4 border-black" />
 
             {/*
               Horizontal centring only — the row's `items-center` already
               places this block vertically, so the height floor and
               `justify-center` this carried under `items-start` would now both
               be inert.
+
+              The `+` itself does not ramp. `PopupButton` ships one fixed 65px
+              scale and it is the drawn one; `CLOSE_BUTTON_SIZE` exists for the
+              ✕ that *closes* a modal, whose ramp was driven by crowding inside
+              a 345px band (§13). Nothing crowds this one — it has a 320px cell
+              at 640 and a whole 311px column on a phone — and 65px is a
+              generous touch target for the page's primary affordance.
             */}
             <div className="flex flex-col items-center">
               {/*
@@ -220,7 +283,11 @@ export default function TreatmentLandscape() {
                 aria-haspopup={row.content ? "dialog" : undefined}
                 onClick={(next) => setOpenIndex(next ? index : null)}
               />
-              <p className="mt-4 text-center text-2xl font-bold text-popup-caption">{row.label}</p>
+              {/* One step down below `lg`, matching `DisclosureBand`'s own
+                  caption ramp so the four chapters agree (§11). */}
+              <p className="mt-4 text-center text-xl font-bold text-popup-caption lg:text-2xl">
+                {row.label}
+              </p>
             </div>
           </Fragment>
         ))}
@@ -265,6 +332,14 @@ export default function TreatmentLandscape() {
  * headings do land on `text-3xl` — they measure ~36px on the artboard, but that
  * number came off a raster rather than out of Figma, and a guessed raw value
  * reads to the next person as an authority it never had.
+ *
+ * **Both sizes step down below `lg`, and the bullets' step is derived rather
+ * than picked.** `Popup`'s card is `min(1140px, 92vw)` inside a `border-5` with
+ * `px-4 sm:px-8 lg:px-16`, so at 375 the body is 345 − 10 − 32 = **303px** —
+ * eight pixels *narrower* than the page's own 311px column, which sets 16px
+ * bullets. A card cannot set larger body type than the page that opened it in a
+ * narrower measure, which lands `text-base` exactly. The headings take the
+ * page's own sub-heading ramp (§11).
  */
 function BenefitsChallengesCard({
   data,
@@ -284,11 +359,11 @@ function BenefitsChallengesCard({
     <div className="flex items-center gap-8 py-6">
       <div className="min-w-0 flex-1">
         {/* `<h3>`: `Popup`'s band heading is the card's `<h2>`. */}
-        <h3 className="text-3xl font-bold text-black">Benefits</h3>
-        <BulletList items={data.benefits} className="mt-4 text-xl leading-[1.6]" />
+        <h3 className="text-2xl font-bold text-black lg:text-3xl">Benefits</h3>
+        <BulletList items={data.benefits} className="mt-4 text-base leading-[1.6] lg:text-xl" />
 
-        <h3 className="mt-6 text-3xl font-bold text-black">Challenges</h3>
-        <BulletList items={data.challenges} className="mt-4 text-xl leading-[1.6]" />
+        <h3 className="mt-6 text-2xl font-bold text-black lg:text-3xl">Challenges</h3>
+        <BulletList items={data.challenges} className="mt-4 text-base leading-[1.6] lg:text-xl" />
       </div>
 
       {/*
@@ -354,6 +429,27 @@ const USED_FOOTNOTES: readonly FootnoteKey[] = [
 const MATRIX_CELL = "px-2 py-1.5 align-middle";
 
 /**
+ * The two type ramps the table's five columns divide between — the outer pair
+ * (option name, route) and the column headings take `MATRIX_LEAD`, the three
+ * prose columns take `MATRIX_PROSE`.
+ *
+ * The export draws **22 / 16 / 22**: one larger size on the headings and both
+ * outer columns, one smaller in the middle. So the drawing genuinely sets the
+ * option name and the route larger than the prose between them, and the
+ * distinction the ramp has to preserve is that one, not a three-way split.
+ * (`769a354` rounded all three 22s onto the scale at `text-xl`, a 2px round
+ * down; docs/styling.md §11 recorded this as "20 headings / 24 outer, no
+ * rounding in any of them", which was wrong on both counts and is corrected
+ * there.)
+ *
+ * One step down below `lg` for the reason `SeverityTable` steps: it is what
+ * drops the per-column floor far enough for `min-w-165` to be the guard rather
+ * than the common case. See the wrapper below.
+ */
+const MATRIX_LEAD = "text-base leading-tight lg:text-xl";
+const MATRIX_PROSE = "text-sm leading-tight lg:text-base";
+
+/**
  * The hairline between cells. Inferred, like `SeverityTable`'s: the export draws
  * a flat #A0A0A0 rule the palette has no token for, and `black/30` over the
  * body gradient resolves within a point of it — close enough that reproducing
@@ -380,12 +476,37 @@ const MATRIX_RULE = "border-black/30";
  * the five header cells touch and share one `bg-white/50` bar while only the
  * outer two round, so the row paints as a single pill.
  *
- * Type is raw design values under §8's precedent, and the three sizes are
- * measured off the export rather than guessed: 20px headings, 16px in the three
- * middle columns, and 24px in the two outer ones — the drawing genuinely sets
- * the option name and the route larger than the prose between them. None of the
- * three lands on a scale step at the weight drawn (`text-xl` and `text-2xl` both
- * carry 600 where this is 400), which is why they are stated raw.
+ * Type is `MATRIX_LEAD` and `MATRIX_PROSE` above, which is where the export's
+ * two measured sizes and their ramp are recorded.
+ *
+ * **It scrolls sideways rather than reflowing**, which is `SeverityTable`'s
+ * answer applied unchanged — open item 27 already calls that a precedent rather
+ * than a one-off. `table-fixed` divides the body into five equal columns, so the
+ * widest unbreakable token in *any* column sets the floor for all five, and here
+ * that token is the heading "Administration" rather than anything in the data:
+ * `/` and `-` are UAX-14 break opportunities, so "prophylaxis/treatment" and
+ * "Long-term" both split, while "Administration" cannot.
+ *
+ * At 1440 the card body is 1002px = 200px a column and it fits outright. At 375
+ * it is 303px = 60px a column and the words shred. The type step drops the
+ * per-column floor from ~148px to ~132px, and `min-w-165` (660 = 5 × 132) holds
+ * it when the card is narrower still.
+ *
+ * **The 660 is arithmetic off character counts, not a measurement**, and it is
+ * the weakest number on this chapter — see open item 36. If the real advance is
+ * wider, the words still break at 375; if narrower, the card scrolls further
+ * than it needs to.
+ *
+ * The wrapper is a plain `div` and it holds the `<table>` alone. `overflow-x-auto`
+ * on a table box does nothing — a table is not a scroll container — and the
+ * footnotes below are prose that wraps fine, so dragging them sideways with the
+ * grid would be a scroll region doing a job nobody asked for.
+ *
+ * Restacking into five labelled blocks on a phone was the alternative and is
+ * rejected for §11's reason: it flattens the column association at exactly the
+ * width where it matters most, and that association — `scope="row"` letting a
+ * screen reader announce "Rebalancing: siRNA, Route of Administration, SC" — is
+ * why this is a real `<table>` at all.
  */
 function TreatmentOptionsTable() {
   return (
@@ -394,68 +515,62 @@ function TreatmentOptionsTable() {
     // sides, so the pill reads as tucked under the band rather than floating
     // below it.
     <div>
-      <table className="w-full table-fixed border-separate border-spacing-0 text-center text-black">
-        <thead>
-          <tr>
-            {MATRIX_COLUMNS.map((column, index) => (
-              <th
-                key={column}
-                scope="col"
-                className={cn(
-                  "bg-white/50 px-2 py-3 text-xl leading-tight font-normal",
-                  index === 0 && "rounded-l-2xl",
-                  index === MATRIX_COLUMNS.length - 1 && "rounded-r-2xl",
-                )}
-              >
-                {column}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {TREATMENT_OPTIONS_MATRIX.map((row, index) => {
-            // Every cell of every row but the first carries the rule above it,
-            // rather than the row below carrying one beneath: `border-separate`
-            // does not collapse adjacent borders, so stating it on one side is
-            // what keeps a single hairline between rows and none under the last.
-            const rule = index > 0 && cn("border-t", MATRIX_RULE);
-            const column = cn("border-l", MATRIX_RULE);
-
-            return (
-              <tr key={row.option}>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-165 table-fixed border-separate border-spacing-0 text-center text-black">
+          <thead>
+            <tr>
+              {MATRIX_COLUMNS.map((column, index) => (
                 <th
-                  scope="row"
-                  className={cn(MATRIX_CELL, "text-xl leading-tight font-normal", rule)}
+                  key={column}
+                  scope="col"
+                  className={cn(
+                    "bg-white/50 px-2 py-3 font-normal",
+                    MATRIX_LEAD,
+                    index === 0 && "rounded-l-2xl",
+                    index === MATRIX_COLUMNS.length - 1 && "rounded-r-2xl",
+                  )}
                 >
-                  {row.option}
-                  {row.footnote && <sup>{row.footnote}</sup>}
+                  {column}
                 </th>
-                <td className={cn(MATRIX_CELL, "text-base leading-tight", column, rule)}>
-                  {row.moa}
-                </td>
-                <td className={cn(MATRIX_CELL, "text-base leading-tight", column, rule)}>
-                  {row.population}
-                </td>
-                <td className={cn(MATRIX_CELL, "text-base leading-tight", column, rule)}>
-                  {/* Stacked, not joined: the two indications on the first row
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {TREATMENT_OPTIONS_MATRIX.map((row, index) => {
+              // Every cell of every row but the first carries the rule above it,
+              // rather than the row below carrying one beneath: `border-separate`
+              // does not collapse adjacent borders, so stating it on one side is
+              // what keeps a single hairline between rows and none under the last.
+              const rule = index > 0 && cn("border-t", MATRIX_RULE);
+              const column = cn("border-l", MATRIX_RULE);
+
+              return (
+                <tr key={row.option}>
+                  <th scope="row" className={cn(MATRIX_CELL, MATRIX_LEAD, "font-normal", rule)}>
+                    {row.option}
+                    {row.footnote && <sup>{row.footnote}</sup>}
+                  </th>
+                  <td className={cn(MATRIX_CELL, MATRIX_PROSE, column, rule)}>{row.moa}</td>
+                  <td className={cn(MATRIX_CELL, MATRIX_PROSE, column, rule)}>{row.population}</td>
+                  <td className={cn(MATRIX_CELL, MATRIX_PROSE, column, rule)}>
+                    {/* Stacked, not joined: the two indications on the first row
                       are separate statements in the export, which is why
                       `indication` is a list. `<span className="block">` rather
                       than a `<ul>` — a single-entry list on the other four rows
                       would announce "list of 1 item" four times over. */}
-                  {row.indication.map((line) => (
-                    <span key={line} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </td>
-                <td className={cn(MATRIX_CELL, "text-xl leading-tight", column, rule)}>
-                  {row.route}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                    {row.indication.map((line) => (
+                      <span key={line} className="block">
+                        {line}
+                      </span>
+                    ))}
+                  </td>
+                  <td className={cn(MATRIX_CELL, MATRIX_LEAD, column, rule)}>{row.route}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* `list-none` with the marker in the text: the letters are the join to
           the `<sup>`s above, so they are content, not a counter. An `<ol
@@ -464,7 +579,17 @@ function TreatmentOptionsTable() {
 
           14px/300 is the export's, and so is `leading-none` — the block is set
           solid there. Both are raw for the usual reason: the scale's smallest
-          step is 12px, and it carries weight 500. */}
+          step is 12px, and it carries weight 500.
+
+          **Deliberately not ramped, and it is the one thing on this chapter the
+          2026-08-04 responsive pass left broken.** `leading-none` is only
+          defensible for a line that never wraps, and footnote (a) is ~150
+          characters — roughly 1100px at 14px against a 1002px body — so it
+          already wraps to two touching lines *at 1440*, before any of this. That
+          makes it a transcription question rather than a responsive one, and
+          fixing it here would change the drawn composition at the drawn width
+          without the designer. Raised as open item 37 instead; at 375 it sets
+          about nine solid lines, which is the cost of holding that line. */}
       <ul className="mt-4 list-none text-sm leading-none font-light text-black">
         {USED_FOOTNOTES.map((key) => {
           const note = TREATMENT_OPTIONS_FOOTNOTES[key];

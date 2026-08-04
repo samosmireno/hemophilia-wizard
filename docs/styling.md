@@ -969,6 +969,8 @@ narrower than the 1165px content column, so it stays centred within it.
 | 33  | **Every `clamp()` in the app was replaced by its own maximum on 2026-08-04, and the last two arbitrary font sizes were rounded onto the scale with it (45.47 → `text-5xl` 48, 26 → `text-2xl` 24) — the app now has no arbitrary font size anywhere, and the small-screen layouts regressed as a result.** Measured at 375 × 800: `/` sets its 128px headline in four lines, fills the viewport, pushes the CTA under the sidebar's bottom bar and scrolls (853px against 800); `/explore` and `/wizard-intro`'s CTAs are both now 24px type in a 20px `leading-5` box, wrapping to four lines with descenders into the caps below — the exact bug the clamps were added to fix, and one that had shipped once before; `Popup`'s band spends 200px of a 345px card on padding. Nothing overflows horizontally and 1440 is untouched, so this is a below-`lg` regression only. The fixes are per-case, not a blanket revert: `leading-tight` on the two CTAs, and a floor of some kind on the hero. **Hero closed 2026-08-04** by the four-step ratio-holding ramp in §8 — not a clamp, so the no-arbitrary-size invariant holds. ~~Three cases remain: `/explore`'s CTA, `/wizard-intro`'s CTA, and `Popup`'s band.~~ **`Popup`'s band closed 2026-08-04** — `px-22 lg:px-25` restored the 88px floor as a breakpoint step, and the title ramps `text-2xl sm:text-3xl lg:text-5xl` with it (§13). The inset moved again the same day to `px-16.5 sm:px-19.5 lg:px-25` when the ✕ itself started ramping, which is what the floor is derived from; the band now spends 132px of the 345px card rather than 200. **Two remain: `/explore`'s CTA and `/wizard-intro`'s CTA.** The hero's fix was never verified in a browser at the user's instruction, so the ~1000px headline width the `xl:` step rests on is inherited from the pre-2026-08-04 measurement rather than re-measured. | §8, §13, §14          |
 | 34  | **`--spacing-bar` (80px) overshoots the sidebar bottom bar it clears by 15px.** The bar mlg-components renders is `h-12` buttons in `py-2` with a 1px `border-t` = 65px, so every page below `lg` reserves 15px of clearance that nothing occupies — a strip of page gradient between the content and the nav. `ArchBand` patches it locally with `-mb-4` (§11), which is the only place it was visible enough to notice. The token should either be 65 or be derived from the package the way `--spacing-rule` is derived from `TopRule`; 80 is a round number nobody has tied to a measurement. Read off the package's compiled classes, not measured in a browser.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | §11, §12              |
 | 35  | **The ✕ ramp is arithmetic, not a measurement.** `size-11 sm:size-14 lg:size-16.25` and the band inset and floor derived from it (§13) were checked in the compiled CSS and in `Popup.test.tsx`, and nothing at or above `lg` moved — but no card was opened in a browser below `lg`, so the 44px button, the 66px inset and the ~49px one-line band at 375 are predicted rather than seen. §13's browser table is explicitly stale in its band column below `lg` for the same reason. **The card's height floor was removed the same day** (`min-h-[min(520px,95dvh)]` deleted, §13), which is unverified in a browser at _every_ width, not just below `lg` — and it leaves the body region as `flex-1 min-h-0`, i.e. `flex-basis:0%` with the automatic minimum removed, in a now-auto-height column flex container. That resolves to the content's max-content height by spec and in practice, but it is the exact pair that collapses when a container's height _is_ definite, so one short card is worth opening. Rolls up into item 30, which already names 1024 and 768 as the app's unmeasured widths.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | §13                   |
+| 36  | **`/education/treatment-landscape`'s responsive pass of 2026-08-04 is arithmetic end to end**, at the user's instruction — verified in the compiled CSS (every new utility present, `min-w-165` resolving to 660px) and in Vitest (29 tests, two of them new and pinning the grid's three steps and the table's scroll wrapper), but jsdom computes no layout, so nothing about pixels can fail. **The weakest number is `min-w-165`**: 660 = 5 × 132, where 132 is "Administration" at 16px plus `px-2`, estimated from character counts rather than measured. Too wide and the card scrolls further than it needs to; too narrow and the words still break at 375. The `sm` two-up, the 320px caption cell it rests on and the 752px single column at 1024 are unmeasured for the same reason. Rolls up into item 30 — and this pass makes **1024 the width carrying the most untested reasoning in the app**, since it is where the grid now stops applying.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | §11, §12              |
+| 37  | **Table 1's footnote list is `leading-none` and already wraps at the drawn width.** Footnote (a) is ~150 characters, roughly 1100px at 14px against a 1002px card body, so it sets two touching lines at 1440 — `leading-none` is only defensible for a line that never wraps. §11 records it as the designer's own inspector value, so it is a transcription question rather than a responsive one and the 2026-08-04 pass deliberately left it alone rather than change the drawn composition at the drawn width. At 375 it is about nine solid lines. Wants the designer's answer with items 9, 13 and 25.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | §11                   |
 
 ---
 
@@ -1327,20 +1329,25 @@ which is what says the pairing is real rather than coincidence.
 Tracks are stated as the residue of the content column:
 
 ```
-1168 − 24 − 202 − 24 − 286  =  632px prose
+1168 − 24 − 200 − 24 − 300  =  620px prose
 ```
 
 which puts the figure box at x=768 (the artboard draws 762) and the caption's right
-edge on the content column's own at x=1280 — landing its left edge on 994, which is
-where the artboard's caption ink starts. The `+` centres at 1137 against a measured 1135. All `lg:` only; below that the grid collapses and DOM order stacks each row
-prose → figure → caption.
+edge on the content column's own at x=1280 — landing its left edge on 980, close to
+where the artboard's caption ink starts. The `+` centres at 1130 against a measured 1135. (This block read `202` and `286` and summed to 632 until 2026-08-04; the shipped
+classes have been `200px 300px` since the first pass, so the arithmetic was describing
+tracks the file never had. The conclusions are unaffected — the right edge still lands
+on 1280, which is the load-bearing one.)
 
 The 24px column gap is a tightening of the artboard's 32, applied after the first
 pass; the figure box moves 6px right of where the export draws it and everything else
 still lands. The caption track is what is load-bearing here, not the prose width —
-286px is what puts the column's right edge where the design has it.
+300px is what puts the column's right edge where the design has it.
 
-`items-center` throughout: whichever of prose / figure / caption is tallest sets the
+**All three tracks are `xl:` only, not `lg:`, since 2026-08-04** — see the responsive
+pass below, which is also where the two-track step between `sm` and `xl` is recorded.
+
+`items-center` from `xl`: whichever of prose / figure / caption is tallest sets the
 row, and the other two sit level with its middle. The artboard's own alignment is
 inconsistent — it lifts the **first** figure ~30px above its heading (the "figure sets
 the top, prose is nudged down" relationship `disease-background` reproduces with
@@ -1364,20 +1371,124 @@ uniform at the two that agree, so the rail reads as a set and dropping in real a
 does not re-cut the grid.
 
 **Vertical rhythm.** `mt-8` from the h1 (the designer's 32px, same as §11's
-`h1 → "Disease mechanism…"`), `gap-y-5` between rows, and `mt-4` from each `+` to its
+`h1 → "Disease mechanism…"`), `xl:gap-y-5` between rows, and `mt-4` from each `+` to its
 caption (matching `DisclosureBand`). The row gap measures 25 and 28 ink-to-ink on the
 export and ships at 20 — tightened, like the column gap, once the rows were centred
-and the ragged edge the looser value was absorbing went away.
+and the ragged edge the looser value was absorbing went away. Below `xl` it is 40; see
+the responsive pass.
 
 **It fits one screen.** 800px exactly at 1440×800, verified in Chromium — so the §11
 open item below happens to be satisfied here. That is a property of this chapter's
 content, not a rule, and it does not close the item: the rule still wants writing once
 all four chapters exist.
 
-**The 1024px cliff bites harder here.** §12's open item leaves `disease-background`
-with a 250px prose column at exactly 1024px; this grid's fixed tracks leave **220px**.
-Verified, cramped but not broken, and deliberately not fixed separately — the `clamp()`
-that section proposes is one change that fixes both.
+**The 1024px cliff bit harder here, and it is fixed.** §12's open item left
+`disease-background` with a 250px prose column at exactly 1024px; this grid's fixed
+tracks left **204px** — the item records 220, from the 202/286 tracks the paragraph
+above corrects. Fixed on 2026-08-04 the same way that chapter was, by moving the split
+to `xl` rather than by touching the gutter: see the responsive pass below.
+
+### The responsive pass of 2026-08-04
+
+Everything below `xl` got a rule that day. Four decisions, in dependency order.
+
+**1. The three tracks moved to `xl`.** The gutter steps 48 → 112 at `lg`, so the pixel
+that turned the fixed tracks on was the pixel that took 175px of content column away:
+752 − 24 − 200 − 24 − 300 = **204px** of prose, not recovering until 1280.
+
+| Viewport | Content column | Prose column     |
+| -------- | -------------: | ---------------- |
+| 1024     |            752 | 752 — one column |
+| 1280     |           1008 | 460              |
+| 1440     |           1168 | 620 (drawn)      |
+
+Between 1024 and 1279 the chapter is a single 752px column, **wider than the prose ever
+got from the three-track layout at that width** — so the stack is the better
+composition there, not a fallback. Identical argument, identical fix and identical day
+as `disease-background`'s move to `xl`; the two chapters were the two cases §12's open
+item named, and both are now fixed from the layout end rather than from the gutter.
+
+**2. Between `sm` and `xl` the grid keeps two tracks**, which is what stops that stack
+running nine blocks deep to 1279: `sm:grid-cols-[200px_1fr]` with the prose taking
+`sm:col-span-2 xl:col-span-1`, so the prose spans full width and the figure sits beside
+its own `+` underneath. Implicit placement does all of it — a spanning item takes a row
+of its own and the next two fill the row below — so it is still **one grid**, and the
+pairing the section opens with is as true at 640 as at 1440.
+
+`sm` is invented and stated as such per §12's rule, alongside `DisclosureBand`'s `md`
+and `ArchBand`'s 150px radius. It is where the arithmetic clears: 544 − 24 − 200 leaves
+the caption cell 320px, which holds a 65px `+` and three lines of `text-xl` with room
+over. Below it everything stacks, which is right for a phone.
+
+**3. The type takes `disease-background`'s table unchanged**, so all four chapters
+agree and §11's table stays one table rather than a per-chapter list.
+
+| Element                       | <`lg` | `lg`+ |
+| ----------------------------- | ----: | ----: |
+| `<h1>` (unchanged, §2)        |    30 |    48 |
+| `<h2>` sub-headings           |    24 |    30 |
+| disclosure caption            |    20 |    24 |
+| `BenefitsChallengesCard` `h3` |    24 |    30 |
+| its bullets                   |    16 |    20 |
+| Table 1 headings, cols 1 & 5  |    16 |    20 |
+| Table 1 cols 2–4              |    14 |    16 |
+| page bullets (unchanged)      |    16 |    16 |
+| Table 1 footnotes (unchanged) |    14 |    14 |
+
+The ramp is at **`lg`** while the layout moves at `xl`. Two different questions: `lg` is
+§2's app-wide type step, which `disease-background` also kept at `lg` after its own
+split moved to `xl`.
+
+The card bullets' step is **derived, not picked**. `Popup` is `min(1140px, 92vw)` inside
+a `border-5` with `px-4 sm:px-8 lg:px-16`, so at 375 the card body is 345 − 10 − 32 =
+**303px** — eight pixels _narrower_ than the page's own 311px column, which sets 16px
+bullets. A card cannot set larger body type than the page that opened it in a narrower
+measure, which lands `text-base` exactly.
+
+**4. Nothing else shrinks.** The reserved box keeps 200 × 166 at every width — it exists
+to hold the track open at the drawn size, so a smaller reserved box reserves the wrong
+thing — and gains only `mx-auto`, which is inert from `sm` up (its track is exactly
+200px) and does its whole job in the phone stack, where `max-w-50` would otherwise leave
+111px of dead column beside it. The `+` keeps `PopupButton`'s one fixed 65px scale;
+`CLOSE_BUTTON_SIZE` (§13) is the ✕ that _closes_ a modal, whose ramp answered crowding
+inside a 345px band, and nothing crowds this one.
+
+The row gap ramps `gap-y-10 xl:gap-y-5`, because the two-up gives it a second job: at
+`xl` it separates three rows and nothing else, and below it separates a row's prose from
+that row's own figure _as well as_ row from row, so at one value the three blocks stop
+reading as three. This is **not** one of §11's eight — those are 1440 gaps deliberately
+left unramped pending one one-screen rule, and 40 does not exist at 1440.
+
+### Table 1 scrolls rather than reflowing
+
+`SeverityTable`'s answer applied unchanged, which open item 27 already calls a precedent
+rather than a one-off. `table-fixed` divides the card body into five equal columns, so
+the widest unbreakable token in _any_ column sets the floor for all five — and here that
+token is the column heading **"Administration"**, not anything in the data: `/` and `-`
+are UAX-14 break opportunities, so "prophylaxis/treatment" and "Long-term" both split.
+
+At 1440 the body is 1002px = 200px a column and the grid fits outright. At 375 it is
+303px = 60px a column. The type step above drops the per-column floor from ~148px to
+~132px, and `min-w-165` (660 = 5 × 132) holds it when the card is narrower still.
+
+**The 660 is arithmetic off character counts, not a measurement** — open item 36, and
+the weakest number on this chapter. The wrapper is a plain `div`, because `overflow-x-auto`
+on a table box does nothing, and it holds the `<table>` alone: the footnote list below
+is prose that wraps fine, and dragging it sideways with the grid would be a scroll
+region doing a job nobody asked for.
+
+Restacking into five labelled blocks on a phone was the alternative, rejected for the
+reason `SeverityTable` rejects it: it flattens the column association at exactly the
+width where it matters most, and that association — `scope="row"` letting a screen
+reader announce "Rebalancing: siRNA, Route of Administration, SC" — is why the element
+is a real `<table>`.
+
+The footnote list is the one thing the pass left broken, deliberately. It is `text-sm
+leading-none` — set solid — and footnote (a) is ~150 characters, roughly 1100px at 14px
+against a 1002px body, so it **already wraps to two touching lines at 1440**, before any
+of this. That makes it a transcription question rather than a responsive one, and fixing
+it would change the drawn composition at the drawn width without the designer. Open item
+37; at 375 it sets about nine solid lines.
 
 **Copy that diverges from the source.** The three sub-headings are literals, not
 `topic.title`: two carry a colon the source titles do not, and the middle is
@@ -1414,16 +1525,31 @@ cell beside it — an _F9_ transgene is hemophilia B. Not a typo, so not silentl
 either; held at B, because a table that tells a clinician the class is indicated for HA
 is a worse error to ship than a stale cell, and raised for the designer.
 
-**Its type is measured, not assumed.** Three sizes off the export, none of which lands
-on a scale step at the weight drawn: 20px column headings, 16px in the three middle
-columns, 24px in the two outer ones — the drawing genuinely sets the option name and
-the route larger than the prose between them. Footnotes are 14px/300 set solid
-(`leading-none`), which is the designer's own inspector value. All five were raw
-under §8's precedent because the old `h3`/`h4` steps bundled weight 600. With
-weight now stated at the call site that reason is gone, and — unusually for this
-app — **all four sizes land on a Tailwind step exactly**: 24 → `text-2xl`,
-20 → `text-xl`, 16 → `text-base`, 14 → `text-sm`, no rounding in any of them.
-Only the leading is still transcribed.
+**Its type is measured, not assumed** — and this paragraph had the measurements wrong
+until 2026-08-04. It read "20px column headings, 16px in the three middle columns, 24px
+in the two outer ones", and then that **all four sizes land on a Tailwind step exactly**
+(24 → `text-2xl`, 20 → `text-xl`, 16 → `text-base`, 14 → `text-sm`, "no rounding in any
+of them"). Git says none of that was ever true of the file.
+
+What `c5e79cc` actually transcribed off the export is **22 / 16 / 22**:
+
+| Cells                            | Drawn | Shipped                    |
+| -------------------------------- | ----: | -------------------------- |
+| column headings                  |    22 | `text-base lg:text-xl`     |
+| column 1 (option) and 5 (route)  |    22 | `text-base lg:text-xl`     |
+| columns 2–4 (MOA, population, …) |    16 | `text-sm lg:text-base`     |
+| footnotes                        |    14 | `text-sm` (`leading-none`) |
+
+So the export sets **two** sizes here, not three — the headings and the two outer
+columns are one value, and the drawing does set the option name and the route larger
+than the prose between them. `769a354` then rounded all three 22s onto the scale at
+`text-xl`, a 2px round _down_, so "no rounding in any of them" was wrong about three of
+the five. `text-2xl` appears nowhere in this component and never did.
+
+Same shape as §13's 291-vs-159 error, and the same lesson: the wrong numbers were the
+ones that made the argument tidier — a three-way split reads as more deliberate
+transcription than "22, 16, 22, and we rounded". Nothing downstream depended on them.
+Only the leading is still transcribed raw.
 
 The hairline between cells is **inferred**, as `SeverityTable`'s is: the export draws a
 flat `#A0A0A0` the palette has no token for, and `black/30` over the body gradient
@@ -1844,11 +1970,20 @@ change was looking at.
 `disease-background` was fixed from the other end instead: its two-column split
 moved to `xl`, so the fixed 470px track no longer turns on in the pixel where the
 gutter takes 175px away, and between 1024 and 1279 that chapter is a single 752px
-column (§11). **The gutter itself is untouched, and `treatment-landscape`'s 220px
-case is untouched with it.** So this row stays open, with the caveat that "one
-fix for both" is now an argument for a shared _breakpoint_ answer rather than the
-shared clamp it was written as — and that `disease-background` is no longer
-evidence for it.
+column (§11).
+
+**`treatment-landscape` took the same fix later the same day**, so both cases this
+item names are now closed from the layout end. Its three tracks move to `xl` too, and
+between 1024 and 1279 it is a single 752px column with a two-track step under it (§11).
+Its figure here was **204px**, not the 220 recorded above — that number came from the
+202/286 tracks §11 was documenting rather than the 200/300 the file ships.
+
+**The gutter itself is still untouched**, which is why this row stays open rather than
+closing. What is left is the general case: every other route crossing 1024 pays 112px
+of gutter out of a 1024px viewport, and nothing measures whether that is right. The
+shape of any fix is now a breakpoint step rather than the `clamp()` this item was
+written around, and neither chapter is evidence for it any more — both routed around
+the gutter instead of paying it.
 
 Neither page's numbers here have been measured in a browser. Open item 30 still
 records 1024 as unchecked.
