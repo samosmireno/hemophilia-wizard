@@ -16,19 +16,49 @@ import { nextOf } from "../data/sectionOrder";
  * step 0 — a card grid would be a second, competing navigation.
  *
  * Type sizes are the design's own 60 / 128 / 36 / 24px, and all four land on a
- * Tailwind step exactly: `text-6xl`, `text-9xl`, `text-4xl`, `text-2xl`.
+ * Tailwind step exactly: `text-6xl`, `text-9xl`, `text-4xl`, `text-2xl`. Those
+ * are the **`xl:` values** — a four-step ramp carries each line down from there
+ * (docs/styling.md §8):
  *
- * **These were `clamp()`s until 2026-08-04 and are now fixed sizes**, which is a
- * deliberate call and a costly one on a phone. The clamps existed so the
- * composition held together below the canvas — each reached the drawn value at
- * ~1440 and floored on a phone (the headline at 2.5rem, i.e. 40px against 128).
- * Without them the 128px headline sets "The Future Is Now:" in four lines at
- * 375px, fills the viewport, pushes the CTA under the sidebar's bottom bar and
- * makes the page scroll (853px against 800). Measured, not predicted. See
- * styling open item 33.
+ * |                    | base | `sm:` | `lg:` | `xl:` |
+ * | ------------------ | ---- | ----- | ----- | ----- |
+ * | `HM-85L`           |   24 |    36 |    48 |    60 |
+ * | `The Future Is Now:` | 48 |    72 |    96 |   128 |
+ * | `Personalizing …`  |   14 |    20 |    30 |    36 |
+ * | `LET’S GET STARTED`|   16 |    18 |    20 |    24 |
  *
- * The headline's leading stays the ratio 0.75 rather than the drawn 96px, which
- * costs nothing now the size is fixed and keeps the two in step if it moves again.
+ * Two things are load-bearing about those numbers.
+ *
+ * **The drawn values arrive at `xl:` (1280), not `lg:`.** The 128px headline is
+ * ~1000px wide, and the content column `AppShell` gives it is 1024 − 112 − 160 =
+ * 752px at `lg` against 1008px at `xl`. Attaching the top step to `lg` would put
+ * the drawn headline in a column that cannot hold it, breaking the composition at
+ * exactly the width where the sidebar becomes a rail. 1280 ≤ the 1440 canvas, so
+ * **1440 is unaffected**.
+ *
+ * **The first three lines hold their drawn proportions at every step** — eyebrow
+ * ÷ headline stays 0.47–0.50 and subtitle ÷ headline 0.28–0.31 all the way down,
+ * so the hero is one composition scaled rather than three lines resized. The CTA
+ * is deliberately NOT in that ratio: at 0.19 × a 48px headline its label would be
+ * 9px. It is a control with a legibility floor, not a fourth line of type, so it
+ * ramps on its own.
+ *
+ * These were `clamp()`s until 2026-08-04, then fixed sizes for the length of one
+ * commit — which regressed the page below `lg` (the 128px headline set in four
+ * lines at 375px, filled the viewport, pushed the CTA under the sidebar's bottom
+ * bar and made the page scroll, 853px against 800). §8 held that a ramp "steps
+ * all three at once and looks broken between stops"; holding the ratios above is
+ * what answers that, and the column measurement is what settled where the top
+ * step goes. Nothing here is a `clamp()` or an arbitrary size — every value is a
+ * named Tailwind step.
+ *
+ * **Line-height is written as a slash modifier, not a separate `leading-*`.**
+ * `text-5xl … text-9xl` each carry a line-height of their own, so a bare
+ * `leading-[0.75]` would be overridden the moment a responsive `sm:text-7xl`
+ * lands in a later media query at equal specificity. `text-5xl/[0.75]` sets both
+ * in one declaration and cannot desync. The headline's leading is still the ratio
+ * 0.75 (= 96/128) rather than the drawn 96px, which is now load-bearing again
+ * rather than merely tidy: the size moves at three breakpoints.
  */
 export default function Landing() {
   const navigate = useNavigate();
@@ -51,16 +81,20 @@ export default function Landing() {
       >
         {/* Outside the <h1>: the activity code identifies the CME activity, it
             is not part of its title. */}
-        <p className="font-display text-6xl leading-none font-normal">{ACTIVITY_CODE}</p>
+        <p className="font-display text-2xl/none font-normal sm:text-4xl/none lg:text-5xl/none xl:text-6xl/none">
+          {ACTIVITY_CODE}
+        </p>
         {/* One heading, split into two typographic halves — so the accessible
             name is the whole title, exactly as `ACTIVITY_TITLE` spells it. */}
         <h1 id="landing-heading" className="mt-2 max-w-280 font-display">
-          <span className="block text-9xl leading-[0.75] font-bold">{ACTIVITY_TITLE_LEAD}</span>{" "}
+          <span className="block text-5xl/[0.75] font-bold sm:text-7xl/[0.75] lg:text-8xl/[0.75] xl:text-9xl/[0.75]">
+            {ACTIVITY_TITLE_LEAD}
+          </span>{" "}
           {/* The space is load-bearing, not formatting: without a text node
               between the two block spans the heading's accessible name runs the
               halves together. CSS discards white space between block boxes, so
               it costs no line box. */}
-          <span className="mt-3 block text-4xl leading-tight font-normal text-balance">
+          <span className="mt-3 block text-sm/tight font-normal text-balance sm:text-xl/tight lg:text-3xl/tight xl:text-4xl/tight">
             {ACTIVITY_TITLE_TAIL}
           </span>
         </h1>
@@ -73,24 +107,32 @@ export default function Landing() {
 
           The component is a single fixed scale (`px-16 py-[18px] text-[26px]`),
           which is 370px wide at a 24px label — wider than a 375px phone once the
-          shell's padding is taken off. The override is the design's own 24px
-          type and 64/18px padding, which is what the package ships less 2px of
-          label.
+          shell's padding is taken off. The `xl:` override is the design's own
+          24px type and 64/18px padding, which is what the package ships less 2px
+          of label.
 
-          **This was a `clamp()` until 2026-08-04.** It floored at 1rem so the
-          button stayed inside a phone; fixed at 24px it wraps to three lines at
-          375 and, with the taller headline above it, lands under the sidebar's
-          bottom bar. Styling open item 33.
+          **The padding ramps with the label, and that is not decoration.** Type
+          alone would leave a 16px label inside 64px of horizontal padding on a
+          phone — a 268px pill in a 311px column, almost all of it air. So the
+          package's one fixed scale becomes four:
 
-          `leading-tight` is restated rather than inherited: tailwind-merge
-          treats a font-size utility as resetting line-height, so passing a
-          `text-*` class drops the component's own `leading-tight` and the label
-          would fall back to whatever it inherits. The design's `leading-5` is
-          deliberately not used — at 24px that is a 20px line box, and the label
-          overlaps itself the moment it wraps.
+              base  px-8  py-3     sm:  px-12 py-3.5
+              lg:   px-14 py-4     xl:  px-16 py-4.5
+
+          The label does NOT hold the hero's proportions (see the ratio note on
+          the component above); a control has a legibility floor that a headline
+          does not, so 16px is where it stops.
+
+          Line-height is a slash modifier rather than a `leading-tight` alongside,
+          for the reason the component doc-comment gives, and it must be restated
+          at every step regardless: tailwind-merge treats a font-size utility as
+          resetting line-height, so passing `text-*` drops the package's own
+          `leading-tight` and the label would inherit whatever it finds. The
+          design's `leading-5` is deliberately not used — at 24px that is a 20px
+          line box, and the label overlaps itself the moment it wraps.
         */}
         <Button
-          className="mt-12 px-16 py-4.5 text-2xl leading-tight lg:mt-20"
+          className="mt-12 px-8 py-3 text-base/tight sm:px-12 sm:py-3.5 sm:text-lg/tight lg:mt-20 lg:px-14 lg:py-4 lg:text-xl/tight xl:px-16 xl:py-4.5 xl:text-2xl/tight"
           onClick={() => void navigate(next)}
         >
           LET’S GET STARTED
