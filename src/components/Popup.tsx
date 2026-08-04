@@ -3,6 +3,7 @@ import { PopupButton } from "mlg-components";
 
 import { cn } from "../lib/cn";
 import { preserveCase } from "../lib/preserveCase";
+import { CLOSE_BUTTON_SIZE } from "./closeButton";
 import ModalLayer from "./ModalLayer";
 
 /**
@@ -16,14 +17,21 @@ import ModalLayer from "./ModalLayer";
  * is 345px wide, so the band spent 200 of it on padding and left 145 for a 48px
  * title.
  *
- * **The floor is back as a breakpoint step rather than a `clamp()`.** 88px is
- * not an invented comfort value the way `DisclosureBand`'s `md` is: it is the
- * ✕'s own 65px plus the 22px inset the button is drawn at, i.e. the narrowest
- * inset at which the title can never run under the button. `px-22` is that
- * number on Tailwind's scale, so the app keeps its no-arbitrary-length
- * invariant. The drawn 100px arrives at `lg`, above which nothing moves.
+ * **Every step is the ✕ plus the 22px inset it is drawn at**, i.e. the narrowest
+ * inset at which the title can never run under the button. None of the three is
+ * an invented comfort value the way `DisclosureBand`'s `md` is, and all three
+ * are on Tailwind's scale, so the app keeps its no-arbitrary-length invariant:
+ *
+ *     base  px-16.5  66 = size-11    44 + 22
+ *     sm:   px-19.5  78 = size-14    56 + 22
+ *     lg:   px-25   100 = size-16.25 65 + 22, and the drawn maximum
+ *
+ * The `lg` step is 100 rather than the derived 87 because 100px is what the
+ * design draws; the other two have no drawn value to transcribe, so they are the
+ * floor. **Move `CLOSE_BUTTON_SIZE` and this has to move with it** — the band
+ * floor on the `<header>` below is built from the same three numbers.
  */
-const BAND_INSET = "px-22 lg:px-25";
+const BAND_INSET = "px-16.5 sm:px-19.5 lg:px-25";
 
 /** Which of the three card widths a caller wants. See `CARD_WIDTH`. */
 export type PopupWidth = "narrow" | "default" | "wide";
@@ -134,14 +142,23 @@ export default function Popup({
           clips the full-bleed band to the rounded corners — the band and the
           border are the same crimson, so the top edge reads as one mass either
           way. */}
-      {/* The floor is `min(520px, 95dvh)`, not a bare 520px: `min-height` beats
-          `max-height` in CSS, so an unguarded floor would push the card past the
-          cap on any viewport shorter than ~612px — a phone in landscape — and
-          overflow it off screen with no way to scroll back. Written this way the
-          two can never disagree. */}
+      {/* **There is no height floor: the card is its content's height, capped.**
+          It carried `min-h-[min(520px,95dvh)]` until 2026-08-04 — 520 chosen
+          short of the drawn 645 so a brief popup did not open a screen of empty
+          gradient, and wrapped in `min()` because `min-height` beats
+          `max-height` and a bare floor would overflow a landscape phone off
+          screen. Both are gone; a short card is now short. The known cost is the
+          one §13 recorded when the floor went in: a single-bullet body rendered
+          193px and read as a bar rather than the drawn card, with `bg-popup`
+          showing only its warm centre. Accepted deliberately.
+
+          Nothing else is needed to get content height — no `h-fit`. `ModalLayer`
+          lays this out with `place-items-center`, i.e. `align-items: center`
+          rather than `stretch`, so the card's height was already `auto` and only
+          the floor was overriding it. */}
       <div
         className={cn(
-          "flex max-h-[95dvh] min-h-[min(520px,95dvh)] flex-col overflow-hidden rounded-[40px] border-5 border-brand-crimson-50 shadow-popup",
+          "flex max-h-[95dvh] flex-col overflow-hidden rounded-[40px] border-5 border-brand-crimson-50 shadow-popup",
           CARD_WIDTH[width],
           surface === "white" ? "bg-white" : "bg-popup",
         )}
@@ -155,17 +172,21 @@ export default function Popup({
             which is why the band still measured within 4px of the export and
             nobody caught either. Both corrected together; docs/styling.md §13.
 
-            **`min-h-[65px]` is the ✕, not a design value.** The button is 65px
-            tall and centred on the band, so a band shorter than that overhangs
-            it at both ends — and the card's `overflow-hidden` then clips the top
-            of the button against the rounded corner. The design never draws a
-            one-line band (its own is two lines at 118px), so there is no drawn
-            floor to transcribe; the honest one is the height of the thing the
-            band has to contain. It is the same 65 `BAND_INSET` is built from.
+            **The floor is the ✕, not a design value.** The button is centred on
+            the band, so a band shorter than it overhangs it at both ends — and
+            the card's `overflow-hidden` then clips the top of the button against
+            the rounded corner. The design never draws a one-line band (its own
+            is two lines at 118px), so there is no drawn floor to transcribe; the
+            honest one is the height of the thing the band has to contain. It is
+            `CLOSE_BUTTON_SIZE` restated as a height, the same three numbers
+            `BAND_INSET` is built from, and it ramps because the button does.
+
             Nothing at 1440 reaches it — a one-line band is 74px at `text-5xl`.
             It used to bind only where the title's `clamp()` sat at its 22px
             floor, i.e. on a phone; with the title fixed at 48px (2026-08-04) the
-            band is taller everywhere and the floor is inert. Open item 33.
+            band is taller everywhere and the floor went inert. Shrinking the ✕
+            keeps it inert rather than reviving it: a one-line band at `text-2xl`
+            is 12 + 24×1.0278 + 12 = 48.7px against a 44px button. Open item 33.
 
             `flex flex-col justify-center` is what makes that floor invisible:
             the ✕ is centred by `top-1/2`, so without it the title would sit at
@@ -173,7 +194,7 @@ export default function Popup({
             middle, ~9px apart. Only the header's direct children become flex
             items, so the `preserveCase` whitespace trap §17 records does not
             apply — the `<h2>`'s own spans and text nodes stay in normal flow. */}
-        <header className="relative flex min-h-[65px] shrink-0 flex-col justify-center bg-brand-crimson-50 py-3">
+        <header className="relative flex min-h-11 shrink-0 flex-col justify-center bg-brand-crimson-50 py-3 sm:min-h-14 lg:min-h-16.25">
           {/* `BAND_INSET` is symmetric so the title stays centred on the card,
               and sized to clear the ✕ on the right — its floor is the button's
               own 65px plus the 22px inset, so the two never overlap. Type is
@@ -183,11 +204,13 @@ export default function Popup({
               **This title falls two steps below `lg` where the chapter's `<h2>`
               falls one**, and the reason is the box rather than the type: a
               heading sits in the content column, but this sits in whatever the
-              card's inset leaves, which on a phone is 291px against the column's
-              311 — and it is `uppercase` display type, the widest thing the app
-              sets. 48 → 36 would still take "Hemophilia Severity Based on Factor
-              VIII/IX Level" to five lines in a band the ✕ has to stay centred
-              on.
+              card's inset leaves, which on a 375px phone is 203px against the
+              column's 311 — and it is `uppercase` display type, the widest thing
+              the app sets. 48 → 36 would still take "Hemophilia Severity Based
+              on Factor VIII/IX Level" to five lines in a band the ✕ has to stay
+              centred on. (203 = 345px card − `border-5`×2 − `px-16.5`×2. It was
+              159 until the ✕ shrank; docs/styling.md §13 carried 291, which was
+              wrong in the direction that understated the case.)
 
               **The `leading-[1.0278]` is stated once and survives all three
               steps**, which is worth knowing because the opposite looks true. A
@@ -249,9 +272,19 @@ export default function Popup({
               the export is literally that component's "+" rotated 45°. It is a
               controlled toggle here that only ever goes one way, so the click
               result is discarded. `label` gives it the accessible name "Close
-              <title>". */}
+              <title>".
+
+              `right-5.5` is the drawn 22px and does not ramp; the *button* does,
+              via `CLOSE_BUTTON_SIZE`. The inset is measured to the card's edge,
+              so holding it fixed is what lets `BAND_INSET` and the band floor
+              above be "the button at this step, plus 22". */}
           <div className="absolute top-1/2 right-5.5 -translate-y-1/2">
-            <PopupButton label={title} open onClick={() => onClose()} />
+            <PopupButton
+              label={title}
+              open
+              className={CLOSE_BUTTON_SIZE}
+              onClick={() => onClose()}
+            />
           </div>
         </header>
 

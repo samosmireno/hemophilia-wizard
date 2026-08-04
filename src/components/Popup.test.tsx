@@ -180,24 +180,53 @@ describe("Popup", () => {
 
     /**
      * The band is content-height, so a one-line title on a phone sizes it to
-     * ~47px — and the ✕ centred on it is 65px, which then overhangs the band at
-     * both ends and is clipped at the top by the card's `overflow-hidden`.
+     * ~47px — and the ✕ centred on it was 65px, which then overhung the band at
+     * both ends and was clipped at the top by the card's `overflow-hidden`.
      * Measured at 390px before the floor went in: 4px of the button gone.
      *
-     * Asserted as a class for the same reason as the widths — jsdom lays nothing
-     * out, so the only thing a test here can hold is that the rule is still on
-     * the element. `justify-center` is asserted with it because the floor is
+     * Asserted as classes for the same reason as the widths — jsdom lays nothing
+     * out, so the only thing a test here can hold is that the rules are still on
+     * the element. `justify-center` is asserted with them because the floor is
      * what makes it matter: without it the title sits at the top of a band the
      * ✕ is centred in.
+     *
+     * All three steps are asserted, not just the drawn one, because the floor is
+     * only correct while it equals the button — and the button now ramps. A step
+     * dropped from one and not the other is exactly the regression this guards.
      */
-    it("floors the band at the ✕'s own height, with the title centred in it", () => {
+    it("floors the band at the ✕'s own height at every step, title centred in it", () => {
       render(
         <Popup open title={TITLE} onClose={vi.fn()}>
           <p>body</p>
         </Popup>,
       );
 
-      expect(card().firstElementChild).toHaveClass("min-h-[65px]", "justify-center");
+      expect(card().firstElementChild).toHaveClass(
+        "min-h-11",
+        "sm:min-h-14",
+        "lg:min-h-16.25",
+        "justify-center",
+      );
+    });
+
+    /**
+     * The other half of the same invariant: the ✕ itself. `PopupButton` merges a
+     * caller's `className` last, so this both overrides the package's fixed
+     * `size-16.25` below `lg` and restates it at `lg` — and a `lg:` step lost
+     * from here would silently ship a 56px button on the 1440 canvas.
+     */
+    it("ramps the ✕ in step with the band it is centred on", () => {
+      render(
+        <Popup open title={TITLE} onClose={vi.fn()}>
+          <p>body</p>
+        </Popup>,
+      );
+
+      expect(screen.getByRole("button", { name: `Close ${TITLE}` })).toHaveClass(
+        "size-11",
+        "sm:size-14",
+        "lg:size-16.25",
+      );
     });
   });
 

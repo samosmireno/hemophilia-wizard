@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import { PopupButton } from "mlg-components";
 
+import { CLOSE_BUTTON_SIZE } from "./closeButton";
 import ModalLayer from "./ModalLayer";
 
 /**
@@ -71,9 +72,15 @@ export default function Lightbox({
         convention every image viewer uses, and it stays put whatever shape the
         asset is — a portrait figure would leave a content-anchored ✕ stranded
         mid-scrim.
+
+        `CLOSE_BUTTON_SIZE` is here for the parity claimed above rather than for
+        a constraint of this layer's own: nothing here is crowded the way the
+        card's band is, since the ✕ hangs over the scrim. But it does overlap the
+        picture on a phone — the layer is `p-4` and a figure is `max-w-full` — so
+        the ramp is an improvement here too, not just a cost of matching.
       */}
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
-        <PopupButton label={title} open onClick={() => onClose()} />
+        <PopupButton label={title} open className={CLOSE_BUTTON_SIZE} onClick={() => onClose()} />
       </div>
     </ModalLayer>
   );
