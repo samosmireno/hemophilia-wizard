@@ -129,6 +129,71 @@ describe("Popup", () => {
     expect(dialog()).toHaveAccessibleName(TITLE);
   });
 
+  /**
+   * Class assertions again, for the same reason the subtitle's is one: jsdom
+   * applies no Tailwind, so a card at the wrong width is invisible to every
+   * other kind of test in this file. What they guard is not the numbers — those
+   * are a browser's business — but that the prop reaches the card at all and
+   * that `cn()` does not drop it. Routing a `w-` utility through tailwind-merge
+   * beside the base string is exactly the shape that silently ate `text-h4`.
+   */
+  describe("width", () => {
+    /** The card is the layer's only child; the layer itself is always full-size. */
+    const card = () => dialog().firstElementChild!;
+
+    it.each([
+      ["narrow", "w-[min(869px,92vw)]"],
+      ["default", "w-[min(1024px,92vw)]"],
+      ["wide", "w-[min(1360px,96vw)]"],
+    ] as const)("draws the %s card", (width, expected) => {
+      render(
+        <Popup open title={TITLE} width={width} onClose={vi.fn()}>
+          <p>body</p>
+        </Popup>,
+      );
+
+      expect(card()).toHaveClass(expected);
+    });
+
+    /**
+     * The step every card but the §5 table sits on, and the one the §7.6
+     * hemostatic-mechanisms asset is stored against: it is encoded at 1772px for
+     * a drawn 886, which is this width less the border and the body gutters. A
+     * default that moved would soften that raster with the whole suite green.
+     */
+    it("is the default width when the caller says nothing", () => {
+      render(
+        <Popup open title={TITLE} onClose={vi.fn()}>
+          <p>body</p>
+        </Popup>,
+      );
+
+      expect(card()).toHaveClass("w-[min(1024px,92vw)]");
+    });
+
+    /**
+     * The band is content-height, so a one-line title on a phone sizes it to
+     * ~47px — and the ✕ centred on it is 65px, which then overhangs the band at
+     * both ends and is clipped at the top by the card's `overflow-hidden`.
+     * Measured at 390px before the floor went in: 4px of the button gone.
+     *
+     * Asserted as a class for the same reason as the widths — jsdom lays nothing
+     * out, so the only thing a test here can hold is that the rule is still on
+     * the element. `justify-center` is asserted with it because the floor is
+     * what makes it matter: without it the title sits at the top of a band the
+     * ✕ is centred in.
+     */
+    it("floors the band at the ✕'s own height, with the title centred in it", () => {
+      render(
+        <Popup open title={TITLE} onClose={vi.fn()}>
+          <p>body</p>
+        </Popup>,
+      );
+
+      expect(card().firstElementChild).toHaveClass("min-h-[65px]", "justify-center");
+    });
+  });
+
   it("closes on the ✕", async () => {
     const onClose = vi.fn();
     render(

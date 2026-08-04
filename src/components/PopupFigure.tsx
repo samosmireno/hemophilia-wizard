@@ -24,7 +24,7 @@
  *   the file reserves a box of the wrong shape and the card resettles when the
  *   picture lands.
  * - The height cap subtracts the card's chrome from its own `max-h-[95dvh]` — a
- *   measured 117px of crimson band (the title wraps to two lines at 1440) plus
+ *   117px crimson band (the title wraps to two lines at 1440) plus
  *   the body region's 16px of `py-2`, rounded up to 10rem so a title that wraps
  *   to a THIRD line on a narrower card still does not push the picture into a
  *   scroll. At 720 the bleeding diagram is 626px tall and a 1440×800 laptop
@@ -88,10 +88,17 @@ export default function PopupFigure({
   /**
    * How much of the card's `95dvh` is NOT this picture, as a CSS length.
    *
-   * The default is `Popup`'s chrome alone — a measured 117px band plus the body
-   * region's 16px of `py-2`, rounded up to 10rem so a title wrapping to a third
-   * line still does not push the picture into a scroll. Raise it by whatever the
+   * The default is `Popup`'s chrome alone — a 117px band plus the body region's
+   * 16px of `py-2`, rounded up to 10rem so a title wrapping to a third line
+   * still does not push the picture into a scroll. Raise it by whatever the
    * caller puts in the body beside the figure; see the note above.
+   *
+   * **117 was the drawn band, not the shipped one, until 2026-08-04** — the card
+   * was rendering 114 at two lines and 77 at one, because its title was capped
+   * 21% under the drawn size (docs/styling.md §13). This number was therefore
+   * right about a card that did not exist yet, and generous about the one that
+   * did. It is now simply right: two of the figure cards here gained a line in
+   * that repair and both fit, at 117 + 16 = 133 inside the 160 reserved.
    */
   reserve?: string;
 }) {

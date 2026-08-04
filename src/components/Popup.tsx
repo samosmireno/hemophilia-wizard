@@ -13,6 +13,38 @@ import ModalLayer from "./ModalLayer";
  */
 const BAND_INSET = "px-[clamp(5.5rem,7vw,6.25rem)]";
 
+/** Which of the three card widths a caller wants. See `CARD_WIDTH`. */
+export type PopupWidth = "narrow" | "default" | "wide";
+
+/**
+ * The three card widths. A step scale rather than a free `className`, so that
+ * the set of widths a card can be is a list someone can read — and so that a
+ * body which outgrows its card is a one-word change rather than a new literal.
+ *
+ * `default` is what every card shipped at before the scale existed and what all
+ * but one still ship at. **It is load-bearing beyond this file**: the §7.6
+ * hemostatic-mechanisms asset is stored at exactly this card's body width
+ * (1024 − `border-5` − `px-16` = 886), so moving it goes stale in the direction
+ * of a softened raster. See docs/styling.md §13.
+ *
+ * `narrow` and `wide` are measured and picked respectively, and the difference
+ * is worth knowing: 869 is the narrowest of the three widths the designer drew
+ * across the seven §6 drug sheets, so it is transcribed. 1360 is not drawn
+ * anywhere — it is the widest card that still floats over the 1440 canvas rather
+ * than taking it over (40px of page either side), chosen for the §5 comparison
+ * table's nine columns, which at `default` get 113px each.
+ *
+ * **`wide` alone is `96vw`, and that is the whole point of the number.** At
+ * `92vw` the viewport term would bind first at 1440 (1324.8 < 1360) and the card
+ * would never actually reach the width it is named for. The two cross at
+ * 1416.7px, so below that the percentage governs, as it does for the other two.
+ */
+const CARD_WIDTH: Record<PopupWidth, string> = {
+  narrow: "w-[min(869px,92vw)]",
+  default: "w-[min(1024px,92vw)]",
+  wide: "w-[min(1360px,96vw)]",
+};
+
 /**
  * The §7.7 click-through pop-up — the card behind every "Click here:"
  * disclosure. This is the **skeleton** issue 03 calls for: chrome, behaviour
@@ -34,6 +66,7 @@ export default function Popup({
   subtitle,
   onClose,
   surface = "gradient",
+  width = "default",
   children,
 }: {
   open: boolean;
@@ -62,6 +95,16 @@ export default function Popup({
    * pills with `bg-white/50`, which the gradient is what makes visible.
    */
   surface?: "gradient" | "white";
+  /**
+   * How wide the card is — `CARD_WIDTH`'s three steps.
+   *
+   * A prop rather than a `className` because the widths are a closed set the
+   * design supports, not a dimension each caller invents: two of the three are
+   * read off artboards and the third exists to hold one specific table. A card
+   * whose body does not fit should move a step, and a body that fits no step is
+   * a conversation with the designer rather than a new arbitrary value.
+   */
+  width?: PopupWidth;
   children?: ReactNode;
 }) {
   const titleId = useId();
@@ -73,25 +116,49 @@ export default function Popup({
       onClose={onClose}
       aria-labelledby={subtitle ? `${titleId} ${subtitleId}` : titleId}
     >
-      {/* `min()` rather than the drawn 1066px: the card is a content container
-          and the app runs down to 375px. `overflow-hidden` is what clips the
-          full-bleed band to the rounded corners — the band and the border are
-          the same crimson, so the top edge reads as one mass either way. */}
-      {/* The floor is `min(520px, 85dvh)`, not a bare 520px: `min-height` beats
+      {/* Every width is a `min()` rather than a bare px: the card is a content
+          container and the app runs down to 375px. `overflow-hidden` is what
+          clips the full-bleed band to the rounded corners — the band and the
+          border are the same crimson, so the top edge reads as one mass either
+          way. */}
+      {/* The floor is `min(520px, 95dvh)`, not a bare 520px: `min-height` beats
           `max-height` in CSS, so an unguarded floor would push the card past the
           cap on any viewport shorter than ~612px — a phone in landscape — and
           overflow it off screen with no way to scroll back. Written this way the
           two can never disagree. */}
       <div
         className={cn(
-          "flex max-h-[95dvh] min-h-[min(520px,95dvh)] w-[min(1024px,92vw)] flex-col overflow-hidden rounded-[40px] border-5 border-brand-crimson-50 shadow-popup",
+          "flex max-h-[95dvh] min-h-[min(520px,95dvh)] flex-col overflow-hidden rounded-[40px] border-5 border-brand-crimson-50 shadow-popup",
+          CARD_WIDTH[width],
           surface === "white" ? "bg-white" : "bg-popup",
         )}
       >
         {/* 12px of padding, not a fixed 118px: the band is content-height in the
             export (12 + two 46.73px lines + 12 = 117.5), so it grows with a
-            title that wraps to three lines instead of clipping it. */}
-        <header className="relative shrink-0 bg-brand-crimson-50 py-5">
+            title that wraps to three lines instead of clipping it.
+
+            This shipped as `py-5` for eleven months, against a comment that has
+            always said 12 — paired with a title capped 21% under the drawn size,
+            which is why the band still measured within 4px of the export and
+            nobody caught either. Both corrected together; docs/styling.md §13.
+
+            **`min-h-[65px]` is the ✕, not a design value.** The button is 65px
+            tall and centred on the band, so a band shorter than that overhangs
+            it at both ends — and the card's `overflow-hidden` then clips the top
+            of the button against the rounded corner. The design never draws a
+            one-line band (its own is two lines at 118px), so there is no drawn
+            floor to transcribe; the honest one is the height of the thing the
+            band has to contain. It is the same 65 `BAND_INSET` is built from.
+            Nothing at 1440 reaches it — a one-line band is 71px — and it binds
+            only where the clamp is at its 22px floor, i.e. on a phone.
+
+            `flex flex-col justify-center` is what makes that floor invisible:
+            the ✕ is centred by `top-1/2`, so without it the title would sit at
+            the top of a band taller than the title while the ✕ sat in the
+            middle, ~9px apart. Only the header's direct children become flex
+            items, so the `preserveCase` whitespace trap §17 records does not
+            apply — the `<h2>`'s own spans and text nodes stay in normal flow. */}
+        <header className="relative flex min-h-[65px] shrink-0 flex-col justify-center bg-brand-crimson-50 py-3">
           {/* `BAND_INSET` is symmetric so the title stays centred on the card,
               and sized to clear the ✕ on the right — its floor is the button's
               own 65px plus the 22px inset, so the two never overlap. Type is
@@ -118,7 +185,7 @@ export default function Popup({
             aria-label={title}
             className={cn(
               BAND_INSET,
-              "text-center font-display text-[clamp(1.375rem,3.157vw,2.25rem)] leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase",
+              "text-center font-display text-[clamp(1.375rem,3.157vw,2.842rem)] leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase",
             )}
           >
             {preserveCase(title)}
@@ -155,7 +222,7 @@ export default function Popup({
 
         {/* `min-h-0` is load-bearing: a flex item's default `min-height:auto`
             floors it at its content's height, so without it the card grows past
-            `max-h-[85dvh]` and this never scrolls. */}
+            `max-h-[95dvh]` and this never scrolls. */}
         <div className="min-h-0 flex-1 overflow-y-auto px-16 py-2">{children}</div>
       </div>
     </ModalLayer>

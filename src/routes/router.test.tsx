@@ -4,6 +4,7 @@ import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { ACTIVITY_TITLE } from "../data/activity";
+import { SDM_CONCLUSION } from "../data/explore";
 import { WIZARD_ENTRY_PROMPT, WIZARD_INPUT_TITLE } from "../data/wizard";
 import { routes } from "./router";
 
@@ -38,8 +39,15 @@ describe("router", () => {
     expect(heading()).toHaveAccessibleName(WIZARD_INPUT_TITLE);
   });
 
+  // Built: the §9 SDM conclusion, not the comparison table issue 09 specified —
+  // see `docs/adr/0007-explore-is-the-sdm-conclusion.md`. Its own behaviour is
+  // covered in `explore.test.tsx`.
+  it("renders the SDM conclusion at /explore", () => {
+    renderAt("/explore");
+    expect(heading()).toHaveAccessibleName(SDM_CONCLUSION);
+  });
+
   it.each([
-    ["/explore", /Explore/],
     ["/resources", /Resources/],
     ["/survey", /Survey/],
     ["/glossary", /Glossary/],

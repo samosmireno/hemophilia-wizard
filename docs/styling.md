@@ -739,33 +739,36 @@ narrower than the 1165px content column, so it stays centred within it.
 
 ## 9. Open items
 
-| #   | Item                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Where                 |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
-| 1   | `PopupButton` fails the 3:1 non-text threshold in **every** state it specifies (2.17:1 default, 1.83:1 hover, 2.49:1 press/open, 2.66:1 open hover). This is **not** a mapping error — the mapping is exact. `lagoon-25` is a light step (lum .435) being used as a saturated ground under a white glyph; every other component in the library uses its scale's `-50` step for that job. The one-token fix, if the designer wants it, is `--color-ui-popup-bg: var(--color-brand-lagoon-50)` → 3.58:1. | issue 03, RAISED 1    |
-| 2   | Focus rings drawn without `outline-offset` (`NavBarButton`, `PopupButton` open skin) or with a positive offset (`NavArrowButton`, `PopupButton` closed skin) land on the page ground, so their contrast depends on a surface the component does not own. Currently resolved for the bar by §5; any new dark surface reopens it.                                                                                                                                                                        | issues 00, 02, 03     |
-| 3   | The palette has no step brighter than `crimson-50` and no saturated near-white; two literals stand in.                                                                                                                                                                                                                                                                                                                                                                                                 | §3, issue 01          |
-| 4   | `--color-ui-navbar-bg-current` / `-fg-current` deliberately unset; current-page state is signalled with `disabled` instead.                                                                                                                                                                                                                                                                                                                                                                            | debt 2, issue 06      |
-| 5   | `NavBarButton`'s tooltip colours are inferred — no export was ever supplied.                                                                                                                                                                                                                                                                                                                                                                                                                           | issue 02              |
-| 6   | No semantic layer yet. `bg-surface`, `text-heading`, etc. do not exist; the app reads raw brand steps in the meantime.                                                                                                                                                                                                                                                                                                                                                                                 | app-buildout issue 02 |
-| 7   | The inner gradient's second stop is off-scale (`rgba(114.61, 213.07, 191.53)`, dE .042 from `teal-25`) while the other three stops are exact palette. Probably meant to be `teal-25`; kept literal pending a designer answer.                                                                                                                                                                                                                                                                          | §6                    |
-| 8   | The landing footage does not loop — it is a continuous dolly-in, 46.5/255 apart end to end. Ping-ponging it is a workaround; **ask the designer for an 8–12 s clip that loops cleanly**. That would halve the asset and remove the direction reversal.                                                                                                                                                                                                                                                 | §7, ADR 0002          |
-| 9   | The references do not agree with the §2 scale **or with each other**: `disease-background` measures ~32px sub-headings, ~18px body and ~22px captions against the scale's 26/16/20, while `rebalancing-agents` measures ~24px body and ~25px captions. **The three chapters now answer it differently** — the first two render at the scale, `rebalancing-agents` transcribes a raw `text-[26px]` (§11). Needs the designer's sizes, then one call applied to all three.                               | §11                   |
-| 10  | The chapter is specified to fit one screen and currently does not (818px at 1440×800). Wants one rule across all four chapters rather than per-page constants.                                                                                                                                                                                                                                                                                                                                         | §11                   |
-| 11  | Four of the eight vertical gaps are ink-to-ink measurements off the reference PNG rather than the designer's box gaps, so they render slightly loose.                                                                                                                                                                                                                                                                                                                                                  | §11                   |
-| 12  | The pop-up export has **no scrim** — nothing dims the page behind a dialog that traps focus. The shipped `rgb(0 0 0 / .5)` is inferred, like §4.3's tooltip and §4.5's sidebar. The card's own 55%-black shadow was drawn against Figma's dark canvas and does much less work over the light `bg-page`.                                                                                                                                                                                                | §13                   |
-| 13  | The pop-up title is 45.47px, off the §2 scale, and ships as a raw value under §8's precedent. Same open question as item 9 — if the designer's sizes arrive for the chapters, this wants deciding with them rather than separately.                                                                                                                                                                                                                                                                    | §13                   |
-| 14  | `--color-agent-mab` (`#003d93`) is a sixth hue: it derives from no brand ramp, and the nearest steps are a different colour rather than a different step. Transcribed verbatim pending a designer answer on whether the agent classes are meant to be brand colours at all. Its pair, `--color-agent-sirna`, is `crimson-50` exactly.                                                                                                                                                                  | §11                   |
-| 15  | The artboards disagree on the disclosure-caption colour: `#074655` on the first two, `lagoon-75` (`#076278`) on `rebalancing-agents` **and now `fviiia-mimetics`** — so it is 2 v 2 and the tie is no longer breakable by weight of evidence. All four chapters use `--color-popup-caption`, the first value, pending a designer answer.                                                                                                                                                               | §11                   |
-| 16  | `rebalancing-agents` draws three figure boxes under a caption telling the reader to click them, but §7.7 names no target for any of the three and the export draws "PLACEHOLDER" in all of them. Needs the designer to say what a box opens.                                                                                                                                                                                                                                                           | §11                   |
-| 17  | The mechanisms prose card glosses only `AT`, but its own copy introduces `TFPI` and `APC` as well; the figure card behind it glosses only `TFPI`. Shipped with all three on the prose card (§11), which also normalises the export's "AT=" to the "TFPI = " spacing it uses one card later. The alternative reading is that the two cards are meant as one and the gloss is split deliberately — needs the designer.                                                                                   | §11                   |
-| 18  | `NavArrowButton` and `Button` are not `forwardRef`, so `ref` does not typecheck on either (`PopupButton` is). That is what blocks focus management when the mechanisms card swaps steps — there is no handle to focus. Package change, tracked in `.scratch/mlg-reskin/`.                                                                                                                                                                                                                              | §11, mlg-reskin       |
-| 19  | `--background-image-emerging-panel`'s mint (`#c6eee5`) is dE .0136 from `color-mix(teal-25 30%, teal-0)` — between the ~.002 every derived token clears and the .042 that made item 7 literal, so the file's own rule does not decide it. Shipped literal; ask the designer whether it is meant to be a teal step.                                                                                                                                                                                     | §11                   |
-| 20  | ~~`fviiia-mimetics` ships four `+` disclosures that open nothing.~~ **Closed.** All four cards (Pop ups 10–13) are built; the diagrams arrived as rasters rather than the SVG exports this item asked for, which is why three of them carry their heading in their own pixels. Kept as a row rather than deleted, so the numbering below it does not shift.                                                                                                                                            | §11                   |
-| 21  | `--color-note-panel-border` (`#747474`) is a neutral grey off every ramp — a hue away rather than a step. Sampled exactly neutral on all three channels, so it is neither an antialiasing artefact nor black at an opacity. Transcribed verbatim pending a designer answer, as item 14 is.                                                                                                                                                                                                             | §15                   |
-| 22  | The two `/wizard/therapies` exports disagree about inter-bullet spacing in the note panels — 12px in the Considerations one, 0 in the Strategies one. Shipped at 0 (six observations against one, and the only reading that fits the 8-bullet leaf on one screen), which renders the Considerations panel 141px against the drawn 152.                                                                                                                                                                 | §15                   |
-| 23  | The `/wizard/therapies` bands and arch are drawn 1216px wide (x 112→1328), 48px wider than `max-w-content`. Same "the artboard forgot the sidebar rail" divergence `/wizard/scenario`'s box row has. Both ship at the content column; wants **one** designer ruling covering both pages rather than two. The later vector export of the header bands gives `w-[1217px]`, a third independent reading of the same 1216 and the reason this is a rail question rather than a rounding one.               | §15, §12              |
-| 24  | The seven drug-sheet exports agree on every gap except the one **above** a section label: 29–31px over the line on three sheets, 36–44 on three more, and 48 / 56 on Denecimig, which draws what reads as a blank line before two of its labels. Everything else is 26 ± 1 (bullet to bullet) and 33 ± 1 (label to its list) across all thirty-five sections, so this is the only loose value in the card. Shipped uniform at the median (`mt-3`). Same shape as item 22.                              | §16                   |
-| 25  | The drug-sheet card's horizontal inset is `Popup`'s `px-16` (69px from the card's outer edge). **Two of the seven exports draw exactly that; the other five draw 49.** Not split, because the padding belongs to a card shared with the §7.5 chapters. Wants a designer answer with items 9 and 13 rather than alone.                                                                                                                                                                                  | §16, §13              |
+| #   | Item                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Where                 |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1   | `PopupButton` fails the 3:1 non-text threshold in **every** state it specifies (2.17:1 default, 1.83:1 hover, 2.49:1 press/open, 2.66:1 open hover). This is **not** a mapping error — the mapping is exact. `lagoon-25` is a light step (lum .435) being used as a saturated ground under a white glyph; every other component in the library uses its scale's `-50` step for that job. The one-token fix, if the designer wants it, is `--color-ui-popup-bg: var(--color-brand-lagoon-50)` → 3.58:1.                                                                                                                                                                                            | issue 03, RAISED 1    |
+| 2   | Focus rings drawn without `outline-offset` (`NavBarButton`, `PopupButton` open skin) or with a positive offset (`NavArrowButton`, `PopupButton` closed skin) land on the page ground, so their contrast depends on a surface the component does not own. Currently resolved for the bar by §5; any new dark surface reopens it.                                                                                                                                                                                                                                                                                                                                                                   | issues 00, 02, 03     |
+| 3   | The palette has no step brighter than `crimson-50` and no saturated near-white; two literals stand in.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | §3, issue 01          |
+| 4   | `--color-ui-navbar-bg-current` / `-fg-current` deliberately unset; current-page state is signalled with `disabled` instead.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | debt 2, issue 06      |
+| 5   | `NavBarButton`'s tooltip colours are inferred — no export was ever supplied.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | issue 02              |
+| 6   | No semantic layer yet. `bg-surface`, `text-heading`, etc. do not exist; the app reads raw brand steps in the meantime.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | app-buildout issue 02 |
+| 7   | The inner gradient's second stop is off-scale (`rgba(114.61, 213.07, 191.53)`, dE .042 from `teal-25`) while the other three stops are exact palette. Probably meant to be `teal-25`; kept literal pending a designer answer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | §6                    |
+| 8   | The landing footage does not loop — it is a continuous dolly-in, 46.5/255 apart end to end. Ping-ponging it is a workaround; **ask the designer for an 8–12 s clip that loops cleanly**. That would halve the asset and remove the direction reversal.                                                                                                                                                                                                                                                                                                                                                                                                                                            | §7, ADR 0002          |
+| 9   | The references do not agree with the §2 scale **or with each other**: `disease-background` measures ~32px sub-headings, ~18px body and ~22px captions against the scale's 26/16/20, while `rebalancing-agents` measures ~24px body and ~25px captions. **The three chapters now answer it differently** — the first two render at the scale, `rebalancing-agents` transcribes a raw `text-[26px]` (§11). Needs the designer's sizes, then one call applied to all three.                                                                                                                                                                                                                          | §11                   |
+| 10  | The chapter is specified to fit one screen and currently does not (818px at 1440×800). Wants one rule across all four chapters rather than per-page constants.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | §11                   |
+| 11  | Four of the eight vertical gaps are ink-to-ink measurements off the reference PNG rather than the designer's box gaps, so they render slightly loose.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | §11                   |
+| 12  | The pop-up export has **no scrim** — nothing dims the page behind a dialog that traps focus. The shipped `rgb(0 0 0 / .5)` is inferred, like §4.3's tooltip and §4.5's sidebar. The card's own 55%-black shadow was drawn against Figma's dark canvas and does much less work over the light `bg-page`.                                                                                                                                                                                                                                                                                                                                                                                           | §13                   |
+| 13  | ~~The pop-up title is 45.47px, off the §2 scale, and ships as a raw value under §8's precedent.~~ **Closed 2026-08-04** — but not the way it was written. 45.47px is the _drawn_ size; what shipped was a clamp capped at 36px, and had been since day one. The code now matches the drawing, so the raw value is genuinely on screen and the question this row asked (is an off-scale title acceptable?) is answered by §8's precedent as it always was. Kept as a row so the numbering below it does not shift.                                                                                                                                                                                 | §13                   |
+| 14  | `--color-agent-mab` (`#003d93`) is a sixth hue: it derives from no brand ramp, and the nearest steps are a different colour rather than a different step. Transcribed verbatim pending a designer answer on whether the agent classes are meant to be brand colours at all. Its pair, `--color-agent-sirna`, is `crimson-50` exactly.                                                                                                                                                                                                                                                                                                                                                             | §11                   |
+| 15  | The artboards disagree on the disclosure-caption colour: `#074655` on the first two, `lagoon-75` (`#076278`) on `rebalancing-agents` **and now `fviiia-mimetics`** — so it is 2 v 2 and the tie is no longer breakable by weight of evidence. All four chapters use `--color-popup-caption`, the first value, pending a designer answer.                                                                                                                                                                                                                                                                                                                                                          | §11                   |
+| 16  | `rebalancing-agents` draws three figure boxes under a caption telling the reader to click them, but §7.7 names no target for any of the three and the export draws "PLACEHOLDER" in all of them. Needs the designer to say what a box opens.                                                                                                                                                                                                                                                                                                                                                                                                                                                      | §11                   |
+| 17  | The mechanisms prose card glosses only `AT`, but its own copy introduces `TFPI` and `APC` as well; the figure card behind it glosses only `TFPI`. Shipped with all three on the prose card (§11), which also normalises the export's "AT=" to the "TFPI = " spacing it uses one card later. The alternative reading is that the two cards are meant as one and the gloss is split deliberately — needs the designer.                                                                                                                                                                                                                                                                              | §11                   |
+| 18  | `NavArrowButton` and `Button` are not `forwardRef`, so `ref` does not typecheck on either (`PopupButton` is). That is what blocks focus management when the mechanisms card swaps steps — there is no handle to focus. Package change, tracked in `.scratch/mlg-reskin/`.                                                                                                                                                                                                                                                                                                                                                                                                                         | §11, mlg-reskin       |
+| 19  | `--background-image-emerging-panel`'s mint (`#c6eee5`) is dE .0136 from `color-mix(teal-25 30%, teal-0)` — between the ~.002 every derived token clears and the .042 that made item 7 literal, so the file's own rule does not decide it. Shipped literal; ask the designer whether it is meant to be a teal step.                                                                                                                                                                                                                                                                                                                                                                                | §11                   |
+| 20  | ~~`fviiia-mimetics` ships four `+` disclosures that open nothing.~~ **Closed.** All four cards (Pop ups 10–13) are built; the diagrams arrived as rasters rather than the SVG exports this item asked for, which is why three of them carry their heading in their own pixels. Kept as a row rather than deleted, so the numbering below it does not shift.                                                                                                                                                                                                                                                                                                                                       | §11                   |
+| 21  | `--color-note-panel-border` (`#747474`) is a neutral grey off every ramp — a hue away rather than a step. Sampled exactly neutral on all three channels, so it is neither an antialiasing artefact nor black at an opacity. Transcribed verbatim pending a designer answer, as item 14 is.                                                                                                                                                                                                                                                                                                                                                                                                        | §15                   |
+| 22  | The two `/wizard/therapies` exports disagree about inter-bullet spacing in the note panels — 12px in the Considerations one, 0 in the Strategies one. Shipped at 0 (six observations against one, and the only reading that fits the 8-bullet leaf on one screen), which renders the Considerations panel 141px against the drawn 152.                                                                                                                                                                                                                                                                                                                                                            | §15                   |
+| 23  | The `/wizard/therapies` bands and arch are drawn 1216px wide (x 112→1328), 48px wider than `max-w-content`. Same "the artboard forgot the sidebar rail" divergence `/wizard/scenario`'s box row has. Wants **one** designer ruling covering all of them rather than three. The later vector export of the header bands gives `w-[1217px]`, a third independent reading of the same 1216 and the reason this is a rail question rather than a rounding one. **`/explore` now makes it three pages and three answers**: its arch row is drawn on the identical 112→1328 band and ships at exactly that (`lg:-mr-rail`), where `/wizard/therapies` takes `-mr-16` and lands on 1344.                 | §15, §12, §17         |
+| 24  | The seven drug-sheet exports agree on every gap except the one **above** a section label: 29–31px over the line on three sheets, 36–44 on three more, and 48 / 56 on Denecimig, which draws what reads as a blank line before two of its labels. Everything else is 26 ± 1 (bullet to bullet) and 33 ± 1 (label to its list) across all thirty-five sections, so this is the only loose value in the card. Shipped uniform at the median (`mt-3`). Same shape as item 22.                                                                                                                                                                                                                         | §16                   |
+| 25  | The drug-sheet card's horizontal inset is `Popup`'s `px-16` (69px from the card's outer edge). **Two of the seven exports draw exactly that; the other five draw 49.** Not split, because the padding belongs to a card shared with the §7.5 chapters. Wants a designer answer with items 9 and 13 rather than alone.                                                                                                                                                                                                                                                                                                                                                                             | §16, §13              |
+| 26  | `/explore`'s class labels fit a letter-spacing of **0.036em** across all four strings — between `tracking-wide` (0.025em) and `tracking-wider` (0.05em), and on no step at all. Shipped `tracking-wide`, which renders the longest label 353 → 344px. One tracking rule across every display heading in the app beat an exact bespoke value on a centred label that shifts no layout, but it is the designer's to confirm. Same shape as item 9 — a size/spacing question the file answers off the scale.                                                                                                                                                                                         | §17                   |
+| 27  | ~~`Popup` is too narrow for the §5 comparison table's nine columns.~~ **Half closed.** `Popup` now has a three-step `width` scale and the table's card takes `wide` (1360px), so the columns get ~136px instead of ~113 and the card is no longer the binding constraint. What remains is not a card question: 1360px is not a phone, so the grid still wants a horizontal scroll region inside the card, which is issue 09's own acceptance criterion and is decided against a body that exists. **1360 is a picked number, not a drawn one** — no artboard shows this card, so if the designer draws the table the width is theirs to overrule.                                                 | §13, §17, ADR 0007    |
+| 28  | ~~The pop-up title caps at 36px against the drawn 45.47, and the band's padding is `py-5` against the drawn 12.~~ **Closed 2026-08-04, in code.** Both shipped wrong from the component's first commit and neither was visible, because they cancelled: 20 + (2 × 37) + 20 = 114px of band against the drawn 118. Corrected to the drawn values in both cases; three titles gain a line, none reaches three, the two-line band lands at 117, and `PopupFigure`'s `reserve` — documented against a 117px band it was not getting — becomes correct. The band also gained a `min-h-[65px]` floor, which is the ✕'s own height rather than a design value. Verified on twenty cards at 1440 and 390. | §13                   |
 
 ---
 
@@ -1480,14 +1483,49 @@ Every figure below is from the node's metadata (clean integers), not from the
 `get_design_context` code dump, whose values are the same numbers scaled by
 1.263 and therefore fractional.
 
-| Part            | Design                                    | Shipped                              |
-| --------------- | ----------------------------------------- | ------------------------------------ |
-| Card            | 1066 × 645                                | `w-[min(1066px,92vw)] max-h-[85dvh]` |
-| Radius / border | 40.417px / 5.052px `crimson-50`           | verbatim                             |
-| Shadow          | `0 22.735px 50.142px 5.052px` black @ 55% | `--shadow-popup`                     |
-| Band padding    | 12px top and bottom                       | `py-3`                               |
-| ✕ inset         | 22px from the card's right edge, centred  | verbatim                             |
-| Body gutters    | 64px sides, 32px under the band           | `px-16 py-8`                         |
+| Part            | Design                                    | Shipped                           |
+| --------------- | ----------------------------------------- | --------------------------------- |
+| Card            | 1066 × 645                                | the `default` width step; `95dvh` |
+| Radius / border | 40.417px / 5.052px `crimson-50`           | verbatim                          |
+| Shadow          | `0 22.735px 50.142px 5.052px` black @ 55% | `--shadow-popup`                  |
+| Band padding    | 12px top and bottom                       | `py-3`, floored at the ✕'s 65px   |
+| ✕ inset         | 22px from the card's right edge, centred  | `right-5.5`, `-translate-y-1/2`   |
+| Body gutters    | 64px sides                                | `px-16 py-2`                      |
+
+**Four rows of that table were wrong until 2026-08-04.** Three were corrected by
+changing the table — the code they described was right and had simply moved on
+without them. The fourth was corrected by changing the code, because there the
+table was right and the code had been wrong since the day both were written.
+Worth listing, because the shape of each error is the lesson:
+
+- **`1066px`.** Narrowed to 1024 in the §7.3 commit, which recorded it in the
+  commit message ("Popup.tsx carries an unrelated in-flight change") and not
+  here. A doc updated by the commit that had a reason to is the only kind that
+  stays true; an aside in a message is not that.
+- **`85dvh`.** Never shipped. The cap has been `95dvh` since the component was
+  written, and `PopupFigure` computes its own height budget against 95, so the
+  two live records disagreed and the working one was the code. Two comments
+  inside `Popup.tsx` carried the same 85 and are corrected with it.
+- **`py-8`** on the body, against a `py-2` that has never been anything else.
+- **`py-3`** on the band, against a shipped `py-5` — **and this is the one that
+  was fixed rather than re-documented.** It was never a transcription error: the
+  band's padding shipped 67% larger than drawn and the title inside it 21%
+  smaller, and the two cancelled to a band four pixels off the drawing, which is
+  how both survived eleven months of artboard comparison. See "The title" below.
+  The band is now `py-3` and the title reaches its drawn 45.47px. This closed
+  open items 13 and 28.
+
+The first three share a pattern worth naming, because it will recur: the table
+recorded what the _design_ says and was written in the same commit as the
+component, so a value the implementation had already departed from got
+transcribed as though it were the shipped one. A geometry table is only useful
+when it is read off the code.
+
+The fourth is the opposite failure and the more interesting one. There the doc
+was right, the code was wrong, and the error hid **because a second error
+compensated for it** — no single measurement was far enough off to notice, and
+the only way to find it was to check two records against each other rather than
+either against the screen.
 
 **The band is content-height, not 118px.** The text node measures y=15, h=94
 inside a band running y=3–121, so 12 + (2 × 46.73) + 12 = 117.5 ≈ the 118px the
@@ -1499,6 +1537,58 @@ clipped by it.
 band overhangs the card and is clipped; here `overflow-hidden` clips it to the
 padding box instead. Band and border are the same `crimson-50`, so the top edge
 reads as one mass either way.
+
+### The card has three widths, and only one of them is drawn
+
+`Popup` takes `width="narrow" | "default" | "wide"`. A three-step scale rather
+than a `className` the caller composes, because the widths are a closed set the
+design supports and not a dimension each card invents — a body that fits no step
+is a conversation with the designer, not a fourth literal.
+
+| Step      |   px | Body¹ | Source                                        |
+| --------- | ---: | ----: | --------------------------------------------- |
+| `narrow`  |  869 |   731 | the narrowest of the seven §6 drug sheets     |
+| `default` | 1024 |   886 | everything, and the §7.6 asset's stored width |
+| `wide`    | 1360 |  1222 | chosen for the §5 table's nine columns        |
+
+¹ the step less `border-5` and `px-16`: `w − 10 − 128`.
+
+**`default` is the one that cannot move.** `hemostatic_mechanisms_diagram.webp`
+is stored at 1772px for a drawn width of 886 — which is this step's body, exactly
+— because that figure fills its card rather than being drawn to a size of its
+own (see the asset table below). Widen the default and the raster upscales;
+narrow it and the stored file is bigger than it needs to be. The number also has
+no artboard behind it: the drawn card is 1066 and the shipped one has been 1024
+since the §7.3 commit narrowed it.
+
+**`narrow` is transcribed and `wide` is picked**, and the difference is the point
+of this paragraph. §16 records that the seven drug-sheet artboards draw their
+cards at 1136, 1064 and **869** — the designer sized each sheet to its own
+content, which is the closest thing in the file to a statement that a pop-up may
+be narrower than the default. 869 is that statement's low end. 1360 has no such
+backing: it is the widest card that still floats over the 1440 canvas rather than
+taking it over, at 40px of page either side.
+
+**`wide` is the only step at `96vw`, and that is the number doing the work.** At
+`92vw` the viewport term binds first on the design canvas — 1324.8 < 1360 — so
+the card would never once reach the width it is named for. The two terms cross at
+1416.7px; below that the percentage governs, as it does for the other two steps.
+
+**`narrow` has no caller.** It ships as the third step of a scale rather than in
+response to a card, which is the opposite of the posture this repo takes for
+features (`TreatmentOptionsTable`: "one caller, and a second is not coming"). The
+distinction is that a size scale is a vocabulary, not a feature: the cost of the
+unused step is one line in a lookup, and the cost of not having it is the next
+short card either sitting in 1024px of gradient or inventing its own width. The
+number is measured, so it is not a guess awaiting a designer either.
+
+**The one caller off `default` is `/explore`'s comparison-table card**, and it is
+set there ahead of the grid it is for — so the placeholder is measured in the box
+the table will actually land in rather than a box it will have to be re-fitted
+to. Nine columns get 136px at `wide` against 113 at `default`. That does not by
+itself make item 27 go away: 136px is a readable column and a phone still is not
+1360px wide, so the grid will want a horizontal scroll region inside the card
+regardless. What `wide` settles is that the card is not the binding constraint.
 
 ### The title
 
@@ -1512,6 +1602,73 @@ text-[clamp(1.375rem,3.157vw,2.842rem)]   /* 45.47px at 1440 */
 leading-[1.0278]                          /* = 46.732 / 45.469 */
 tracking-[0.0289em]                       /* = 1.3136 / 45.469 */
 ```
+
+#### The cap was 2.25rem for eleven months
+
+The block above is what this section has said since the component was written.
+The code said `2.25rem`, so the title topped out at **36px against the drawn
+45.47** — 21% smaller, on every card in the app. Only the two relative values
+survived; the `3.157vw` middle term is the drawn ratio and reaches 45.47 at 1440
+on its own, and the cap was what stopped it.
+
+**It never looked wrong, because a second error cancelled it.** The band shipped
+`py-5` where the export measures 12, and 20 + (2 × 37) + 20 = 114px of band
+against the drawn 118. Four pixels — built from a title 21% too small and padding
+67% too large. Neither would have survived a measurement on its own; together
+they produced a band that measured right, so nothing ever prompted one.
+
+Both are corrected as of 2026-08-04, and the correction is the drawn value in
+each case rather than a new compromise: `2.842rem` and `py-3`. **This closed open
+items 13 and 28.** The lesson is in the geometry table above — the compensating
+pair was found by checking two records against each other, not by looking at the
+screen, which had looked fine for eleven months and still does.
+
+#### What restoring it actually changed
+
+Measured across all twenty-three strings that reach the band today, then verified
+by opening all twenty cards in Chromium at 1440 × 800 and 390 × 844:
+
+- **Three titles gain a line** — the severity table, the bleeding figure and the
+  clotting cascade go one line to two. Every one of them wraps to two lines in the
+  designer's own 1066px card as well (measured at that card's 856px text box), so
+  the wrap is the type size and not our 42px-narrower card. **Nothing reaches
+  three lines**, at either viewport.
+- **The two-line band lands at 117px** against the drawn 118, on all six titles
+  that wrap. The one-line band is 71px, and the drawing has no one-line case.
+- **`PopupFigure`'s `reserve` becomes correct rather than merely safe.** Its
+  default is 10rem, documented as "a measured 117px of crimson band … plus the
+  body region's 16px" — a figure that described the _drawn_ band, not the one
+  that shipped. It now describes both. The two figure cards that gain a line
+  still fit: 117 + 16 = 133 inside the 160 reserved.
+- **Below 1140px nothing changes at all.** That is where `3.157vw` crosses 36px,
+  so under it the middle term was already governing and was already the drawn
+  ratio. The whole size change is a desktop change.
+
+#### The band has a floor now, and it is the ✕
+
+`min-h-[65px] flex flex-col justify-center` on the header. This is the one part
+of the repair that is not a drawn value, and it is not a design number at all:
+
+Cutting the padding to 12px took the one-line band on a phone from 63px to 47px,
+and the ✕ centred on it is **65px tall**. A band shorter than its own button
+overhangs it at both ends, and the card's `overflow-hidden` clips the top against
+the rounded corner — measured at 390px, 4px of the button gone. The bug was
+already latent at `py-5` (the button overhung by 1px and cleared the card by
+under 4); the correct padding is what made it visible.
+
+So the floor is the height of the thing the band must contain, which is the same
+65 `BAND_INSET`'s own floor is built from. The design draws no one-line band and
+therefore offers no value to transcribe. Nothing at 1440 reaches the floor — a
+one-line band is 71px — and it binds only where the clamp is at its 22px floor,
+i.e. on a phone. Because the band and the border are the same crimson, a ✕ flush
+to the band's edge still has the border's 5px of crimson above it.
+
+`justify-center` is what makes the floor invisible: the ✕ is centred by
+`top-1/2`, so without it a band taller than its title would put the two ~9px
+apart. Only the header's **direct** children become flex items, so the
+`preserveCase` whitespace trap §17 records does not apply here — the `<h2>`'s own
+spans and text nodes stay in normal flow, and the browser check confirms the
+cased terms keep their spaces.
 
 The horizontal padding is `clamp(5.5rem,7vw,6.25rem)` — 100px at 1440, floored
 at 88px, which is the ✕'s own 65px plus its 22px inset. Symmetric, so the title
@@ -1707,26 +1864,92 @@ three lines and the band grown to fit it.
 Also checked in the compiled CSS: `bg-popup` resolves to the live `var()` chain,
 and `--shadow-popup` inlines onto its utility as §1 predicts.
 
+That pass predates the width scale and its 1066px card is the pre-§7.3 default;
+the scale has its own pass below.
+
+### Verified in a browser — the width scale
+
+Chromium at five widths on `/explore`, measuring the `wide` card (the table),
+the `default` card (Emicizumab's sheet, which this work does not touch and which
+is therefore the regression half of the check), and the `narrow` rule applied to
+a bare element, since no caller renders one:
+
+| viewport | `wide`        | `default` | `narrow` | band | overflow |
+| -------: | ------------- | --------- | -------- | ---- | -------: |
+|     1440 | **1360** @x40 | **1024**  | **869**  | 71   |        0 |
+|     1280 | 1229          | 1024      | 869      | 66   |        0 |
+|     1024 | 983           | 942       | 869      | 65   |        0 |
+|      768 | 737           | 707       | 707      | 65   |        0 |
+|      375 | 360           | 345       | 345      | 69   |        0 |
+
+Everything below 1440 is a percentage, and the table is the proof that the two
+percentages are the ones intended: 1229 is 96vw of 1280 and 942 is 92vw of 1024,
+so `wide` reaches its named width **only** on the design canvas and governs by
+`96vw` everywhere below — which is the whole reason it is not `92vw` like the
+other two. The steps also converge from the bottom, exactly as a percentage scale
+should: `narrow` and `default` are the same card below 944px, and all three are
+within 15px of each other at 375. No horizontal document overflow at any width.
+
+The `wide` card's body measures 1350px, which is 1360 less the border — its own
+`px-16` puts content at **1222**, the number the width table above states.
+
+**The band column is what caught open item 28.** On the first run of this table
+it read 77 / 77 / 73 / 65 / 85, and 77px at 1440 is one line of a _36px_ title
+plus `py-5` twice — not the 71px a 45.47px title in a 12px band gives. Five
+widths agreeing with `clamp(1.375rem,3.157vw,2.25rem)` to the pixel is what
+turned "the doc says 2.842rem" from a suspected typo into a finding. The column
+above is the same measurement after the repair; the two 65s at 1024 and 768 are
+the new `min-h-[65px]` floor binding, where the pre-repair run gave 73 and 65 for
+different reasons.
+
+### Verified in a browser — the title repair
+
+Every card in the app, opened by clicking its own trigger, at 1440 × 800 and
+390 × 844: four §7.7 disclosures, three §7.3–7.4 cards, both `rebalancing-agents`
+steps, the four §7.5 agent cards, all seven §6 drug sheets, and the §5 table
+card. **Twenty cards, forty openings.**
+
+- Title computes to **45.46px** at 1440 on every one of them, and to the 22px
+  clamp floor at 390.
+- **No band clips its ✕ and no page overflows horizontally**, at either viewport
+  — the check that failed at 390 before the floor went in.
+- One-line bands are 71px, two-line 117 (drawn 118), and the one card with a
+  subtitle is 146. At 390 the range is 65–239 and every card either fits or
+  scrolls its body region rather than growing past `95dvh`.
+- `preserveCase` survives the header becoming a flex container: "Inno8: Oral
+  FVIIIa Mimetic for HA" renders with both cased terms and both spaces intact,
+  and its `textContent` equals the raw title exactly.
+- The three cards that gain a line — severity, bleeding, cascade — all still fit
+  without scrolling at 1440.
+
 ### The height floor
 
 The design draws 645px, and the card's height is otherwise its content's — which
 left the one popup with content today (a single bullet) rendering 193px, reading
 as a bar rather than the drawn card, with the body gradient showing only its warm
-centre. So the card carries a floor as well as the `85dvh` cap:
+centre. So the card carries a floor as well as the `95dvh` cap:
 
 ```
-min-h-[min(520px,85dvh)]   max-h-[85dvh]
+min-h-[min(520px,95dvh)]   max-h-[95dvh]
 ```
 
 520px is a chosen number, not a transcribed one — it is short of the drawn 645px
 deliberately, so a popup whose content genuinely is brief does not open a screen
 of empty gradient.
 
+**Both are `95dvh`, not the `85dvh` this section claimed until 2026-08-04.** The
+code has never said 85; see the geometry table above.
+
 **The floor is guarded by the cap, and must stay that way.** `min-height` beats
-`max-height` in CSS, so a bare `min-h-[520px]` would push the card past `85dvh`
-on any viewport shorter than ~612px — a phone in landscape — and overflow it off
-screen with no way to scroll back. Written as `min(520px, 85dvh)` the two cannot
+`max-height` in CSS, so a bare `min-h-[520px]` would push the card past `95dvh`
+on any viewport shorter than ~547px — a phone in landscape — and overflow it off
+screen with no way to scroll back. Written as `min(520px, 95dvh)` the two cannot
 disagree.
+
+**The floor is width-independent, and `narrow` is where that shows.** 520 × 869
+is a squarer card than the design has ever drawn; a short body in a narrow card
+is the combination most likely to look like a floor rather than a card, and the
+first caller to hit it should say so rather than assume the number transfers.
 
 ### The figure that opens itself — `ExpandableFigure`
 
@@ -2341,3 +2564,181 @@ three others, and 48 and 56 on Denecimig — where the export opens what looks l
 line before Monitoring and before Clinical Trials. Shipped at the median (12px over the
 line) uniformly. Open item 24; it is the same shape as item 22 and wants the same kind of
 ruling.
+
+---
+
+## 17. `/explore` — the SDM conclusion and the class arches
+
+`Explore` draws CONTEXT.md §9's shared-decision-making node over a row of three arched
+segments indexing the §6 drug sheets by therapeutic class. Why this page is the SDM node
+rather than the comparison table issue 09 specified is
+`docs/adr/0007-explore-is-the-sdm-conclusion.md`.
+
+One artboard, 1440 × 800, and **it is 1:1** — established before anything was read off it,
+because a wrong scale factor makes every number below wrong in the same direction and
+nothing else would catch it. Rendering DM Sans 700 at 22px gives the five one-line
+captions as 131 / 115 / 135 / 143 / 95px against the export's 131 / 115 / 135 / 143 / 94.
+Four exact, one off by a pixel. The package `Button`'s own `px-16 py-[18px]` also lands on
+the drawn CTA's 67/66 × 17/15 of padding. So the export is unscaled and the measurements
+below are pixels, not ratios.
+
+### The band is the gutter on both sides, and this page takes all of it
+
+The three segments tile **x 112 → 1328**: 339 + 524 + 353 = 1216. That is
+`--spacing-gutter` (112px) on the left and the same on the right, i.e. the artboard's
+content is symmetric about the canvas and takes no account of the sidebar rail — the
+divergence open item 23 already records for `/wizard/therapies` and `/wizard/scenario`.
+
+The content column is `--container-content` (1168px) and stops at x=1280 to clear the
+rail, so the page breaks out 48px to the right with **`lg:-mr-rail`**, landing the band on
+1328 exactly. `/wizard/therapies` breaks out with `-mr-16` (64px) and lands on 1344,
+overshooting the same drawn edge by 16. Two pages, two answers, one designer question —
+folded into open item 23 rather than raised again.
+
+Everything on the page centres on the band's centre (x≈717 drawn, 720 computed), not the
+column's 696.
+
+### The arches: radius verified, not asserted
+
+`rounded-t-[128px]`, and the radius was checked against the drawn curve rather than read
+off a corner. The left segment's flat top is y=518; at x=200 its edge should therefore sit
+at `518 + 128 − √(128² − 40²)` = **524.4**, and it measures **524**. The opposite corner
+predicts 543.8 at x=400 and measures 544. Both corners, one radius.
+
+| segment | x → x      | width | drawn top | ships at |
+| ------- | ---------- | ----: | --------: | -------: |
+| left    | 112 → 451  |   339 |       518 |      514 |
+| middle  | 451 → 975  |   524 |       478 |      478 |
+| right   | 975 → 1328 |   353 |       511 |      514 |
+
+**The middle's 40px lift is kept; the flanks' 7px difference is not.** The lift is far too
+large to be hand placement and is what makes the three read as a range with a peak. The
+7px between two flanking segments drawn as a pair is placement noise, so they take the
+mean and share one top. The padding inside each segment absorbs the difference, which is
+what keeps all seven buttons on one line (y 566–630) whatever their arches do: 88px from
+the row's top edge in the middle, 36 + 52 either side of it.
+
+The segments carry **no `overflow-hidden`**, unlike `ArchBand` — there is no footage to
+clip, and the 128px radius clips nothing else.
+
+### The fills: one solved exactly, one substituted deliberately
+
+Solving `inside = (1−α)·bg + α·C` over the flat top of each segment, against the
+composited page gradient immediately above it:
+
+- **middle, α=0.60 → C = (254.7, 254.7, 254.7)** over 245 columns. White, to within a
+  quantisation step. Ships `bg-white/60`, exact.
+- **flanks, α=0.05 → C = (248, 7, 2) and (254, 4, −3)**. A pure red. The solve is noisy —
+  at 5% a ±0.5 quantisation error is amplified 20× — but it is decisive about _hue_:
+  `brand-crimson-50` is (214, 58, 82), a pink, and would need G≈58 / B≈82 where the solve
+  returns G≈5 / B≈0. The export is Tailwind's `red-600`, not a palette step.
+
+**Shipped `bg-brand-crimson-50/5` anyway.** At α=0.05 the composited difference between
+the two is **(−0.3, 1.0, 2.2) out of 255** — under one quantisation step on two channels,
+and invisible. Following the export would have made this the only native-Tailwind colour
+in an app whose every other value is a token, to buy a difference no display can show.
+`ArchBand` already washes its arch in the same crimson at `/15`, so the flanks are now the
+same colour one alpha step lighter. Recorded rather than silent, because it is the one
+place on this page the code deliberately does not match the file.
+
+### Type
+
+| element     | value                                                     | how it was fixed                                                                                                                                                      |
+| ----------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<h1>`      | `text-[42px] leading-9 tracking-wide`, display, uppercase | least squares over all four drawn lines returns size 42 at 0.0234em, residuals ≤1.1px on lines up to 1139px; cap height agrees independently (30px ink / 0.70 = 42.9) |
+| bullets     | `text-[22px] leading-8`                                   | rendered widths 655/1110/817/718 vs drawn 651/1106/813/715 — a constant +4, i.e. the indent, not the size                                                             |
+| CTA         | `text-[24px] leading-5`, **sentence case**                | ink measures 24px ascender-to-descender; the drawn label is mixed case                                                                                                |
+| caption     | `text-[22px] leading-5 font-bold text-brand-slate-100`    | pixel-exact to `/wizard/therapies`; `leading-5` from the 20px baseline pitch of "Efanesoctocog / alfa"                                                                |
+| class label | `text-h3 leading-5.5 tracking-wide`, display, uppercase   | 18px cap ink / Barlow Condensed's 0.70 = 25.7 → 26 = `text-h3`; 22px line pitch off the three-line label                                                              |
+
+**The `<h1>` is 42px where every other page in the app sets `text-h1` (52px).** It is a
+four-line sentence and the designer dropped it. Raw under §8's precedent, as §13's 45.5px
+pop-up title is.
+
+**`max-w-content` on the `<h1>` is a line-break cap**, the device `/wizard/therapies`'
+`max-w-215` uses. The drawn lines measure 961 / 1019 / 1142 / 362, and the 1216px band is
+wide enough to pull "EMPHASIZING" up onto line 1 and set the whole thing in three. The
+window that reproduces the drawn break is **[1142, 1178)** — at least line 3's own width,
+and less than line 1 plus the next word. 1168 is inside it, and it is the app's own
+content measure rather than a number chosen to fit.
+
+**The CTA's clamps are load-bearing, not responsive polish.** `leading-5` is what makes
+the package `Button` 56px instead of 68 — but 24px type in a 20px line box overlaps itself
+the moment the label wraps, which is why `Landing` refuses the trick. The size clamp
+floors at 1rem, so at every width where this label wraps it is set at 16px inside a 20px
+box. Shipped broken for one commit and caught at 375px.
+
+### The label row is a fixed height, because the export says so four times
+
+The four class labels carry 1, 1, 3 and 2 lines of text, and their ink spans are 743–760,
+743–760, 721–782 and 765–782. Every one of them has its vertical **midpoint at y = 751.5**.
+Four for four, to half a pixel — that is a fixed-height row with the label centred in it,
+not labels flowing under their captions. Built as one: the captions take a fixed `h-15`
+(60px, the three-line height) and the label row `h-20` (80px), which puts the centre at
+751 against the drawn 751.5.
+
+Both are `xl:` only. Below that the buttons wrap and the columns stack, so the four labels
+genuinely are not in one row and the fixed heights would only be gaps.
+
+### `preserveCase` and the flex-item whitespace trap
+
+"FVIIIa mimetics" needs `preserveCase` — `uppercase` renders it "FVIIIA MIMETICS" and
+destroys the letter that says _activated_ factor VIII, which is why the artboard draws
+that `a` lower case.
+
+The helper returns a `<span>` beside a bare text node, and **a flex container makes each
+of those an anonymous flex item and drops the whitespace between them**, rendering the
+label "FVIIIaMIMETICS". The centring therefore lives on a wrapper and the text is not a
+flex item. The helper's other two callers are an `<h1>` and a pop-up band, neither of them
+a flex container, which is why this is the first place it bites — worth knowing before the
+third caller.
+
+No `aria-label` here, unlike those two callers. The helper's contract asks for one because
+the accessible-_name_ algorithm joins each element's contribution with a separating space,
+but that computation only runs on elements whose name is being computed, and this is a
+`<p>` of body text that names nothing. Its concatenated text content still has the space.
+
+### Below `xl`, and the padding that moved
+
+`px-4` on the segment sits on the inner row, not the flex item: with `flex-basis: 0%` and
+border-box, padding on the item floors its basis at 32px and the three segments come out
+344.2 / 514.6 / 357.1 instead of 339 / 524 / 353. It is also `xl:px-0`, because 32px taken
+out of the space the buttons divide moves every button in the middle segment by up to 21px
+against the drawing. The drawn case needs no padding: at the buttons' own height the 128px
+radius has already opened to within 25px of the segment edge, and the nearest button is 27
+clear of that.
+
+A column's agents need their captions' width and no less — three of them come to 373px —
+which fits no phone at any division, so below `xl` the items take a 160px basis, refuse to
+shrink, and the row wraps; the three segments stack. That is `/wizard/therapies`'
+arrangement on the same breakpoint and the same finding: the gap gives before the item,
+because the item is what carries the caption.
+
+### Verified in a browser
+
+At 1440 × 800, measured off the render the same way the artboard was measured:
+
+- heading lines ink at **51 / 87 / 123 / 159** — the artboard's four values exactly;
+- bullets at 221 / 253 / 285 / 317 / 349 against the drawn 220 / 252 / 284 / 316 / 348;
+- CTA 398–453 (drawn 396–451), 56px tall exactly;
+- segments at **x 112 / 451 / 975, widths 339 / 524 / 353, tops 478 / 514 / 514** — the
+  drawn geometry to the pixel;
+- buttons 566–630, matching the drawn row exactly; centres within 8px at every one of the
+  seven, and the worst three are the middle segment, whose buttons the export draws 8px
+  right of its own centred label;
+- captions ink 652–667 (drawn 651–666); the two wrapping captions span 36 and 55px, both
+  identical to the export;
+- class labels ink 743–760 with the three-line one at 721 / 743 / 765, and **all four
+  midpoints at 751.5** — the drawn value;
+- "FVIIIa MIMETICS" keeps its space and its lower-case `a`;
+- both pop-ups open, and Efanesoctocog alfa's sheet renders with its `Class:` heading —
+  the first time that card has been reachable in the app;
+- **no horizontal document overflow at 1440, 1280, 1024, 768 or 375**, and no caption
+  clipped at any of them.
+
+### Open: two carried forward
+
+The label tracking fits at 0.036em and ships at `tracking-wide` (0.025em) — open item 26.
+`Popup` is too narrow for the nine-column table it will hold — open item 27, since **half
+closed**: the card now takes `width="wide"` (1360px, ~136px a column) and what is left is
+the scroll region the grid needs on a phone, not the card. See §13's width scale.

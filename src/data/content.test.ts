@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { DRUG_SHEETS, sheetFor } from "./drug-sheets";
 import { EDUCATION_TOPICS, SEVERITY_TABLE, TREATMENT_OPTIONS_MATRIX } from "./education";
+import { EXPLORE_AGENTS, EXPLORE_SEGMENTS } from "./explore";
 import { ACRONYMS, GLOSSARY } from "./glossary";
 import { REFERENCES, RESOURCES } from "./references";
 import { SURVEY_QUESTIONS } from "./survey";
@@ -26,6 +27,20 @@ describe("drug sheets", () => {
         `RECOMMENDATIONS names ${name} but it has no drug sheet`,
       ).toBeDefined();
     }
+  });
+
+  // `/explore` marks every one of its seven `+` buttons `aria-haspopup="dialog"`
+  // unconditionally, which is only honest if every agent it draws has a sheet.
+  // This is also what makes Efanesoctocog alfa's sheet reachable at last — it
+  // was built with no caller when the sheets landed (CONTEXT.md §6).
+  it("cover every agent /explore draws a button for", () => {
+    for (const agent of EXPLORE_AGENTS) {
+      expect(
+        sheetFor(agent),
+        `EXPLORE_SEGMENTS names ${agent} but it has no drug sheet`,
+      ).toBeDefined();
+    }
+    expect(EXPLORE_AGENTS).toHaveLength(DRUG_SHEETS.length);
   });
 
   it("join to a Treatment row by verbatim agent name", () => {
@@ -140,6 +155,35 @@ describe("wizard class boxes", () => {
         /^Therapeutic classes to consider for/,
       );
     }
+  });
+});
+
+describe("explore segments", () => {
+  // The three arches tile the band 112→1328 with no gaps, and the widths are
+  // used as flex-grow factors — so a typo would silently reproportion the row
+  // rather than fail anywhere visible.
+  it("carry drawn widths that sum to the 1216px band", () => {
+    expect(EXPLORE_SEGMENTS.reduce((sum, s) => sum + s.width, 0)).toBe(1216);
+  });
+
+  it("draws each agent exactly once", () => {
+    expect(new Set(EXPLORE_AGENTS).size).toBe(EXPLORE_AGENTS.length);
+  });
+
+  /**
+   * The labels are the artboard's, and three of the four deliberately disagree
+   * with `TREATMENT_CLASSES` — plural where the enum is singular, and "UHL
+   * clotting factor replacement" naming a half-life the enum has no term for.
+   * This is the test that objects if someone "fixes" them into the enum.
+   */
+  it("label columns in the artboard's wording, not the TreatmentClass enum", () => {
+    const labels = EXPLORE_SEGMENTS.flatMap((s) => s.columns.map((c) => c.label));
+    expect(labels).toEqual([
+      "FVIIIa mimetics",
+      "Hemostatic rebalancing agents",
+      "UHL clotting factor replacement",
+      "Gene therapy",
+    ]);
   });
 });
 

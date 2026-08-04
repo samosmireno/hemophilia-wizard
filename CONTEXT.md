@@ -9,7 +9,10 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-04 (the two `/wizard/therapies` artboards: the leaf's one-open
+- **Last reviewed:** 2026-08-04 (the `/explore` artboard: the route is §9's SDM conclusion node, not
+  the §5 table — see §5, §9 and `docs/adr/0007-explore-is-the-sdm-conclusion.md`; §9's four bullets
+  recovered verbatim where they had been abridged, and the seven-agent class index recorded on §5);
+  previously 2026-08-04 (the two `/wizard/therapies` artboards: the leaf's one-open
   Considerations/Strategies accordion, and the §4.2 nesting correction recovered from `out.txt`'s
   column positions — see §4 and §4.2); previously 2026-08-03 (the four `/wizard/scenario` artboards: per-scenario titles, leads
   and captions, and the plural "rebalancing agents" on HA +inhib — see §4); previously 2026-08-03
@@ -334,6 +337,22 @@ Administration Route · Schedule · Monitoring & Safety`
 Three columns are dropdown **filters**: Treatment class, Hemophilia Type (A / B / A + B),
 Indicated with inhibitors (Yes / No). "A + B" means eligible for both.
 
+> **The table is a pop-up, not a page `[BUILD]`.** Issue 09 specified `/explore` as the table
+> itself; the `/explore` artboard makes that route the [§9](#9-references--resources) SDM
+> conclusion node and launches the table from a button on it. Rationale in
+> `docs/adr/0007-explore-is-the-sdm-conclusion.md`. **The card is built and its body is not** —
+> the filters and the grid are still issue 09's scope, and `Popup` needs a wide variant or an
+> inner scroll region before nine columns will fit (docs/styling.md open item 27).
+>
+> **The same page indexes the [§6](#6-drug-information-sheets) sheets by class `[BUILD]`.** Below
+> the SDM copy the artboard draws three arched segments holding all seven agents that have a
+> sheet, under four verbatim class labels — "FVIIIa mimetics" · "Hemostatic rebalancing agents" ·
+> "UHL clotting factor replacement" · "Gene therapy". Three of the four disagree with the
+> `TreatmentClass` enum in `treatments.ts` (plural where it is singular; "UHL" is a half-life the
+> enum has no term for), so they are transcribed rather than derived — the same call
+> `CLASSES_TO_CONSIDER` records. Encoded as `src/data/explore.ts` → `EXPLORE_SEGMENTS`. The two
+> generic SHL/EHL rows are **not** drawn, consistent with their having no sheet by design.
+
 The `[PDF-V]` embedded copy of the table fills in the **"Toxicity & Monitoring"** column per row
 (the S1 header calls it "Monitoring & Safety"), transcribed 2026-07-27 in `documents/out_raw.txt`
 (RIGHT band). Representative values: SHL/EHL/UHL → _"FVIII/FIX monitoring; PK-guided dose
@@ -385,8 +404,9 @@ agent the wizard can **recommend** has a sheet" (all 6 novel `AGENTS` + Efanesoc
 wearing the sheet's name, then the five sections as crimson `<h3>`s over disc lists, in that
 fixed order. Seven artboards, one per sheet; measurements in `docs/styling.md` §16. It is
 component state rather than issue 10's `?drug=` overlay — `docs/adr/0006-component-state-drug-sheets.md`.
-Wired from `/wizard/therapies` (all 6 recommendable agents); Efanesoctocog alfa's sheet is built
-and has no caller until `/explore` (issue 09).
+Wired from `/wizard/therapies` (all 6 recommendable agents) **and from `/explore`, which draws all
+seven** — so Efanesoctocog alfa's sheet, built with no caller since the sheets landed, is reachable
+at last. See [§5](#5-explore-therapy-options-table-secondary-engine).
 
 Three per-sheet deviations the card reads as optional fields, all transcription:
 
@@ -721,8 +741,29 @@ Validated Hemophilia Regimen Treatment Adherence Scale–Prophylaxis · VWD von 
   - **URLs accessed July 14, 2026.**
 - **Shared decision-making (SDM) conclusion node** — "Leverage multidisciplinary care and SDM
   with patient, emphasizing consideration of risks, benefits, alternative treatment options, and
-  patient goals/preferences." Focus on what matters to patients/families; empower participation;
-  improve understanding; support adherence, quality of care, satisfaction.
+  patient goals/preferences."
+
+  `[BUILD]` **This node is the `/explore` page** — see
+  [§5](#5-explore-therapy-options-table-secondary-engine) and
+  `docs/adr/0007-explore-is-the-sdm-conclusion.md`. The `/explore` artboard renders it as the
+  page's `<h1>` and **continues the sentence past where the blueprint stops**, with "…when making
+  treatment decisions"; the app ships the longer form, on the standing rule that the artboard is
+  the filing authority where the two disagree.
+
+  Its four bullets were previously recorded here abridged ("Focus on what matters to
+  patients/families; empower participation; improve understanding; support adherence, quality of
+  care, satisfaction"). The artboard supplies them in full, and these are now verbatim `[BUILD]`
+  (`src/data/explore.ts` → `SDM_POINTS`):
+
+  - "Focus on what matters most to patients, families, and caregivers"
+  - "Empower patients and caregivers to actively participate in education and decision-making
+    around treatment selection"
+  - "Improves understanding of treatment options and engages patients in their care"
+  - "Supports improved adherence, quality of care, and patient satisfaction"
+
+  Note the tense shift the source makes and the app keeps: the first two are imperatives addressed
+  to the clinician, the last two are statements about what SDM does. It reads like a slip and is
+  not ours to repair.
 
 ---
 
@@ -755,15 +796,16 @@ Post-use survey (note: source labels two items "Question 2" — likely a typo fo
 
 ## 12. Implementation status `[BUILD]`
 
-| Piece                                 | File                                                 | Status                                                                                  |
-| ------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| Comparison-table data + filter engine | `src/data/treatments.ts`                             | ✅ built, type-checks                                                                   |
-| Wizard branching model + notes        | `src/data/wizard.ts`                                 | ✅ built, type-checks (scenario-specific `SCENARIO_NOTES`; `CLASSES_TO_CONSIDER` boxes) |
-| Interactive demo (both engines)       | `treatment-wizard-demo.html` (repo root)             | ✅ standalone; logic mirrors the TS modules (incl. `CLASSES_TO_CONSIDER`)               |
-| Per-drug info sheets data             | `src/data/drug-sheets.ts`                            | ✅ built, type-checks (7 sheets; see [§6](#6-drug-information-sheets))                  |
-| Education / glossary / refs / survey  | `src/data/{education,glossary,references,survey}.ts` | ✅ built, type-checks (issue 00)                                                        |
-| Content join/coverage tests           | `src/data/content.test.ts`                           | ✅ 14 tests pass                                                                        |
-| React UI (wizard + table + sheets)    | —                                                    | ⬜ not built                                                                            |
+| Piece                                 | File                                                 | Status                                                                                                                      |
+| ------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Comparison-table data + filter engine | `src/data/treatments.ts`                             | ✅ built, type-checks                                                                                                       |
+| Wizard branching model + notes        | `src/data/wizard.ts`                                 | ✅ built, type-checks (scenario-specific `SCENARIO_NOTES`; `CLASSES_TO_CONSIDER` boxes)                                     |
+| Interactive demo (both engines)       | `treatment-wizard-demo.html` (repo root)             | ✅ standalone; logic mirrors the TS modules (incl. `CLASSES_TO_CONSIDER`)                                                   |
+| Per-drug info sheets data             | `src/data/drug-sheets.ts`                            | ✅ built, type-checks (7 sheets; see [§6](#6-drug-information-sheets))                                                      |
+| Education / glossary / refs / survey  | `src/data/{education,glossary,references,survey}.ts` | ✅ built, type-checks (issue 00)                                                                                            |
+| `/explore` SDM copy + class index     | `src/data/explore.ts`                                | ✅ built, type-checks (§9's node verbatim; `EXPLORE_SEGMENTS`, see [§5](#5-explore-therapy-options-table-secondary-engine)) |
+| Content join/coverage tests           | `src/data/content.test.ts`                           | ✅ 21 tests pass                                                                                                            |
+| React UI (wizard + sheets + explore)  | `src/routes/`                                        | 🟡 wizard, education, landing and `/explore` built; the §5 comparison table is not                                          |
 
 **Open decisions:**
 
