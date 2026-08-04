@@ -179,15 +179,16 @@ describe("wizard — the pages past the questions", () => {
   );
 
   /**
-   * `seedWizardAnswers`' default is HA without inhibitors, so the scenario page
-   * wears that screen's heading. It comes from the data module rather than as a
-   * literal — the four titles are transcribed copy, and `scenario.test.tsx` is
-   * where they are asserted against each branch. Here the only claim is that the
-   * gate lets an answered session through.
+   * `seedWizardAnswers`' default is HA without inhibitors for bleeding control,
+   * so the scenario page wears that screen's heading and the leaf wears that
+   * reason's. Both come from the data module rather than as literals — the
+   * titles are transcribed copy, and `scenario.test.tsx` / `therapies.test.tsx`
+   * are where they are asserted against each branch. Here the only claim is that
+   * the gate lets an answered session through.
    */
   it.each([
     ["/wizard/scenario", CLASSES_TO_CONSIDER["A-without"].title],
-    ["/wizard/therapies", "Novel therapies to consider"],
+    ["/wizard/therapies", SWITCH_REASONS.find((r) => r.id === "bleeding-control")!.label],
   ])("renders %s for an answered session", (path, title) => {
     seedWizardAnswers();
     const router = renderAt(path);

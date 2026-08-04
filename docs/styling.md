@@ -761,6 +761,11 @@ narrower than the 1165px content column, so it stays centred within it.
 | 18  | `NavArrowButton` and `Button` are not `forwardRef`, so `ref` does not typecheck on either (`PopupButton` is). That is what blocks focus management when the mechanisms card swaps steps — there is no handle to focus. Package change, tracked in `.scratch/mlg-reskin/`.                                                                                                                                                                                                                              | §11, mlg-reskin       |
 | 19  | `--background-image-emerging-panel`'s mint (`#c6eee5`) is dE .0136 from `color-mix(teal-25 30%, teal-0)` — between the ~.002 every derived token clears and the .042 that made item 7 literal, so the file's own rule does not decide it. Shipped literal; ask the designer whether it is meant to be a teal step.                                                                                                                                                                                     | §11                   |
 | 20  | ~~`fviiia-mimetics` ships four `+` disclosures that open nothing.~~ **Closed.** All four cards (Pop ups 10–13) are built; the diagrams arrived as rasters rather than the SVG exports this item asked for, which is why three of them carry their heading in their own pixels. Kept as a row rather than deleted, so the numbering below it does not shift.                                                                                                                                            | §11                   |
+| 21  | `--color-note-panel-border` (`#747474`) is a neutral grey off every ramp — a hue away rather than a step. Sampled exactly neutral on all three channels, so it is neither an antialiasing artefact nor black at an opacity. Transcribed verbatim pending a designer answer, as item 14 is.                                                                                                                                                                                                             | §15                   |
+| 22  | The two `/wizard/therapies` exports disagree about inter-bullet spacing in the note panels — 12px in the Considerations one, 0 in the Strategies one. Shipped at 0 (six observations against one, and the only reading that fits the 8-bullet leaf on one screen), which renders the Considerations panel 141px against the drawn 152.                                                                                                                                                                 | §15                   |
+| 23  | The `/wizard/therapies` bands and arch are drawn 1216px wide (x 112→1328), 48px wider than `max-w-content`. Same "the artboard forgot the sidebar rail" divergence `/wizard/scenario`'s box row has. Both ship at the content column; wants **one** designer ruling covering both pages rather than two. The later vector export of the header bands gives `w-[1217px]`, a third independent reading of the same 1216 and the reason this is a rail question rather than a rounding one.               | §15, §12              |
+| 24  | The seven drug-sheet exports agree on every gap except the one **above** a section label: 29–31px over the line on three sheets, 36–44 on three more, and 48 / 56 on Denecimig, which draws what reads as a blank line before two of its labels. Everything else is 26 ± 1 (bullet to bullet) and 33 ± 1 (label to its list) across all thirty-five sections, so this is the only loose value in the card. Shipped uniform at the median (`mt-3`). Same shape as item 22.                              | §16                   |
+| 25  | The drug-sheet card's horizontal inset is `Popup`'s `px-16` (69px from the card's outer edge). **Two of the seven exports draw exactly that; the other five draw 49.** Not split, because the padding belongs to a card shared with the §7.5 chapters. Wants a designer answer with items 9 and 13 rather than alone.                                                                                                                                                                                  | §16, §13              |
 
 ---
 
@@ -1963,3 +1968,376 @@ legend breaks where the designer broke it —
 which needs `max-w-[700px]` on the legend, the midpoint of the 589–809px window
 in which the drawn break survives. At 390 the grid stacks, the document does not
 scroll sideways, and wrapped labels stay legible.
+
+---
+
+## 15. Wizard leaf — the Considerations/Strategies accordion
+
+`/wizard/therapies` draws the leaf's note pair as two stacked header bands with
+one panel open beneath the header it belongs to. Two artboards were delivered for
+the same leaf (HB with inhibitors, improving bleeding control), one per open
+block; everything below is measured off them. The behaviour — exactly one open,
+always — is `docs/adr/0005-one-open-leaf-accordion.md`.
+
+A **third source** arrived later: a vector (Tailwind) export of the two header
+bands alone, from the _adherence_ leaf. It is the authority for the shadows below
+and it overrules two raster measurements in the geometry table — both noted where
+they occur.
+
+### The state is carried twice: by the ground and by the shadow
+
+Sampled `rgb(214, 58, 82)` on the open header and `rgb(74, 191, 212)` on the
+closed one: `crimson-50` and `lagoon-25` exactly, no literal needed. They are
+`--color-note-open` / `--color-note-closed` rather than bare palette utilities at
+the call site, because "open is crimson, closed is lagoon" is one design fact with
+one place to change — the call `--color-choice-selected` makes one section up.
+
+There is no chevron. That is faithful, and it is not a use-of-colour problem:
+`aria-expanded` carries the state non-visually, the open panel below the header is
+itself a non-colour signal, and the shadow below carries it a third time as
+elevation rather than as hue.
+
+### The shadow says the same thing the ground does
+
+The vector export gives both bands one drop shadow and differing insets:
+
+| band            | drop                    | inset                                    |
+| --------------- | ----------------------- | ---------------------------------------- |
+| open (crimson)  | `0 1px 2px` black @ .25 | `0 1px 4px` **black** @ .36, + a 1px rim |
+| closed (lagoon) | `0 1px 2px` black @ .25 | `0 1px 4px` **white** @ .36              |
+
+Open reads pressed in, closed reads lifted. That is the grammar the rest of this
+file already speaks: every `--shadow-ui-*-hover` lifts with an
+`inset … rgba(255,255,255,.25)` and every press state recesses with a dark one.
+
+**The numbers are rounded, and that is a reading rather than a liberty.** The
+export's drop is `0px 1.0641891956329346px 2.128378391265869px` and its inset blur
+`4.256756782531738px` — one scale factor on 1, 2 and 4. Three things say so: the
+ratio is exact; the inset's y came out an unscaled `1px` beside a scaled blur,
+which is only coherent if 1 and 4 are the real numbers; and the same export
+carries `outline-offset-[-1.06px]`, which is −1 × the factor and is not a value
+anyone draws. The rounded drop layer then lands verbatim on one already inside
+`--shadow-ui-btn-active`.
+
+**The rim ships inside the shadow, not as an `outline`.** The export draws
+`outline outline-1 outline-offset-[-1.06px]` on the crimson band and drops its
+colour. It cannot be an outline here — the header spends its own on the focus ring
+and an element has only one — so it rides as `inset 0 0 0 1px`, which is the trade
+the package documents for `--shadow-ui-btn-hover`. Its alpha is that token's
+`rgba(255,255,255,0.2)`, borrowed rather than invented on the grounds that it is
+the designer's own rim value for a **crimson** ground, which is what this band is.
+
+Two caveats on the export, both handled by the fact that the two snippets can be
+cross-checked against each other. It emits **two competing `shadow-[…]` classes**,
+which both set `box-shadow` — the second wins, and `tailwind-merge` (which `cn()`
+runs) would drop the first outright, so the pasted classes render half of
+themselves. Tokens sidestep it. And it names **different font families for the
+same component** (`DM_Sans`, `Roboto`), which is what marks the typography half of
+the export as noise; only the values both snippets agree on are treated as signal.
+
+### Hover and press are borrowed, not derived
+
+Neither is drawn — both artboards are at rest. The usual move here would be §4.2's
+model (lift the ground toward the `-25` tint, push one step darker on press), but
+that recipe assumes the resting ground is a `-50` step, and this one already **is**
+the `-25`.
+
+So they come from `PopupButton` instead, which is the component the designer
+already answered this exact question for — a `lagoon-25` ground under white type
+(§4.4). Its answer is that on hover **the ground does not move and the label
+lifts** (`--color-ui-popup-fg-hover`, `#bff5ff`), and that press goes to
+`--color-ui-popup-bg-active` / `-fg-active`. The header references those tokens
+directly, the way `OptionGroup` references the `Button`'s press pair.
+
+Only the **closed** header takes them. The open one is `aria-disabled` (ADR 0005),
+so a lift under the cursor would advertise an action it does not have — hover
+therefore means "this one will open", which is true of the only header that has
+it. Focus is the app's inset ring, `outline-[3px] outline-offset-[-3px]` in
+`--color-ui-btn-ring`, on both: drawn outside it would vanish against two
+saturated grounds, and it keeps the resting shadow.
+
+**The shadows are borrowed on the same footing.** `--shadow-note-closed-hover` is
+the lift `--shadow-ui-btn-hover` and `--shadow-ui-arrow-hover` both make — the
+drop grows to `0 2px 4px` and the white inset spreads to `0 2px 4px 2px` @ .25.
+`--shadow-note-closed-active` takes the **open** band's own recessed inset over
+the lighter `.15` drop the `-focus` variants use, so touching a closed header
+previews the state it is about to enter. That is not a flourish: it is exactly
+what `--color-ui-popup-bg-active` is documented to do for the ground one line
+below it, where the closed press ground **is** the open skin's resting ground.
+
+`box-shadow` joins the header's existing 120ms transition list, which is the
+package's own `transition-[background-color,box-shadow,color]`.
+
+### The panel fill is translucent, and the number is fitted
+
+`bg-brand-teal-25/30`. The panel is **not** a flat fill — the page's radial
+gradient brightens it toward the centre, which is what identifies it as
+translucent in the first place: sampling across the drawn panel gives 181 → 208 →
+184 in the red channel, tracking `bg-page`'s own centre at x≈698.
+
+Fitted properly rather than eyeballed. Compositing the §6 gradient over white,
+calibrating the model against the page background beside the panel, then solving
+`panel = α·C + (1−α)·bg` by least squares over ~85 000 panel pixels puts the free
+optimum at α = .265 on `(112, 187, 171)`, RMSE 5.79. Constrained to palette steps:
+
+| candidate             | best α | RMSE     |
+| --------------------- | ------ | -------- |
+| `teal-25`             | .305   | **5.83** |
+| `teal-50`             | .160   | 5.95     |
+| `teal-75`             | .125   | 7.03     |
+| `lagoon-25`           | .225   | 9.58     |
+| `--color-figure-note` | 1.00   | 10.66    |
+
+`teal-25` at .305 is within .04 RMSE of the unconstrained best — indistinguishable
+— and lands on an exact palette step at an exact opacity step, so it is the
+scale's answer rather than a literal. (`--color-figure-note` was the obvious
+guess and is wrong: it matches the panel at the page's brightest point only,
+because it is opaque.)
+
+### The stroke is the one literal
+
+`--color-note-panel-border: #747474`, sampled `(116, 116, 116)` — exactly neutral
+on all three channels, which is what rules out the alternatives: an antialiased
+tint would not be neutral, and black at 45% over the panel's own ground computes
+to `(116, 143, 137)`, not grey. It is off every ramp in this file by a hue rather
+than by a step, so it stays literal under the §3/§4 rule and is **open item 21**
+below, alongside `--color-agent-mab`.
+
+**The panel draws an edge only where one is exposed**, which makes the stroke
+positional rather than fixed. Its top never is — the panel tucks flush under its
+own header band with no gap — so there are no top corners and no top stroke. Its
+bottom is exposed only on the **last** block: the Considerations panel opens
+_between_ the two headers and runs straight into the Strategies band beneath it,
+with no stroke and no radius where they meet. So `rounded-b-xl` and `border-b`
+are the `last` prop's, and the first block's side strokes run down to the next
+band and stop. 12px inset per side from the band either way.
+
+### Geometry
+
+|                     | drawn                                       | shipped                     |
+| ------------------- | ------------------------------------------- | --------------------------- |
+| header band         | 44px tall, 8px radius, all four corners     | `min-h-11 rounded-lg`       |
+| header type         | 24px, ~24px of ink ascender-to-descender    | `text-[24px] font-semibold` |
+| band → panel        | flush, 0px                                  | no margin                   |
+| panel inset         | 12px per side                               | `mx-3`                      |
+| bullet pitch        | 28px, ink 19px on a line with both extremes | `text-[20px] leading-7`     |
+| `<h1>` → first band | 12px                                        | `mt-3`                      |
+
+24px and 20px are both off the §2 scale (`text-h3` is 26 at weight 600, `text-h4`
+is 20 at weight 600 where the bullets are 400), so both ship raw under §8's
+precedent, as the chapters' 26px bullets do.
+
+**Two rows of that table were corrected by the vector export**, which gives
+`h-11 rounded-lg … font-semibold` where the raster reading was 43px, a 6px radius
+and weight 700. The vector is the better witness on all three and neither raster
+reading could have caught its own error: an antialiased 8px corner genuinely
+measures as 6 on a flat PNG, and ink height tells you font **size**, not weight.
+The corroboration is the height — the export's 44px is what this page already
+shipped, a scale step it had been moved onto independently of the 43px prose.
+`rounded-lg` also matters to the shadows above, since it is the corner the drop
+and the rim both trace.
+
+**`mt-3` after the `<h1>`, where every chapter and `/wizard/scenario` use `mt-8`.**
+Measured, not inherited: this screen packs its heading onto the accordion in a way
+the prose screens do not, and their shared 32px is a fact about a heading over
+prose rather than about headings.
+
+### The two exports disagree about the gap between bullets
+
+The Considerations export puts 12px between its two bullets — a 40px baseline
+pitch where every other pair in it is 28. The Strategies export puts **none**: all
+six of its inter-bullet gaps are the same 28px as the intra-bullet ones.
+
+Shipped with **no gap**, on the weight of evidence — six observations against one
+— and because it is the reading that survives the tallest note: HA without
+inhibitors' _Reducing Treatment Burden_ Considerations runs to 8 bullets, and 12px
+between each would push the arch off a 800px screen. The cost is that the
+Considerations panel renders 141px against the drawn 152. Worth a designer
+question at the styling gate.
+
+### The arch is pinned, not flowed
+
+`ArchBand` with `mt-auto grow-0`, where `DisclosureBand` uses the default `grow`.
+Both artboards put the arch's top edge at **the same y (553)** with panels of
+152px and 335px above it, which is a band anchored to the bottom of the column
+rather than one that follows the content down — so the arch does not jump when
+the open block changes. When a note is tall enough to overflow the column
+(the 8-bullet leaf, 822px at 1440×800), `mt-auto` collapses and the arch follows
+the content, which is the right degradation.
+
+Its captions are **`brand-slate-100`**, not `--color-popup-caption`: the drawn
+caption's darkest pixel is `(17, 29, 46)`, which is that step exactly, where the
+chapters' captions sample `(7, 70, 85)`. The two bands genuinely wear different
+caption colours — `fviiia-mimetics` already records `slate-100` arriving "new and
+exact" on a fourth artboard — so this is transcribed rather than folded into open
+item 15. They are 22px here against the chapters' 26.
+
+The agent row is equal-width items at an equal gap (`w-40`, `gap-x-30`), which is
+what makes the **button centres** evenly spaced — the thing the artboard draws.
+Its three land at 427 / 720 / 1015 on a band running 112→1328: a pitch of 294 on
+1216, or .2415 of the band, which on this page's 1168 column is 282 against the
+shipped 280. The equal width is load-bearing: the three captions measure
+137 / 143 / 95px, so content-width items would space the buttons 322 and 301
+apart.
+
+**Fuller rows close the gap; they do not squeeze the item.** Five agents do not
+fit at the drawn pitch (5 × 160 + 4 × 120 = 1280 against a 1232 band) and the
+designer drew no such leaf. The first attempt let the _item_ give, and that was
+wrong in a way only a browser showed: measured across viewports, five items fell
+to 150px at 1440, 118px at 1280 and **67px at 1024** while the gap sat at its
+drawn 120 throughout, so the captions overflowed their own boxes by up to 38px a
+side and the outermost — "Emicizumab", "Fitusiran" — ran past the arch into its
+`overflow-hidden` and were clipped mid-word.
+
+Three changes, none of which touches the case the designer drew:
+
+|                                                       |                                                                                                                                                                                                               |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gap-x-20` above three agents, `gap-x-30` at or below | The 120px pitch is measured off a **three**-agent artboard, so it stays exact wherever it was drawn; rows the designer never drew close to 80. 5 × 160 + 4 × 80 = 1120 fits 1232 uncompressed.                |
+| **no `min-w-0`**                                      | It licensed shrinking past the content, which is what produced the clipping. Without it an item's automatic minimum size is its min-content — and every caption is one word, so the floor **is** the caption. |
+| `xl:` not `lg:` for nowrap                            | Below 1280 even the closed-up row cannot hold five captions on a line, so the wrap takes over. A second row is legible; a clipped word is not.                                                                |
+
+Re-measured after: every one of the sixteen leaves holds its items at the full
+160px at 1440 with zero clipping, and the five-agent leaf clears the arch wall by
+16–56px at every width from 1280 up, wrapping to two rows below that with no
+horizontal scroll and no collision with the panel above. `px-4` keeps the wrapped
+row off the wall. It is still `/wizard/scenario`'s `shrink-0` / `shrink` split,
+hinged one breakpoint later.
+
+One residual, measured and left: hemophilia B without inhibitors has a 164px
+caption in the 160px box, a 2px overflow per side. It is not clipped and has 80px
+of gap either side, so it is recorded rather than chased.
+
+### Motion
+
+220ms `ease-out` on `grid-template-rows`, with the panel's contents cross-fading
+at 150ms on the same curve so text does not appear mid-wipe; header colours stay
+on the app's 120ms. Under `prefers-reduced-motion: reduce` both are dropped
+(`motion-reduce:transition-none`) and the swap is instant — verified, and the same
+call `BrandLoop` makes for the footage.
+
+`grid-template-rows` rather than `max-height` because there are sixteen leaves and
+sixteen panel heights; see ADR 0005. It needs the inner element to be
+`overflow-hidden` **and** `min-h-0` — a grid item's automatic minimum size is its
+content, which would otherwise pin the row open.
+
+### Verified in a browser
+
+At 1440, against the two exports: header bands 43px at 6px radius computing to
+`rgb(214,58,82)` and `rgb(74,191,212)`; panels 141px and 337px against the drawn
+152 and 335; the arch pinned at y=542 in **both** states; the `<h2>`'s two lines
+at a 32px pitch and 22–23px cap height, matching the export exactly; captions
+inking 16px tall at 133/139/92px against the drawn 137/143/95 — inside the ~4px
+this font runs narrower than the export, the same discrepancy §14's pill labels
+record. All ink sits 5–6px above the drawn y, which is the whole page's
+pre-existing offset, not this section's: `AppShell`'s `pt-below-rule-lg` puts the
+`<h1>` at 46 against the artboard's ~53.
+
+Checked at 2, 3, 4 and 5 agents: button centres evenly spaced in every case
+(pitch 280 at 2–4, 257 at 5), no horizontal document overflow at any count, and
+the 4-agent leaf's three-line "Etranacogene dezaparvovec-drlb" caption grows the
+arch rather than overflowing it.
+
+**`leading-none` on the arch's title** is a caller override of `text-h2`'s own 1.1
+step: the export sets this heading's two lines at a 32px pitch, measured twice
+(cap tops at y=594 and y=626). It only shows up here because `DisclosureBand`'s
+titles are phrases that never reach a second line. `max-w-215` beside it is a
+line-break cap, not styling — the drawn break falls after "…IS", and the window
+that reproduces it is ≥809px (to hold line 1) and under ~895 (before "THE" fits
+beside it).
+
+---
+
+## 16. Drug information sheets — the §6 card
+
+`DrugSheetPopup` draws a per-drug sheet inside `Popup`: the crimson band wearing the
+drug's name, then five crimson labels each over a disc list. Seven artboards were
+delivered, one per sheet, and everything below is measured off all seven together.
+The behaviour — component state rather than a `?drug=` route — is
+`docs/adr/0006-component-state-drug-sheets.md`.
+
+### The seven exports share one scale, and it is 1:1
+
+Worth stating first, because it is the opposite of what they look like: the cards are
+1136, 1064 and 869px wide across the set, which reads as three export scales. It is not.
+**The crimson band is 96px in all seven**, the border is the same weight in all seven,
+and body ink measures 20–21px tall wherever it carries an ascender and a descender. So
+the exports are one scale and the _cards_ are three widths — the designer drew each
+sheet to its own content.
+
+That matters because it means nothing here needs normalising before it is read, and it
+is why the "airy vs tight" difference between images is content, not type.
+
+### Type, and why it is not measured off these PNGs
+
+|               |                                        |
+| ------------- | -------------------------------------- |
+| Section label | 20px, weight 700, `crimson-50`         |
+| Bullets       | 20px, weight 400, `BulletList`'s black |
+| Both          | `leading-[1.6]`                        |
+
+The size is the **established pop-up body value** — the same `text-[20px]
+leading-[1.6]` all four §7.5 agent cards set — reused rather than re-derived, which is
+the rule `DenecimigCard` writes down: two cards a reader opens in sequence should be one
+size. It holds harder here than it did there, because these open from a wizard leaf and
+those open from an education chapter, and nothing stops a learner doing both in a minute.
+
+The exports agree on the size and disagree on the leading: they draw ~20px type at a
+**26px** pitch (1.3), against the 1.6 shipped. That 6px is the one deliberate divergence
+in this section, and it is inherited from the house value rather than chosen here.
+
+`crimson-50` is **exact, not near**: 26,144 pixels of `rgb(214, 58, 82)` in the labels
+across the seven exports, with no other core value present. No literal, no `color-mix`.
+
+### The two gaps are the measured extra over one line
+
+Ink-top to ink-top, the artboards give:
+
+|                          | Drawn                      | Over one 26px line | Shipped     |
+| ------------------------ | -------------------------- | ------------------ | ----------- |
+| bullet → next bullet     | 25–27 (median 26)          | 0                  | 0           |
+| label → its first bullet | **32–34, all 35 sections** | +7                 | `mt-2` (8)  |
+| last bullet → next label | 29–56 (median 37)          | +11                | `mt-3` (12) |
+
+The middle row is the striking one: across seven sheets and thirty-five sections the
+label-to-list distance is 33px within ±1. It is a rule, and it is shipped as one.
+
+Inter-bullet spacing is **zero**, the same reading §15 takes for the note panels and on
+the same evidence — a wrapped continuation line and a new bullet are both 26 apart, so
+there is no gap to find.
+
+### Padding, and the one inset that follows `Popup` rather than the drawing
+
+`py-6` (24px) on the body, the value all four §7.5 cards use, on top of `Popup`'s own
+`py-2`. The artboards put the first label's ink 28–43px below the band; 32 is inside it.
+
+The horizontal inset is `Popup`'s existing `px-16`, which puts text 69px from the card's
+outer edge. **Two of the seven exports are exactly that**; the other five draw 49. Not
+changed: the card is shared with the §7.5 chapters, and a 20px inset is not worth
+splitting a component over. Recorded rather than chased.
+
+### Verified in a browser
+
+At 1440 × 800, HB without inhibitors / reduced treatment burden and HA without
+inhibitors / reduced treatment burden:
+
+- labels compute to `rgb(214, 58, 82)` at 20px/700/32px line-height, bullets to
+  `rgb(0, 0, 0)` at 20px/32px — the measured values exactly;
+- label→list 40px box-to-box (32px line + the 8px `mt-2`) and list→label 12px, i.e. the
+  +8 / +12 intended;
+- the card holds `1024 × 760` and **the scroll region engages**: Emicizumab 824px of
+  content in 673px, Fitusiran 792, Etranacogene 728, all `overflow-y: auto`. This is the
+  thing jsdom cannot see and the reason the pass exists;
+- `dialog:modal` is true with focus inside it;
+- no horizontal document overflow at 1440 or at 390, where the card settles to 359 × 741.
+
+`2 × 10¹³` renders as the superscript it should be, and no card contains a link.
+
+### Open: the seven exports disagree about the space above a label
+
+Only above. The three rows of the gap table are 26 ± 1 and 33 ± 1 across every sheet,
+and then the last-bullet-to-next-label distance runs 29, 30, 31 on three sheets, 36–44 on
+three others, and 48 and 56 on Denecimig — where the export opens what looks like a blank
+line before Monitoring and before Clinical Trials. Shipped at the median (12px over the
+line) uniformly. Open item 24; it is the same shape as item 22 and wants the same kind of
+ruling.

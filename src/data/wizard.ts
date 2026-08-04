@@ -21,6 +21,7 @@
  * information sheet (see drug-sheets.ts / DRUG_SHEETS).
  */
 
+import type { Bullet } from "./education";
 import { TREATMENTS, type Treatment } from "./treatments";
 
 /**
@@ -292,7 +293,27 @@ export const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
 /** One "Pop-up note" — a title plus its bullet list. Text is verbatim from the source. */
 export interface NoteBlock {
   title: string;
-  points: string[];
+  /**
+   * `Bullet`, not `string[]`, because four of the 32 notes genuinely carry a
+   * nested level — the `treatment-burden` Considerations in every scenario open
+   * a lead-in with a colon ("Frequent IV therapy is particularly challenging for
+   * children:") and subordinate their age-restriction bullets to it.
+   *
+   * **The nesting is measured, not inferred from the colon.** `documents/out.txt`
+   * is a layout-preserving dump, and in it the top-level bullets of those notes
+   * start at column 1755 while the age bullets start at 1763 — a real indent the
+   * `out_raw.txt` band extraction flattens away, because its `[x=…]` headers are
+   * page regions rather than per-line positions. The same measurement is what
+   * keeps `B-without`'s trailing gene-therapy bullet OUT of the nest: it sits
+   * back at 1755, and on content grounds it is about gene therapy rather than
+   * about children.
+   *
+   * Reusing `education.ts`'s type rather than declaring a second one: a bullet
+   * with one nested level is the same shape wherever the source draws it, and
+   * `BulletList` already renders it as markup rather than as indentation. The
+   * import is `import type`, so it is erased at build and couples nothing.
+   */
+  points: Bullet[];
 }
 
 /**
@@ -365,10 +386,14 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Less frequent dosing schedules improve convenience",
           "Simplified dosing approaches, such as fixed or tiered dosing, may reduce the need for frequent dose calculations and ongoing treatment adjustments",
           "Prefilled dosing pens simplify preparation and administration, reduce dosing complexity, and support at-home treatment",
-          "Frequent IV therapy is particularly challenging for children:",
-          "Emicizumab is indicated for younger patients, including newborns; denecimig was evaluated in patients >1 year of age",
-          "Marstacimab is indicated for patients > age 6 years",
-          "Other FDA-approved options are indicated for children >12 years",
+          {
+            text: "Frequent IV therapy is particularly challenging for children:",
+            children: [
+              "Emicizumab is indicated for younger patients, including newborns; denecimig was evaluated in patients >1 year of age",
+              "Marstacimab is indicated for patients > age 6 years",
+              "Other FDA-approved options are indicated for children >12 years",
+            ],
+          },
         ],
       },
       strategies: {
@@ -451,10 +476,17 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Less frequent dosing schedules (weekly, every-other-week, or monthly) improve convenience and support adherence",
           "Simplified dosing approaches, such as fixed or tiered dosing, may reduce the need for frequent dose calculations and ongoing treatment adjustments",
           "Prefilled dosing pens simplify preparation and administration, reduce dosing complexity, and support at-home treatment",
-          "Frequent IV therapy is particularly challenging for children:",
-          "Emicizumab is indicated for younger patients, including newborns; denecimig was evaluated in patients >1 year",
-          "Marstacimab is indicated for patients > age 6 years",
-          "Other FDA-approved options are indicated for children >12 years",
+          {
+            /* Same lead-in as `A-without`, and its first child differs by two
+               words — ">1 year" here, ">1 year of age" there. Transcribed as the
+               source sets each rather than reconciled. */
+            text: "Frequent IV therapy is particularly challenging for children:",
+            children: [
+              "Emicizumab is indicated for younger patients, including newborns; denecimig was evaluated in patients >1 year",
+              "Marstacimab is indicated for patients > age 6 years",
+              "Other FDA-approved options are indicated for children >12 years",
+            ],
+          },
         ],
       },
       strategies: {
@@ -535,9 +567,18 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "SC administration reduces the burden associated with IV access, infusion preparation, and venous access challenges",
           "Less frequent dosing schedules improve convenience and support adherence",
           "Prefilled dosing pens simplify preparation and administration, reduce dosing complexity, and support at-home treatment",
-          "Frequent IV therapy is particularly challenging for children:",
-          "Marstacimab is indicated for patients > age 6 years",
-          "Concizumab and fitusiran are approved for children >12 years",
+          {
+            text: "Frequent IV therapy is particularly challenging for children:",
+            children: [
+              "Marstacimab is indicated for patients > age 6 years",
+              "Concizumab and fitusiran are approved for children >12 years",
+            ],
+          },
+          /* Top level, NOT a third child, and this scenario is the only one where
+             the distinction is live. `out.txt` puts it back at column 1755 with
+             the other top-level bullets where the two age bullets above sit at
+             1763 — and it is about gene therapy rather than about children, so
+             the measurement and the content agree. */
           "Gene therapy may reduce long-term treatment burden by decreasing the need for routine prophylactic FIX infusions, but requires careful patient selection and structured post-treatment monitoring",
         ],
       },
@@ -617,9 +658,13 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "SC administration reduces the burden associated with IV access, infusion preparation, and venous access challenges",
           "Less frequent dosing schedules improve convenience and support adherence",
           "Prefilled dosing pens simplify preparation and administration and support at-home treatment",
-          "Frequent IV therapy is particularly challenging for children:",
-          "Marstacimab is indicated for patients > age 6 years",
-          "Concizumab and fitusiran are approved for children >12 years",
+          {
+            text: "Frequent IV therapy is particularly challenging for children:",
+            children: [
+              "Marstacimab is indicated for patients > age 6 years",
+              "Concizumab and fitusiran are approved for children >12 years",
+            ],
+          },
         ],
       },
       strategies: {

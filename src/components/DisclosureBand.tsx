@@ -1,7 +1,7 @@
 import { type ReactNode, useState } from "react";
 import { PopupButton } from "mlg-components";
 
-import BrandLoop from "./BrandLoop";
+import ArchBand from "./ArchBand";
 import Popup from "./Popup";
 
 /** One "Click here:" disclosure — the caption under the button, and what it opens. */
@@ -43,25 +43,11 @@ export interface Disclosure {
  * a design question rather than a data change, and the tuple is what makes the
  * compiler ask it.
  *
- * **Parent contract:** `grow` means this expects a growing flex column — see
- * `education/DiseaseBackground`, whose `<section>` is `flex flex-1 flex-col`
- * inside `AppShell`'s `min-h-dvh` wrapper. In a non-flex parent `grow` is inert
- * and the band simply ends under its own content, which is a degraded but not
- * broken layout.
- *
- * The heading is an `<h2>`: chapters own the `<h1>`.
- *
- * `isolate` + `-z-10` is what keeps the loop BEHIND the heading and the
- * disclosures without positioning either of them — a positioned child otherwise
- * paints over in-flow siblings whatever the DOM order. The isolation is
- * load-bearing: it makes this div a stacking context, so `-z-10` bottoms out
- * here, above the div's own background, instead of escaping up the tree and
- * disappearing behind the page.
- *
- * `opacity-20` over `bg-brand-crimson-50/15` is the whole wash — no overlay
- * element, no blend mode — and the pair is measured rather than eyeballed
- * (docs/styling.md §7.1). The two numbers move together; changing one alone
- * shifts the hue as well as the strength.
+ * **The arch itself is `ArchBand`'s** — the drawing, the footage, the wash and
+ * the heading, all shared with `/wizard/therapies`, which the artboards draw as
+ * the same object. What is left here is the part that is a chapter's: three
+ * disclosures, mutually exclusive, over one dialog. See `ArchBand` for the
+ * stacking recipe and the parent contract `grow` assumes.
  */
 export default function DisclosureBand({
   title,
@@ -83,19 +69,7 @@ export default function DisclosureBand({
   const open = openIndex === null ? undefined : disclosures[openIndex];
 
   return (
-    <div className="-border-offset-4 relative isolate mt-4 grow overflow-hidden rounded-t-[300px] border-t-4 border-white/40 bg-brand-crimson-50/15">
-      {/*
-        `object-cover` fills the arch at whatever height `grow` settles on, and
-        `overflow-hidden` clips it to the rounded top rather than leaving a
-        rectangle of video behind it. On the walkthrough path (`/` → a chapter)
-        the asset is already cached, so this is not a second 1.9 MB fetch.
-      */}
-      <BrandLoop className="absolute inset-0 -z-10 opacity-20" />
-
-      <h2 className="mt-9 text-center font-display text-h2 tracking-wide text-brand-crimson-50 uppercase">
-        {title}
-      </h2>
-
+    <ArchBand title={title}>
       <ul className="mt-10 grid justify-items-center gap-10 lg:grid-cols-3">
         {/* The captions run 1–3 lines. Grid stretch makes every cell as tall
             as the longest, so the caption below takes the leftover space as a
@@ -143,6 +117,6 @@ export default function DisclosureBand({
       >
         {open?.content}
       </Popup>
-    </div>
+    </ArchBand>
   );
 }

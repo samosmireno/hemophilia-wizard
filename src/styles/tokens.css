@@ -212,6 +212,79 @@
      the Button. Named outside `brand-` (the raw scale) and outside `ui-`
      (mlg-components' namespace), as --color-popup-caption and --color-agent-mab
      are. */
+  /* ─── Wizard leaf notes (docs/styling.md §15) ─────────────────────────────
+     `/wizard/therapies` draws the leaf's Considerations/Strategies pair as a
+     two-header accordion. Its state is carried TWICE — by the header's ground
+     and by its shadow (below): the open one is crimson and recessed, the closed
+     one lagoon and lifted. Both grounds are exact palette steps — sampled
+     (214,58,82) and (74,191,212) against crimson-50 (214,58,82) and lagoon-25
+     (74,191,212) — so they are references rather than literals. Named here
+     anyway because "open is crimson, closed is lagoon" is one design fact with
+     one place to change, and stated as two bare palette utilities at the call
+     site it would read as a coincidence. The same call --color-choice-selected
+     makes above.
+
+     Hover and press are NOT here: they are `PopupButton`'s own drawn values
+     (--color-ui-popup-fg-hover, --color-ui-popup-bg/fg-active), reused rather
+     than re-derived, because the designer already answered "what does a
+     lagoon-25 ground with white text do when you touch it" for that component.
+     The call site references them directly, as `OptionGroup` does with the
+     Button's press pair. */
+  --color-note-open: var(--color-brand-crimson-50);
+  --color-note-closed: var(--color-brand-lagoon-25);
+
+  /* The 1px stroke around the open panel, on its left, right and bottom edges —
+     its top is under the header band and carries none.
+
+     TRANSCRIBED, and the one value in this block that is not a palette
+     reference. Sampled (116,116,116) — exactly neutral on all three channels,
+     which rules out both an antialiased tint and black at an opacity (black at
+     45% over the panel's own ground lands at (116,143,137), not grey). It is off
+     every ramp in this file by a hue rather than by a step, so it stays literal
+     per the §3/§4 rule and is raised as an open item (docs/styling.md §9)
+     alongside --color-agent-mab. A token so there is one place to change when
+     the designer rules on it. */
+  --color-note-panel-border: #747474;
+
+  /* The header bands' shadows — the accordion's SECOND state carrier, and the
+     reason the block comment above no longer says the ground is the only one.
+     The two exports share a drop shadow and differ in one thing: the inset is
+     BLACK at .36 on the crimson band and WHITE at .36 on the lagoon one. Open
+     reads pressed in, closed reads lifted, which is the same grammar every
+     --shadow-ui-* pair below speaks (white inset = raised, dark inset = pressed).
+
+     **The geometry is rounded, and that is a reading rather than a liberty.**
+     The export gives `0px 1.0641891956329346px 2.128378391265869px` and an inset
+     blur of `4.256756782531738px` — one scale factor on 1, 2 and 4. Three things
+     say so: the ratio is exact, the inset's y came out an unscaled `1px` beside a
+     scaled blur, and the same export carries `outline-offset-[-1.06px]`, which is
+     -1 × the factor and is not a number anyone draws. The rounded drop layer also
+     lands verbatim on one already in --shadow-ui-btn-active.
+
+     Hover and press are BORROWED, not derived — the call --color-note-open makes
+     for the grounds. Hover is the lift `--shadow-ui-btn-hover` and
+     `--shadow-ui-arrow-hover` both make. Press takes the open band's own recessed
+     inset, so touching a closed header previews the state it is about to enter —
+     which is exactly what --color-ui-popup-bg-active is documented to do for the
+     ground below.
+
+     The open band's rim is a third layer inside its shadow rather than an
+     `outline`, because the header spends its outline on the focus ring and an
+     element has only one. rgba(255,255,255,0.2) is --shadow-ui-btn-hover's rim
+     value — the designer's own answer for a rim on a CRIMSON ground, which is
+     what this band is. The export drew the rim but dropped its colour. */
+  --shadow-note-open:
+    inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2), 0px 1px 2px 0px rgba(0, 0, 0, 0.25),
+    inset 0px 1px 4px 0px rgba(0, 0, 0, 0.36);
+  --shadow-note-closed:
+    0px 1px 2px 0px rgba(0, 0, 0, 0.25), inset 0px 1px 4px 0px rgba(255, 255, 255, 0.36);
+  --shadow-note-closed-hover:
+    0px 2px 4px 0px rgba(0, 0, 0, 0.25), inset 0px 2px 4px 2px rgba(255, 255, 255, 0.25);
+  /* The open band's inset without its rim, over the lighter .15 drop the press
+     states of --shadow-ui-navbar-focus and --shadow-ui-popup-open-focus use. */
+  --shadow-note-closed-active:
+    0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px 1px 4px 0px rgba(0, 0, 0, 0.36);
+
   --color-choice-selected: var(--color-brand-teal-75);
   --color-choice-selected-hover: color-mix(
     in oklab,

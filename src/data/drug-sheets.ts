@@ -24,6 +24,13 @@
  * Text fields are bulleted lists, kept verbatim (PDF soft-hyphen line-wrap
  * artifacts removed). The `points: string[]` shape mirrors `NoteBlock` in
  * wizard.ts.
+ *
+ * **The trial citations are gone, by client direction (2026-08-04):** "delete the
+ * colon and everything after on each bullet (ie, only the clinical trials name
+ * (NCT…) would be kept". `ClinicalTrial` therefore has no `citation` field, and
+ * the four Denecimig tails it held ("See Mancuso NEJM 2026" and its siblings) are
+ * not stored anywhere in this module. They remain recoverable from
+ * `documents/out_raw.txt`; CONTEXT.md §6 records the cut.
  */
 
 /** One clinical-trial reference on a drug sheet. */
@@ -32,14 +39,43 @@ export interface ClinicalTrial {
   name: string;
   /** Registry id — an NCT number, or a jRCT id for NXT007-style trials. */
   id: string;
-  /** Denecimig-only citation tail, verbatim (e.g. "See Mancuso NEJM 2026"). */
-  citation?: string;
 }
 
 /** A per-drug information sheet. Fields are verbatim bullet lists from the PDF. */
 export interface DrugSheet {
   /** Verbatim agent name — the join key to Treatment.agent / AGENTS values. */
   agent: string;
+  /**
+   * The heading the pop-up card wears, where the source gives the sheet one that
+   * is not the agent's name. Falls back to `agent`.
+   *
+   * This is the caption/title split the education chapters record (see
+   * `fviiia-mimetics`' `CARD_TITLE`): the button announces "Expand Denecimig",
+   * because the agent is what the reader picked, and the card is named for what
+   * the source calls the sheet. Stored in sentence case — every band in this app
+   * is shouted by CSS, not by copy.
+   */
+  title?: string;
+  /**
+   * Label over `classTarget`, **without its trailing colon** — the card appends
+   * that. Defaults to "Class/Target".
+   *
+   * Six sheets pair a class with a molecular target and say so; Efanesoctocog
+   * alfa names a class alone and the source heads it "Class". Transcribed rather
+   * than normalised, because the heading is telling you what the field under it
+   * contains.
+   */
+  classHeading?: string;
+  /**
+   * Label over `monitoring`, same convention as `classHeading`. Defaults to
+   * "Monitoring".
+   *
+   * Denecimig's is a whole sentence — it has no approved label to monitor
+   * against, so the source qualifies the entire section at its heading rather
+   * than caveating each bullet. It was transcribed as `monitoring[0]` before the
+   * card existed to draw it; it is a heading, and it lives here now.
+   */
+  monitoringHeading?: string;
   /** "Class" / "Class/Target" — 1–2 source lines. */
   classTarget: string[];
   /** "Indication(s)" bullets. */
@@ -55,6 +91,8 @@ export interface DrugSheet {
 export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: "Efanesoctocog alfa",
+    // The one sheet whose heading is "Class" alone — see `classHeading`.
+    classHeading: "Class",
     classTarget: ["Clotting factor replacement; ultralong half-life"],
     indication: [
       "Adults + pediatric patients with HA",
@@ -101,6 +139,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   },
   {
     agent: "Denecimig",
+    title: "Denecimig (emerging/investigational)",
     classTarget: ["Factor VIIIa–mimetic BsAb", "FIXa x FX BsAb"],
     indication: [
       "TBD based on FDA approval; clinical trial populations evaluated HA +/- inhibitors, patients >1 year",
@@ -109,19 +148,21 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
       "SC injection, prefilled pen with attachable syringe",
       "No washout required when switching from emicizumab",
     ],
+    // The source's own qualifier over the whole section, not a bullet in it.
+    monitoringHeading: "Monitoring: TBD; based on phase 3 clinical trial data",
     monitoring: [
-      "Monitoring: TBD; based on phase 3 clinical trial data:",
       "Injection site reactions (mostly mild, transient)",
       "No thromboembolic events or thrombotic microangiopathies",
       "No hypersensitivity reactions",
       "No clinically relevant findings in laboratory assessments",
     ],
-    // Source spells "FRONTEIR5" and "Oldenburg"; kept as-authored.
+    // Source spells "FRONTEIR5"; kept as-authored. The four citation tails this
+    // sheet alone carried are cut by client direction — see the module header.
     trials: [
-      { name: "FRONTIER2", id: "NCT05053139", citation: "See Mancuso NEJM 2026" },
-      { name: "FRONTIER3", id: "NCT05306418", citation: "See Mahlangu EAHAD 2025" },
-      { name: "FRONTIER4", id: "NCT05685238", citation: "See Windyga ISTH 2026" },
-      { name: "FRONTEIR5", id: "NCT05878938", citation: "See Oldenburg ISTH 2026" },
+      { name: "FRONTIER2", id: "NCT05053139" },
+      { name: "FRONTIER3", id: "NCT05306418" },
+      { name: "FRONTIER4", id: "NCT05685238" },
+      { name: "FRONTEIR5", id: "NCT05878938" },
     ],
   },
   {
@@ -193,7 +234,10 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
     agent: "Etranacogene dezaparvovec-drlb",
     classTarget: ["AAV vector-based gene therapy"],
     indication: ["Adults with HB without FIX inhibitors"],
-    dosing: ["Single IV infusion", "2 x 10^13 genome copies/kg body weight"],
+    // "2 × 10¹³" in Unicode, not "2 x 10^13": the caret renders literally, and a
+    // dose that reads as ten-thousand-and-thirteen is a hazard rather than a
+    // typo. Same notation CONTEXT.md §6 already uses for it.
+    dosing: ["Single IV infusion", "2 × 10¹³ genome copies/kg body weight"],
     monitoring: [
       "Eligibility: LFTs, hepatic ultrasound and elastography; hepatitis B/C, hepatologist consultation if needed",
       "Hypersensitivity reaction",

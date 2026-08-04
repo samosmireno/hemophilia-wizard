@@ -9,7 +9,9 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-03 (the four `/wizard/scenario` artboards: per-scenario titles, leads
+- **Last reviewed:** 2026-08-04 (the two `/wizard/therapies` artboards: the leaf's one-open
+  Considerations/Strategies accordion, and the §4.2 nesting correction recovered from `out.txt`'s
+  column positions — see §4 and §4.2); previously 2026-08-03 (the four `/wizard/scenario` artboards: per-scenario titles, leads
   and captions, and the plural "rebalancing agents" on HA +inhib — see §4); previously 2026-08-03
   (the `/wizard` artboard: Q1/Q3 renamed on screen, the flow split
   into three routes — see §4); previously 2026-08-03 (the NXT007 artboard split `nxt007-structure` off the overview and
@@ -158,8 +160,15 @@ Entry node (purple diamond): **"Explore Novel Prophylactic Therapy Options for Y
 > Submit button; `/wizard/scenario` is the "Therapeutic classes to consider" box below;
 > `/wizard/therapies` the leaf ([§4.1](#41-recommendation-matrix-scenario--reason--agents)–4.2).
 > All three are walkthrough steps, and the answers are held for the browsing session only —
-> rationale in `docs/adr/0003-session-scoped-wizard-answers.md`. `/wizard/therapies` is still a
-> placeholder.
+> rationale in `docs/adr/0003-session-scoped-wizard-answers.md`.
+>
+> **The leaf renders its note pair as a one-open accordion `[BUILD]`.** Two `/wizard/therapies`
+> artboards were delivered for the same leaf, one per open block, and both draw exactly one open:
+> the open header crimson, the closed one lagoon, and the arch below pinned at the same y whichever
+> is showing. Considerations opens on mount; the open header cannot be collapsed. Rationale, and
+> why the source's own "tabs" wording did **not** become ARIA tabs, in
+> `docs/adr/0005-one-open-leaf-accordion.md`. The `+` buttons beside each recommended agent are
+> drawn but open nothing — issue 10's `?drug=` overlay is unbuilt.
 
 Blueprint layout note (verified 2026-07-27 by rendering the diagram): the canvas is split by a
 **dashed horizontal midline explicitly labelled "hemophilia B" (top) / "hemophilia A" (bottom)** —
@@ -285,6 +294,33 @@ is `Record<ScenarioKey, Record<SwitchReason, { considerations, strategies }>>` (
 verbatim), `recommend()` returns the scenario's note pair, and `treatment-wizard-demo.html` mirrors
 it. The old shared per-reason `REASON_NOTES` is gone.
 
+**Nesting correction, 2026-08-04 `[PDF-V]` `[BUILD]`.** Four of the 32 notes carry a **second
+bullet level**, which the earlier transcription flattened. In all four scenarios the
+_Reducing Treatment Burden_ **Considerations** open a lead-in ending in a colon — _"Frequent IV
+therapy is particularly challenging for children:"_ — and subordinate their age-restriction
+bullets to it:
+
+| scenario  | children of the lead-in                                                     |
+| --------- | --------------------------------------------------------------------------- |
+| HA −inhib | Emicizumab (…>1 year **of age**) · Marstacimab · Other FDA-approved options |
+| HA +inhib | Emicizumab (…>1 year) · Marstacimab · Other FDA-approved options            |
+| HB −inhib | Marstacimab · Concizumab and fitusiran                                      |
+| HB +inhib | Marstacimab · Concizumab and fitusiran                                      |
+
+The nesting is **measured, not inferred from the colon**. `documents/out_raw.txt` cannot show it —
+its `[x=…]` headers are page regions, and the lead-in and its children land in different bands at
+the same nominal x. `documents/out.txt` is layout-preserving and does: the top-level bullets of
+those notes start at **column 1755**, the age bullets at **1763**.
+
+That measurement is also what keeps HB −inhib's trailing _"Gene therapy may reduce long-term
+treatment burden…"_ bullet **out** of the nest — it sits back at 1755, and on content grounds it is
+about gene therapy rather than about children, so a mechanical "group everything after the colon"
+rule would have swallowed it.
+
+`NoteBlock.points` is therefore `Bullet[]` (reusing `education.ts`'s `NestedBullet`), not
+`string[]`; `BulletList` renders the nesting as markup so a screen reader announces the sub-list's
+depth and count. `treatment-wizard-demo.html` was updated to match.
+
 ---
 
 ## 5. "Explore therapy options" table (SECONDARY engine) `[XLSX]` `[PDF-V]` `[BUILD]`
@@ -341,9 +377,36 @@ the one deliberate departure from S1 (see [Data quality](#data-quality--conflict
 Per-drug pop-up content (fields: Class/Target · Indication · Dosage & Administration ·
 Monitoring · Clinical Trials). **Built `[BUILD]`** as `src/data/drug-sheets.ts` → `DRUG_SHEETS`
 (7 sheets, keyed by verbatim `agent`; `sheetFor(agent)` accessor; `trials` structured as
-`{ name, id, citation? }`). **No SHL/EHL sheet** — the source authored none (they are generic
+`{ name, id }`). **No SHL/EHL sheet** — the source authored none (they are generic
 class rows in the comparison table, not branded agents), so the acceptance criterion is "every
 agent the wizard can **recommend** has a sheet" (all 6 novel `AGENTS` + Efanesoctocog covered).
+
+**The card is built `[BUILD]`** as `src/components/DrugSheetPopup.tsx` — `Popup`'s crimson band
+wearing the sheet's name, then the five sections as crimson `<h3>`s over disc lists, in that
+fixed order. Seven artboards, one per sheet; measurements in `docs/styling.md` §16. It is
+component state rather than issue 10's `?drug=` overlay — `docs/adr/0006-component-state-drug-sheets.md`.
+Wired from `/wizard/therapies` (all 6 recommendable agents); Efanesoctocog alfa's sheet is built
+and has no caller until `/explore` (issue 09).
+
+Three per-sheet deviations the card reads as optional fields, all transcription:
+
+- **`title`** — Denecimig alone. The card is headed _"Denecimig (emerging/investigational)"_ where
+  the button says "Denecimig", the caption/title split §7.5's agent cards already use.
+- **`classHeading`** — Efanesoctocog alfa alone, whose section is headed _"Class"_ (it names a
+  class with no molecular target) where the other six read _"Class/Target"_.
+- **`monitoringHeading`** — Denecimig alone: _"Monitoring: TBD; based on phase 3 clinical trial
+  data"_ qualifies the whole section rather than each bullet, and is a heading, not a bullet.
+
+**Trial citations cut, 2026-08-04 `[CLIENT]`.** Direction: _"Delete the colon and everything after
+on each bullet (ie, only the clinical trials name (NCT…) would be kept."_ Only Denecimig's four
+entries carried a tail; they were drawn as blue links but the source supplied no URL for any of
+them. `ClinicalTrial` therefore has no `citation` field, every trial renders `Name (NCTxxxxx)`, and
+the card contains no link at all. The four tails are recorded below and remain in
+`documents/out_raw.txt`, but are stored nowhere in the code.
+
+Etranacogene's dose is stored `"2 × 10¹³ genome copies/kg body weight"` in Unicode — the earlier
+`10^13` renders literally, and a dose reading as ten-thousand-and-thirteen is a hazard rather than
+a typo.
 
 **Efanesoctocog alfa** — _Class:_ clotting factor replacement, ultralong half-life.
 _Indications:_ adults & pediatric HA; routine prophylaxis; on-demand bleed control;
@@ -362,11 +425,12 @@ interaction; ADAs. _Trials:_ HAVEN 3 (NCT02847637), HAVEN 4 (NCT03020160), HAVEN
 _Indication:_ TBD (FDA); trials in HA ±inhibitors, patients >1 yr. _Dosage:_ SC prefilled pen
 w/ attachable syringe; no washout when switching from emicizumab. _Monitoring:_ TBD (phase 3):
 mostly mild transient injection-site reactions; no thromboembolic/TMA events; no
-hypersensitivity; no clinically relevant lab findings. _Trials (with the conference/journal
-citation tails the sheet carries, verbatim):_ FRONTIER2 (NCT05053139) — _See Mancuso NEJM 2026_;
-FRONTIER3 (NCT05306418) — _See Mahlangu EAHAD 2025_; FRONTIER4 (NCT05685238) — _See Windyga ISTH
-2026_; FRONTEIR5 (NCT05878938) — _See Oldenburg ISTH 2026_. _(Source spells "FRONTEIR5" and
-"Oldenburg"; the trial-program abstracts are also listed in the left education band.)_
+hypersensitivity; no clinically relevant lab findings. _Trials:_ FRONTIER2 (NCT05053139);
+FRONTIER3 (NCT05306418); FRONTIER4 (NCT05685238); FRONTEIR5 (NCT05878938). _(Source spells
+"FRONTEIR5"; the trial-program abstracts are also listed in the left education band.)_ The
+sheet's four citation tails — _See Mancuso NEJM 2026_ / _See Mahlangu EAHAD 2025_ / _See Windyga
+ISTH 2026_ / _See Oldenburg ISTH 2026_, in that order, source spelling "Oldenburg" — are **cut by
+client direction 2026-08-04** and are recorded here only; see the section head.
 
 **Concizumab** — _Class/Target:_ hemostatic rebalancing agent, TFPI mAB. _Indication:_ routine
 prophylaxis, ≥12 yrs, HA/HB ±inhibitors. _Dosage:_ SC prefilled pen; D1 load 1 mg/kg; D2 daily
@@ -392,7 +456,7 @@ acute/recurrent gallbladder disease; hepatotoxicity (LFTs baseline, monthly >6 m
 
 **Etranacogene dezaparvovec-drlb** — _Class/Target:_ AAV vector-based gene therapy.
 _Indication:_ adults with HB **without** FIX inhibitors. _Dosage:_ single IV infusion,
-2×10¹³ genome copies/kg. _Monitoring:_ eligibility (LFTs, hepatic ultrasound/elastography,
+2 × 10¹³ genome copies/kg. _Monitoring:_ eligibility (LFTs, hepatic ultrasound/elastography,
 hepatitis B/C, hepatologist consult); hypersensitivity; hepatotoxicity (LFTs weekly ×3 mo then
 monthly ×1 yr); immune-mediated neutralizing antibodies to AAV5 capsid; FIX inhibitor
 observation; plasma FIX activity (e.g. weekly ×3 mo, aPTT one-stage assay). _Trial:_

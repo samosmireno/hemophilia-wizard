@@ -49,6 +49,48 @@ describe("drug sheets", () => {
       }
     }
   });
+
+  it("state the three optional fields only where the source deviates", () => {
+    /*
+      All three default in the card, so a value present on a sheet that does not
+      need one is invisible rather than wrong — which is exactly the kind of drift
+      worth pinning. Each is a single-sheet deviation transcribed from the PDF:
+      Denecimig is the one sheet the source titles beyond the agent's name and the
+      one whose Monitoring heading is a whole sentence, and Efanesoctocog alfa is
+      the one that names a class with no target.
+    */
+    expect(DRUG_SHEETS.filter((s) => s.title).map((s) => s.agent)).toEqual(["Denecimig"]);
+    expect(DRUG_SHEETS.filter((s) => s.monitoringHeading).map((s) => s.agent)).toEqual([
+      "Denecimig",
+    ]);
+    expect(DRUG_SHEETS.filter((s) => s.classHeading).map((s) => s.agent)).toEqual([
+      "Efanesoctocog alfa",
+    ]);
+  });
+
+  it("carry section headings without their colon", () => {
+    /* The card appends it, so no record has to remember to — and a heading that
+       arrived with one would render "Class::". */
+    for (const sheet of DRUG_SHEETS) {
+      expect(sheet.classHeading ?? "").not.toMatch(/:$/);
+      expect(sheet.monitoringHeading ?? "").not.toMatch(/:$/);
+    }
+  });
+
+  it("keep no citation tail on any trial", () => {
+    /*
+      Client direction, 2026-08-04: "delete the colon and everything after on each
+      bullet (ie, only the clinical trials name (NCT…) would be kept". Asserted on
+      the two fields rather than on the rendered string, so re-adding the data
+      fails here rather than silently at a call site that has not been updated.
+    */
+    for (const sheet of DRUG_SHEETS) {
+      for (const trial of sheet.trials) {
+        expect(Object.keys(trial).sort()).toEqual(["id", "name"]);
+        expect(trial.name).not.toContain(":");
+      }
+    }
+  });
 });
 
 describe("wizard class boxes", () => {
