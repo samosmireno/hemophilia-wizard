@@ -91,6 +91,40 @@ describe("wizard — patient characteristics", () => {
     expect(radio("Yes").closest("label")).toHaveClass("uppercase");
   });
 
+  /**
+   * Submit is right-aligned to the pill grid rather than to the content column,
+   * so its box has to carry whatever cap `OptionGroup` gives itself — at every
+   * step of the responsive pass, not just at the canvas. Asserted against the
+   * group's own classes rather than against the literals, because the claim is
+   * that the two agree, and a hard-coded pair would keep passing after one of
+   * them moved (docs/styling.md §14).
+   */
+  it("aligns Submit to the pill grid at both steps of the cap", () => {
+    renderAt("/wizard");
+    const group = screen.getByRole("group", { name: WIZARD_QUESTIONS.type });
+    const row = submit().parentElement!;
+
+    for (const cap of ["max-w-110", "lg:max-w-225"]) {
+      expect(group).toHaveClass(cap);
+      expect(row).toHaveClass(cap);
+    }
+  });
+
+  /**
+   * The one `max-*` variant in the app, and it is load-bearing: `Button`'s own
+   * `text-[26px]` is the size the artboard draws, it is on no scale step, and an
+   * ascending ramp would have to restate it to keep it. `max-lg:` steps the
+   * phone case without emitting a rule where the design applies (§14).
+   */
+  it("steps Submit down below `lg` without restating the package's own size", () => {
+    renderAt("/wizard");
+
+    // Both survive the merge, which is the claim: a modifier and a bare size are
+    // different groups to tailwind-merge, so the step does not evict the drawn
+    // value the way an unprefixed `text-*` would.
+    expect(submit()).toHaveClass("max-lg:text-lg", "text-[26px]", "leading-5");
+  });
+
   describe("the submit gate", () => {
     it("is disabled until all three questions are answered", async () => {
       const user = userEvent.setup();

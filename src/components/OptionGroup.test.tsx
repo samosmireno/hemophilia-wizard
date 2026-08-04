@@ -131,6 +131,50 @@ describe("OptionGroup", () => {
       }
     });
 
+    /**
+     * The responsive pass of 2026-08-04, pinned as one assertion per box,
+     * because the four ramps are one argument: below `lg` the block is a single
+     * column of drawn-width (440px) pills at two-thirds type, and at `lg` the
+     * artboard's two columns come back. jsdom computes no styles, so the class
+     * is the seam — docs/styling.md §14 carries the arithmetic.
+     */
+    it("stacks one column of drawn-width pills below `lg`, and splits at it", () => {
+      renderGroup(null);
+      const group = screen.getByRole("group", { name: "Pick one" });
+
+      // 440px = (900 − 20) / 2, i.e. the pill's own width at the canvas.
+      expect(group).toHaveClass("max-w-110", "lg:max-w-225");
+      expect(group.querySelector("div")).toHaveClass("grid-cols-1", "lg:grid-cols-2");
+    });
+
+    /**
+     * Three steps on the pills against one on the legend: the legend takes §2's
+     * app-wide step at `lg` while the pills follow their own width, which is 440
+     * / 366 / 440 across the two breakpoints and so cannot be one step.
+     */
+    it("ramps the label type on the pill's width and the legend on §2's rule", () => {
+      renderGroup(null);
+
+      expect(screen.getByText("Pick one")).toHaveClass("text-xl", "lg:text-3xl");
+      expect(radio("Option A").closest("label")).toHaveClass(
+        "text-base",
+        "lg:text-xl",
+        "xl:text-2xl",
+      );
+    });
+
+    /**
+     * One `leading-tight` covers all three sizes — a v4 `leading-*` sets
+     * `--tw-leading` and each `text-<size>` reads it back — and with `min-h-14`
+     * it is what keeps the pill 56px tall at every step rather than only where
+     * the padding happens to add up.
+     */
+    it("states the line box once, and floors the pill at the drawn height", () => {
+      renderGroup(null);
+
+      expect(radio("Option A").closest("label")).toHaveClass("leading-tight", "min-h-14");
+    });
+
     it("applies `optionClassName` to every option", () => {
       render(
         <OptionGroup

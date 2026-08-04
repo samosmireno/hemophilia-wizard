@@ -95,14 +95,21 @@ export default function Wizard() {
       </h1>
 
       {/*
-        A real `<form>`, so Enter submits from any of the fifteen radios without
-        a keydown handler — and so the disabled Submit governs that path too.
+        A real `<form>`, so Enter submits from any of the eight radios without a
+        keydown handler — and so the disabled Submit governs that path too.
 
         `mt-20` (80px) is the artboard's gap, arrived at in a browser rather than
         from the export's ink: ink-to-ink the title's baseline sits 92px above
         the first legend's cap top, but how much of that is line-box leading
         depends on the two fonts' metrics. Rendered at 1440, this puts the first
         row of pills at y=226 against the drawn 227.
+
+        It does not ramp, and it is the largest gap on the page, so the reason is
+        worth stating rather than deferring to open item 10 alone: this page is a
+        form of eight pills in three groups and it scrolls on a phone whatever
+        happens here — ~1000px of column at 375. Halving the one gap recovers 4%
+        of that and buys no screenful, where on `/wizard-intro` the equivalent
+        question was whether a hero fit at all.
       */}
       <form
         className="mt-20"
@@ -147,14 +154,18 @@ export default function Wizard() {
 
         {/*
           Right-aligned to the pill grid, not to the content column — hence the
-          same `max-w-225 mx-auto` box the groups use. That coupling is the
-          point, not the number: whatever `OptionGroup` caps itself at, this has
-          to match, or the button stops landing on the grid's right edge.
+          same `mx-auto max-w-110 lg:max-w-225` box the groups use. That coupling
+          is the point, not the numbers: whatever `OptionGroup` caps itself at,
+          this has to match at every step, or the button stops landing on the
+          grid's right edge. Both steps are restated here rather than derived,
+          for the reason the component's own comment gives — 440 is the drawn
+          pill and 900 the drawn block, and they are two facts, not a ratio.
 
           `mt-8` is the drawn 32px, fill to fill, which needs no leading
-          correction between two buttons.
+          correction between two buttons. It does not ramp: the vertical gaps are
+          left alone until one rule covers them (open item 10).
         */}
-        <div className="mx-auto mt-8 flex max-w-225 justify-end">
+        <div className="mx-auto mt-8 flex max-w-110 justify-end lg:max-w-225">
           {/*
             The package's `Button`, re-grounded in lagoon. Only the three ground
             colours are overridden (tailwind-merge, so the caller wins); type,
@@ -171,6 +182,29 @@ export default function Wizard() {
             (the same discrepancy the pill labels above record). The type size is
             the package's 26px untouched.
 
+            **`max-lg:text-lg` is the responsive step, and the variant is the
+            point.** Nothing here is about fit: the label is 13 characters, so
+            the pill computes to 224 × 56 at every width — inside even the 256px
+            column a 320px phone gives — and `leading-5` is safe for as long as
+            the label does not wrap, which it never does. What ramps is the
+            relationship the design draws between this button and the pills above
+            it, which is +2px: 26 against 24 at the canvas, and 18 against 16
+            once `OptionGroup` takes its base step. `text-lg` is that +2 on the
+            scale.
+
+            A `max-*` variant rather than the three ascending steps everything
+            else on the page takes, because this is the one size in the app the
+            APP does not own — `Button` ships `text-[26px]`, and 26 is on no
+            scale step. An ascending ramp has to restate its own top, so it could
+            only end in an arbitrary `text-[26px]` the app no longer has anywhere
+            (styling open item 33) or in `text-2xl`, which would quietly round
+            the drawn 26 to 24 and drop the 2px §14 measured. `max-lg:` emits no
+            rule at or above `lg` at all, so the package's value stands untouched
+            exactly where the artboard draws it, and only the phone case is
+            stated. The height does not move either way: 2 × 18px of padding plus
+            the 20px `leading-5` box is 56 at both sizes, so the drawn pill
+            survives the step.
+
             `disabled` is the real attribute, not `aria-disabled`: the gate is
             visible in the three unanswered groups above it, so a focusable
             button that refuses to act would explain nothing extra.
@@ -178,7 +212,7 @@ export default function Wizard() {
           <Button
             type="submit"
             disabled={!complete}
-            className="bg-brand-lagoon-50 px-6 leading-5 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75"
+            className="bg-brand-lagoon-50 px-6 leading-5 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75 max-lg:text-lg"
           >
             Submit inputs
           </Button>

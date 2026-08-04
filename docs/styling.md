@@ -1024,6 +1024,7 @@ Everything above is arithmetic — see open item 41.
 | 39  | **`/education/rebalancing-agents`' responsive pass of 2026-08-04 is arithmetic end to end**, like item 36's — verified in the compiled CSS (every new and changed utility present, `gap-x-10` and `gap-x-35.25` resolving to 40px and 141px) and in Vitest (28 tests, three of them new and pinning the row's gap ramp, the boxes' drawn size, the whole type ramp and the CTA's inset), but jsdom computes no layout so nothing about pixels can fail. **The weakest number is the 752-exact fill at 1024** — 3 × 224 + 2 × 40 leaves the row no slack at all, so anything that moves the gutter, the border width or `--spacing` puts the boxes back into shrinking, silently and by a pixel at a time. It is also the width already carrying the most untested reasoning in the app (items 30, 36), which makes it the one to confirm first. The 640px of stacked placeholder below `lg` is a deliberate cost rather than an unverified number (§11), but how it reads on a phone is a judgement no test makes. **The CTA's ~241px at 375 rests on an estimated ink width** — 230px for "VIEW MECHANISM" at 26px, back-derived from the ~358px the package computes, then scaled linearly to 20px. It has 62px of card body in hand, and the failure mode is a wrapped label rather than an overflow, but it is an estimate. A preview server was started for this pass and the user declined it, so nothing was opened in a browser — the same call as item 36.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | §11, §12              |
 | 40  | **`docs/styling.md` is inside Tailwind v4's default source scan, so every class name this file writes in prose is compiled into the bundle.** v4 auto-detects sources from the project root and does not exclude Markdown; `src/styles/tokens.css` adds one `@source` for the package's `dist` and overrides nothing. Confirmed by `px-22`, which has zero occurrences under `src/` — it is the superseded value item 33 records — and ships as a real rule. So do the historical `text-[26px]`, `min-w-105` and `rounded-t-[150px]` mentions, and the count grows every time this file explains a class it is retiring. Harmless to correctness and small against a 72kB sheet, but it means the CSS is not a record of what the app uses, which is exactly what the 2026-08-04 passes were reading it as. Fixed by an explicit `@source` narrowing the scan to `src/`, or by `@source not "docs/"`; either is a one-line change, and it wants a rebuild diff rather than a blind edit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | §1, §9                |
 | 41  | **`/wizard-intro` and `/education/prophylaxis-guidance`'s responsive passes of 2026-08-04 are arithmetic end to end**, like items 36 and 39 — verified in the compiled CSS (every new utility present, `text-2xl/5` resolving to a 20px line box and the three `/[1.05]` steps to `line-height:1.05`) and in Vitest (16 tests across the two pages, three of them new), but jsdom computes no layout so nothing about pixels can fail. **The weakest numbers are the two ink widths the `/wizard-intro` ramp is derived from.** "PROPHYLACTIC" at ~397px/72px comes from §8's own drawn line measurements (729px and ~830px) divided into letters at ~0.46em, and the CTA label's ~385px at 24px is back-derived from the 545px the package computes at 26 — so the 320px column clearing `text-4xl` by 57px is safe, while the base CTA step landing 321px in a 311px column is inside the error bar in both directions. That one is deliberately built to survive either outcome (`/tight` makes a wrapped label legible), but which outcome ships is unknown. The 1024 case rests on 729 < 752 with 23px of margin, i.e. on a measurement taken off the export rather than a render — and 1024 is already the app's least-tested width (items 30, 36, 39). `prophylaxis-guidance` carries less: one class, no layout change, and its one-screen claim at 375 × 667 (~460px of ink in a 557px box) is the only estimate in it. Nothing was opened in a browser for either page, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | §8, §11               |
+| 42  | **`/wizard`'s responsive pass of 2026-08-04 is arithmetic end to end**, like items 36, 39 and 41 — verified in the compiled CSS (every new utility present, `max-w-110` resolving to 440px and `max-lg:text-lg` to a `width < 64rem` rule that wins over the package's `text-[26px]`) and in Vitest (31 tests across the page and its component, five of them new), but jsdom computes no layout. **Every number in the ramp descends from two rendered measurements §14 already carried**: "Reduce monitoring requirement" at 369px and "Hemophilia A" at 153px, both at 24px, which agree on ~0.53em a character. The binding case is `lg` — ~308px of label inside a 318px pill, i.e. **10px of margin**, against the ~4px export/render discrepancy §14 records — so it is the one step that would flip if the font rounded differently than measured, and 1024 is already the app's least-tested width (items 30, 36, 39, 41). The base step has more room (246 in 263 at 375) and 320 is _known_ to wrap and is built for it. The legend windows (368–506px at 20px) are scaled from a **drawn** 589/809 rather than from a render, so "440 reproduces the designer's break below `lg`" is the softest claim here; it costs a line break rather than an overflow if it is wrong. Nothing was opened in a browser, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | §14                   |
 
 ---
 
@@ -3085,9 +3086,95 @@ own label confirms: 173px drawn, 176px rendered.
 
 **The line box is `leading-tight` (30px), where the design's is 20px.** The
 padding absorbs the difference — 30 + 2×13 = 56, the drawn height — so nothing
-moves where the design applies. It only shows below `md`, where the grid is one
-column and the labels wrap: at 24px in a 20px box, wrapped lines collide, which
-is the same trap `Button`'s own comment records about its 26px type.
+moves where the design applies. It only shows where a label wraps, which after
+the pass below is a 320px phone: at 24px in a 20px box, wrapped lines collide,
+which is the same trap `Button`'s own comment records about its 26px type. It is
+stated once and covers all three type steps, because a v4 `leading-*` sets
+`--tw-leading` and each `text-<size>` reads it back — so the ratio holds at 16,
+20 and 24, and `min-h-14` keeps the pill 56px tall at all three.
+
+### The responsive pass of 2026-08-04
+
+Four ramps, one argument: **below `lg` the block is a single column of
+drawn-width pills, and at `lg` the artboard's two columns come back.**
+
+| Box              | Base                | `lg`        | `xl`        |
+| ---------------- | ------------------- | ----------- | ----------- |
+| fieldset cap     | `max-w-110` (440)   | 900         | 900         |
+| grid             | one column          | two columns | two columns |
+| legend           | `text-xl` (20)      | `text-3xl`  | `text-3xl`  |
+| pill label       | `text-base` (16)    | `text-xl`   | `text-2xl`  |
+| Submit label     | `max-lg:text-lg`    | 26 (pkg)    | 26 (pkg)    |
+| Submit row's cap | 440, matching above | 900         | 900         |
+
+**The 440px cap is the drawn pill, not a new number** — `(900 − 20) / 2` is what
+a pill measures at the canvas, so out of the grid the block is one column of
+full-size pills rather than a shrunken artboard. Uncapped it would stretch a
+153px label across a 752px pill at `lg`. Same move §11's `disease-background`
+figure makes when it leaves its grid: keep the drawn width, add `mx-auto`.
+
+**The split moved from `md` to `lg` because `md` cannot hold the label the pill
+was sized around.** At 768 the content column is 672, so two pills are 326 wide
+and 278 inside their padding against a longest label of 369px — the reason grid
+shipped with one pill in two lines and its row 84px tall rather than 56. That is
+the one thing on this page that was wrong rather than merely undrawn.
+
+| Viewport | Column | Cols | Pill | Inside | Type | Longest label |
+| -------: | -----: | ---: | ---: | -----: | ---: | ------------: |
+|      320 |    256 |    1 |  256 |    208 |   16 | 246 → 2 lines |
+|      375 |    311 |    1 |  311 |    263 |   16 |           246 |
+|      640 |    544 |    1 |  440 |    392 |   16 |           246 |
+|     1024 |    752 |    2 |  366 |    318 |   20 |          ~308 |
+|     1280 |   1008 |    2 |  440 |    392 |   24 |           369 |
+|     1440 |   1168 |    2 |  440 |    392 |   24 |           369 |
+
+**The pills take three steps where everything else on the page takes one**, and
+the reason is that they follow their own width rather than the viewport's: 440 →
+366 → 440 is not monotonic, because two pills start sharing a 752px column at
+`lg` and only get the drawn 440 back when the block reaches its cap at `xl`. The
+base step is then set by the phone rather than by the block, exactly as §2's
+`<h1>` rule is — 440px would hold the drawn 24px outright, but 375 gives 263px
+inside the padding and only 16 keeps "Reduce monitoring requirement" on one line
+there. 320 is past every step on the scale (246 against 208) and wraps.
+
+**The legend takes §2's step at `lg` and needs no cap ramp to follow it.** 700px
+is inert below the breakpoint — the 440px fieldset clamps it — and the window
+that reproduces the drawn line break scales with the type: 589–809px at the drawn
+32 becomes 368–506 at 20, whose midpoint is 437. The block's own 440 lands 3px
+off the setting that breaks where the designer did, without anything being chosen
+for it. Below `sm` the column is narrower than the window (311 at 375) and the
+question sets in three lines; nothing overflows at any width, the longest word
+being CONSIDERING at ~137px against a 256px column at 320.
+
+**Submit steps with `max-lg:text-lg`, and the variant is the point.** Nothing
+about it is fit: the label computes to a 224 × 56 pill at every width, inside
+even the 256px column a 320px phone gives, and `leading-5` is safe for as long as
+the label does not wrap, which it never does. What ramps is the +2px this section
+measured between this button and the pills beside it — 26 against 24 drawn, 18
+against 16 once the pills take their base step.
+
+It is the one `max-*` variant in the app, and it is there because **26px is the
+one size on this page the app does not own**: `Button` ships `text-[26px]`, which
+is on no scale step. An ascending ramp has to restate its own top, so it could
+only end in an arbitrary `text-[26px]` — which the app no longer has anywhere
+(item 33) — or in `text-2xl`, rounding the drawn 26 to 24 and dropping the very
+2px the step exists to preserve. `max-lg:` emits no rule at or above `lg`, so the
+package's value stands untouched where the artboard draws it and only the phone
+case is stated. The two survive `twMerge` together because a modifier and a bare
+size are different groups to it; that is asserted in `wizard.test.tsx` rather
+than assumed, since an unprefixed `text-lg` would have evicted the drawn value
+silently. The pill height is unaffected at either size: 2 × 18px of padding plus
+the 20px `leading-5` box is 56 both times.
+
+Any other consumer of a package-defaulted size wanting a phone step should reach
+for the same device rather than restating the package's value.
+
+`mt-20` and `mt-6` are untouched, per open item 10. Stated here rather than
+deferred silently, because 80px is the largest gap in the app: this page is a
+form of eight pills in three groups and scrolls on a phone whatever happens to
+that gap (~1000px of column at 375), so halving it recovers 4% and buys no
+screenful — where on `/wizard-intro` the same question was whether a hero fit at
+all.
 
 ### Verified in a browser
 
@@ -3099,6 +3186,11 @@ legend breaks where the designer broke it —
 which needs `max-w-[700px]` on the legend, the midpoint of the 589–809px window
 in which the drawn break survives. At 390 the grid stacks, the document does not
 scroll sideways, and wrapped labels stay legible.
+
+That pass predates the responsive one above and covers 1440 and 390 only — both
+still land where it says (nothing at or above `xl` moved, and 390 stacked before
+and stacks now), but the three widths the ramp actually turns on — 640, 1024 and
+1280 — have not been opened. Open item 42.
 
 ---
 

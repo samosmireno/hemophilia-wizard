@@ -73,12 +73,21 @@ export default function OptionGroup<T extends string>({
       the grid below); the line break this cap exists to protect is governed by
       the legend's own narrower cap and is unaffected.
 
+      **`max-w-110` below `lg` is that same block with one column in it, and it
+      is the drawn pill rather than a new number**: 440px is exactly what
+      `(900 − 20) / 2` gives, i.e. what a pill measures at the canvas. So below
+      the breakpoint the block is not a shrunken artboard — it is one column of
+      full-size pills, centred (docs/styling.md §14). Uncapped it would stretch a
+      153px label across a 752px pill at `lg`; capped, an element that leaves a
+      grid keeps its drawn width and takes `mx-auto`, which is what §11's
+      `disease-background` figure does for the same reason.
+
       `min-w-0` because a `<fieldset>` carries `min-inline-size: min-content` in
       the UA stylesheet, which Tailwind's preflight does not reset — without it
       the grid inside refuses to shrink below its widest label and the page
       scrolls sideways on a phone.
     */
-    <fieldset className={cn("mx-auto max-w-225 min-w-0", className)}>
+    <fieldset className={cn("mx-auto max-w-110 min-w-0 lg:max-w-225", className)}>
       {/*
         32px bold uppercase in teal-75, measured off the artboard (cap height 23
         on the 1440 canvas ÷ DM Sans' 0.70 cap ratio = 33px, i.e. `text-3xl`).
@@ -94,11 +103,22 @@ export default function OptionGroup<T extends string>({
         likely to flip a line if the font rounds differently than measured. The
         other two questions are far shorter and unaffected.
 
+        **The type steps down one size below `lg`, which is §2's app-wide rule,
+        and the cap needs no ramp to follow it** — 700px is inert down there,
+        because the fieldset above is 440px wide and clamps it. That window
+        scales with the type: at 20px it is 368–506px, whose midpoint is 437 —
+        i.e. the block's own 440 lands 3px off the setting that reproduces the
+        designer's break, without anything being chosen for it. Below `sm` the
+        column is narrower than the window (311px at 375) and the question sets
+        in three lines; nothing else can be done from here, and nothing overflows
+        — the longest word, CONSIDERING, is ~137px at 20px against a 256px column
+        at 320.
+
         `mb-2.5` is the 10px the artboard leaves between the legend's baseline
         and the pills: ink-to-ink measures 15px, which is that gap once the line
         box's descender space is taken off (docs/styling.md §11).
       */}
-      <legend className="mx-auto mb-2.5 w-full max-w-175 text-center font-sans text-3xl font-bold text-brand-teal-75 uppercase">
+      <legend className="mx-auto mb-2.5 w-full max-w-175 text-center font-sans text-xl font-bold text-brand-teal-75 uppercase lg:text-3xl">
         {legend}
       </legend>
 
@@ -113,11 +133,19 @@ export default function OptionGroup<T extends string>({
         30px between them. The row is still two equal pills 20px apart, which is
         what the design is saying; it is 15px wider per pill than it was drawn.
 
-        One column under `md`, where two would leave ~140px per pill. Nobody has
-        drawn a phone, so this is an invented comfort value, as the shell's small
-        gutters are (docs/styling.md §11).
+        **Two columns from `lg`, where it was `md` until 2026-08-04.** The split
+        is not a comfort call — it is where a two-column row can hold the label
+        the design sized the pill around. At `md` the content column is 672px, so
+        two pills are 326 wide and 278 inside their padding, against a longest
+        label of 369px at the drawn type: the reason grid shipped with one pill
+        set in two lines and its whole row 84px tall rather than 56. `lg` gives
+        752 / 366 / 318, which holds it at the stepped-down 20px (~308px) — and
+        that is the same "move the split to where the composition fits" call §11
+        records for `disease-background` and `treatment-landscape`, one
+        breakpoint lower because this block pays for it in a wrap rather than in
+        a 250px prose column.
       */}
-      <div className="grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 lg:grid-cols-2">
         {options.map((option) => {
           const selected = value === option.id;
 
@@ -143,7 +171,10 @@ export default function OptionGroup<T extends string>({
                   the padding absorbs it and the pill is still 56px — and only
                   shows up in the case the artboard does not draw. `break-words`
                   is its companion, since a fixed-width design relies on `nowrap`
-                  and this one does not.
+                  and this one does not. Stated once, it covers all three type
+                  steps below: a Tailwind v4 `leading-*` sets `--tw-leading` and
+                  each `text-<size>` reads it back, so the ratio holds and the
+                  padding plus the minimum keep the pill 56px at every width.
 
                   **24px, where the package's `Button` is 26.** Cap height alone
                   cannot separate the two at this size, so it was settled by
@@ -160,9 +191,33 @@ export default function OptionGroup<T extends string>({
                   longest label exactly 365px of a 369px render, i.e. wrapping on
                   a 4px difference between this font's metrics and the export's.
                   24px keeps it on one line as drawn, with room to spare.
+
+                  **The type ramps on three steps, and it follows the pill's own
+                  width rather than the viewport's** — which is why it is not the
+                  single step below `lg` that the legend above and every chapter
+                  heading take. The pill is 440px wide below `lg` (one column at
+                  the drawn width), 366 at `lg` (two share the 752px column) and
+                  440 again from `xl`, so what the label has to fit is 392 / 318
+                  / 392 inside the padding:
+
+                    Viewport  Column  Cols  Pill  Inside  Type  Longest label
+                    320          256     1   256     208    16   246 → 2 lines
+                    375          311     1   311     263    16            246
+                    640          544     1   440     392    16            246
+                    1024         752     2   366     318    20           ~308
+                    1280        1008     2   440     392    24            369
+                    1440        1168     2   440     392    24            369
+
+                  The base step is set by the phone rather than by the block, as
+                  §2's `<h1>` rule is: 440px would hold the drawn 24px outright,
+                  but 375 gives the pill 263px inside and only 16px keeps
+                  "Reduce monitoring requirement" on one line there. 320 is
+                  past what any step on the scale can hold — 246 against 208 —
+                  and takes two lines, which is what `min-h-14` and the line box
+                  above exist for.
                 */
                 "flex min-h-14 cursor-pointer items-center justify-center rounded-lg px-6 py-3",
-                "text-center text-2xl leading-tight font-semibold wrap-break-word",
+                "text-center text-base leading-tight font-semibold wrap-break-word lg:text-xl xl:text-2xl",
                 "shadow-ui-btn transition-[background-color,color] duration-120 ease-out",
                 /*
                   Three resting skins, two of them the package's own:
