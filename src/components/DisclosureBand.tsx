@@ -70,7 +70,14 @@ export default function DisclosureBand({
 
   return (
     <ArchBand title={title}>
-      <ul className="mt-10 grid justify-items-center gap-10 lg:grid-cols-3">
+      {/* Three-up from `md`, not `lg`. The band is the tallest thing on the
+          page once it stacks, and `lg` left a 768px tablet showing one 272px
+          caption per screenful — while at that width the content column is
+          768 − 96 = 672px, i.e. 224px a disclosure, which holds the button and
+          a 20px caption with room over. Below `md` it stacks, which is right
+          for a phone. 768 is an invented comfort value: no artboard exists
+          below 1440 (docs/styling.md §12). */}
+      <ul className="mt-10 grid justify-items-center gap-10 md:grid-cols-3">
         {/* The captions run 1–3 lines. Grid stretch makes every cell as tall
             as the longest, so the caption below takes the leftover space as a
             flex track and centres in it — the three blocks then read as one
@@ -88,7 +95,7 @@ export default function DisclosureBand({
               aria-haspopup={disclosure.content ? "dialog" : undefined}
               onClick={(next) => setOpenIndex(next ? index : null)}
             />
-            <p className="mt-4 flex max-w-68 flex-1 items-center text-center text-2xl font-bold text-popup-caption">
+            <p className="mt-4 flex max-w-68 flex-1 items-center text-center text-xl font-bold text-popup-caption lg:text-2xl">
               {disclosure.label}
             </p>
           </li>

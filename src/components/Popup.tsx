@@ -11,12 +11,19 @@ import ModalLayer from "./ModalLayer";
  * on the card *and* clear of the ✕, and a band whose lines disagree on their
  * inset reads as one of them being off-centre.
  *
- * `clamp(5.5rem,7vw,6.25rem)` until 2026-08-04, now the 100px maximum flat. The
- * 88px floor it lost was the phone case: at 375 the card is 345px wide, so the
- * band now spends 200 of it on padding and leaves 145 for the title. Styling
- * open item 33.
+ * `clamp(5.5rem,7vw,6.25rem)` until 2026-08-04, then the 100px maximum flat —
+ * which was the phone regression styling open item 33 recorded: at 375 the card
+ * is 345px wide, so the band spent 200 of it on padding and left 145 for a 48px
+ * title.
+ *
+ * **The floor is back as a breakpoint step rather than a `clamp()`.** 88px is
+ * not an invented comfort value the way `DisclosureBand`'s `md` is: it is the
+ * ✕'s own 65px plus the 22px inset the button is drawn at, i.e. the narrowest
+ * inset at which the title can never run under the button. `px-22` is that
+ * number on Tailwind's scale, so the app keeps its no-arbitrary-length
+ * invariant. The drawn 100px arrives at `lg`, above which nothing moves.
  */
-const BAND_INSET = "px-25";
+const BAND_INSET = "px-22 lg:px-25";
 
 /** Which of the three card widths a caller wants. See `CARD_WIDTH`. */
 export type PopupWidth = "narrow" | "default" | "wide";
@@ -171,7 +178,27 @@ export default function Popup({
               and sized to clear the ✕ on the right — its floor is the button's
               own 65px plus the 22px inset, so the two never overlap. Type is
               raw design values per §8's precedent; the scale has no 45.5px
-              step. */}
+              step.
+
+              **This title falls two steps below `lg` where the chapter's `<h2>`
+              falls one**, and the reason is the box rather than the type: a
+              heading sits in the content column, but this sits in whatever the
+              card's inset leaves, which on a phone is 291px against the column's
+              311 — and it is `uppercase` display type, the widest thing the app
+              sets. 48 → 36 would still take "Hemophilia Severity Based on Factor
+              VIII/IX Level" to five lines in a band the ✕ has to stay centred
+              on.
+
+              **The `leading-[1.0278]` is stated once and survives all three
+              steps**, which is worth knowing because the opposite looks true. A
+              Tailwind v4 `leading-*` compiles to `--tw-leading:1.0278` as well
+              as a `line-height`, and every `text-<size>` compiles to
+              `line-height:var(--tw-leading,<its own>)` — so the custom property
+              is read by each step rather than replaced by it, and a custom
+              property is not scoped to the media query the step arrives in. A
+              slash modifier (`text-5xl/[1.0278]`) is the one that would need
+              restating, because it emits a bare `line-height` and sets no
+              property. Verified in the built CSS; docs/styling.md §8. */}
           {/*
             `preserveCase` is what stops the `uppercase` below destroying an
             abbreviation the band is there to state — "EMICIZUMAB MOA:
@@ -193,7 +220,7 @@ export default function Popup({
             aria-label={title}
             className={cn(
               BAND_INSET,
-              "text-center font-display text-5xl leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase",
+              "text-center font-display text-2xl leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase sm:text-3xl lg:text-5xl",
             )}
           >
             {preserveCase(title)}
@@ -230,8 +257,20 @@ export default function Popup({
 
         {/* `min-h-0` is load-bearing: a flex item's default `min-height:auto`
             floors it at its content's height, so without it the card grows past
-            `max-h-[95dvh]` and this never scrolls. */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-16 py-2">{children}</div>
+            `max-h-[95dvh]` and this never scrolls.
+
+            **The 64px inset is the drawn one and it arrives at `lg`.** It is
+            69px from the card's outer edge, which two of the seven drug-sheet
+            exports draw and five draw at 49 (open item 25) — but neither
+            reading is a phone number: at 375 the card is 345px, so `px-16`
+            spends 128 of it and leaves the body 207px. Three `table-fixed`
+            columns in that is ~29px of text a column. 16 → 32 → 64 instead,
+            which gives the body 303 / 514 / 1002 at 375 / 640 / 1440.
+
+            Only the horizontal padding ramps. `py-2` is 16px of clearance
+            between the band and the content, which is the same job at every
+            width — and `PopupFigure`'s `reserve` is measured off it. */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2 sm:px-8 lg:px-16">{children}</div>
       </div>
     </ModalLayer>
   );

@@ -114,15 +114,38 @@ export default function DiseaseBackground() {
       >
         Hemophilia Disease Background
       </h1>
-      {/* The figure sets the top of this block and the prose is nudged down
-          under it — hence the per-column margins rather than one on the grid:
-          in the comp the pop-up sits nearer the chapter title than the
-          "Disease mechanism" heading does. */}
-      <div className="mt-5 grid lg:grid-cols-[1fr_470px] lg:gap-x-8">
-        <div className="lg:mt-3">
-          <h2 className="text-3xl font-bold tracking-wide text-black">{MECHANISM.title}</h2>
+      {/*
+        The figure sets the top of this block and the prose is nudged down
+        under it — hence the per-column margins rather than one on the grid:
+        in the comp the pop-up sits nearer the chapter title than the
+        "Disease mechanism" heading does.
+
+        **The split is `xl:`, not `lg:`** — the same argument §8 makes for the
+        landing hero, and for the same reason. The drawn two-column layout needs
+        the 1440 canvas's column, and `lg` is where it can least afford it: the
+        gutter steps 48 → 112 at that exact pixel (§12), so the content column
+        drops 927 → 752 in the same breakpoint that turns the fixed 470px figure
+        track on, leaving the prose 752 − 32 − 470 = **250px**. At `xl` the
+        column is 1008 and the prose 506. Between 1024 and 1279 the chapter is
+        one 752px column instead, which is wider than the prose gets in the
+        two-column layout at that width — the stack is not a fallback here, it
+        is the better composition. 1280 ≤ the 1440 canvas, so **1440 is
+        unaffected**.
+      */}
+      <div className="mt-5 grid xl:grid-cols-[1fr_470px] xl:gap-x-8">
+        <div className="xl:mt-3">
+          {/* `text-3xl` from `lg` only — §2's `<h1>` rule applied one level
+              down. A sub-heading does not overflow the way a display `<h1>`
+              does, so this is comfort rather than correctness: at 30px in a
+              311px phone column the heading hierarchy collapses onto the body
+              size, and one step restores it. */}
+          <h2 className="text-2xl font-bold tracking-wide text-black lg:text-3xl">
+            {MECHANISM.title}
+          </h2>
           <BulletList items={MECHANISM.body} className="mt-4" />
-          <h2 className="mt-4 text-3xl font-bold tracking-wide text-black">Diagnosis:</h2>
+          <h2 className="mt-4 text-2xl font-bold tracking-wide text-black lg:text-3xl">
+            Diagnosis:
+          </h2>
         </div>
 
         {/*
@@ -136,17 +159,23 @@ export default function DiseaseBackground() {
           it opens is rebuilt as markup rather than shown as that same raster
           (docs/styling.md §13), which is why the card is white: the diagram is
           drawn on white, and the tinted body would frame it as a rectangle.
+
+          `mx-auto` below the split and `xl:mx-0` above it: the 480px cap is
+          narrower than the stacked column at every width the stack exists at
+          (752px at 1024), so left-flush would hang 272px of dead space beside
+          it. Inside its own grid track the track IS the box, and centring there
+          would break the drawn 807–1277 alignment.
         */}
         <ExpandableFigure
           thumbSrc={cascadeThumbUrl}
           title={CASCADE_TITLE}
           surface="white"
-          className="mt-8 max-w-120 lg:mt-0"
+          className="mx-auto mt-8 max-w-120 xl:mx-0 xl:mt-0"
         >
           <ClottingCascadeFigure />
         </ExpandableFigure>
 
-        <BulletList items={DIAGNOSIS.body} className="mt-4 lg:col-span-2" />
+        <BulletList items={DIAGNOSIS.body} className="mt-4 xl:col-span-2" />
       </div>
 
       {/*
@@ -186,65 +215,96 @@ const MANIFESTATION_HEADING = "Bleeding Manifestation Based on Severity";
  * Type is raw design values under §8's precedent — 26/700 lands on the `text-2xl`
  * step at a heavier weight, and 22px is off the scale entirely. The column rules
  * are inferred: the export draws a hairline the palette has no token for.
+ *
+ * **It is the one thing on this page that cannot simply reflow.** Three
+ * `table-fixed` columns divide whatever they are given, and the manifestation
+ * cells carry unbreakable words — `intracranial`, `hemorrhages` — so below a
+ * floor the text breaks mid-word rather than wrapping. At 375px the card is
+ * `min(1140, 92vw)` = 345px and its body 303px after the border and the ramped
+ * padding, which is 101px a column and ~61px of text once `px-2` and `pl-6` are
+ * taken off.
+ *
+ * So it gets both halves of the usual answer: the type steps down below `lg`
+ * (24 → 16 in the cells, 20 → 14 in the bullets), which drops the floor to
+ * ~140px a column, and `min-w-105` (420px) with an `overflow-x-auto` wrapper
+ * holds that floor when the card is narrower still. The table fits outright
+ * from ~480px up; below that the card scrolls sideways rather than shredding
+ * the words. That is the same call open item 27 already took for the §5
+ * comparison table, and it keeps the `<table>` intact — the alternative,
+ * restacking into three blocks on a phone, flattens the column association for
+ * assistive tech at exactly the width where it matters most, which is the thing
+ * the element was chosen for above.
+ *
+ * The wrapper is a plain `div`: `overflow-x-auto` on the `<table>` itself does
+ * nothing, because a table box is not a scroll container.
  */
 function SeverityTable() {
   return (
-    <table className="w-full table-fixed border-separate border-spacing-x-0 border-spacing-y-2 text-center text-black">
-      <thead>
-        <tr>
-          {SEVERITY_TABLE.map((row, index) => (
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-105 table-fixed border-separate border-spacing-x-0 border-spacing-y-2 text-center text-black">
+        <thead>
+          <tr>
+            {SEVERITY_TABLE.map((row, index) => (
+              <th
+                key={row.severity}
+                scope="col"
+                className={cn(
+                  "bg-white/50 px-2 py-5 text-base font-bold lg:text-2xl",
+                  index === 0 && "rounded-l-2xl",
+                  index === SEVERITY_TABLE.length - 1 && "rounded-r-2xl",
+                )}
+              >
+                {row.severity}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {SEVERITY_TABLE.map((row, index) => (
+              <td
+                key={row.severity}
+                className={cn(
+                  "px-2 py-5 text-base font-bold lg:text-2xl",
+                  index > 0 && "border-l border-black/10",
+                )}
+              >
+                {row.factorLevel}
+              </td>
+            ))}
+          </tr>
+          <tr>
             <th
-              key={row.severity}
-              scope="col"
-              className={cn(
-                "bg-white/50 px-2 py-5 text-2xl font-bold",
-                index === 0 && "rounded-l-2xl",
-                index === SEVERITY_TABLE.length - 1 && "rounded-r-2xl",
-              )}
+              scope="colgroup"
+              colSpan={SEVERITY_TABLE.length}
+              className="rounded-2xl bg-white/50 px-2 py-5 text-base font-bold lg:text-2xl"
             >
-              {row.severity}
+              {MANIFESTATION_HEADING}
             </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          {SEVERITY_TABLE.map((row, index) => (
-            <td
-              key={row.severity}
-              className={cn(
-                "px-2 py-5 text-2xl font-bold",
-                index > 0 && "border-l border-black/10",
-              )}
-            >
-              {row.factorLevel}
-            </td>
-          ))}
-        </tr>
-        <tr>
-          <th
-            scope="colgroup"
-            colSpan={SEVERITY_TABLE.length}
-            className="rounded-2xl bg-white/50 px-2 py-5 text-2xl font-bold"
-          >
-            {MANIFESTATION_HEADING}
-          </th>
-        </tr>
-        <tr>
-          {SEVERITY_TABLE.map((row, index) => (
-            <td
-              key={row.severity}
-              className={cn("px-2 pt-2 pb-6 align-top", index > 0 && "border-l border-black/10")}
-            >
-              <ul className="list-disc pl-6 text-left text-xl leading-[1.6] font-normal">
-                {row.manifestations.map((manifestation) => (
-                  <li key={manifestation}>{manifestation}</li>
-                ))}
-              </ul>
-            </td>
-          ))}
-        </tr>
-      </tbody>
-    </table>
+          </tr>
+          <tr>
+            {SEVERITY_TABLE.map((row, index) => (
+              <td
+                key={row.severity}
+                className={cn("px-2 pt-2 pb-6 align-top", index > 0 && "border-l border-black/10")}
+              >
+                {/*
+                  One `leading-[1.6]` covers both steps: a Tailwind v4
+                  `leading-*` sets `--tw-leading`, and every `text-<size>`
+                  resolves its line-height through that property, so the ramp
+                  reads it rather than replacing it. A slash modifier would be
+                  the one needing restatement per step. See `Popup`'s title.
+                */}
+                <ul className="list-disc pl-6 text-left text-sm leading-[1.6] font-normal lg:text-xl">
+                  {row.manifestations.map((manifestation) => (
+                    <li key={manifestation}>{manifestation}</li>
+                  ))}
+                </ul>
+              </td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
+    </div>
   );
 }

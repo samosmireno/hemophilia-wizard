@@ -146,6 +146,14 @@ export default function Therapies() {
         here because `DisclosureBand`'s titles are phrases that never reach a
         second line.
 
+        **It survives `ArchBand`'s new 24 → 30 step at `lg` without being
+        restated**, which was worth checking rather than assuming: a Tailwind v4
+        `leading-*` sets `--tw-leading` and every `text-<size>` resolves its
+        line-height through that property, so the step reads the 1.0 rather than
+        replacing it — and a custom property is not scoped to the media query
+        the step arrives in. Verified in the built CSS. It is a slash modifier
+        that would need restating at each step; see `Popup`'s title.
+
         The sentence itself is the blueprint's, verbatim from CONTEXT.md §4.2,
         with the reason interpolated in its `sourceLabel` form.
 

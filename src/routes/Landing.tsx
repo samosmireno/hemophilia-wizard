@@ -52,13 +52,24 @@ import { nextOf } from "../data/sectionOrder";
  * step goes. Nothing here is a `clamp()` or an arbitrary size — every value is a
  * named Tailwind step.
  *
- * **Line-height is written as a slash modifier, not a separate `leading-*`.**
- * `text-5xl … text-9xl` each carry a line-height of their own, so a bare
- * `leading-[0.75]` would be overridden the moment a responsive `sm:text-7xl`
- * lands in a later media query at equal specificity. `text-5xl/[0.75]` sets both
- * in one declaration and cannot desync. The headline's leading is still the ratio
- * 0.75 (= 96/128) rather than the drawn 96px, which is now load-bearing again
- * rather than merely tidy: the size moves at three breakpoints.
+ * **Line-height is written as a slash modifier on every step.** That is a
+ * choice, not a necessity, and the comment here claimed otherwise until
+ * 2026-08-04: a bare `leading-[0.75]` would NOT have been overridden by
+ * `sm:text-7xl`. A Tailwind v4 `leading-*` compiles to `--tw-leading:.75` as
+ * well as a `line-height`, every `text-<size>` compiles to
+ * `line-height:var(--tw-leading,<its own>)`, and a custom property is not scoped
+ * to the media query a step arrives in — so one `leading-*` covers a whole ramp.
+ * Verified in the built CSS (docs/styling.md §8). Restating it per step is kept
+ * because four sizes reading one property at a distance is the thing that goes
+ * wrong silently when someone edits one line, but it buys clarity, not
+ * correctness.
+ *
+ * The CTA below is the case where the modifier IS required, for an unrelated
+ * reason — see its own comment.
+ *
+ * The headline's leading is still the ratio 0.75 (= 96/128) rather than the
+ * drawn 96px, which is load-bearing rather than merely tidy: the size moves at
+ * three breakpoints.
  */
 export default function Landing() {
   const navigate = useNavigate();
@@ -123,11 +134,13 @@ export default function Landing() {
           the component above); a control has a legibility floor that a headline
           does not, so 16px is where it stops.
 
-          Line-height is a slash modifier rather than a `leading-tight` alongside,
-          for the reason the component doc-comment gives, and it must be restated
-          at every step regardless: tailwind-merge treats a font-size utility as
-          resetting line-height, so passing `text-*` drops the package's own
-          `leading-tight` and the label would inherit whatever it finds. The
+          Line-height is a slash modifier rather than a `leading-tight`
+          alongside, and here that IS required — for a tailwind-merge reason
+          rather than the CSS one the component doc-comment used to give.
+          tailwind-merge lists `leading` as conflicting with `font-size`, so the
+          `text-*` classes passed in strip the package's own `leading-tight`
+          before the browser ever sees them, and the label would inherit whatever
+          it finds. Restating it per step is what puts the value back. The
           design's `leading-5` is deliberately not used — at 24px that is a 20px
           line box, and the label overlaps itself the moment it wraps.
         */}

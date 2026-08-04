@@ -35,6 +35,13 @@
  * `max-h` or its band padding moves, this goes stale in the direction of a
  * scrollbar rather than a broken layout.
  *
+ * **The band now steps down below `lg` and this number does not follow it**, on
+ * purpose: 117px is the two-line band at the drawn 48px title, and below the
+ * breakpoint the title is 24–30px, so the band is shorter and the 10rem
+ * reserved is generous rather than stale. The coupling only bites in the other
+ * direction. `py-2` on the body is deliberately not part of that ramp for the
+ * same reason — see `Popup`.
+ *
  * **`Popup`'s `subtitle` is the live edge of that coupling.** A subtitle adds a
  * fourth line to the band, and the 10rem above allows for three. No caller of
  * this component passes one today, so nothing is stale — but the first figure
