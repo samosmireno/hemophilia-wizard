@@ -150,7 +150,11 @@ export default function TreatmentLandscape() {
           artboard reproduces exactly, so it is a data read and not a literal. */}
       <h1
         id="chapter-heading"
-        className="font-display text-h1 tracking-wide text-brand-crimson-50 uppercase"
+        // `text-5xl` from `lg` only, app-wide (docs/styling.md §2). This is the
+        // one chapter whose longest word (`HEMOPHILIA`, 234px) clears a 320px
+        // column at 52px; it steps down with the rest so the four chapters do
+        // not disagree about their own heading size.
+        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
       >
         {LANDSCAPE.title}
       </h1>
@@ -178,7 +182,7 @@ export default function TreatmentLandscape() {
         {ROWS.map((row, index) => (
           <Fragment key={row.heading}>
             <div>
-              <h2 className="text-h2 font-bold tracking-wide text-black">{row.heading}</h2>
+              <h2 className="text-3xl font-bold tracking-wide text-black">{row.heading}</h2>
               <BulletList items={row.bullets} className="mt-4" />
             </div>
 
@@ -216,7 +220,7 @@ export default function TreatmentLandscape() {
                 aria-haspopup={row.content ? "dialog" : undefined}
                 onClick={(next) => setOpenIndex(next ? index : null)}
               />
-              <p className="mt-4 text-center text-h3 font-bold text-popup-caption">{row.label}</p>
+              <p className="mt-4 text-center text-2xl font-bold text-popup-caption">{row.label}</p>
             </div>
           </Fragment>
         ))}
@@ -257,8 +261,8 @@ export default function TreatmentLandscape() {
  * an import.
  *
  * Type is raw design values under §8's precedent: 20px body copy is off the
- * scale's `text-body` step, and `text-h4` is 20px but carries weight 600. The
- * headings do land on `text-h2` — they measure ~36px on the artboard, but that
+ * scale's `text-base` step, and `text-xl` is 20px but carries weight 600. The
+ * headings do land on `text-3xl` — they measure ~36px on the artboard, but that
  * number came off a raster rather than out of Figma, and a guessed raw value
  * reads to the next person as an authority it never had.
  */
@@ -280,11 +284,11 @@ function BenefitsChallengesCard({
     <div className="flex items-center gap-8 py-6">
       <div className="min-w-0 flex-1">
         {/* `<h3>`: `Popup`'s band heading is the card's `<h2>`. */}
-        <h3 className="text-h2 font-bold text-black">Benefits</h3>
-        <BulletList items={data.benefits} className="mt-4 text-[20px] leading-[1.6]" />
+        <h3 className="text-3xl font-bold text-black">Benefits</h3>
+        <BulletList items={data.benefits} className="mt-4 text-xl leading-[1.6]" />
 
-        <h3 className="mt-6 text-h2 font-bold text-black">Challenges</h3>
-        <BulletList items={data.challenges} className="mt-4 text-[20px] leading-[1.6]" />
+        <h3 className="mt-6 text-3xl font-bold text-black">Challenges</h3>
+        <BulletList items={data.challenges} className="mt-4 text-xl leading-[1.6]" />
       </div>
 
       {/*
@@ -380,7 +384,7 @@ const MATRIX_RULE = "border-black/30";
  * measured off the export rather than guessed: 20px headings, 16px in the three
  * middle columns, and 24px in the two outer ones — the drawing genuinely sets
  * the option name and the route larger than the prose between them. None of the
- * three lands on a scale step at the weight drawn (`text-h4` and `text-h3` both
+ * three lands on a scale step at the weight drawn (`text-xl` and `text-2xl` both
  * carry 600 where this is 400), which is why they are stated raw.
  */
 function TreatmentOptionsTable() {
@@ -398,7 +402,7 @@ function TreatmentOptionsTable() {
                 key={column}
                 scope="col"
                 className={cn(
-                  "bg-white/50 px-2 py-3 text-[22px] leading-tight font-normal",
+                  "bg-white/50 px-2 py-3 text-xl leading-tight font-normal",
                   index === 0 && "rounded-l-2xl",
                   index === MATRIX_COLUMNS.length - 1 && "rounded-r-2xl",
                 )}
@@ -421,18 +425,18 @@ function TreatmentOptionsTable() {
               <tr key={row.option}>
                 <th
                   scope="row"
-                  className={cn(MATRIX_CELL, "text-[22px] leading-tight font-normal", rule)}
+                  className={cn(MATRIX_CELL, "text-xl leading-tight font-normal", rule)}
                 >
                   {row.option}
                   {row.footnote && <sup>{row.footnote}</sup>}
                 </th>
-                <td className={cn(MATRIX_CELL, "text-[16px] leading-tight", column, rule)}>
+                <td className={cn(MATRIX_CELL, "text-base leading-tight", column, rule)}>
                   {row.moa}
                 </td>
-                <td className={cn(MATRIX_CELL, "text-[16px] leading-tight", column, rule)}>
+                <td className={cn(MATRIX_CELL, "text-base leading-tight", column, rule)}>
                   {row.population}
                 </td>
-                <td className={cn(MATRIX_CELL, "text-[16px] leading-tight", column, rule)}>
+                <td className={cn(MATRIX_CELL, "text-base leading-tight", column, rule)}>
                   {/* Stacked, not joined: the two indications on the first row
                       are separate statements in the export, which is why
                       `indication` is a list. `<span className="block">` rather
@@ -444,7 +448,7 @@ function TreatmentOptionsTable() {
                     </span>
                   ))}
                 </td>
-                <td className={cn(MATRIX_CELL, "text-[22px] leading-tight", column, rule)}>
+                <td className={cn(MATRIX_CELL, "text-xl leading-tight", column, rule)}>
                   {row.route}
                 </td>
               </tr>
@@ -461,7 +465,7 @@ function TreatmentOptionsTable() {
           14px/300 is the export's, and so is `leading-none` — the block is set
           solid there. Both are raw for the usual reason: the scale's smallest
           step is 12px, and it carries weight 500. */}
-      <ul className="mt-4 list-none text-[14px] leading-none font-light text-black">
+      <ul className="mt-4 list-none text-sm leading-none font-light text-black">
         {USED_FOOTNOTES.map((key) => {
           const note = TREATMENT_OPTIONS_FOOTNOTES[key];
 

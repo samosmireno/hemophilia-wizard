@@ -66,18 +66,21 @@ export default function ProphylaxisGuidance() {
           as on every other chapter. A data read rather than a literal: this is
           §7.4's own bullet, which the artboard reproduces exactly.
 
-          `text-h1` only from `lg`, which no other chapter needs: this heading is
-          a 17-word sentence where the other four are two to six words, and at
-          52px it takes eleven lines on a 390px phone — the whole screen before
-          the first bullet. Below the design canvas it steps down one scale step,
-          the same call `AppShell` makes for the gutters it cannot honour down
-          there (docs/styling.md §11): the artboard is 1440 and nobody has drawn
-          a phone, so this is an invented comfort value, stated as a step rather
-          than as a raw size so the two are visibly one scale.
+          `text-5xl` only from `lg` — this heading asked for it first, and it is
+          now the app-wide rule (docs/styling.md §2). The reason here is still
+          the strongest: a 17-word sentence where the other four chapters are two
+          to six words, taking eleven lines on a 390px phone at 52px, the whole
+          screen before the first bullet. What generalised it was measurement —
+          52px overflows the content column on a single unbreakable word, so
+          every `<h1>` steps down and not just the long ones. Below the design
+          canvas it steps down one scale step, the same call `AppShell` makes for
+          the gutters it cannot honour down there (§11): the artboard is 1440 and
+          nobody has drawn a phone, so this is an invented comfort value, stated
+          as a step rather than as a raw size so the two are visibly one scale.
         */}
         <h1
           id="chapter-heading"
-          className="font-display text-h2 tracking-wide text-brand-crimson-50 uppercase lg:text-h1"
+          className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
         >
           {HEADING}
         </h1>
@@ -88,13 +91,13 @@ export default function ProphylaxisGuidance() {
           once a line box's leading is taken off (docs/styling.md §11).
 
           26px/1.25 is measured off the export — the two bullets are set far
-          larger than `text-body` here, this being a chapter with one block of
+          larger than `text-base` here, this being a chapter with one block of
           copy on it. Raw under §8's precedent: the scale's nearest step is
-          `text-h3`, which is 26px at weight 600 where this is 400.
+          `text-2xl`, which is 26px at weight 600 where this is 400.
           `rebalancing-agents` sets its bullets at the same 26px for the same
           reason.
         */}
-        <BulletList items={BODY} className="mt-8 text-[26px] leading-tight" />
+        <BulletList items={BODY} className="mt-8 text-2xl leading-tight" />
       </section>
     </>
   );

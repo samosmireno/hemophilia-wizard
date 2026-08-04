@@ -107,7 +107,7 @@ export default function ExpandableFigure({
         */}
         <span
           aria-hidden="true"
-          className="absolute inset-0 grid place-items-center bg-black/50 px-4 text-center font-display text-h3 tracking-wide text-white uppercase opacity-0 transition-opacity duration-150 ease-out group-hover:opacity-100 group-focus-visible:opacity-100"
+          className="absolute inset-0 grid place-items-center bg-black/50 px-4 text-center font-display text-2xl font-semibold tracking-wide text-white uppercase opacity-0 transition-opacity duration-150 ease-out group-hover:opacity-100 group-focus-visible:opacity-100"
         >
           Click to enlarge
         </span>

@@ -101,7 +101,10 @@ export default function Therapies() {
       */}
       <h1
         id="wizard-therapies-heading"
-        className="font-display text-h1 tracking-wide text-brand-crimson-50 uppercase"
+        // `text-5xl` from `lg` only, app-wide (docs/styling.md §2). `REQUIREMENT`
+        // — from the fourth switch reason — sets 272px at 52px, which clears a
+        // 375px column and overflows a 320px one.
+        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
       >
         {reason.label}
       </h1>
@@ -138,7 +141,7 @@ export default function Therapies() {
         inside a centred heading would otherwise sit left.
 
         `leading-none` because the artboard sets this heading's two lines at a
-        32px pitch, where `text-h2`'s own step is 1.1 (35.2px). Measured off the
+        32px pitch, where `text-3xl`'s own step is 1.1 (35.2px). Measured off the
         export's ink twice — cap tops at y=594 and y=626 — and it only shows up
         here because `DisclosureBand`'s titles are phrases that never reach a
         second line.
@@ -239,7 +242,7 @@ export default function Therapies() {
                 `mt-3` (12px), not `DisclosureBand`'s `mt-4`: the drawn caption
                 inks 21px below the button, and 16px puts it at 24.
               */}
-              <p className="mt-3 text-center text-[22px] font-bold text-brand-slate-100">
+              <p className="mt-3 text-center text-xl font-bold text-brand-slate-100">
                 {treatment.agent}
               </p>
             </li>
@@ -337,7 +340,7 @@ function NoteDisclosure({
               title that wraps on a narrow viewport grows the band instead of
               overflowing it — the call `OptionGroup` records for its pills.
               24px is measured off the export's ink (24px of ascender-to-
-              descender on a line with both), and it is not a scale step: `text-h3`
+              descender on a line with both), and it is not a scale step: `text-2xl`
               is 26 at weight 600 where this is 24 at 600. Raw under §8's
               precedent, as the chapters' 26px bullets are.
 
@@ -349,7 +352,7 @@ function NoteDisclosure({
               44px already shipped here, which is what makes it the better witness.
             */
             "flex min-h-11 w-full items-center justify-center rounded-lg px-4",
-            "text-center text-[24px] font-semibold text-white",
+            "text-center text-2xl font-semibold text-white",
             "transition-[background-color,box-shadow,color] duration-120 ease-out",
             /*
               State is carried twice: by the ground and by the shadow. Open is
@@ -440,7 +443,7 @@ function NoteDisclosure({
               */
               "mx-3 border-x border-note-panel-border bg-brand-teal-25/30",
               last && "rounded-b-xl border-b",
-              "px-9 pt-4 pb-3",
+              "px-9 pt-2 pb-3",
               /*
                 Contents fade with the height rather than being sliced by the
                 clip. Shorter than the 220ms wipe so the text has settled before
@@ -453,14 +456,14 @@ function NoteDisclosure({
             {/*
               20px/28px, measured: the panel's lines sit at a 28px pitch and a
               line carrying both an ascender and a descender inks 19px, which is
-              ~20px of DM Sans at weight 400. Not a scale step — `text-h4` is 20
+              ~20px of DM Sans at weight 400. Not a scale step — `text-xl` is 20
               at weight 600 — so raw, under the same §8 precedent the chapters'
               26px bullets use.
 
               `text-black` is `BulletList`'s default and is the off-palette black
               docs/styling.md §11 records for the education chapters.
             */}
-            <BulletList items={block.points} className="text-[20px] leading-7" />
+            <BulletList items={block.points} className="text-xl leading-7" />
           </div>
         </div>
       </div>

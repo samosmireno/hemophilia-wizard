@@ -107,7 +107,10 @@ export default function DiseaseBackground() {
           way `Landing` keeps the activity title readable. */}
       <h1
         id="chapter-heading"
-        className="font-display text-h1 tracking-wide text-brand-crimson-50 uppercase"
+        // `text-5xl` from `lg` only, app-wide (docs/styling.md §2). `BACKGROUND`
+        // sets 258.5px at 52px, which is the thinnest passing margin in the app
+        // — 2.5px over a 320px column.
+        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
       >
         Hemophilia Disease Background
       </h1>
@@ -117,9 +120,9 @@ export default function DiseaseBackground() {
           "Disease mechanism" heading does. */}
       <div className="mt-5 grid lg:grid-cols-[1fr_470px] lg:gap-x-8">
         <div className="lg:mt-3">
-          <h2 className="text-h2 font-bold tracking-wide text-black">{MECHANISM.title}</h2>
+          <h2 className="text-3xl font-bold tracking-wide text-black">{MECHANISM.title}</h2>
           <BulletList items={MECHANISM.body} className="mt-4" />
-          <h2 className="mt-4 text-h2 font-bold tracking-wide text-black">Diagnosis:</h2>
+          <h2 className="mt-4 text-3xl font-bold tracking-wide text-black">Diagnosis:</h2>
         </div>
 
         {/*
@@ -180,7 +183,7 @@ const MANIFESTATION_HEADING = "Bleeding Manifestation Based on Severity";
  * The banner is one `colspan=3` cell for the same reason — a `colgroup` header
  * over the row beneath it, which is what it is.
  *
- * Type is raw design values under §8's precedent — 26/700 lands on the `text-h3`
+ * Type is raw design values under §8's precedent — 26/700 lands on the `text-2xl`
  * step at a heavier weight, and 22px is off the scale entirely. The column rules
  * are inferred: the export draws a hairline the palette has no token for.
  */
@@ -194,7 +197,7 @@ function SeverityTable() {
               key={row.severity}
               scope="col"
               className={cn(
-                "bg-white/50 px-2 py-5 text-h3 font-bold",
+                "bg-white/50 px-2 py-5 text-2xl font-bold",
                 index === 0 && "rounded-l-2xl",
                 index === SEVERITY_TABLE.length - 1 && "rounded-r-2xl",
               )}
@@ -209,7 +212,10 @@ function SeverityTable() {
           {SEVERITY_TABLE.map((row, index) => (
             <td
               key={row.severity}
-              className={cn("px-2 py-5 text-h3 font-bold", index > 0 && "border-l border-black/10")}
+              className={cn(
+                "px-2 py-5 text-2xl font-bold",
+                index > 0 && "border-l border-black/10",
+              )}
             >
               {row.factorLevel}
             </td>
@@ -219,7 +225,7 @@ function SeverityTable() {
           <th
             scope="colgroup"
             colSpan={SEVERITY_TABLE.length}
-            className="rounded-2xl bg-white/50 px-2 py-5 text-h3 font-bold"
+            className="rounded-2xl bg-white/50 px-2 py-5 text-2xl font-bold"
           >
             {MANIFESTATION_HEADING}
           </th>
@@ -230,7 +236,7 @@ function SeverityTable() {
               key={row.severity}
               className={cn("px-2 pt-2 pb-6 align-top", index > 0 && "border-l border-black/10")}
             >
-              <ul className="list-disc pl-6 text-left text-[22px] leading-[1.6] font-normal">
+              <ul className="list-disc pl-6 text-left text-xl leading-[1.6] font-normal">
                 {row.manifestations.map((manifestation) => (
                   <li key={manifestation}>{manifestation}</li>
                 ))}

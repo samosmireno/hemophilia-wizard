@@ -334,13 +334,15 @@ export default function FviiiaMimetics() {
       <h1
         id="chapter-heading"
         aria-label={CHAPTER.title}
-        // `text-h1` only from `lg`, which is `prophylaxis-guidance`'s call for
-        // its own reason: at 52px this nine-word title takes six lines and 328px
-        // of a 390 × 780 phone — 42% of the screen before the first bullet
-        // (measured in Chrome). The other three chapters are two to six words
-        // and do not need it. An invented comfort value, stated as a scale step
-        // so the two sizes read as one scale (docs/styling.md §11).
-        className="font-display text-h2 tracking-wide text-brand-crimson-50 uppercase lg:text-h1"
+        // `text-5xl` only from `lg`, now the app-wide rule (docs/styling.md §2)
+        // rather than this chapter's own call. The reason here came first and
+        // still holds: at 52px this nine-word title takes six lines and 328px of
+        // a 390 × 780 phone — 42% of the screen before the first bullet
+        // (measured in Chrome). The other chapters were left bare on the
+        // reasoning that two-to-six-word titles do not need it, which measuring
+        // disproved — 52px overflows the column on a single long word, so all
+        // six now step down too.
+        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
       >
         <span className="block">{preserveCase(HEADING_LEAD)}</span>{" "}
         <span className="block text-brand-slate-100">{preserveCase(HEADING_TAIL)}</span>
@@ -348,11 +350,11 @@ export default function FviiiaMimetics() {
 
       {/* `mt-8` is the designer's 32px h1 gap, the value every chapter uses.
           26px is measured off the artboard and raw under §8's precedent — the
-          nearest step, `text-h3`, is 26px at weight 600 where this is 400.
+          nearest step, `text-2xl`, is 26px at weight 600 where this is 400.
           Four bullets, not the export's five: its last two are one sentence
           Figma broke across lines, which is why this reads the topic's `body`
           rather than the drawing. */}
-      <BulletList items={CHAPTER.body} className="mt-8 text-[26px] leading-tight" />
+      <BulletList items={CHAPTER.body} className="mt-8 text-2xl leading-tight" />
 
       {/*
         The bottom half: two disclosures at the left, the corner panel at the
@@ -489,7 +491,7 @@ export default function FviiiaMimetics() {
 function EmicizumabCard() {
   return (
     <div className="flex flex-col items-center gap-8 py-6 lg:flex-row lg:gap-12">
-      <BulletList items={EMICIZUMAB.body} className="flex-1 text-[20px] leading-[1.6]" />
+      <BulletList items={EMICIZUMAB.body} className="flex-1 text-xl leading-[1.6]" />
 
       {/*
         **The white panel is load-bearing, not decoration.** `emicizumab.webp`
@@ -552,7 +554,7 @@ function EmicizumabCard() {
           and the caption stops being centred *on the picture*. Zero intrinsic
           width, then fill what the picture settled on.
         */}
-        <p className="mt-4 w-0 min-w-full text-center text-[20px] leading-[1.6] text-white drop-shadow-md">
+        <p className="mt-4 w-0 min-w-full text-center text-xl leading-[1.6] text-white drop-shadow-md">
           {EMICIZUMAB_MOA.body[0] as string}
         </p>
       </ExpandableFigure>
@@ -587,7 +589,7 @@ function EmicizumabCard() {
 function DenecimigCard() {
   return (
     <div className="flex flex-col items-start gap-8 py-6 lg:flex-row lg:gap-6">
-      <BulletList items={DENECIMIG.body} className="flex-1 text-[20px] leading-[1.6]" />
+      <BulletList items={DENECIMIG.body} className="flex-1 text-xl leading-[1.6]" />
 
       {/*
         The right column: the panel, then the two sentences under it. `w-112` is
@@ -649,7 +651,7 @@ function DenecimigCard() {
         {/* `denecimig-moa`'s whole body, read rather than sliced — see the topic.
             Black on the card's gradient, as the left column is: this list is in
             the card, not on the scrim. */}
-        <BulletList items={DENECIMIG_MOA.body} className="text-[20px] leading-[1.6]" />
+        <BulletList items={DENECIMIG_MOA.body} className="text-xl leading-[1.6]" />
       </div>
     </div>
   );
@@ -675,7 +677,7 @@ function DenecimigCard() {
 function Nxt007Card() {
   return (
     <div className="flex flex-col items-start gap-8 py-6 lg:flex-row lg:gap-6">
-      <BulletList items={NXT007_OVERVIEW.body} className="flex-1 text-[20px] leading-[1.6]" />
+      <BulletList items={NXT007_OVERVIEW.body} className="flex-1 text-xl leading-[1.6]" />
 
       {/* The right column: the panel, then the sentence under it. `w-112` is the
           drawn ~450px — 543 of the artboard's 1075px content column, which is
@@ -734,7 +736,7 @@ function Nxt007Card() {
           scrim, so it needs none of the Emicizumab enlargement's white-on-black
           treatment.
         */}
-        <p className="text-center text-[20px] leading-[1.6] text-black">
+        <p className="text-center text-xl leading-[1.6] text-black">
           {NXT007_STRUCTURE.body[0] as string}
         </p>
       </div>
@@ -766,7 +768,7 @@ function Nxt007Card() {
 function Inno8Card() {
   return (
     <div className="flex flex-col gap-3 py-6">
-      <BulletList items={INNO8_OVERVIEW.body} className="text-[20px] leading-[1.6]" />
+      <BulletList items={INNO8_OVERVIEW.body} className="text-xl leading-[1.6]" />
 
       {/*
         **No white panel in markup**, as on the Denecimig and NXT007 cards:
@@ -880,7 +882,7 @@ function Disclosure({
  * three lines beneath. The two halves are `block` so the name keeps its own line
  * even where the tail would have fitted beside it.
  *
- * 26px at weights 900 and 500, which the scale has no step for (`text-h3` is 26
+ * 26px at weights 900 and 500, which the scale has no step for (`text-2xl` is 26
  * at 600) — raw under §8's precedent, as the chapter's bullets are. DM Sans is
  * loaded as a variable font, so both weights are real rather than synthesised.
  *
@@ -895,7 +897,7 @@ function AgentCaption({ title }: { title: string }) {
   const [lead, tail] = splitTitle(title);
 
   return (
-    <p className="w-72 text-center text-[26px] leading-7.5 tracking-wide">
+    <p className="w-72 text-center text-2xl leading-7.5 tracking-wide">
       <span className="block font-black text-brand-slate-100">{lead}</span>
       <span className="block font-medium text-popup-caption">{tail}</span>
     </p>
@@ -905,9 +907,7 @@ function AgentCaption({ title }: { title: string }) {
 /** A panel caption: one word, no status to tone against. Colour as above. */
 function PanelCaption({ children }: { children: ReactNode }) {
   return (
-    <p className="text-[26px] leading-6.5 font-black tracking-wide text-popup-caption">
-      {children}
-    </p>
+    <p className="text-2xl leading-6.5 font-black tracking-wide text-popup-caption">{children}</p>
   );
 }
 
@@ -948,7 +948,7 @@ function EmergingPanel({ children }: { children: ReactNode }) {
             this one is NOT shouted, where the chapter heading is. */}
         <h2
           id="emerging-heading"
-          className="max-w-148 text-center text-[26px] leading-6.5 font-black tracking-wide text-brand-crimson-50"
+          className="max-w-148 text-center text-2xl leading-6.5 font-black tracking-wide text-brand-crimson-50"
         >
           {PANEL_HEADING}
         </h2>

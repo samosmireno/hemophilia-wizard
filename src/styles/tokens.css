@@ -14,34 +14,16 @@
 @theme {
   /* ─── Typography (docs/styling.md §2) ─────────────────────────────────────
      DM Sans = default, Barlow Condensed = display (font-display). Self-hosted
-     via @fontsource, imported in main.tsx. Each step bundles size + weight +
-     line-height, so one utility (text-h1) sets all three. */
+     via @fontsource, imported in main.tsx.
+
+     There is NO house type scale. Sizes are Tailwind's own --text-* defaults
+     (text-xs … text-5xl), used unmodified, and line-height comes with them. A
+     step therefore sets size + line-height only, so every call site that wants
+     a weight states it (font-bold, font-semibold, …) — the drawn value → utility
+     mapping is the table in §2. Do not reintroduce --text-* here: overriding
+     one silently changes every utility of that name across the app. */
   --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
-
-  --text-h1: 52px;
-  --text-h1--font-weight: 700;
-  --text-h1--line-height: 1.05;
-
-  --text-h2: 32px;
-  --text-h2--font-weight: 700;
-  --text-h2--line-height: 1.1;
-
-  --text-h3: 26px;
-  --text-h3--font-weight: 600;
-  --text-h3--line-height: 1.2;
-
-  --text-h4: 20px;
-  --text-h4--font-weight: 600;
-  --text-h4--line-height: 1.25;
-
-  --text-body: 16px;
-  --text-body--font-weight: 400;
-  --text-body--line-height: 1.6;
-
-  --text-small: 12px;
-  --text-small--font-weight: 500;
-  --text-small--line-height: 19.8px;
 
   /* ─── Brand palette (docs/styling.md §3) ──────────────────────────────────
      Raw scales, namespaced so they never collide with Tailwind's built-in

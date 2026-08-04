@@ -72,21 +72,98 @@ DM Sans is the app default (body/UI). Barlow Condensed is the display face,
 reachable as `font-display`. Both are self-hosted via `@fontsource` and imported
 in `src/main.tsx`.
 
-The type scale bundles size + weight + line-height per step, so a single utility
-(`text-h1`, `text-body`, …) sets all three.
+**There is no house type scale.** Sizes are Tailwind's own `--text-*` defaults,
+used unmodified — `tokens.css` declares no `--text-*` at all, and reintroducing
+one would silently redefine that utility everywhere.
 
-| Step    | Size | Weight | Line-height |
-| ------- | ---- | ------ | ----------- |
-| `h1`    | 52px | 700    | 1.05        |
-| `h2`    | 36px | 700    | 1.1         |
-| `h3`    | 26px | 600    | 1.2         |
-| `h4`    | 20px | 600    | 1.25        |
-| `body`  | 16px | 400    | 1.6         |
-| `small` | 12px | 500    | 19.8px      |
+A step therefore sets **size + line-height only**. Weight is stated at the call
+site, always: Tailwind's font-size utilities carry no `font-weight`, and
+preflight resets `h1`–`h6` to `font-weight: inherit`
+(`node_modules/tailwindcss/preflight.css:84`), so a heading with no `font-*`
+class renders at 400.
 
-Line-heights for `h1`–`h4` and `body` are house defaults. `small` is taken
-verbatim from the source spec (12px / 500 / 19.8px), which is why it is the one
-absolute value in the column.
+The design's drawn sizes and the utility each one maps to:
+
+| Drawn | Utility     | Renders      | Weight at the call site          | Δ   |
+| ----- | ----------- | ------------ | -------------------------------- | --- |
+| 52px  | `text-5xl`  | 48px / 1.0   | `font-bold`                      | −4  |
+| 42px  | `text-4xl`  | 36px / 1.111 | as drawn                         | −6  |
+| 32px  | `text-3xl`  | 30px / 1.2   | `font-bold`                      | −2  |
+| 26px  | `text-2xl`  | 24px / 1.333 | `font-semibold`, `font-bold`     | −2  |
+| 24px  | `text-2xl`  | 24px / 1.333 | as drawn                         | 0   |
+| 22px  | `text-xl`   | 20px / 1.4   | as drawn                         | −2  |
+| 20px  | `text-xl`   | 20px / 1.4   | `font-semibold`                  | 0   |
+| 16px  | `text-base` | 16px / 1.5   | none — 400 is the default        | 0   |
+| 14px  | `text-sm`   | 14px / 1.43  | as drawn                         | 0   |
+| 12px  | `text-xs`   | 12px / 1.333 | `font-medium` (no call site yet) | 0   |
+
+**26px maps to `text-2xl` at either weight.** The old scale's `h3` step was 26px
+at weight 600, which is why several call sites transcribed a raw `text-[26px]`
+instead of taking the step — they wanted 700. That reason is gone now that weight
+is always explicit, so all of them are `text-2xl` and differ only in their
+`font-*` class.
+
+**Line-heights are Tailwind's, not the design's.** The drawn leading is no longer
+transcribed and a step never carries a `/…` modifier. Where a specific line box
+is load-bearing the call site states it with an explicit `leading-*` — see
+`Explore`'s class label (`leading-5.5`) and `ArchBand`'s title (`leading-none`).
+Two consequences worth knowing: body prose tightens from a 25.6px line box to
+24px, and the old `small` step's 19.8px — the one line-height taken verbatim from
+the source spec — is gone, at no visual cost because nothing used it.
+
+This replaced a house scale (`text-h1`…`text-small`, 52/32/26/20/16/12 with
+weights and line-heights bundled) on 2026-08-04. That scale is why so much of the
+prose below reasons about whether a value "lands on a step": those passages have
+been updated to name the utility that ships, but the arguments they make are
+about the old numbers. Where one still cites 52px or 26px as what renders, treat
+this table as the authority.
+
+### `h1` steps down one size below `lg`
+
+**Every `<h1>` in the app is `text-3xl font-bold … lg:text-5xl`, not bare
+`text-5xl`.** At the canvas width it renders at 48px; below `lg` it drops to
+30px.
+
+This started as two chapters' comfort call — `prophylaxis-guidance` and
+`fviiia-mimetics` have long sentence headings that took nine and six lines on a
+phone — but it is now a correctness rule, because the display size **overflows**,
+not merely wraps. Barlow Condensed uppercase with `tracking-wide` sets a single
+word wider than the content column, and a word cannot break:
+
+| `<h1>` word                                           | At 48px | 375px column (311px)    | 320px column (256px) |
+| ----------------------------------------------------- | ------- | ----------------------- | -------------------- |
+| `CHARACTERISTICS` (`/wizard`, both leaves)            | 329.1px | **overflows by 18.1px** | overflows by 73.1px  |
+| `REQUIREMENT` (`/wizard/therapies` label)             | 251.1px | fits                    | fits by 4.9px        |
+| `REBALANCING` (`rebalancing-agents`)                  | 251.1px | fits                    | fits by 4.9px        |
+| `BACKGROUND` (`disease-background`)                   | 238.6px | fits                    | fits by 17.4px       |
+| `HEMOPHILIA` (`treatment-landscape`, scenario titles) | 216.0px | fits                    | fits                 |
+
+**These figures are arithmetic, not measurement.** The originals were measured in
+Chrome at 375 × 800 and 320 × 800 against the old 52px `h1`; the move to
+`text-5xl` scaled every one by 48/52 and this table is that multiplication. The
+ranking and the conclusion are unchanged, but the exact pixels have not been
+re-verified in a browser — re-measure before relying on a thin margin.
+
+The `/wizard` case was not theoretical at 52px: it pushed `document.scrollWidth`
+to 388px against a 375px window, i.e. a horizontal scrollbar on the whole page
+with the final `S` clipped at the viewport edge. It still overflows at 48px, by
+less. At the stepped-down 30px the worst word measures ~205.7px and clears even
+the 320px column with 50px to spare.
+
+Dropping to `text-5xl` made the passing rows more comfortable than they were —
+`REQUIREMENT` and `REBALANCING` overflowed a 320px column by 16px at 52px and now
+fit, and `BACKGROUND`'s 2.5px overflow became a 17.4px margin. The rule is kept
+anyway: the worst word still fails at 375, three of the headings are data-driven,
+and a new scenario title or switch reason must not be able to reintroduce this.
+
+**Not `clamp()`**, which §8 uses for the landing hero. That is a different
+problem: a hero is one composition whose lines must hold their proportions at
+every width, so a breakpoint ramp visibly steps them together. A chapter heading
+is a single line failing on a single word. One size step fixes it and costs one
+class — where a clamp would add a bespoke `(min, slope, max)` triple per heading.
+Below the canvas nobody has drawn a phone, so this is an invented comfort value
+stated as a step on Tailwind's scale, the same call `AppShell` makes for the
+gutters it cannot honour down there (§11).
 
 ---
 
@@ -656,8 +733,14 @@ against the export rather than nudging one.
 ## 8. Landing hero type
 
 The hero on `/` is the one place in the app whose type sits **outside** the
-`text-h1`…`text-small` scale of §2. The design specifies 60 / 128 / 36 / 24px,
-and the scale tops out at 52px.
+`text-5xl`…`text-xs` scale of §2. The design specifies 60 / 128 / 36 / 24px,
+and §2's mapping tops out at 48px.
+
+Tailwind's own scale does run further — `text-6xl` is 60px and `text-9xl` is
+128px, so two of those four drawn sizes now have an exact step, which was not
+true under the old house scale. They still ship as `clamp()`, because the reason
+was never the missing step: a hero is one composition whose lines must hold their
+proportions at every width, and a fixed step cannot do that (§8).
 
 Those four numbers are Tailwind's own default steps exactly (`text-6xl`,
 `text-9xl`, `text-4xl`, `text-2xl`), which is a strong hint that the designer
@@ -749,7 +832,7 @@ narrower than the 1165px content column, so it stays centred within it.
 | 6   | No semantic layer yet. `bg-surface`, `text-heading`, etc. do not exist; the app reads raw brand steps in the meantime.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | app-buildout issue 02 |
 | 7   | The inner gradient's second stop is off-scale (`rgba(114.61, 213.07, 191.53)`, dE .042 from `teal-25`) while the other three stops are exact palette. Probably meant to be `teal-25`; kept literal pending a designer answer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | §6                    |
 | 8   | The landing footage does not loop — it is a continuous dolly-in, 46.5/255 apart end to end. Ping-ponging it is a workaround; **ask the designer for an 8–12 s clip that loops cleanly**. That would halve the asset and remove the direction reversal.                                                                                                                                                                                                                                                                                                                                                                                                                                            | §7, ADR 0002          |
-| 9   | The references do not agree with the §2 scale **or with each other**: `disease-background` measures ~32px sub-headings, ~18px body and ~22px captions against the scale's 26/16/20, while `rebalancing-agents` measures ~24px body and ~25px captions. **The three chapters now answer it differently** — the first two render at the scale, `rebalancing-agents` transcribes a raw `text-[26px]` (§11). Needs the designer's sizes, then one call applied to all three.                                                                                                                                                                                                                          | §11                   |
+| 9   | The references do not agree with the §2 scale **or with each other**: `disease-background` measures ~32px sub-headings, ~18px body and ~22px captions against the scale's 26/16/20, while `rebalancing-agents` measures ~24px body and ~25px captions. **The three chapters answered it differently until 2026-08-04**, when the §2 migration put all of them on `text-2xl` and removed the divergence — but only by making every reading round to the same step, not by resolving which reading is right. Still needs the designer's sizes.                                                                                                                                                      | §11                   |
 | 10  | The chapter is specified to fit one screen and currently does not (818px at 1440×800). Wants one rule across all four chapters rather than per-page constants.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | §11                   |
 | 11  | Four of the eight vertical gaps are ink-to-ink measurements off the reference PNG rather than the designer's box gaps, so they render slightly loose.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | §11                   |
 | 12  | The pop-up export has **no scrim** — nothing dims the page behind a dialog that traps focus. The shipped `rgb(0 0 0 / .5)` is inferred, like §4.3's tooltip and §4.5's sidebar. The card's own 55%-black shadow was drawn against Figma's dark canvas and does much less work over the light `bg-page`.                                                                                                                                                                                                                                                                                                                                                                                           | §13                   |
@@ -770,6 +853,9 @@ narrower than the 1165px content column, so it stays centred within it.
 | 27  | ~~`Popup` is too narrow for the §5 comparison table's nine columns.~~ **Half closed.** `Popup` now has a three-step `width` scale and the table's card takes `wide` (1360px), so the columns get ~136px instead of ~113 and the card is no longer the binding constraint. What remains is not a card question: 1360px is not a phone, so the grid still wants a horizontal scroll region inside the card, which is issue 09's own acceptance criterion and is decided against a body that exists. **1360 is a picked number, not a drawn one** — no artboard shows this card, so if the designer draws the table the width is theirs to overrule.                                                 | §13, §17, ADR 0007    |
 | 28  | ~~The pop-up title caps at 36px against the drawn 45.47, and the band's padding is `py-5` against the drawn 12.~~ **Closed 2026-08-04, in code.** Both shipped wrong from the component's first commit and neither was visible, because they cancelled: 20 + (2 × 37) + 20 = 114px of band against the drawn 118. Corrected to the drawn values in both cases; three titles gain a line, none reaches three, the two-line band lands at 117, and `PopupFigure`'s `reserve` — documented against a 117px band it was not getting — becomes correct. The band also gained a `min-h-[65px]` floor, which is the ✕'s own height rather than a design value. Verified on twenty cards at 1440 and 390. | §13                   |
 | 29  | **Two of the three `Popup` widths moved on 2026-08-04 and neither new number is drawn**: `narrow` 869 → 860 and `default` 1024 → **1140**. The consequence is the one the default was documented as protecting — `hemostatic_mechanisms_diagram.webp` is stored at 1772px for a drawn 886, which was exactly the old body, and the body is now 1002. The asset did not move with it, so the §7.6 figure is painted ~13% past its stored width. Either re-export it at 2004px or return the default to 1024; the widths are the designer's, and the raster follows them.                                                                                                                           | §13, §7.6             |
+| 30  | **The §2 migration of 2026-08-04 is verified at 1440 and 375 only.** A Chromium pass over all ten routes at both widths confirmed: no horizontal overflow anywhere, `<h1>` computing 48px/48/700 at 1440 and 30px/36/700 at 375, and `CHARACTERISTICS` clearing the 375 column. **1024 and 768 were not checked**, and 1024 is where the gutter steps 48 → 112 and the prose column is thinnest (§12) — the width most likely to break and the one still unmeasured. §2's `<h1>` overflow table also remains arithmetic (rescaled ×48/52); the pass proves the conclusion, not the individual pixel figures.                                                                                      | §2, §12               |
+| 31  | **`/explore`'s `<h1>` lost 6px to the scale** — drawn 42, fitted by least squares with residuals ≤1.1px, now `text-4xl` at 36. The largest fidelity loss in the migration, and it re-flowed: **the heading now sets in three lines where the artboard draws four.** It reads well and is arguably tighter, but it is no longer the drawn composition. If that matters, restore `text-[42px]` under §8's precedent rather than moving to `text-5xl` — 48 is further from 42 than 36 is.                                                                                                                                                                                                            | §14                   |
+| 32  | **Every chapter now fits 1440 × 800 with no scroll**, measured in the item-30 pass — `document.scrollHeight` is exactly 800 on all five. Item 10 recorded `prophylaxis-guidance` at 818px and open; the tighter body leading §2 brought (25.6px line box → 24px) is the likely cause, but the before-state was not measured in the same pass, so this is an observation rather than a closure. Confirm, then close item 10.                                                                                                                                                                                                                                                                       | §11                   |
 
 ---
 
@@ -845,7 +931,7 @@ at dE .232 OKLab, roughly 10× the just-noticeable threshold every other mapping
 this document holds itself to, and it is a blue-black rather than a neutral. So it
 ships as `text-black`, verbatim, per the §3/§4 rule that off-scale colours are
 written as-is and raised rather than rounded into the palette. Issue 02's semantic
-layer is where it becomes `text-body` / `text-heading`.
+layer is where it becomes `text-base` / `text-heading`.
 
 ### `--color-popup-caption`
 
@@ -921,8 +1007,8 @@ the other three exist, not eight numbers per page. Deferred deliberately.
 
 ### Open: the type is smaller than the reference
 
-The chapter uses the §2 scale — `text-h1` for the title, `text-h2` for the severity
-heading, `text-h3` for the sub-headings, `text-body` for bullets, `text-h4` for
+The chapter uses the §2 scale — `text-5xl` for the title, `text-3xl` for the severity
+heading, `text-2xl` for the sub-headings, `text-base` for bullets, `text-xl` for
 captions. The first two match the reference; **the last three do not.** Cap-height
 measurements put the reference at roughly 32px sub-headings, 18px body and 22px
 captions, against the scale's 26 / 16 / 20.
@@ -937,8 +1023,8 @@ snaps to the scale.
 
 The second designed chapter (`src/routes/education/TreatmentLandscape.tsx`), from a
 **1440 × 800** artboard like the first. It carries the same type as
-`disease-background` by instruction — `text-h1` title, `text-h2` sub-headings,
-`text-body` bullets, `text-h3` captions, all with the same tracking — so open item 9
+`disease-background` by instruction — `text-5xl` title, `text-3xl` sub-headings,
+`text-base` bullets, `text-2xl` captions, all with the same tracking — so open item 9
 above applies to it unchanged and is not re-litigated here.
 
 **Layout.** Three rows of `[prose | figure | disclosure]` in **one grid**, not a
@@ -1041,8 +1127,12 @@ is a worse error to ship than a stale cell, and raised for the designer.
 on a scale step at the weight drawn: 20px column headings, 16px in the three middle
 columns, 24px in the two outer ones — the drawing genuinely sets the option name and
 the route larger than the prose between them. Footnotes are 14px/300 set solid
-(`leading-none`), which is the designer's own inspector value. The `text-h4`/`text-h3`
-steps are 20 and 26 but carry weight 600, so all five are raw under §8's precedent.
+(`leading-none`), which is the designer's own inspector value. All five were raw
+under §8's precedent because the old `h3`/`h4` steps bundled weight 600. With
+weight now stated at the call site that reason is gone, and — unusually for this
+app — **all four sizes land on a Tailwind step exactly**: 24 → `text-2xl`,
+20 → `text-xl`, 16 → `text-base`, 14 → `text-sm`, no rounding in any of them.
+Only the leading is still transcribed.
 
 The hairline between cells is **inferred**, as `SeverityTable`'s is: the export draws a
 flat `#A0A0A0` the palette has no token for, and `black/30` over the body gradient
@@ -1097,13 +1187,13 @@ the `disease-background` reference measured 18 and 22: the same elements, a thir
 apart between two artboards, which is what makes §9 item 9 a spread rather than a
 single offset.
 
-So the bullets ship at a raw `text-[26px]` over `BulletList`'s `text-body` base, and
-the three agents at `font-semibold` under it. 26 is the measurement rounded to the
-`text-h3` step's size, taken raw rather than as `text-h3` because that step carries
-weight 600 where the prose is drawn at 400 — §8's precedent, the same call the
-treatment-options table makes for all five of its sizes. The captions need no such
-value: they are `text-h3` outright, and 26 against the drawn 25 is inside the
-measurement.
+So the bullets ship as `text-2xl` over `BulletList`'s `text-base` base, and the
+three agents at `font-semibold` under it. This was a raw `text-[26px]` until
+2026-08-04, taken raw because the old `h3` step bundled weight 600 where the
+prose is drawn at 400. With weight stated at the call site that reason is gone,
+so the step is usable and the measured 26 now renders at 24 (§2). The captions
+were already on the step and are unchanged; 26 against the drawn 25 was always
+inside the measurement, and 24 is 1px the other side of it.
 
 This is the divergence §9 item 9 has been holding open, decided in one direction for
 one chapter. `disease-background` and `treatment-landscape` still render at the scale,
@@ -1153,9 +1243,12 @@ the `Bullet` union rather than splitting on punctuation or slicing at an index.
 
 **Its type is measured off the 2000px export and is approximate**, that being a raster
 rather than Figma: ~26px for the lead set tight, ~20px for the bullets, 32px bold for
-the two headings, 14px/300 solid for the footnote. Only the headings land on a scale
-step (`text-h2` exactly); the rest are raw under §8's precedent, and the 20px is
+the two headings, 14px/300 solid for the footnote. All four now ship as steps —
+the headings at `text-3xl` (30, from a measured 32), the lead and bullets at
+`text-2xl` and `text-xl`, the footnote at `text-sm` exactly. The 20px is
 `BenefitsChallengesCard`'s own pop-up body value reused rather than re-derived.
+None of this is worth much precision either way: the source is a raster and the
+sizes are approximate, so a ±2px snap is inside the measurement error.
 
 The CTA is the package `Button` with `py-2` against its own `py-[18px]` — the export
 draws ~353×49 where the component computes ~358×68, so the width agrees and the height
@@ -1212,20 +1305,21 @@ the one-screen goal the open item above records for `disease-background`.
 
 Type, measured off the 2000px export against the 1.389 scale that canvas implies:
 
-| Ink                | Measured           | Ships as                      |
-| ------------------ | ------------------ | ----------------------------- |
-| heading, 3 lines   | ~49px/58 leading   | `text-h1` (52/54.6), `lg:` up |
-| heading → bullets  | 35px ink-to-ink    | `mt-8` — the designer's 32    |
-| bullets, 26px/32.5 | 26px/32.4 measured | `text-[26px] leading-tight`   |
+| Ink                | Measured           | Ships as                       |
+| ------------------ | ------------------ | ------------------------------ |
+| heading, 3 lines   | ~49px/58 leading   | `text-5xl` (52/54.6), `lg:` up |
+| heading → bullets  | 35px ink-to-ink    | `mt-8` — the designer's 32     |
+| bullets, 26px/32.5 | 26px/32.4 measured | `text-2xl leading-tight`       |
 
-The heading is within 6% of `text-h1` on size and looser on leading (1.18 against
+The heading is within 6% of `text-5xl` on size and looser on leading (1.18 against
 1.05), which is open item 9's discrepancy again rather than a new one — it stays on
-the scale. The bullets are raw for the §8 reason the other chapters record: 26px is
-`text-h3`'s size at weight 600 where this is 400. `rebalancing-agents` sets its
-bullets at the same 26px.
+the scale. The bullets were raw for the §8 reason the other chapters record —
+26px was `text-2xl`'s size at weight 600 where this is 400 — and are now the step
+itself, at 24, since weight no longer travels with a size (§2).
+`rebalancing-agents` sets its bullets from the same measurement.
 
-**The heading steps down to `text-h2` below `lg`, which no other chapter does.** This
-one is a 17-word sentence where the others are two to six words, so at 52px it takes
+**The heading steps down to `text-3xl` below `lg`, which no other chapter does.** This
+one is a 17-word sentence where the others are two to six words, so at the old 52px it took
 eleven lines on a 390px phone — the whole screen before the first bullet. An invented
 comfort value, exactly like the small-screen gutters above: the artboard is 1440 and
 nobody has drawn a phone. Stated as a scale step rather than a raw size so the two
@@ -1275,19 +1369,21 @@ Type, off the artboard:
 
 | Ink                      | Drawn                | Ships as                      |
 | ------------------------ | -------------------- | ----------------------------- |
-| heading, 2 lines         | 52px/57.2, Barlow Bd | `text-h2`, `lg:text-h1`       |
+| heading, 2 lines         | 52px/57.2, Barlow Bd | `text-3xl`, `lg:text-5xl`     |
 | heading → bullets        | 32px                 | `mt-8` — the designer's value |
-| bullets                  | 26px/32, DM Sans 400 | `text-[26px] leading-tight`   |
-| agent captions           | 26px/30, wt 900/500  | `text-[26px] leading-7.5`     |
-| panel heading & captions | 26px/26, wt 900      | `text-[26px] leading-6.5`     |
+| bullets                  | 26px/32, DM Sans 400 | `text-2xl leading-tight`      |
+| agent captions           | 26px/30, wt 900/500  | `text-2xl leading-7.5`        |
+| panel heading & captions | 26px/26, wt 900      | `text-2xl leading-6.5`        |
 
-The bullets are raw for the §8 reason the other chapters record, and the captions for
-the same one — 26px is `text-h3`'s size at weights the scale does not carry. Tracking
+The bullets and captions were raw for the §8 reason the other chapters record —
+26px at weights 900 and 500, which the old scale's 26px step (weight 600) could
+not carry. All three now take `text-2xl` and state their weight beside it, which
+is the whole of what changed; the drawn 26 renders at 24. Tracking
 is drawn at 0.608px on 26px (0.0234em); `tracking-wide` is 0.025em, within 0.04px, so
 it ships on the scale rather than as an arbitrary value.
 
-**The heading steps down to `text-h2` below `lg`, the second chapter to need it.** Nine
-words at 52px take six lines and 328px of a 390 × 780 phone — 42% of the screen before
+**The heading steps down to `text-3xl` below `lg`, the second chapter to need it.** Nine
+words at the old 52px took six lines and 328px of a 390 × 780 phone — 42% of the screen before
 the first bullet, measured in Chrome. Same invented comfort value as
 `prophylaxis-guidance`'s, for the same reason and stated the same way.
 
@@ -1617,9 +1713,10 @@ so `denecimig.webp` is still painted at the size it was drawn at.
 ### The title
 
 45.469px / 46.732 leading / +1.3136px tracking, Barlow Condensed Bold, uppercase.
-The §2 scale has no step there — `text-h1` at 52px is 13% larger and wraps the
-title to three lines inside a band drawn for two — so this transcribes raw
-values under §8's precedent, expressed relative so they survive the clamp:
+No step lands there — `text-5xl` at 48px is 5.6% larger and `text-4xl` at 36px is
+21% smaller, and the larger of the two wraps the title to three lines inside a
+band drawn for two — so this transcribes raw values under §8's precedent,
+expressed relative so they survive the clamp:
 
 ```
 text-[clamp(1.375rem,3.157vw,2.842rem)]   /* 45.47px at 1440 */
@@ -2183,7 +2280,7 @@ nothing is answered, so this state has no reference at all — see §9.
 ### Geometry, and the two sizes that are not what they look like
 
 On the 1440 canvas: pills **425 × 56**, `rounded-lg` (8px), 20px between columns
-and 16px between rows, in an **870px** block; legends `text-h2` (32px) in teal-75,
+and 16px between rows, in an **870px** block; legends `text-3xl` (drawn 32, renders 30) in teal-75,
 10px above their pills; groups 24px apart; Submit 223 × 56, right-aligned to the
 block, 32px under it.
 
@@ -2361,18 +2458,19 @@ band and stop. 12px inset per side from the band either way.
 
 ### Geometry
 
-|                     | drawn                                       | shipped                     |
-| ------------------- | ------------------------------------------- | --------------------------- |
-| header band         | 44px tall, 8px radius, all four corners     | `min-h-11 rounded-lg`       |
-| header type         | 24px, ~24px of ink ascender-to-descender    | `text-[24px] font-semibold` |
-| band → panel        | flush, 0px                                  | no margin                   |
-| panel inset         | 12px per side                               | `mx-3`                      |
-| bullet pitch        | 28px, ink 19px on a line with both extremes | `text-[20px] leading-7`     |
-| `<h1>` → first band | 12px                                        | `mt-3`                      |
+|                     | drawn                                       | shipped                  |
+| ------------------- | ------------------------------------------- | ------------------------ |
+| header band         | 44px tall, 8px radius, all four corners     | `min-h-11 rounded-lg`    |
+| header type         | 24px, ~24px of ink ascender-to-descender    | `text-2xl font-semibold` |
+| band → panel        | flush, 0px                                  | no margin                |
+| panel inset         | 12px per side                               | `mx-3`                   |
+| bullet pitch        | 28px, ink 19px on a line with both extremes | `text-xl leading-7`      |
+| `<h1>` → first band | 12px                                        | `mt-3`                   |
 
-24px and 20px are both off the §2 scale (`text-h3` is 26 at weight 600, `text-h4`
-is 20 at weight 600 where the bullets are 400), so both ship raw under §8's
-precedent, as the chapters' 26px bullets do.
+24px and 20px were both off the old scale (its 26px and 20px steps carried weight
+600 where the bullets are 400), so both shipped raw under §8's precedent. Both
+are now steps that land exactly — 24 is `text-2xl` and 20 is `text-xl` — with the
+weight stated beside them (§2).
 
 **Two rows of that table were corrected by the vector export**, which gives
 `h-11 rounded-lg … font-semibold` where the raster reading was 43px, a 6px radius
@@ -2485,7 +2583,7 @@ Checked at 2, 3, 4 and 5 agents: button centres evenly spaced in every case
 the 4-agent leaf's three-line "Etranacogene dezaparvovec-drlb" caption grows the
 arch rather than overflowing it.
 
-**`leading-none` on the arch's title** is a caller override of `text-h2`'s own 1.1
+**`leading-none` on the arch's title** is a caller override of `text-3xl`'s own 1.2
 step: the export sets this heading's two lines at a 32px pitch, measured twice
 (cap tops at y=594 and y=626). It only shows up here because `DisclosureBand`'s
 titles are phrases that never reach a second line. `max-w-215` beside it is a
@@ -2523,7 +2621,7 @@ is why the "airy vs tight" difference between images is content, not type.
 | Bullets       | 20px, weight 400, `BulletList`'s black |
 | Both          | `leading-[1.6]`                        |
 
-The size is the **established pop-up body value** — the same `text-[20px]
+The size is the **established pop-up body value** — the same `text-xl
 leading-[1.6]` all four §7.5 agent cards set — reused rather than re-derived, which is
 the rule `DenecimigCard` writes down: two cards a reader opens in sequence should be one
 size. It holds harder here than it did there, because these open from a wizard leaf and
@@ -2667,17 +2765,27 @@ place on this page the code deliberately does not match the file.
 
 ### Type
 
-| element     | value                                                     | how it was fixed                                                                                                                                                      |
-| ----------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `<h1>`      | `text-[42px] leading-9 tracking-wide`, display, uppercase | least squares over all four drawn lines returns size 42 at 0.0234em, residuals ≤1.1px on lines up to 1139px; cap height agrees independently (30px ink / 0.70 = 42.9) |
-| bullets     | `text-[22px] leading-8`                                   | rendered widths 655/1110/817/718 vs drawn 651/1106/813/715 — a constant +4, i.e. the indent, not the size                                                             |
-| CTA         | `text-[24px] leading-5`, **sentence case**                | ink measures 24px ascender-to-descender; the drawn label is mixed case                                                                                                |
-| caption     | `text-[22px] leading-5 font-bold text-brand-slate-100`    | pixel-exact to `/wizard/therapies`; `leading-5` from the 20px baseline pitch of "Efanesoctocog / alfa"                                                                |
-| class label | `text-h3 leading-5.5 tracking-wide`, display, uppercase   | 18px cap ink / Barlow Condensed's 0.70 = 25.7 → 26 = `text-h3`; 22px line pitch off the three-line label                                                              |
+| element     | value                                                    | how it was fixed                                                                                                                                                      |
+| ----------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<h1>`      | `text-4xl leading-9 tracking-wide`, display, uppercase   | least squares over all four drawn lines returns size 42 at 0.0234em, residuals ≤1.1px on lines up to 1139px; cap height agrees independently (30px ink / 0.70 = 42.9) |
+| bullets     | `text-xl leading-8`                                      | rendered widths 655/1110/817/718 vs drawn 651/1106/813/715 — a constant +4, i.e. the indent, not the size                                                             |
+| CTA         | `text-2xl leading-5`, **sentence case**                  | ink measures 24px ascender-to-descender; the drawn label is mixed case                                                                                                |
+| caption     | `text-xl leading-5 font-bold text-brand-slate-100`       | pixel-exact to `/wizard/therapies`; `leading-5` from the 20px baseline pitch of "Efanesoctocog / alfa"                                                                |
+| class label | `text-2xl leading-5.5 tracking-wide`, display, uppercase | 18px cap ink / Barlow Condensed's 0.70 = 25.7 → 26 = `text-2xl`; 22px line pitch off the three-line label                                                             |
 
-**The `<h1>` is 42px where every other page in the app sets `text-h1` (52px).** It is a
-four-line sentence and the designer dropped it. Raw under §8's precedent, as §13's 45.5px
-pop-up title is.
+**The `<h1>` is drawn at 42px where every other page in the app sets `text-5xl` (drawn 52,
+renders 48).** It is a four-line sentence and the designer dropped it.
+
+It shipped raw at `text-[42px]` until 2026-08-04, as §13's 45.5px pop-up title
+still does. It now takes `text-4xl` and renders at **36px — a 6px drop, the
+largest single change the §2 migration made anywhere in the app.** That is a real
+loss of fidelity and it is worth stating plainly: the 42 was not a guess but a
+least-squares fit over all four drawn lines with residuals ≤1.1px, independently
+corroborated by cap height (30px ink / 0.70 = 42.9). Snapping to 36 discards that
+work, and the four-line heading it was fitted against will re-flow. It went on
+the scale anyway, on the instruction that no arbitrary font sizes survive; if the
+heading reads wrong at 36, the honest fix is `text-[42px]` back under §8's
+precedent, not a different step — 48 is further out than 36 is.
 
 **`max-w-content` on the `<h1>` is a line-break cap**, the device `/wizard/therapies`'
 `max-w-215` uses. The drawn lines measure 961 / 1019 / 1142 / 362, and the 1216px band is

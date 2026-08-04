@@ -208,7 +208,10 @@ export default function RebalancingAgents() {
           moved to the topic whose prose it actually heads. */}
       <h1
         id="chapter-heading"
-        className="font-display text-h1 tracking-wide text-brand-crimson-50 uppercase"
+        // `text-5xl` from `lg` only, app-wide (docs/styling.md §2).
+        // `REBALANCING` sets 272px at 52px, which clears a 375px column and
+        // overflows a 320px one.
+        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
       >
         {AGENTS.title}
       </h1>
@@ -224,7 +227,7 @@ export default function RebalancingAgents() {
       */}
       <BulletList
         items={AGENTS.body}
-        className="mt-8 text-[26px]"
+        className="mt-8 text-2xl"
         // `font-bold` for every child, tone for the class it belongs to: the
         // weight is the same on all three, so it is stated once here rather
         // than folded into both entries of MECHANISM_TONE.
@@ -265,7 +268,7 @@ export default function RebalancingAgents() {
           1082px of ink against the group's 963, so it overhangs both sides on
           the artboard, and the two share a centre line.
         */}
-        <p className="mt-4 text-center text-h3 font-bold text-popup-caption uppercase">
+        <p className="mt-4 text-center text-2xl font-bold text-popup-caption uppercase">
           {BOXES_CAPTION}
         </p>
 
@@ -280,7 +283,7 @@ export default function RebalancingAgents() {
           the row does that on its own.
         */}
         <div className={cn(GROUP, "mt-20 flex flex-wrap items-start gap-x-6 gap-y-4")}>
-          <p className="max-w-135 text-h3 font-bold text-popup-caption">{MECHANISMS_LABEL}</p>
+          <p className="max-w-135 text-2xl font-bold text-popup-caption">{MECHANISMS_LABEL}</p>
 
           {/*
             **Controlled**, where this was uncontrolled while it opened nothing.
@@ -336,22 +339,22 @@ export default function RebalancingAgents() {
  * Type is measured off the 2000px export and, being a raster rather than Figma,
  * is approximate: the lead reads ~26px set tight and the bullets ~20px, against
  * 32px bold for the two headings. The first is raw under §8's precedent (the
- * `text-h3` step is 26px at weight 600, where this is 400) and so is the second
+ * `text-2xl` step is 26px at weight 600, where this is 400) and so is the second
  * — it is `BenefitsChallengesCard`'s own pop-up body value, reused because it is
- * the same fact. The headings land on `text-h2` exactly.
+ * the same fact. The headings land on `text-3xl` exactly.
  */
 function MechanismsCard({ onViewMechanism }: { onViewMechanism: () => void }) {
   return (
     <div className="py-6">
       {MECHANISMS.body.map((item) =>
         typeof item === "string" ? (
-          <p key={item} className="text-[26px] leading-tight text-black">
+          <p key={item} className="text-2xl leading-tight text-black">
             {item}
           </p>
         ) : (
           <section key={item.text} className="mt-6">
-            <h3 className="text-h2 font-bold text-brand-crimson-50">{item.text}</h3>
-            <BulletList items={item.children} className="mt-4 text-[20px] leading-[1.6]" />
+            <h3 className="text-3xl font-bold text-brand-crimson-50">{item.text}</h3>
+            <BulletList items={item.children} className="mt-4 text-xl leading-[1.6]" />
           </section>
         ),
       )}
@@ -456,9 +459,7 @@ function MechanismFigureCard({ onBack }: { onBack: () => void }) {
 function CardFooter({ note, children }: { note: string; children: ReactNode }) {
   return (
     <div className="mt-8 flex flex-wrap items-end gap-x-6 gap-y-4">
-      <p className="min-w-0 flex-1 basis-80 text-[14px] leading-tight font-light text-black">
-        {note}
-      </p>
+      <p className="min-w-0 flex-1 basis-80 text-sm leading-tight font-light text-black">{note}</p>
       <div className="ms-auto">{children}</div>
     </div>
   );

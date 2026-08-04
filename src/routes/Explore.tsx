@@ -63,13 +63,19 @@ export default function Explore() {
   return (
     <section aria-labelledby="explore-heading" className="flex flex-1 flex-col lg:-mr-rail">
       {/*
-        **42px, not `text-h1`.** Every other page in the app sets its `<h1>` at
-        the 52px token; this heading is a four-line sentence and the designer
-        dropped it. Fitted rather than guessed: least squares over all four drawn
-        lines in Barlow Condensed 700 returns 42px at 0.0234em of tracking —
-        `tracking-wide` to within a thousandth — with residuals under 1.1px on
-        lines up to 1139px wide. Cap height agrees independently (30px of ink /
-        0.70 = 42.9). Raw under §8's precedent, as the pop-up's 45.5px title is.
+        **Drawn at 42px, not the 52 every other page sets.** This heading is a
+        four-line sentence and the designer dropped it. Fitted rather than
+        guessed: least squares over all four drawn lines in Barlow Condensed 700
+        returns 42px at 0.0234em of tracking — `tracking-wide` to within a
+        thousandth — with residuals under 1.1px on lines up to 1139px wide. Cap
+        height agrees independently (30px of ink / 0.70 = 42.9).
+
+        It shipped raw at `text-[42px]` until 2026-08-04 and now takes
+        `text-4xl`, i.e. **36px — a 6px drop, the biggest fidelity loss in the
+        §2 migration** (styling open item 31). The fit above is what it cost. If
+        the heading reads wrong or re-flows past four lines, put `text-[42px]`
+        back under §8's precedent rather than reaching for `text-5xl`, which at
+        48 is further from the drawing than 36 is.
 
         `leading-9` is the drawn 36px pitch, well inside the font's own step —
         the same tightening `/wizard/therapies` applies to its arch title, and
@@ -94,7 +100,7 @@ export default function Explore() {
       */}
       <h1
         id="explore-heading"
-        className="mx-auto max-w-content text-center font-display text-[42px] leading-9 font-bold tracking-wide text-brand-crimson-50 uppercase"
+        className="mx-auto max-w-content text-center font-display text-4xl leading-9 font-bold tracking-wide text-brand-crimson-50 uppercase"
       >
         {SDM_CONCLUSION}
       </h1>
@@ -110,7 +116,7 @@ export default function Explore() {
         against ~1178px of room, so the drawn break falls out of the width rather
         than needing to be forced.
       */}
-      <BulletList items={SDM_POINTS} className="mt-6 text-[22px] leading-8" />
+      <BulletList items={SDM_POINTS} className="mt-6 text-xl leading-8" />
 
       {/*
         The package `Button`, at `WizardIntro`'s recipe and not `WizardIntro`'s
@@ -219,7 +225,7 @@ export default function Explore() {
         width="wide"
         onClose={() => setTableOpen(false)}
       >
-        <p className="py-6 text-center text-[20px] leading-[1.6] text-black">
+        <p className="py-6 text-center text-xl leading-[1.6] text-black">
           The filterable comparison table is not built yet.
         </p>
       </Popup>
@@ -366,7 +372,7 @@ function Segment({
                     column's label starts at the same y whatever its caption
                     costs. Stacked, the labels are not in one row, so it goes.
                   */}
-                  <p className="mt-5 text-center text-[22px] leading-5 font-bold text-brand-slate-100 xl:h-15">
+                  <p className="mt-5 text-center text-xl leading-5 font-bold text-brand-slate-100 xl:h-15">
                     {agent}
                   </p>
                 </li>
@@ -384,7 +390,7 @@ function Segment({
               columns stack, so the four labels genuinely are not in one row and
               the fixed height would only be a gap.
 
-              `text-h3` is measured: 18px of cap ink / Barlow Condensed's 0.70 cap
+              `text-2xl` is measured: 18px of cap ink / Barlow Condensed's 0.70 cap
               ratio = 25.7, and rendering at 26px reproduces all four label widths
               to within 2px. `leading-[22px]` is the drawn pitch, taken off the
               three-line label's line tops.
@@ -421,7 +427,7 @@ function Segment({
                 lower case for exactly that reason, and `FVIIIa` is already in the
                 helper's term list.
               */}
-              <p className="text-center font-display text-h3 leading-5.5 tracking-wide text-brand-crimson-50 uppercase">
+              <p className="text-center font-display text-2xl leading-5.5 font-semibold tracking-wide text-brand-crimson-50 uppercase">
                 {preserveCase(column.label)}
               </p>
             </div>

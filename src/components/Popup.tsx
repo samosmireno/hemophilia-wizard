@@ -193,7 +193,7 @@ export default function Popup({
           </h2>
 
           {/* Same inset as the title, so the two lines share one centre and one
-              clearance from the ✕. 20px lands on `text-h4` exactly, but that
+              clearance from the ✕. 20px lands on `text-xl` exactly, but that
               token carries weight 600 and the design draws 500 — hence the
               explicit `font-medium` rather than a raw size. */}
           {subtitle && (
@@ -204,7 +204,7 @@ export default function Popup({
               aria-label={subtitle}
               className={cn(
                 BAND_INSET,
-                "mt-1 text-center font-display text-h4 font-medium tracking-wide text-white uppercase",
+                "mt-1 text-center font-display text-xl font-medium tracking-wide text-white uppercase",
               )}
             >
               {preserveCase(subtitle)}

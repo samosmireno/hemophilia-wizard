@@ -35,7 +35,7 @@ export default function ClottingCascadeFigure() {
           {CLOTTING_CASCADE_NOTES.map((note) => (
             <p
               key={note}
-              className="rounded-2xl bg-figure-note px-5 py-4 text-center text-body text-black"
+              className="rounded-2xl bg-figure-note px-5 py-4 text-center text-base text-black"
             >
               {note}
             </p>
@@ -52,7 +52,7 @@ export default function ClottingCascadeFigure() {
 
       {/* Uppercase is CSS, not copy — the data module stores it sentence-case,
           the way every other shouted string in this app is stored. */}
-      <figcaption className="text-center font-display text-h3 tracking-wide text-brand-crimson-50 uppercase">
+      <figcaption className="text-center font-display text-2xl font-semibold tracking-wide text-brand-crimson-50 uppercase">
         {CLOTTING_CASCADE_CONCLUSION}
       </figcaption>
     </figure>

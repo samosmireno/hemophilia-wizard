@@ -53,7 +53,7 @@ export default function WizardIntro() {
         {/*
           72px/1.05 bold, measured off the export (cap height 51.1px on the 1440
           canvas ÷ Barlow Condensed's 0.72 cap ratio; line pitch 74.9px = 1.05,
-          which is `--text-h1`'s own ratio one size up). Raw rather than a scale
+          which is the old `h1` step's own ratio one size up). Raw rather than a scale
           step under docs/styling.md §8's precedent: the scale tops out at 52px
           and this card is set well above it, the same call `Landing` makes for
           its hero. `clamp()` for the same reason as there — 5vw reaches the

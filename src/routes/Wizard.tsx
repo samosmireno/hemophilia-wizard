@@ -85,7 +85,11 @@ export default function Wizard() {
       */}
       <h1
         id="wizard-heading"
-        className="font-display text-h1 tracking-wide text-brand-crimson-50 uppercase"
+        // `text-5xl` from `lg` only, app-wide (docs/styling.md §2). This is the
+        // heading that forced the rule: `CHARACTERISTICS` sets 356.5px at 52px
+        // against a 311px column, so at 375px the word left the screen and took
+        // the document's scroll width with it.
+        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
       >
         {WIZARD_INPUT_TITLE}
       </h1>

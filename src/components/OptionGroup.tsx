@@ -81,7 +81,7 @@ export default function OptionGroup<T extends string>({
     <fieldset className={cn("mx-auto max-w-225 min-w-0", className)}>
       {/*
         32px bold uppercase in teal-75, measured off the artboard (cap height 23
-        on the 1440 canvas ÷ DM Sans' 0.70 cap ratio = 33px, i.e. `text-h2`).
+        on the 1440 canvas ÷ DM Sans' 0.70 cap ratio = 33px, i.e. `text-3xl`).
         `w-full text-center` because a legend is inline-ish by default and the
         artboard centres each question over its buttons.
 
@@ -98,7 +98,7 @@ export default function OptionGroup<T extends string>({
         and the pills: ink-to-ink measures 15px, which is that gap once the line
         box's descender space is taken off (docs/styling.md §11).
       */}
-      <legend className="mx-auto mb-2.5 w-full max-w-175 text-center font-sans text-h2 text-brand-teal-75 uppercase">
+      <legend className="mx-auto mb-2.5 w-full max-w-175 text-center font-sans text-3xl font-bold text-brand-teal-75 uppercase">
         {legend}
       </legend>
 
@@ -162,7 +162,7 @@ export default function OptionGroup<T extends string>({
                   24px keeps it on one line as drawn, with room to spare.
                 */
                 "flex min-h-14 cursor-pointer items-center justify-center rounded-lg px-6 py-3",
-                "text-center text-[24px] leading-tight font-semibold wrap-break-word",
+                "text-center text-2xl leading-tight font-semibold wrap-break-word",
                 "shadow-ui-btn transition-[background-color,color] duration-120 ease-out",
                 /*
                   Three resting skins, two of them the package's own:

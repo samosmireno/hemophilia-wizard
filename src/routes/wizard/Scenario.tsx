@@ -67,7 +67,7 @@ export default function Scenario() {
   const captionBelow = screen.classes.length === 1;
 
   const caption = (
-    <p className="text-center text-h3 font-bold text-popup-caption uppercase">{screen.caption}</p>
+    <p className="text-center text-2xl font-bold text-popup-caption uppercase">{screen.caption}</p>
   );
 
   /*
@@ -109,7 +109,11 @@ export default function Scenario() {
       */}
       <h1
         id="wizard-scenario-heading"
-        className="font-display text-h1 tracking-wide text-brand-crimson-50 uppercase"
+        // `text-5xl` from `lg` only, app-wide (docs/styling.md §2). The four
+        // scenario titles clear a phone column at 52px today — `HEMOPHILIA` is
+        // the longest word at 234px — but the title is a data read, so the rule
+        // is what keeps a future one from overflowing.
+        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
       >
         {screen.title}
       </h1>
@@ -121,7 +125,7 @@ export default function Scenario() {
         Through `formatInline` for the italic polarity word, which is the whole
         reason that helper exists.
       */}
-      <p className="mt-8 text-[26px] text-black">{formatInline(screen.lead)}</p>
+      <p className="mt-8 text-2xl text-black">{formatInline(screen.lead)}</p>
 
       {/*
         No top margin: the artboard runs the bullets straight on from the lead at
@@ -132,13 +136,11 @@ export default function Scenario() {
         a paired-delimiter parser is that pointing it at unmarked strings costs
         nothing, and emphasising a word later becomes a data change.
       */}
-      <BulletList items={screen.classes} className="text-[26px]" format={formatInline} />
+      <BulletList items={screen.classes} className="text-2xl" format={formatInline} />
 
       {/* Only HB +inhibitors has one. Plain prose under the list, not a bullet
           in it — it qualifies the whole list rather than joining it. */}
-      {screen.caveat && (
-        <p className="mt-8 text-[26px] text-black">{formatInline(screen.caveat)}</p>
-      )}
+      {screen.caveat && <p className="mt-8 text-2xl text-black">{formatInline(screen.caveat)}</p>}
 
       {/*
         `mt-40` is 160px, against the 164 the exports draw from the last line of

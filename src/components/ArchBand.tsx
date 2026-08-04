@@ -12,7 +12,7 @@ import { cn } from "../lib/cn";
  * `DisclosureBand` (an education chapter's three "Click here:" disclosures) and
  * `/wizard/therapies` (the leaf's 2–5 recommended agents). The `/wizard/therapies`
  * artboard draws the same object: `rounded-t-[300px]` fits its measured left edge
- * to within a pixel over 230 rows, and its `<h2>` measures the same `text-h2`
+ * to within a pixel over 230 rows, and its `<h2>` measures the same `text-3xl`
  * at the same `mt-9`.
  *
  * What it owns is the drawing — the arch, the wash, the footage, the heading's
@@ -97,7 +97,7 @@ export default function ArchBand({
 
       <h2
         className={cn(
-          "mt-9 text-center font-display text-h2 tracking-wide text-brand-crimson-50 uppercase",
+          "mt-9 text-center font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase",
           titleClassName,
         )}
       >

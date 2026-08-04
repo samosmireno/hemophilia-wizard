@@ -16,7 +16,7 @@ import { nextOf } from "../data/sectionOrder";
  * step 0 — a card grid would be a second, competing navigation.
  *
  * Type sizes are the design's raw Tailwind steps (60 / 128 / 36 / 24px) rather
- * than the `text-h1`…`text-small` scale, which tops out at 52px. They are
+ * than the `text-5xl`…`text-xs` scale, which tops out at 48px. They are
  * wrapped in `clamp()` so the composition holds together on a phone: each one
  * reaches the design's exact value at ~1440px and stops there. The headline's
  * leading is the design's 96px expressed as the ratio 0.75 — a fixed leading is

@@ -5,7 +5,7 @@ import { cn } from "../lib/cn";
 
 /**
  * An education topic's `body` as the chapters draw it: a disc list at
- * `text-body`, with `NestedBullet`'s children as a second list inside their own
+ * `text-base`, with `NestedBullet`'s children as a second list inside their own
  * `<li>` rather than as siblings.
  *
  * The nesting is markup, not indentation — a child bullet is inside the item it
@@ -58,7 +58,7 @@ export default function BulletList({
   const render = format ?? ((text: string) => text);
 
   return (
-    <ul className={cn("list-disc pl-6 text-body text-black", className)}>
+    <ul className={cn("list-disc pl-6 text-base text-black", className)}>
       {items.map((item) =>
         typeof item === "string" ? (
           <li key={item}>{render(item)}</li>

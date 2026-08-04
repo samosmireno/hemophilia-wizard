@@ -88,7 +88,7 @@ export default function DisclosureBand({
               aria-haspopup={disclosure.content ? "dialog" : undefined}
               onClick={(next) => setOpenIndex(next ? index : null)}
             />
-            <p className="mt-4 flex max-w-68 flex-1 items-center text-center text-h3 font-bold text-popup-caption">
+            <p className="mt-4 flex max-w-68 flex-1 items-center text-center text-2xl font-bold text-popup-caption">
               {disclosure.label}
             </p>
           </li>

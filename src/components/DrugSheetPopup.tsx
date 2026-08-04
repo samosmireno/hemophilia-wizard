@@ -138,15 +138,10 @@ function Section({
 }) {
   return (
     <>
-      <h3
-        className={cn(
-          "text-[20px] leading-[1.6] font-bold text-brand-crimson-50",
-          !first && "mt-1",
-        )}
-      >
+      <h3 className={cn("text-xl leading-[1.6] font-bold text-brand-crimson-50", !first && "mt-1")}>
         {heading}:
       </h3>
-      <BulletList items={items} className="text-[20px] leading-normal" />
+      <BulletList items={items} className="text-xl leading-normal" />
     </>
   );
 }

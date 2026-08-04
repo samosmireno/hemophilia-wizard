@@ -74,10 +74,15 @@ describe("Popup", () => {
   /**
    * A class assertion, which this suite otherwise avoids — and it is here
    * because the bug it guards is invisible to every other kind of test. Routing
-   * these classes through `cn()` silently dropped `text-h4`: tailwind-merge does
-   * not know this project's `@theme` font sizes, reads `text-h4` as a colour,
-   * and lets the `text-white` beside it win. jsdom applies no Tailwind at all,
-   * so the subtitle rendered at an inherited 16px with the whole suite green.
+   * these classes through `cn()` silently dropped the old `text-h4`:
+   * tailwind-merge did not know this project's `@theme` font sizes, read
+   * `text-h4` as a colour, and let the `text-white` beside it win. jsdom applies
+   * no Tailwind at all, so the subtitle rendered at an inherited 16px with the
+   * whole suite green.
+   *
+   * `text-xl` is a stock t-shirt size, so the default config resolves it and the
+   * bug cannot recur in this form (`src/lib/cn.ts`). Kept as the regression test
+   * for reintroducing a named `--text-*` token, which would fail exactly here.
    */
   it("keeps the subtitle's font-size utility intact", () => {
     render(
@@ -86,7 +91,7 @@ describe("Popup", () => {
       </Popup>,
     );
 
-    expect(screen.getByText(SUBTITLE)).toHaveClass("text-h4", "font-medium");
+    expect(screen.getByText(SUBTITLE)).toHaveClass("text-xl", "font-medium");
   });
 
   /**
@@ -135,7 +140,7 @@ describe("Popup", () => {
    * other kind of test in this file. What they guard is not the numbers — those
    * are a browser's business — but that the prop reaches the card at all and
    * that `cn()` does not drop it. Routing a `w-` utility through tailwind-merge
-   * beside the base string is exactly the shape that silently ate `text-h4`.
+   * beside the base string is exactly the shape that silently ate the old `text-h4`.
    */
   describe("width", () => {
     /** The card is the layer's only child; the layer itself is always full-size. */
