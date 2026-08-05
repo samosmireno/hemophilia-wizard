@@ -398,3 +398,106 @@ describe("wizard therapies — the drug sheets", () => {
     expect(screen.getByRole("dialog")).toHaveAccessibleName("Marstacimab");
   });
 });
+
+describe("wizard therapies — the responsive pass", () => {
+  /**
+   * The four decisions of 2026-08-05, asserted as class strings because jsdom
+   * computes no layout and a class string is the only thing here that can fail.
+   * The pixel arithmetic behind them was measured in a browser instead
+   * (docs/styling.md §15).
+   *
+   * The `<h1>` rides along in the first test because it is the reason the rest
+   * ramp: it drops 48 → 30 below `lg` under §2's app-wide rule, so a body left
+   * at its drawn 20 would read 0.67× the heading on a phone where the artboard
+   * draws 0.42×.
+   */
+  it.each(LEAVES)(
+    "steps the heading, the bands and the body below lg, %s/%s/%s",
+    (type, inh, why) => {
+      const region = renderTherapies(type, inh, why);
+
+      expect(within(region).getByRole("heading", { level: 1 })).toHaveClass(
+        "text-3xl",
+        "lg:text-5xl",
+      );
+
+      for (const header of headers(region)) {
+        expect(header).toHaveClass("text-xl", "lg:text-2xl");
+        /* A bare `text-2xl` would be the pre-pass value surviving the merge. */
+        expect(header.className.split(/\s+/)).not.toContain("text-2xl");
+        /* The 44px band is a floor at every width, not a thing that ramps. */
+        expect(header).toHaveClass("min-h-11");
+      }
+    },
+  );
+
+  /**
+   * **§2's body-copy exception reaches a fifth page here, and this is the first
+   * one whose step lands ON the 16px floor** rather than above it: the other
+   * four transcribe 26 and step to 20, where this page is drawn at 20.
+   *
+   * `leading-[1.4]` is pinned separately from the size and matters more than it
+   * looks. The drawn 20/28 shipped as `leading-7`, which is absolute — against a
+   * 16px step it renders 1.75, i.e. the step loosening what it was meant to
+   * tighten. The ratio is what survives both sizes with one class, which is §2's
+   * own lesson from `fviiia-mimetics`.
+   */
+  it.each(LEAVES)(
+    "steps the panel bullets to the floor, on a ratio, %s/%s/%s",
+    (type, inh, why) => {
+      const { note } = recommend(type, inh, why);
+      const region = renderTherapies(type, inh, why);
+      const list = within(region)
+        .getByRole("region", { name: note.considerations.title })
+        .querySelector("ul")!;
+
+      expect(list).toHaveClass("text-base", "leading-[1.4]", "lg:text-xl");
+      expect(list.className.split(/\s+/)).not.toContain("leading-7");
+    },
+  );
+
+  /**
+   * The measure fix, and the half of it that must NOT move.
+   *
+   * Three insets stack inside this panel — the 12px `mx-3`, this padding, and
+   * `BulletList`'s `pl-6` — and at the drawn 36 that is 120px of chrome inside a
+   * 311px column, leaving 191px of measure. Both halves are pinned because
+   * either alone reopens it: the padding must ramp, and `mx-3` must not, since
+   * it is where the `border-x` stroke and `last`'s bottom corners land.
+   */
+  it.each(LEAVES)(
+    "ramps the panel's padding and not its 12px inset, %s/%s/%s",
+    (type, inh, why) => {
+      const { note } = recommend(type, inh, why);
+      const region = renderTherapies(type, inh, why);
+      const panel = within(region).getByRole("region", { name: note.considerations.title });
+
+      expect(panel).toHaveClass("px-4", "sm:px-6", "lg:px-9");
+      expect(panel).toHaveClass("mx-3");
+      for (const c of ["sm:mx-0", "lg:mx-3", "px-9"]) {
+        expect(panel.className.split(/\s+/)).not.toContain(c);
+      }
+    },
+  );
+
+  /**
+   * The one deliberate non-step, pinned so a later consistency pass does not
+   * take it silently. Nothing about this element's box moves with the viewport:
+   * `w-40` fits even the 224px a 320px phone leaves inside the row's `px-4`,
+   * `PopupButton` is a fixed 65px `shrink-0` from the package, and the captions
+   * are single words that never wrap and never touch a measure.
+   */
+  it.each(LEAVES)("holds the agent captions at one size, %s/%s/%s", (type, inh, why) => {
+    const { recommendations } = recommend(type, inh, why);
+    const region = renderTherapies(type, inh, why);
+
+    for (const treatment of recommendations) {
+      const caption = within(region).getByText(treatment.agent, { selector: "p" });
+      expect(caption).toHaveClass("text-xl");
+      for (const c of ["text-base", "lg:text-xl", "lg:text-2xl"]) {
+        expect(caption.className.split(/\s+/)).not.toContain(c);
+      }
+      expect(caption.parentElement).toHaveClass("w-40", "shrink-0", "xl:shrink");
+    }
+  });
+});

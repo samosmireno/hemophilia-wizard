@@ -249,6 +249,17 @@ export default function Therapies() {
 
                 `mt-3` (12px), not `DisclosureBand`'s `mt-4`: the drawn caption
                 inks 21px below the button, and 16px puts it at 24.
+
+                **It is the one thing on this page that does not take §2's step,
+                and that is a decision rather than an omission.** Every other
+                element here steps because the viewport moves something about it;
+                nothing about this one moves. The item is `w-40` at every width
+                and fits even the 224px a 320px phone leaves inside the row's
+                `px-4`, `PopupButton` is a fixed 65px `shrink-0` from the
+                package, and the captions are single words that never wrap and
+                never touch a measure. So there is no fit argument and no
+                hierarchy argument — its neighbour is a button, not body copy —
+                and 20 already sits 2px under the drawn 22.
               */}
               <p className="mt-3 text-center text-xl font-bold text-brand-slate-100">
                 {treatment.agent}
@@ -346,13 +357,22 @@ function NoteDisclosure({
             /*
               44px is the drawn band height, and `min-h` rather than `h` so a
               title that wraps on a narrow viewport grows the band instead of
-              overflowing it — the call `OptionGroup` records for its pills.
-              24px is measured off the export's ink (24px of ascender-to-
-              descender on a line with both), and it is not a scale step: `text-2xl`
-              is 26 at weight 600 where this is 24 at 600. Raw under §8's
-              precedent, as the chapters' 26px bullets are.
+              overflowing it — the call `OptionGroup` records for its pills. It
+              is the floor at every width: all six titles already wrap past it
+              on a phone, and 44px is a touch target as well as a drawing.
 
-              `rounded-lg` and `font-semibold` come from the VECTOR export, which
+              **The type takes §2's one step down below `lg`** — 20px against
+              the drawn 24. It buys no line (the longest title, "Considerations
+              for Reducing Treatment Burden and Improving QoL", sets in three
+              either way against the 279px this button gets at 375), so the
+              argument is the ratio rather than fit: with the panel's bullets
+              stepping 20 → 16 below the same breakpoint, a flat 24 would leave
+              the header 1.5x its own body where the artboard draws 1.2x.
+              `text-xl lg:text-2xl` is the pair every disclosure caption and
+              `/wizard/scenario` already use.
+
+              The 24 at the top of that step, and `rounded-lg` and
+              `font-semibold` beside it, come from the VECTOR export, which
               overrules the raster measurements §15 first recorded (6px, weight
               700). An antialiased 8px corner measures as 6 on a flat PNG, and ink
               height tells you font size rather than weight — neither original
@@ -360,7 +380,7 @@ function NoteDisclosure({
               44px already shipped here, which is what makes it the better witness.
             */
             "flex min-h-11 w-full items-center justify-center rounded-lg px-4",
-            "text-center text-2xl font-semibold text-white",
+            "text-center text-xl font-semibold text-white lg:text-2xl",
             "transition-[background-color,box-shadow,color] duration-120 ease-out",
             /*
               State is carried twice: by the ground and by the shadow. Open is
@@ -451,7 +471,31 @@ function NoteDisclosure({
               */
               "mx-3 border-x border-note-panel-border bg-brand-teal-25/30",
               last && "rounded-b-xl border-b",
-              "px-9 pt-2 pb-3",
+              /*
+                **The horizontal padding ramps; the 12px inset does not.** Three
+                insets stack inside this panel — `mx-3` (12 a side), this
+                padding, and `BulletList`'s own `pl-6` — and at the drawn 36 that
+                is 120px of chrome inside a 311px column, leaving the clinical
+                copy 191px of measure. ~19 characters a line, and 163px on the
+                nested bullets. It is the narrowest measure in the app and the
+                one thing on this screen that was wrong rather than undrawn.
+
+                36 is also the only number in this block no artboard is recorded
+                as supplying — §15's geometry table lists the 12px inset and not
+                this — which is what makes it the one to give. It recovers 40px
+                at 375 (231px of measure) and 24 at `sm`, and `lg` restores the
+                drawn value untouched. Same three-step shape as `Popup`'s own
+                `px-4 sm:px-8 lg:px-16`.
+
+                `mx-3` stays at every width because it is drawn AND positional:
+                it is where the `border-x` stroke and `last`'s bottom corners
+                land, so at `mx-0` the panel's sides would run flush into the
+                band above and the radius would sit on the column edge.
+
+                `pt-2 pb-3` do not ramp — 8px and 12px are already under
+                everything else on the page.
+              */
+              "px-4 pt-2 pb-3 sm:px-6 lg:px-9",
               /*
                 Contents fade with the height rather than being sliced by the
                 clip. Shorter than the 220ms wipe so the text has settled before
@@ -464,14 +508,34 @@ function NoteDisclosure({
             {/*
               20px/28px, measured: the panel's lines sit at a 28px pitch and a
               line carrying both an ascender and a descender inks 19px, which is
-              ~20px of DM Sans at weight 400. Not a scale step — `text-xl` is 20
-              at weight 600 — so raw, under the same §8 precedent the chapters'
-              26px bullets use.
+              ~20px of DM Sans at weight 400. Both land on the scale exactly —
+              `text-xl` and `leading-7`.
+
+              **This is §2's body-copy exception's fifth page**, and the first
+              whose step lands ON the app's 16px floor rather than above it. The
+              other four transcribe 26 and step to 20; this one is drawn at 20,
+              so one step is 16 — the size every education chapter's body already
+              ships at, and the floor open item 9 says there is nothing below.
+              The argument is the one `/wizard/scenario` made: the `<h1>` drops
+              48 → 30 under §2 while the body sat at 20, rendering the page's
+              clinical copy at 0.67x its heading on a phone where the artboard
+              draws 0.42x. The measure agrees — ~23 characters a line at 375
+              becomes ~29 — but the padding ramp above is what actually fixed
+              that, so this is proportion rather than fit.
+
+              **`leading-[1.4]`, not `leading-7`.** 28px is absolute and would
+              render 1.75 against a 16px step — the step loosening what it was
+              meant to tighten. 1.4 is the ratio 20/28 already renders at, so one
+              class covers both sizes and the 1440 canvas is unchanged. That is
+              §2's own lesson from `fviiia-mimetics`: a `leading-*` on the scale
+              does not survive a size ramp, a ratio does. (`ArchBand`'s title is
+              the other half of it — a caller's ratio survives a size step there
+              for the same reason, because both set `--tw-leading`.)
 
               `text-black` is `BulletList`'s default and is the off-palette black
               docs/styling.md §11 records for the education chapters.
             */}
-            <BulletList items={block.points} className="text-xl leading-7" />
+            <BulletList items={block.points} className="text-base leading-[1.4] lg:text-xl" />
           </div>
         </div>
       </div>
