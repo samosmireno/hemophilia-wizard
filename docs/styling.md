@@ -1045,7 +1045,7 @@ Everything above is arithmetic — see open item 41.
 | 42  | **`/wizard`'s responsive pass of 2026-08-04 is arithmetic end to end**, like items 36, 39 and 41 — verified in the compiled CSS (every new utility present, `max-w-110` resolving to 440px and `max-lg:text-lg` to a `width < 64rem` rule that wins over the package's `text-[26px]`) and in Vitest (31 tests across the page and its component, five of them new), but jsdom computes no layout. **Every number in the ramp descends from two rendered measurements §14 already carried**: "Reduce monitoring requirement" at 369px and "Hemophilia A" at 153px, both at 24px, which agree on ~0.53em a character. The binding case is `lg` — ~308px of label inside a 318px pill, i.e. **10px of margin**, against the ~4px export/render discrepancy §14 records — so it is the one step that would flip if the font rounded differently than measured, and 1024 is already the app's least-tested width (items 30, 36, 39, 41). The base step has more room (246 in 263 at 375) and 320 is _known_ to wrap and is built for it. The legend windows (368–506px at 20px) are scaled from a **drawn** 589/809 rather than from a render, so "440 reproduces the designer's break below `lg`" is the softest claim here; it costs a line break rather than an overflow if it is wrong. Nothing was opened in a browser, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | §14                   |
 | 43  | **`/wizard/scenario`'s responsive pass of 2026-08-04 is arithmetic end to end**, like items 36, 39, 41 and 42 — verified in the compiled CSS and in Vitest (33 tests, eight of them new across the four branches), but jsdom computes no layout. **This screen has never been opened in a browser at any width**, which makes it weaker than its four predecessors rather than equal to them: their `lg` reasoning was untested, this page's 1440 case is too. The box row is the firmest thing in it — 227 and 185 are read off the exports, and 3 × 227 + 2 × 32 = 745 in 752 is arithmetic on `AppShell`'s own tokens with 7px of slack against item 39's zero. **The soft claim is the type ramp's premise.** "Nothing overflows at either size" rests on character-count estimates at §14's ~0.53em rather than on a render, and the uppercase bold caption is the one string estimated at a width its font was never measured at (~0.62em); it fails as a wrap rather than as an overflow either way. The 619px stacked block below `lg` is a deliberate cost rather than an unverified number (§18), but how it reads on a phone is a judgement no test makes. Nothing was opened in a browser, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | §18                   |
 | 44  | **`/education/fviiia-mimetics`'s responsive pass of 2026-08-05 is arithmetic end to end**, like items 36, 39, 41, 42 and 43 — verified in the compiled CSS and in Vitest (51 tests, six of them new), but jsdom computes no layout. **It rests on firmer ground than its five predecessors and reaches a worse conclusion, which is the thing to check first if this chapter is ever opened in a browser.** The row's 1122px is a sum of four transcribed or package-owned numbers — the drawn 78px indent, the drawn 288px caption, `gap-4`, and `PopupButton`'s `size-16.25 shrink-0` read out of the package's `dist` — so it rests on no character-width estimate at all, and the claim that the drawn row never fitted below a 1394px viewport is as strong as anything in this file that was not rendered. What follows from it is not: **that this chapter has been overflowing its content column at every width from 1024 to ~1394 since it shipped**, by ~285px at 1024, and that no test, no review and no screenshot caught it. If a render disagrees, the first two suspects are `PopupButton`'s rendered box (the package sets `size-16.25`, but its ring and shadow are drawn outside it) and whether the caption's own shrink was absorbing the overflow quietly rather than pushing the panel past the column. The card table's 241px is the same kind of number one layer down — `96vw` and a fixed `xl:w-145` against `Popup`'s padding — and it depends on the §13 correction this pass made rather than on anything measured. The two invented values (the pairs centring below `xl`, and the 60px radius holding to 1024 on a now-full-width panel) are judgements no arithmetic settles. Nothing was opened in a browser, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | §11, §13              |
-| 45  | **`/wizard/therapies` responsive pass of 2026-08-05 is the first in the series that is NOT arithmetic** — items 36, 39, 41, 42, 43 and 44 all end "jsdom computes no layout", and this one was measured in Chromium across all sixteen leaves, both accordion states and seven widths (112 renders, §15). Nothing in it is predicted. What stays open is what the measurements turned up rather than what they failed to check. **First, 320 remains the worst measure in the app at 174px** — better than 375 was before the pass (191) but still ~21 characters a line of clinical prose, and the only lever left there is `mx-3` or `BulletList` `pl-6`, both of which this pass argues should not move. **Second, the agent captions render 20px bold against a 16px body at 375**, which is the visible cost of the deliberate non-step and is a designer question rather than a bug: no artboard exists below 1440 to say whether a fixed 160px box should keep its caption size when the prose around it shrinks. **Third, the five-agent row shrinks its items to 144px at 1280** — the only width at which they are not the drawn 160, previously unrecorded — which is `xl:flex-nowrap` meeting 1120px of content in a 1040px band. Nothing clips, because the absence of `min-w-0` floors each item at its own caption, but it is the drawn item giving way at exactly one width and the designer drew no five-agent leaf to check it against.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | §15, §2               |
+| 45  | **`/wizard/therapies` responsive pass of 2026-08-05 is the first in the series that is NOT arithmetic** — items 36, 39, 41, 42, 43 and 44 all end "jsdom computes no layout", and this one was measured in Chromium across all sixteen leaves, both accordion states and seven widths (112 renders, §15). Nothing in it is predicted. What stays open is what the measurements turned up rather than what they failed to check. **First, 320 remains the worst measure in the app at ~190px** — roughly where 375 sat before the pass, and still ~23 characters a line of clinical prose. The only lever left there is `mx-3` or `BulletList` `pl-6`, both of which this pass argues should not move. **Second, the agent captions render 20px bold against a 16px body at 375**, which is the visible cost of the deliberate non-step and is a designer question rather than a bug: no artboard exists below 1440 to say whether a fixed 160px box should keep its caption size when the prose around it shrinks. **Third, the five-agent row shrinks its items to 144px at 1280** — the only width at which they are not the drawn 160, previously unrecorded — which is `xl:flex-nowrap` meeting 1120px of content in a 1040px band. Nothing clips, because the absence of `min-w-0` floors each item at its own caption, but it is the drawn item giving way at exactly one width and the designer drew no five-agent leaf to check it against. **Fourth, and from the same day: the below-`sm` gutter narrowed 32 -> 24px within hours of this pass**, so §15's 320 and 375 rows are carried forward at +16px rather than re-rendered — the gutter change was checked visually rather than instrumented, at the user's call, and the derived figures wear a tilde there to say so. Everything from 640 up is untouched by it and stays measured. What is genuinely unknown is the header-band height at 320: it was 112px, four lines, with ~32px less to set in, so it very likely reads three now and nothing has confirmed it.                                                                                                                                                                                                                                                                                                                                  | §15, §2, §12          |
 
 ---
 
@@ -1287,21 +1287,27 @@ two inset values are still arithmetic.
 
 ### The arch bleeds out of the shell's padding, twice
 
-`ArchBand` also carries `-mx-8 sm:mx-0` and `-mb-4 lg:mb-0`. Both cancel padding
+`ArchBand` also carries `-mx-6 sm:mx-0` and `-mb-4 lg:mb-0`. Both cancel padding
 that `AppShell` applies to every page, and they do it for different reasons.
 
-**`-mx-8` is full bleed on a phone, and it is a look.** It cancels `<main>`'s
-`px-8` exactly — 32px each side, the invented comfort gutter §12 records as
+**`-mx-6` is full bleed on a phone, and it is a look.** It cancels `<main>`'s
+`px-6` exactly — 24px each side, the invented comfort gutter §12 records as
 belonging to nobody — so below `sm` the band runs edge to edge instead of sitting
-in a 311px column. It buys the arch room: at 375px the band goes 311 → 375, which
-is 64px more for the title and the disclosure captions, and the curve reads as
-part of the page rather than as a rounded box floating in it. `sm:mx-0` stops it
+in a 327px column. It buys the arch room: at 375px the band goes 327 → 375, which
+is 48px more for the title and the disclosure captions, and the curve reads as
+part of the page rather than as a rounded box floating in it.
+
+**The pair was 32px until 2026-08-05**, and the two numbers must move together —
+a bleed that does not cancel the gutter exactly leaves the band either inset or
+hanging over the viewport edge. `EmergingPanel`'s `-mr-6` is the third member
+(§11's `fviiia-mimetics`), for the same reason on one side only. `sm:mx-0` stops it
 there; from 640 up the gutter is wide enough that the inset looks deliberate.
 
-It is an aesthetic call, stated as one. It is also a **coupling**: the −32 is
-`px-8` written a second time, so re-pointing the shell's phone gutter silently
-leaves a strip of page down each side of the arch. `-mx-8` and `AppShell`'s
-`px-8` have to move together.
+It is an aesthetic call, stated as one. It is also a **coupling**: the −24 is
+`px-6` written a second time, so re-pointing the shell's phone gutter silently
+leaves a strip of page down each side of the arch. `-mx-6` and `AppShell`'s
+`px-6` have to move together — which is exactly what the 2026-08-05 change had
+to do, in three files rather than one.
 
 **`-mb-4` closes a real 15px gap, and the gap is a token being wrong.** The shell
 reserves `pb-bar` = `--spacing-bar` = **80px** below `lg` to clear the sidebar's
@@ -2294,7 +2300,7 @@ sums hid where the seams were.
 
 ### What is deliberately _not_ a token
 
-The 32px horizontal gutter below `sm`, the 48px at `sm`, and the 16px bottom
+The 24px horizontal gutter below `sm`, the 48px at `sm`, and the 16px bottom
 padding at `lg`. No design canvas exists below 1440 — those three were invented
 here for comfort, are specified by nobody, and have one consumer each. Naming
 them would claim an authority they do not have. This is §3's rule for off-scale
@@ -3568,13 +3574,19 @@ this one had a column that did not fit its text.
 | agent caption          |    20 |    — |    20 |
 | `ArchBand` title       |    24 |    — |    30 |
 
-#### Three insets stacking in a 311px column
+#### Three insets stacking in a phone column
 
 `mx-3` (12 a side), the panel's own padding, and `BulletList`'s `pl-6` are each
 defensible alone and come to 120px of chrome. Against the 311px column a 375px
-phone gives, that left the leaf's clinical copy **191px of measure — ~19
-characters a line, and 163 on the nested bullets**. The narrowest measure in the
-app, on the page whose whole content is prose a clinician is meant to read.
+phone gave at the time, that left the leaf's clinical copy **191px of measure —
+~19 characters a line, and 163 on the nested bullets**. The narrowest measure in
+the app, on the page whose whole content is prose a clinician is meant to read.
+
+**The gutter narrowed 32 → 24px hours after this pass** (§11, §12), so every
+below-`sm` figure in this subsection moved 16px with it. The defect this pass
+fixed would read 207px rather than 191 on today's shell; the shipped numbers are
+in the ladder below. Nothing at or above `sm` is affected, and no ramp decision
+hinges below it.
 
 The padding is the axis that gives, for the reason the geometry table above now
 records: it is the only number in the block with no export behind it. `mx-3` is
@@ -3586,21 +3598,28 @@ indent, so moving it for 4px here would land on every chapter.
 `px-4 sm:px-6 lg:px-9` is `Popup`'s own `px-4 sm:px-8 lg:px-16` shape (item 25),
 and `lg` restores the drawn 36 untouched. Measured, after:
 
-| Viewport | Section | Panel | Padding | Measure |
-| -------: | ------: | ----: | ------: | ------: |
-|      320 |     256 |   232 |      16 | **174** |
-|      375 |     311 |   287 |      16 |     229 |
-|      640 |     544 |   520 |      24 |     446 |
-|      768 |     672 |   648 |      24 |     574 |
-|     1024 |     816 |   792 |      36 |     694 |
-|     1280 |    1072 |  1048 |      36 |     950 |
-|     1440 |    1232 |  1208 |      36 |    1110 |
+| Viewport | Section | Panel | Padding |  Measure |
+| -------: | ------: | ----: | ------: | -------: |
+|      320 |     272 |   248 |      16 | **~190** |
+|      375 |     327 |   303 |      16 |     ~245 |
+|      640 |     544 |   520 |      24 |      446 |
+|      768 |     672 |   648 |      24 |      574 |
+|     1024 |     816 |   792 |      36 |      694 |
+|     1280 |    1072 |  1048 |      36 |      950 |
+|     1440 |    1232 |  1208 |      36 |     1110 |
+
+**The two `~` rows are derived, not measured.** Everything from 640 up came out
+of the browser (below); 320 and 375 were measured at 174 and 229 against the
+32px gutter and are carried forward at +16px each, since the gutter change moves
+the column and nothing else. They were not re-rendered — the change was checked
+visually rather than instrumented, which is why they wear a tilde where the rest
+of this file's numbers do not.
 
 The section is wider than `max-w-content` from `lg` up because this page carries
 `lg:-mr-16` — the accordion bleeds into the rail clearance along with the arch
 (item 23), which is why the 1024 row reads 816 rather than the 752 §12's ladder
-would predict. 320 stays the worst case at 174px and is recorded rather than
-chased: it is 40px better than 375 was before the pass, and §12 records no design
+would predict. 320 stays the worst case at ~190px and is recorded rather than
+chased: it is roughly where 375 sat before the pass, and §12 records no design
 canvas down there to be wrong against.
 
 #### The body is §2's fifth exception page, and the first to land on the floor
@@ -3763,6 +3782,13 @@ beside it).
 Chromium rather than computed.** That makes this the first pass in the series of
 six that is not arithmetic (items 36, 39, 41, 42, 43, 44), and the numbers in the
 tables above are what came back rather than what was predicted.
+
+**Caveat on the two narrowest widths.** The pass ran against the 32px below-`sm`
+gutter, which became 24px the same day. The 640-and-up figures are unaffected;
+the 320 and 375 ones are a floor rather than the current value, since the column
+grew 16px under them. The header-band heights below are where that shows most —
+the 112px four-line band at 320 has ~32px more to set in and very likely reads
+three lines now. Not re-rendered; item 45.
 
 - **No horizontal document overflow in any of the 112.** `scrollWidth` equals
   `innerWidth` at 320, 375, 640, 768, 1024, 1280 and 1440 on every leaf in both

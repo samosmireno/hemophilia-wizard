@@ -18,7 +18,7 @@ import AppSidebar from "./AppSidebar";
  * 1440-wide canvas and every page inherits that here; the right side adds
  * `--spacing-rail` on top, which is what stops the content column clear of the
  * rail. Both are `lg:` only — 112px of a 375px phone would leave 151px of text,
- * so below that the gutter is an invented comfort value (32px, 48px at `sm`)
+ * so below that the gutter is an invented comfort value (24px, 48px at `sm`)
  * and stays a plain utility, because no design canvas exists down there to
  * transcribe.
  *
