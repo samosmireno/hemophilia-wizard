@@ -135,9 +135,9 @@ describe("treatment-landscape chapter", () => {
 
     expect(container.querySelector("section > div.grid")).toHaveClass(
       "gap-y-10",
-      "sm:grid-cols-[200px_1fr]",
+      "sm:grid-cols-[12.5rem_1fr]",
       "sm:gap-x-6",
-      "xl:grid-cols-[1fr_200px_300px]",
+      "xl:grid-cols-[1fr_12.5rem_18.75rem]",
       "xl:items-center",
       "xl:gap-y-5",
     );

@@ -45,7 +45,7 @@ import { isComplete, useWizardAnswers } from "../../state/wizardAnswers";
  * ramp that resolves that is on the row below, not on the box, which keeps its
  * drawn size at every width.
  */
-const BOX = "h-[185px] w-full max-w-[227px] shrink-0 border-4 border-black lg:shrink";
+const BOX = "h-46.25 w-full max-w-56.75 shrink-0 border-4 border-black lg:shrink";
 
 export default function Scenario() {
   const { answers } = useWizardAnswers();

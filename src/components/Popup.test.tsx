@@ -147,9 +147,9 @@ describe("Popup", () => {
     const card = () => dialog().firstElementChild!;
 
     it.each([
-      ["narrow", "w-[min(860px,92vw)]"],
-      ["default", "w-[min(1140px,92vw)]"],
-      ["wide", "w-[min(1360px,96vw)]"],
+      ["narrow", "w-[min(53.75rem,92vw)]"],
+      ["default", "w-[min(71.25rem,92vw)]"],
+      ["wide", "w-[min(85rem,96vw)]"],
     ] as const)("draws the %s card", (width, expected) => {
       render(
         <Popup open title={TITLE} width={width} onClose={vi.fn()}>
@@ -175,7 +175,7 @@ describe("Popup", () => {
         </Popup>,
       );
 
-      expect(card()).toHaveClass("w-[min(1140px,92vw)]");
+      expect(card()).toHaveClass("w-[min(71.25rem,92vw)]");
     });
 
     /**

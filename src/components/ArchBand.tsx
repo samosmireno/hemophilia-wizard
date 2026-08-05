@@ -103,7 +103,7 @@ export default function ArchBand({
   return (
     <div
       className={cn(
-        "relative isolate -mx-6 mt-4 -mb-4 grow overflow-hidden rounded-t-[150px] border-t-4 border-white/40 bg-brand-crimson-50/15 pb-4 sm:mx-0 lg:mb-0 lg:pb-0 xl:rounded-t-[300px]",
+        "relative isolate -mx-6 mt-4 -mb-4 grow overflow-hidden rounded-t-[9.375rem] border-t-4 border-white/40 bg-brand-crimson-50/15 pb-4 sm:mx-0 lg:mb-0 lg:pb-0 xl:rounded-t-[18.75rem]",
         className,
       )}
     >

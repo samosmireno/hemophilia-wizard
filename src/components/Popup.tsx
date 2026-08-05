@@ -60,10 +60,16 @@ export type PopupWidth = "narrow" | "default" | "wide";
  * would never actually reach the width it is named for. The two cross at
  * 1416.7px, so below that the percentage governs, as it does for the other two.
  */
+/* The drawn widths are `rem` so the card scales with the board above 1440
+   (docs/styling.md §19) — as px they held 1140 while the type inside them grew,
+   which rewrapped the body and made the card taller instead of wider. The `vw`
+   guard stays viewport-relative on purpose: it is the small-screen clamp, and it
+   must not move when the root does. Identical to the pixel at every width at or
+   below the canvas. */
 const CARD_WIDTH: Record<PopupWidth, string> = {
-  narrow: "w-[min(860px,92vw)]",
-  default: "w-[min(1140px,92vw)]",
-  wide: "w-[min(1360px,96vw)]",
+  narrow: "w-[min(53.75rem,92vw)]",
+  default: "w-[min(71.25rem,92vw)]",
+  wide: "w-[min(85rem,96vw)]",
 };
 
 /**
@@ -158,7 +164,7 @@ export default function Popup({
           the floor was overriding it. */}
       <div
         className={cn(
-          "flex max-h-[95dvh] flex-col overflow-hidden rounded-[40px] border-5 border-brand-crimson-50 shadow-popup",
+          "flex max-h-[95dvh] flex-col overflow-hidden rounded-[2.5rem] border-[0.3125rem] border-brand-crimson-50 shadow-popup",
           CARD_WIDTH[width],
           surface === "white" ? "bg-white" : "bg-popup",
         )}

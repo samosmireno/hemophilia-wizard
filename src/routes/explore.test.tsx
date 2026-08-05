@@ -132,7 +132,7 @@ describe("explore — the responsive pass", () => {
    */
   it("stacks the segments as cards, and grows only at xl", () => {
     const page = renderExplore();
-    const segments = [...page.querySelectorAll<HTMLElement>(".rounded-\\[128px\\]")];
+    const segments = [...page.querySelectorAll<HTMLElement>(".rounded-\\[8rem\\]")];
     const row = segments[0].parentElement!;
 
     expect(segments).toHaveLength(EXPLORE_SEGMENTS.length);
@@ -161,7 +161,7 @@ describe("explore — the responsive pass", () => {
     const page = renderExplore();
     // The right-hand segment is the only one drawn with two columns.
     const twoColumn = EXPLORE_SEGMENTS.findIndex((s) => s.columns.length > 1);
-    const segment = page.querySelectorAll<HTMLElement>(".rounded-\\[128px\\]")[twoColumn];
+    const segment = page.querySelectorAll<HTMLElement>(".rounded-\\[8rem\\]")[twoColumn];
     const row = segment.firstElementChild!;
 
     expect(row).toHaveClass("flex-col", "sm:flex-row");
@@ -214,7 +214,7 @@ describe("explore — the comparison table", () => {
 
     await user.click(within(page).getByRole("button", { name: EXPLORE_TABLE_TITLE }));
 
-    expect(screen.getByRole("dialog").firstElementChild).toHaveClass("w-[min(1360px,96vw)]");
+    expect(screen.getByRole("dialog").firstElementChild).toHaveClass("w-[min(85rem,96vw)]");
   });
 
   it("closes from the ✕", async () => {

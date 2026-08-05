@@ -205,7 +205,10 @@ export default function TreatmentLandscape() {
         §11's eight — those are 1440 gaps deliberately left unramped pending one
         one-screen rule, and this one does not exist at 1440.
       */}
-      <div className="mt-8 grid gap-y-10 sm:grid-cols-[200px_1fr] sm:gap-x-6 xl:grid-cols-[1fr_200px_300px] xl:items-center xl:gap-y-5">
+      {/* 12.5rem / 18.75rem === the drawn 200px / 300px at a 16px root, so the
+          canvas is unchanged; as px these tracks held still while the `1fr` grew
+          above 1440 and the three-column ratio drifted (docs/styling.md §19). */}
+      <div className="mt-8 grid gap-y-10 sm:grid-cols-[12.5rem_1fr] sm:gap-x-6 xl:grid-cols-[1fr_12.5rem_18.75rem] xl:items-center xl:gap-y-5">
         {ROWS.map((row, index) => (
           <Fragment key={row.heading}>
             {/*

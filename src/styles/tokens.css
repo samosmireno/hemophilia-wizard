@@ -448,3 +448,48 @@
     --color-ui-navbar-ring: var(--color-ui-white);
   }
 }
+
+/* Above the canvas the board SCALES, it does not reflow (docs/styling.md §19).
+
+   Everything the shell is built from is already rem — Tailwind's spacing and type
+   scales, and all five §12 tokens — so stepping the root size moves the whole 1440
+   drawing in proportion and every transcribed ratio survives. It is a step, not a
+   `clamp()`: `ce9e4fb` removed all 13 of those and that decision still holds.
+
+   `%` rather than `px` so a user's own browser font-size stays multiplied in
+   rather than overridden.
+
+   These four numbers are INVENTED — no artboard exists above 1440 — so they are
+   plain values here rather than tokens, which is §12's rule for the below-`sm`
+   gutters pointed the other way: transcribe what the designer gave you, and leave
+   what you made up looking like what it is.
+
+   The rem breakpoints elsewhere in the app are NOT dragged along: inside a media
+   query `rem` resolves against the initial font size (16px), not the root's, so
+   `64rem` above and every `sm:`/`lg:`/`xl:` utility stay where they are. The
+   Sidebar's JS matchMedia is unaffected too — it builds `(min-width: ${px}px)`
+   from a hardcoded 1024.
+
+   WIDTH AND HEIGHT, because a width-only step can take a page that fits and make
+   it scroll purely because the screen got wider — a 2560×1080 ultrawide being the
+   case that proved it. Each threshold is the tallest route at that step, rounded
+   up to the next 100: measured 2026-08-05 in Chromium at 1440×800, the tallest is
+   `/education/disease-background` at 788px, so 887 → 900 and 985 → 1000. Note
+   that §11's long-standing "818px" for that page was stale — the 2026-08-04 pass
+   that moved its split to `xl` took 30px out and nobody re-measured.
+
+   Re-measure when issues 12/13 land. `/resources`, `/references`, `/glossary`,
+   `/acronyms` and `/survey` are 94px placeholders today; the bibliography in
+   particular will exceed one screen at every step, and pages that scroll anyway
+   are not what this gate protects. */
+@media (min-width: 1800px) and (min-height: 900px) {
+  :root {
+    font-size: 112.5%; /* 18px — board 1620 × 900 */
+  }
+}
+
+@media (min-width: 2160px) and (min-height: 1000px) {
+  :root {
+    font-size: 125%; /* 20px — board 1800 × 1000 */
+  }
+}

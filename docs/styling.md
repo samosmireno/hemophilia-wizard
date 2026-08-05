@@ -1021,7 +1021,7 @@ Everything above is arithmetic — see open item 41.
 | 7   | The inner gradient's second stop is off-scale (`rgba(114.61, 213.07, 191.53)`, dE .042 from `teal-25`) while the other three stops are exact palette. Probably meant to be `teal-25`; kept literal pending a designer answer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | §6                    |
 | 8   | The landing footage does not loop — it is a continuous dolly-in, 46.5/255 apart end to end. Ping-ponging it is a workaround; **ask the designer for an 8–12 s clip that loops cleanly**. That would halve the asset and remove the direction reversal.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | §7, ADR 0002          |
 | 9   | The references do not agree with the §2 scale **or with each other**: `disease-background` measures ~32px sub-headings, ~18px body and ~22px captions against the scale's 26/16/20, while `rebalancing-agents` measures ~24px body and ~25px captions. **The three chapters answered it differently until 2026-08-04**, when the §2 migration put all of them on `text-2xl` and removed the divergence — but only by making every reading round to the same step, not by resolving which reading is right. Still needs the designer's sizes.                                                                                                                                                                                                                                                                                                                                                                    | §11                   |
-| 10  | The chapter is specified to fit one screen and currently does not (818px at 1440×800). Wants one rule across all four chapters rather than per-page constants.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | §11                   |
+| 10  | The chapter is specified to fit one screen and currently does not (818px at 1440×800). Wants one rule across all four chapters rather than per-page constants. **The 818 is stale: re-measured 788px on 2026-08-05 (§11, §19), so it now fits 1440 × 800 — as item 32 recorded independently. It remains the tallest route, and §19's height gate is derived from it.**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | §11                   |
 | 11  | Four of the eight vertical gaps are ink-to-ink measurements off the reference PNG rather than the designer's box gaps, so they render slightly loose.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | §11                   |
 | 12  | The pop-up export has **no scrim** — nothing dims the page behind a dialog that traps focus. The shipped `rgb(0 0 0 / .5)` is inferred, like §4.3's tooltip and §4.5's sidebar. The card's own 55%-black shadow was drawn against Figma's dark canvas and does much less work over the light `bg-page`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | §13                   |
 | 13  | ~~The pop-up title is 45.47px, off the §2 scale, and ships as a raw value under §8's precedent.~~ **Closed 2026-08-04** — but not the way it was written. 45.47px is the _drawn_ size; what shipped was a clamp capped at 36px, and had been since day one. The code now matches the drawing, so the raw value is genuinely on screen and the question this row asked (is an off-scale title acceptable?) is answered by §8's precedent as it always was. Kept as a row so the numbering below it does not shift.                                                                                                                                                                                                                                                                                                                                                                                               | §13                   |
@@ -1064,6 +1064,9 @@ that item's five cases. | §13, §17, ADR 0007 |
 | 44 | **`/education/fviiia-mimetics`'s responsive pass of 2026-08-05 is arithmetic end to end**, like items 36, 39, 41, 42 and 43 — verified in the compiled CSS and in Vitest (51 tests, six of them new), but jsdom computes no layout. **It rests on firmer ground than its five predecessors and reaches a worse conclusion, which is the thing to check first if this chapter is ever opened in a browser.** The row's 1122px is a sum of four transcribed or package-owned numbers — the drawn 78px indent, the drawn 288px caption, `gap-4`, and `PopupButton`'s `size-16.25 shrink-0` read out of the package's `dist` — so it rests on no character-width estimate at all, and the claim that the drawn row never fitted below a 1394px viewport is as strong as anything in this file that was not rendered. What follows from it is not: **that this chapter has been overflowing its content column at every width from 1024 to ~1394 since it shipped**, by ~285px at 1024, and that no test, no review and no screenshot caught it. If a render disagrees, the first two suspects are `PopupButton`'s rendered box (the package sets `size-16.25`, but its ring and shadow are drawn outside it) and whether the caption's own shrink was absorbing the overflow quietly rather than pushing the panel past the column. The card table's 241px is the same kind of number one layer down — `96vw` and a fixed `xl:w-145` against `Popup`'s padding — and it depends on the §13 correction this pass made rather than on anything measured. The two invented values (the pairs centring below `xl`, and the 60px radius holding to 1024 on a now-full-width panel) are judgements no arithmetic settles. Nothing was opened in a browser, at the user's standing instruction. | §11, §13 |
 | 45 | **`/wizard/therapies` responsive pass of 2026-08-05 is the first in the series that is NOT arithmetic** — items 36, 39, 41, 42, 43 and 44 all end "jsdom computes no layout", and this one was measured in Chromium across all sixteen leaves, both accordion states and seven widths (112 renders, §15). Nothing in it is predicted. What stays open is what the measurements turned up rather than what they failed to check. **First, 320 remains the worst measure in the app at ~190px** — roughly where 375 sat before the pass, and still ~23 characters a line of clinical prose. The only lever left there is `mx-3` or `BulletList` `pl-6`, both of which this pass argues should not move. **Second, the agent captions render 20px bold against a 16px body at 375**, which is the visible cost of the deliberate non-step and is a designer question rather than a bug: no artboard exists below 1440 to say whether a fixed 160px box should keep its caption size when the prose around it shrinks. **Third, the five-agent row shrinks its items to 144px at 1280** — the only width at which they are not the drawn 160, previously unrecorded — which is `xl:flex-nowrap` meeting 1120px of content in a 1040px band. Nothing clips, because the absence of `min-w-0` floors each item at its own caption, but it is the drawn item giving way at exactly one width and the designer drew no five-agent leaf to check it against. **Fourth, and from the same day: the below-`sm` gutter narrowed 32 -> 24px within hours of this pass**, so §15's 320 and 375 rows are carried forward at +16px rather than re-rendered — the gutter change was checked visually rather than instrumented, at the user's call, and the derived figures wear a tilde there to say so. Everything from 640 up is untouched by it and stays measured. What is genuinely unknown is the header-band height at 320: it was 112px, four lines, with ~32px less to set in, so it very likely reads three now and nothing has confirmed it. | §15, §2, §12 |
 | 46 | **`/explore`'s responsive pass of 2026-08-05 is the second measured one** (§17), so what stays open is what the render turned up rather than what it failed to check. **First, the fills now carry a reading nobody drew**: `bg-white/60` on the middle segment against `crimson-50/5` on the flanks makes the row read as a range with a peak side by side, and stacked as three separate cards it reads as one card being _different_ — selected, or current. Both values are drawn and one is solved exactly, so the pass kept them rather than invent a below-`xl` fill, but it is a designer question and it is new. **Second, the class labels equal the `<h1>` at 320 and 375** (both 24px), the deliberate consequence of ramping a heading three steps past a fixed box that does not step — the same shape as item 45's 20px-caption-over-16px-body, and answerable only by a designer who draws a phone. **Third, the arc clearance at 320 is 9.4px** on the middle segment's label: positive, but it is what a longer class label would spend, and `EXPLORE_SEGMENTS` is authored content that could gain one. **Fourth, the `<h1>` renders ten lines at 320 where the arithmetic predicted eight** — narrow-column line-breaking wastes ~20% of the column on short trailing words, which no estimate in this file models. Every other predicted figure in the pass landed, including the CTA wrapping at 375 by 1px. | §17, §2, §9 |
+| 47 | **Figure assets are budgeted for 1.00×, and §19 now draws some of them at 1.25×.** §13's rule is that a figure is stored at 2× its drawn width _and no wider_; `clotting-cascade-thumb.webp` is exactly 940px for a 470px figure. On a DPR-2 panel at the 1.25× step that figure is drawn at 587 CSS px and wants 1175 device px, so it renders at ~80% of ideal density. It is **one file**, not a class of problem — `denecimig` is 3852px, `inno8` 5224px, `hemostatic_mechanisms` 1772px, all far past what any step asks for. Re-export the thumb at 3× if a 5K screen shows it soft; do not re-export the set. | §13, §19 |
+| 48 | **`--shadow-popup` is not scaled, and it is the one shadow big enough for that to read.** Its 50.142px blur stays 50px on a card that is 1.25× larger, i.e. ~20% tight against the drawing. Left alone deliberately (§19): converting it means editing a value §13 documents as straight-from-export, and it is a one-line change if a 2560 render indicts it. Not yet examined at that size. | §13, §19 |
+| 49 | **§19 scaled the pop-up's 5px border but not the app's other visible borders.** `ArchBand`'s `border-t-4` and `Scenario`'s `border-4` are drawn edges of the same class as `Popup`'s, and they stay 4px while the objects they outline grow. They were not in the change because they are Tailwind scale utilities rather than arbitrary values, so the grep that built the conversion list never saw them — an inconsistency found during implementation, not a decision. Two-value fix if wanted; the alternative reading is that only `Popup`'s border is large enough to matter. | §19 |
 
 ---
 
@@ -1396,6 +1399,13 @@ the incompressible constant it needs is a per-page magic number — and the one
 derived from the artboard was wrong by 104px, because ink measurements do not
 include line-box leading. This wants **one rule for every chapter**, written once
 the other three exist, not eight numbers per page. Deferred deliberately.
+
+**The 818px above is stale, and the item is closer to closed than it reads.**
+Re-measured in Chromium on 2026-08-05 with `main`'s `min-h-dvh` neutralised, the
+page is **788px** — the 2026-08-04 pass that moved its split to `xl` took 30px out
+and nobody came back to this paragraph. At 1440 × 800 it fits, which open item 32
+already recorded from the other direction. It is still the tallest route in the
+app, which is why §19's height gate is derived from it.
 
 ### Open: the type is smaller than the reference
 
@@ -2348,6 +2358,14 @@ it. Fixed gutters give the content column no upper bound, so on a 2560px monitor
 a chapter's prose column would be ~1790px wide; the cap is the column's width at
 the design canvas, so nothing moves at or below 1440 and the column centres
 above it.
+
+**Every number in this table is still a 1440 number, but above 1440 they are no
+longer the rendered ones.** §19 steps the root font size at 1800 and 2160, and
+because all five tokens are rem the whole table scales with it — the gutter runs
+112 → 126 → 140 and `--container-content` 1168 → 1314 → 1460. The cap above still
+does exactly what this section says it does; it is simply expressed in a rem that
+is 18 or 20px rather than 16 up there. The measure in characters does not change,
+which is why scaling was chosen over raising the cap.
 
 The wrapper is `flex w-full flex-1 flex-col`, which is load-bearing: §8's
 vertical centring has `Landing` claim leftover height with `flex-1`, and that
@@ -4363,3 +4381,217 @@ and moves with it, not with this page.
 Nothing on this screen has been opened at any width, before this pass or in it — the
 `<h1>` was covered by the §2 migration's 1440/375 sweep (open item 30) and nothing else
 here was. Open item 43.
+
+---
+
+## 19. Above the canvas — the board scales, it does not reflow
+
+Every artboard in this document is **1440 × 800**. Below it, ten routes were made
+responsive one at a time (§11, §14, §17, §18) because a phone needs a different
+layout. Above it, nothing had ever been decided: `max-w-content` capped the column
+at 1168px and centred it, so a 2560px monitor showed the same island with 672/720px
+of air either side. The top breakpoint in the whole app was `xl`; there was no
+`2xl:` anywhere.
+
+The rule added on 2026-08-05 is that above 1440 the drawing **scales**. Two media
+queries at the foot of `tokens.css` step the root font size:
+
+| Viewport                      | root   | factor | board       |
+| ----------------------------- | ------ | -----: | ----------- |
+| 1441–1799 (any height)        | 16px   |  1.00× | 1440 × 800  |
+| ≥1800 wide **and** ≥900 tall  | 112.5% | 1.125× | 1620 × 900  |
+| ≥2160 wide **and** ≥1000 tall | 125%   |  1.25× | 1800 × 1000 |
+
+### Why scaling rather than widening
+
+The alternative was to raise `--container-content` at a `2xl` step and let the
+column grow. Three things ruled it out.
+
+The measure is the first. 1168px is already at the top of a comfortable line
+length; widening it makes the prose worse, not better. **Scaling does not touch
+the measure** — the column grows to 1460px at 1.25× but the type grows with it, so
+the line length in _characters_ is exactly what the artboard drew. That is a
+property no reflow option can offer.
+
+The second is the transcription. Every fixed track in this document — §11's 470px
+figure, `treatment-landscape`'s three columns, §13's three-width pop-up scale,
+§17's arch band — was measured off a 1440 canvas. Widening reopens all of them,
+one route at a time, with no artboard to appeal to. Scaling reopens none: every
+ratio in the drawing survives because every number moves together.
+
+The third is that there is nothing to transcribe. No canvas exists above 1440, so
+this is invented, and §12's rule for invented values applies pointed upward —
+which is why the four numbers in the table above are plain values in a media query
+rather than tokens. Naming them would claim an authority they do not have.
+
+### Why the cap is 1.25× and not "fill the screen"
+
+Filling 2560 means 1.78×, and that is the wrong size for the hardware. A 14"
+laptop is ~127 CSS ppi; a 27" QHD is ~109 and a 32" is ~92. A big monitor already
+has **physically larger pixels** than the canvas was drawn against — 16px body
+text is 0.126″ on the laptop and 0.147″ on the 27" before any scaling at all.
+
+Correcting for viewing distance (~50cm laptop, ~65cm monitor), against the laptop
+as the reference:
+
+| factor | physical on a 27" | angular vs. reference |
+| -----: | ----------------: | --------------------: |
+|  1.00× |            0.147″ |                 0.87× |
+|  1.25× |            0.184″ |                 1.09× |
+|  1.50× |            0.220″ |                 1.31× |
+|  1.78× |            0.262″ |                 1.55× |
+
+1.25× lands closest to parity. 1.78× is presentation sizing, and this is
+self-paced CME — a solo reading activity at a desk.
+
+**Presentation is not handled here, deliberately.** ⌘+ is full page zoom, it
+scales a rem design perfectly (including the borders and shadows this rule leaves
+alone), and it is the presenter's call rather than something guessed from a
+viewport width. Adding a "presentation" step would also have been keyed to the
+wrong number: 2560 CSS px is where Apple's 5K desk displays live (DPR 2) and where
+27–32" QHD panels live (DPR 1), while actual projectors and meeting-room screens
+are 1080p and report **1920**. A jump at 2560 would hit the iMac and miss the
+projector.
+
+### Why 1441–1799 is a deliberate dead band
+
+That range is 1512 and 1728 — the default logical widths of 14" and 16" MacBook
+Pros, at ~127 CSS ppi, which is the density the design was drawn at. They are the
+reference, not a screen with room to spare. The most a page loses there is 144px
+of air a side, which is the same character as the 1440 canvas itself.
+
+### The steps are gated on height as well as width
+
+A width-only step can take a page that fits and make it scroll **because the
+screen got wider**. A 2560 × 1080 ultrawide is the case that proves it: it clears
+2160 on width, and at 1.25× the tallest chapter would need 985px against a ~975px
+viewport. With the height gate it takes the 1.125× step instead and still fits.
+
+Each threshold is the tallest route at that step, rounded up to the next 100.
+Measured in Chromium at 1440 × 800 on 2026-08-05, with `main`'s `min-h-dvh`
+neutralised so the floor did not mask the natural height:
+
+| route                             | 1.00× | 1.125× | 1.25× |
+| --------------------------------- | ----: | -----: | ----: |
+| `/education/disease-background`   |   788 |    887 |   985 |
+| `/education/treatment-landscape`  |   729 |    821 |   912 |
+| `/education/rebalancing-agents`   |   727 |    818 |   909 |
+| `/wizard`                         |   724 |    815 |   905 |
+| `/explore`                        |   723 |    814 |   904 |
+| `/education/fviiia-mimetics`      |   705 |    794 |   882 |
+| `/`                               |   413 |    465 |   517 |
+| `/wizard-intro`                   |   361 |    407 |   452 |
+| `/education/prophylaxis-guidance` |   282 |    318 |   353 |
+
+887 → **900** and 985 → **1000**. Those multiples are exact rather than estimated:
+the board scales proportionally, so line counts are preserved and height scales
+with the factor.
+
+Two notes on that table. **§11's long-standing "818px" for `disease-background` was
+stale** — the 2026-08-04 pass that moved its split to `xl` took 30px out and nobody
+re-measured; it is 788. And the five placeholder routes (`/resources`,
+`/references`, `/glossary`, `/acronyms`, `/survey`) are 94px of bare padding today,
+so they are not in the table. **Re-measure when issues 12/13 land** — the ~40-citation
+bibliography in particular will exceed one screen at every factor, and a page that
+scrolls anyway is not what this gate protects.
+
+Rounding to 900 rather than a tidier 950 matters: a 1920 × 1080 desktop with a
+bookmarks bar has a ~920px viewport, and 950 would have locked the single most
+common desktop configuration out of scaling despite it having 33px to spare.
+
+### What the breakpoints do NOT do
+
+They do not move. Inside a media query `rem` resolves against the **initial** font
+size (16px), not the root element's, so stepping the root leaves `64rem` in §5 and
+every `sm:`/`lg:`/`xl:` utility exactly where they were. The Sidebar's JS
+`matchMedia` is safe for a different reason — it builds `(min-width: ${px}px)` from
+a hardcoded 1024 and never reads a font size. The desync §5 warns about does not
+get worse.
+
+`%` rather than `px` on the root so a user's own browser font-size preference stays
+multiplied in rather than being overridden.
+
+### The px that had to move, and why a grep did not find them
+
+Three sets of fixed pixels defeated the whole premise, and **only the browser
+caught them** — every one is a compound arbitrary value, so a grep for
+`something-[123px]` walks straight past it:
+
+| Where                       | Was                                                | Now                                 |
+| --------------------------- | -------------------------------------------------- | ----------------------------------- |
+| `Popup` (§13, three widths) | `w-[min(860px,92vw)]` / `1140px` / `1360px`        | `53.75rem` / `71.25rem` / `85rem`   |
+| `DiseaseBackground` (§11)   | `xl:grid-cols-[1fr_470px]`                         | `xl:grid-cols-[1fr_29.375rem]`      |
+| `TreatmentLandscape` (§11)  | `sm:grid-cols-[200px_1fr]`, `xl:[1fr_200px_300px]` | `12.5rem`, `[1fr_12.5rem_18.75rem]` |
+
+The pop-up was the one that showed itself. Measured at 2560 × 1330 before the fix,
+the card stayed **1140px wide while its type grew 1.25×** — the body rewrapped
+inside a card that had not grown with it, and because §13 caps the card at
+`max-h-[95dvh]` with an internal scroll region, the symptom was a cramped, scrolling
+body rather than an obviously broken card. The fixed grid tracks are the same fault
+in a quieter form: the `1fr` prose column grew, the 470px figure did not, and §11's
+drawn composition drifted at every step.
+
+After the fix, verified at 2560 × 1330 against the canvas — every ratio holds:
+
+| thing                        |      canvas | 2560 (1.25×) |
+| ---------------------------- | ----------: | -----------: |
+| `Popup` default card         |      1140px |       1425px |
+| `Popup` radius / border      |      40 / 5 |       50 / 6 |
+| `disease-background` tracks  |     666/470 |  832.5/587.5 |
+| `treatment-landscape` tracks | 620/200/300 |  775/250/375 |
+
+The `vw` half of each pop-up width stays viewport-relative on purpose: it is the
+small-screen clamp, it must not move when the root does, and below the canvas it is
+what bites anyway.
+
+### What scales, and what deliberately does not
+
+Everything the shell is built from was already rem — Tailwind's spacing and type
+scales, and all five §12 tokens — so the geometry table moves in proportion for
+free. Verified in Chromium: the column runs 1168 → 1314 → 1460 and `main`'s
+padding 112/160 → 126/180 → 140/200, which is exactly ×1.125 and ×1.25.
+
+**Radii and the pop-up's border were converted to rem** (2026-08-05), because a
+radius is _shape_: holding a fixed 40px corner while the card grows 1.25× changes
+the drawing rather than merely softening it, and §17 records the arch radius as
+"verified, not asserted". Eight values on five lines — `Popup`'s `rounded-[2.5rem]`
+and `border-[0.3125rem]`, `ArchBand`'s `9.375rem`/`18.75rem`, `Explore`'s `8rem`,
+`FviiiaMimetics`' `3.75rem`/`7.3125rem`, and `Scenario`'s box moved onto the spacing
+scale as `h-46.25 max-w-56.75`. Every one is the same number of pixels at a 16px
+root, which is why the canvas did not move.
+
+**Shadows, hairlines and focus rings stay px, on purpose.** A root font-size step is
+text-and-spacing zoom, not page zoom; leaving those fixed is the definition of that
+mode rather than an oversight. It also keeps this rule clear of §13's and §15's
+reverse-engineered shadow geometry — §15 argues at length that its `1px 2px 4px`
+is one scale factor read off an export, and re-expressing that as `0.0625rem` would
+make the provenance prose worse. Tailwind inlines `--shadow-*` at build time (§1),
+which is the layer where mistakes are silent; it is the last place to make a
+speculative edit.
+
+### Verified in a browser
+
+Chromium, 2026-08-05, ten viewport sizes against `/education/disease-background`.
+Every root size landed as designed and nothing scrolled at any of them:
+
+| viewport    | root | column | padding | what it is                    |
+| ----------- | ---: | -----: | ------- | ----------------------------- |
+| 1440 × 800  | 16px |   1168 | 112/160 | the canvas                    |
+| 1512 × 850  | 16px |   1168 | 112/160 | 16" MBP, inside the dead band |
+| 1799 × 1000 | 16px |   1168 | 112/160 | one px under step 1           |
+| 1800 × 900  | 18px |   1314 | 126/180 | step 1 exactly                |
+| 1920 × 975  | 18px |   1314 | 126/180 | 1920 × 1080 desktop           |
+| 1920 × 920  | 18px |   1314 | 126/180 | …with a bookmarks bar         |
+| 2160 × 1000 | 20px |   1460 | 140/200 | step 2 exactly                |
+| 2560 × 1330 | 20px |   1460 | 140/200 | 2560 × 1440 QHD / 5K          |
+| 2560 × 975  | 18px |   1314 | 126/180 | ultrawide — the height gate   |
+| 2560 × 860  | 16px |   1168 | 112/160 | very wide, very short         |
+
+**1440 is pixel-identical, and that was proved rather than asserted.** All nine
+built routes were screenshotted at 1440 × 800 with the change applied, then again
+with it `git stash`ed, and every pair is **byte-identical**. A control at 1920 × 975
+confirms the method is not vacuous: stashed reports `root=16px` there, applied
+reports `18px`, so HMR does pick the stash up and the identity at the canvas is a
+real result.
+
+Open items 47–49 record what this pass did not settle.

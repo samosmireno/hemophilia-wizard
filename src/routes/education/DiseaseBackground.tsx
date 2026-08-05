@@ -132,7 +132,10 @@ export default function DiseaseBackground() {
         is the better composition. 1280 ≤ the 1440 canvas, so **1440 is
         unaffected**.
       */}
-      <div className="mt-5 grid xl:grid-cols-[1fr_470px] xl:gap-x-8">
+      {/* 29.375rem === the drawn 470px at a 16px root, so the canvas is
+          unchanged; as px the figure track held still while the prose track grew
+          above 1440 and the composition drifted (docs/styling.md §19). */}
+      <div className="mt-5 grid xl:grid-cols-[1fr_29.375rem] xl:gap-x-8">
         <div className="xl:mt-3">
           {/* `text-3xl` from `lg` only — §2's `<h1>` rule applied one level
               down. A sub-heading does not overflow the way a display `<h1>`

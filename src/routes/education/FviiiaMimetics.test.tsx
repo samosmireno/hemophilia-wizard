@@ -880,7 +880,7 @@ describe("fviiia-mimetics — the responsive pass", () => {
    */
   it("keeps the panel's radius on its own breakpoint", () => {
     render(<FviiiaMimetics />);
-    expect(bottomHalf().panel).toHaveClass("rounded-tl-[60px]", "lg:rounded-tl-[117px]");
+    expect(bottomHalf().panel).toHaveClass("rounded-tl-[3.75rem]", "lg:rounded-tl-[7.3125rem]");
   });
 
   /**

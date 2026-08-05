@@ -166,7 +166,7 @@ describe("wizard scenario — the illustration boxes", () => {
       const boxes = [...region.querySelectorAll("div.border-4")];
 
       for (const box of boxes) {
-        expect(box).toHaveClass("h-[185px]", "max-w-[227px]", "shrink-0", "lg:shrink");
+        expect(box).toHaveClass("h-46.25", "max-w-56.75", "shrink-0", "lg:shrink");
       }
 
       const row = boxes[0].parentElement!;

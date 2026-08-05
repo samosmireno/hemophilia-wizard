@@ -338,7 +338,7 @@ function Segment({
           so both ends read as near-semicircles and the card is a lozenge; that
           is what mirroring an arch this size onto a phone column looks like.
         */
-        "rounded-[128px] xl:rounded-b-none",
+        "rounded-[8rem] xl:rounded-b-none",
         // The other half of the grow factor above. `basis-auto` is the initial
         // value and is written out because it is load-bearing here rather than
         // inherited by accident.
