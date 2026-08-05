@@ -261,7 +261,7 @@ export default function TreatmentLandscape() {
             {/* `border-[0.25rem]` not `border-4`: the numeric utility is px and
                 would pin the outline while the box scales (§19). Editors will
                 offer to "canonicalise" it — decline. */}
-            <div className="mx-auto h-41.5 w-full max-w-50 border-4 border-black" />
+            <div className="mx-auto h-41.5 w-full max-w-50 border-[0.25rem] border-black" />
 
             {/*
               Horizontal centring only — the row's `items-center` already

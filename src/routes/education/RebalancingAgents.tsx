@@ -285,7 +285,7 @@ export default function RebalancingAgents() {
               // `border-[0.25rem]` not `border-4`: the numeric utility is px and
               // would pin the outline while the box scales (§19). Editors will
               // offer to "canonicalise" it — decline.
-              className="h-48 w-full max-w-56 shrink-0 border-4 border-black lg:shrink"
+              className="h-48 w-full max-w-56 shrink-0 border-[0.25rem] border-black lg:shrink"
             />
           ))}
         </div>

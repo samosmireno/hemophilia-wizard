@@ -4636,6 +4636,15 @@ utility is **px** and pins the edge while the object it outlines grows. Acceptin
 that suggestion silently reverts this. Each of the four call sites carries a comment
 saying so, because the warning is what a future reader sees first.
 
+**Two of them reverted anyway, the same day** — `rebalancing-agents`' and
+`treatment-landscape`' placeholder boxes, both back to `border-4` with the comment
+forbidding it still directly above. `rebalancing-agents` had a test asserting the class
+and went red; `treatment-landscape` had none and was silent, which is the whole argument
+for the test that now exists there too. A comment does not survive an editor action. All
+four call sites are now pinned by a test — `Scenario`'s in `scenario.test.tsx`, one each in
+the two chapters, and `ArchBand`'s in a new `ArchBand.test.tsx`, which is that component's
+first test and pins its two radii along with the rule.
+
 **Shadows, hairlines and focus rings stay px, on purpose.** A root font-size step is
 text-and-spacing zoom, not page zoom; leaving those fixed is the definition of that
 mode rather than an oversight. It also keeps this rule clear of §13's and §15's

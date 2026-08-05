@@ -118,6 +118,28 @@ describe("treatment-landscape chapter", () => {
   });
 
   /**
+   * **The box's outline is `border-[0.25rem]`, not `border-4`** — §19's rule
+   * that a drawn edge is shape and has to scale with the object it edges, which
+   * the numeric utility does not, being px.
+   *
+   * This test exists because the class reverted. The Tailwind language server
+   * offers `suggestCanonicalClasses` on it, the two utilities compute the same
+   * 4px at a 16px root, and accepting the suggestion silently unpins the edge
+   * above the canvas. `rebalancing-agents` pinned its own box in the same pass
+   * and that is what caught this one; this box had nothing asserting it.
+   */
+  it("outlines the figure box in rem, so it scales with the board", () => {
+    const { container } = render(<TreatmentLandscape />);
+    const boxes = [...container.querySelectorAll("div.border-\\[0\\.25rem\\]")];
+
+    // The same three the test above counts by what they are not.
+    expect(boxes).toHaveLength(3);
+    for (const box of boxes) {
+      expect(box).toHaveClass("h-41.5", "max-w-50", "border-black");
+    }
+  });
+
+  /**
    * The three-step grid, asserted as class strings because jsdom computes no
    * layout — there is no width here to measure, so this is the only thing that
    * can fail.
