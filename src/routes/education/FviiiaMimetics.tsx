@@ -353,8 +353,15 @@ export default function FviiiaMimetics() {
           nearest step, `text-2xl`, is 26px at weight 600 where this is 400.
           Four bullets, not the export's five: its last two are one sentence
           Figma broke across lines, which is why this reads the topic's `body`
-          rather than the drawing. */}
-      <BulletList items={CHAPTER.body} className="mt-8 text-2xl leading-tight" />
+          rather than the drawing.
+
+          The size steps down one below `lg` — this chapter is the fourth case of
+          §2's body-copy exception, with `rebalancing-agents`,
+          `prophylaxis-guidance` and `/wizard/scenario`: those four transcribe
+          their body at the artboards' 26px, so they have exactly one step to
+          give, where the other chapters sit on the 16px legibility floor.
+          `leading-tight` is a ratio and is stated once for both steps. */}
+      <BulletList items={CHAPTER.body} className="mt-8 text-xl leading-tight lg:text-2xl" />
 
       {/*
         The bottom half: two disclosures at the left, the corner panel at the
@@ -365,20 +372,44 @@ export default function FviiiaMimetics() {
         so a page can do this, and at the 1440 × 800 canvas that lands the panel
         flush with the bottom of the page exactly as drawn.
 
-        A flex ROW rather than a grid: the panel is a fixed 675 (its drawn
-        width), the left column takes what is left, and `items-stretch` — the
-        default — is what makes the panel fill the row's height. Below `lg` the
-        row becomes a column and the panel keeps `grow`, so it still ends the
-        page; there it stops above the sidebar's bottom bar, which is
-        `AppShell`'s `pb-bar` doing its job rather than a deviation.
+        A flex ROW rather than a grid: the panel is the drawn 675, the left
+        column takes what is left, and `items-stretch` — the default — is what
+        makes the panel fill the row's height. Below the breakpoint the row
+        becomes a column and the panel keeps `grow`, so it still ends the page;
+        there it stops above the sidebar's bottom bar, which is `AppShell`'s
+        `pb-bar` doing its job rather than a deviation.
+
+        **`xl`, not `lg` — the row as drawn needs a 1394px viewport.** The left
+        group is 447px (78 of indent + a 288px caption + `gap-4` + the 65px
+        `PopupButton`, which is `shrink-0` in the package) and the panel is 675,
+        so the row is 1122 against a content column of 752 at `lg` and 1008 at
+        `xl` (§12). It was `lg:`, which is `rebalancing-agents`' failure on the
+        same pixel: the width that turned the row on was the width that made it
+        too wide, and the overflow ran ~285px past the column at 1024.
+
+        The panel is the axis allowed to give — see `EmergingPanel` — so the
+        captions keep the measure that produces their drawn line breaks at every
+        width the row exists at.
       */}
-      <div className="mt-14 flex grow flex-col gap-10 lg:flex-row lg:gap-0">
+      <div className="mt-14 flex grow flex-col gap-10 xl:flex-row xl:gap-0">
         {/*
           78px in from the content column's left edge — the artboard indents
           this group rather than aligning it to the gutter the heading and
           bullets use.
+
+          `basis-112.5` states that group's own width: 450 = 78 + 288 + 16 + 65,
+          rounded up off the scale's quarter step, with `shrink-0` so the whole
+          of any deficit lands on the panel instead. `grow` still takes the
+          slack at 1440, where 1168 − 675 leaves the column 493.
+
+          **Centred below `xl`**, where the indent is gone and the pairs sit
+          under full-width prose: the block beneath them is the panel, which
+          centres its own heading and buttons, and a 369px group hugging the left
+          of a 752px column reads as an accident rather than as the artboard's
+          indent. Invented, like the panel's small-screen radius — no canvas
+          exists below 1440.
         */}
-        <ul className="flex flex-col justify-center gap-20 lg:flex-1 lg:ps-19.5">
+        <ul className="flex flex-col items-center justify-center gap-20 xl:shrink-0 xl:grow xl:basis-112.5 xl:items-start xl:ps-19.5">
           <Disclosure
             caption={<AgentCaption title={EMICIZUMAB.title} />}
             label={EMICIZUMAB.title}
@@ -436,8 +467,14 @@ export default function FviiiaMimetics() {
           panel and its own two sentences — and at `default` the left column is
           the drawn 424, where those bullets wrap far past the artboard's line
           count and the card scrolls on the design canvas itself. `wide` spends
-          the extra 336px entirely on that column (the panel is a fixed `w-112`),
-          which is the dimension the overflow is in. See docs/styling.md §13. */}
+          the extra 336px entirely on that column (the panel is fixed, at
+          `xl:w-145`), which is the dimension the overflow is in. See
+          docs/styling.md §13.
+
+          `wide` is `96vw`, which is what made this the card the 2026-08-05 pass
+          argued from: the extra width does not exist below ~1417px, so at 1024
+          the fixed panel took 580 of an 845px body and left the prose 241.
+          `DenecimigCard` carries that arithmetic. */}
       <Popup
         open={openId === "denecimig"}
         title={DENECIMIG_CARD_TITLE}
@@ -473,12 +510,19 @@ export default function FviiiaMimetics() {
 /**
  * Pop up 10: the three drawn bullets at the left, the MOA diagram at the right.
  *
- * A flex ROW above `lg` and a column below. The card is `w-[min(1024px,92vw)]`
- * and the app runs to 375px, where the drawn split would leave the figure column
- * narrower than the `+` that opened the card — so it stacks, prose first. That
- * keeps the reading order the artboard's own left-to-right order, and puts the
- * source content ahead of a diagram that is unreadable at phone width anyway.
- * Enlarging is what answers that, not a bigger column.
+ * A flex ROW above `xl` and a column below. The card is viewport-bound at
+ * `92vw` and the app runs to 375px, where the drawn split would leave the figure
+ * column narrower than the `+` that opened the card — so it stacks, prose first.
+ * That keeps the reading order the artboard's own left-to-right order, and puts
+ * the source content ahead of a diagram that is unreadable at phone width
+ * anyway. Enlarging is what answers that, not a bigger column.
+ *
+ * **`xl`, not `lg`, since 2026-08-05** — the same move the chapter's own row
+ * took, for a related reason: at 1024 the `92vw` card is 942px and its body 804,
+ * so the split turned on while the card was at its narrowest and left the prose
+ * 804 − 48 − 448 = **308px**. Above `xl` the card reaches its full 1140 and the
+ * prose column is 506. Between the two the card is one column, which costs
+ * scrolling inside `Popup`'s scroll region and buys back 496px of measure.
  *
  * `items-center` because the two sides have no shared baseline to align on: the
  * bullets are a short stack against a near-square picture, and the artboard
@@ -486,12 +530,16 @@ export default function FviiiaMimetics() {
  *
  * 20px bullets — the established pop-up body value, shared with
  * `MechanismsCard` and `BenefitsChallengesCard`, reused here because it is the
- * same fact rather than re-measured off this PNG.
+ * same fact rather than re-measured off this PNG. It steps to 16 below `lg` on
+ * `BenefitsChallengesCard`'s rule: at 375 this card's body is 345 − 10 − 32 =
+ * 303px against the page's own 311px column, and a card may not set larger body
+ * type than the page that opened it in a narrower measure. `leading-[1.6]` is a
+ * ratio and covers both steps.
  */
 function EmicizumabCard() {
   return (
-    <div className="flex flex-col items-center gap-8 py-6 lg:flex-row lg:gap-12">
-      <BulletList items={EMICIZUMAB.body} className="flex-1 text-xl leading-[1.6]" />
+    <div className="flex flex-col items-center gap-8 py-6 xl:flex-row xl:gap-12">
+      <BulletList items={EMICIZUMAB.body} className="flex-1 text-base leading-[1.6] lg:text-xl" />
 
       {/*
         **The white panel is load-bearing, not decoration.** `emicizumab.webp`
@@ -505,7 +553,7 @@ function EmicizumabCard() {
         0.875 scale rather than a Figma node — so the radius and padding are
         approximations, the same caveat `MechanismsCard` records for its type.
         `basis-112` states the drawn ~450px column while leaving the figure free
-        to shrink; `lg:` only, so the panel goes full width once stacked.
+        to shrink; `xl:` only, so the panel goes full width once stacked.
 
         The classes reach `ExpandableFigure`'s BUTTON, which is what makes the
         whole panel — padding included — the click target and the surface its
@@ -521,7 +569,7 @@ function EmicizumabCard() {
         // already inside a card whose own band and ✕ would then be stacked
         // under a second pair. See `ExpandableFigure`'s `variant`.
         variant="bare"
-        className="max-w-112 rounded-3xl bg-white p-4 lg:flex-1 lg:basis-112"
+        className="max-w-112 rounded-3xl bg-white p-4 xl:flex-1 xl:basis-112"
       >
         {/*
           `reserve` is 9rem against the 10rem default, and the two are not the
@@ -553,8 +601,14 @@ function EmicizumabCard() {
           so left to contribute its natural width it stretches the whole column
           and the caption stops being centred *on the picture*. Zero intrinsic
           width, then fill what the picture settled on.
+
+          It takes the card's own type ramp rather than the scrim's measure:
+          `Lightbox` is full-viewport, so at 375 this sentence has 343px against
+          the card's 303 — but it is the same sentence a reader is one gesture
+          away from the bullets of, and the two disagreeing by a step would be
+          the disproportion the ramp exists to fix.
         */}
-        <p className="mt-4 w-0 min-w-full text-center text-xl leading-[1.6] text-white drop-shadow-md">
+        <p className="mt-4 w-0 min-w-full text-center text-base leading-[1.6] text-white drop-shadow-md lg:text-xl">
           {EMICIZUMAB_MOA.body[0] as string}
         </p>
       </ExpandableFigure>
@@ -575,21 +629,30 @@ function EmicizumabCard() {
  * columns of nearly equal height whose first lines the artboard aligns, so
  * centring would only introduce a drift that grows with the measure.
  *
- * Below `lg` it stacks prose-first, for `EmicizumabCard`'s reason: at 375px the
+ * Below `xl` it stacks prose-first, for `EmicizumabCard`'s reason: at 375px the
  * drawn split leaves the figure column narrower than the `+` that opened the
  * card, and a diagram unreadable at phone width is answered by enlarging rather
  * than by a wider column.
  *
+ * **The breakpoint moved `lg` → `xl` on 2026-08-05, and this card is why the
+ * other two moved with it.** `wide` is `96vw`, so at 1024 the card is 983px and
+ * its body 845 — the extra width the step is named for simply is not there yet —
+ * while the panel beside it is a fixed 580. That left the prose **241px**, for
+ * four bullets with a nested three: the narrowest column in the chapter, on the
+ * card that was widened to avoid exactly that. Above `xl` the body is 1091 and
+ * the prose 487, reaching the drawn 618 at the 1440 canvas.
+ *
  * 20px bullets — the established pop-up body value, shared with `EmicizumabCard`,
- * `MechanismsCard` and `BenefitsChallengesCard`. This card is denser than any of
- * them (four bullets and a nested three beside a panel) and will scroll sooner on
- * a short viewport; that is `Popup`'s scroll region doing its job, and reusing
- * the value is what keeps two cards a reader opens in sequence one size.
+ * `MechanismsCard` and `BenefitsChallengesCard`, stepping to 16 below `lg` with
+ * them. This card is denser than any of them (four bullets and a nested three
+ * beside a panel) and will scroll sooner on a short viewport; that is `Popup`'s
+ * scroll region doing its job, and reusing the value is what keeps two cards a
+ * reader opens in sequence one size.
  */
 function DenecimigCard() {
   return (
-    <div className="flex flex-col items-start gap-8 py-6 lg:flex-row lg:gap-6">
-      <BulletList items={DENECIMIG.body} className="flex-1 text-xl leading-[1.6]" />
+    <div className="flex flex-col items-start gap-8 py-6 xl:flex-row xl:gap-6">
+      <BulletList items={DENECIMIG.body} className="flex-1 text-base leading-[1.6] lg:text-xl" />
 
       {/*
         The right column: the panel, then the two sentences under it. `w-112` is
@@ -606,7 +669,7 @@ function DenecimigCard() {
         424. (`EmicizumabCard` gets away with the growing pair only because its
         figure carries a `max-w-112` that caps the overgrown column back down.)
       */}
-      <div className="flex w-full flex-col gap-3 lg:w-145 lg:shrink-0">
+      <div className="flex w-full flex-col gap-3 xl:w-145 xl:shrink-0">
         {/*
           **No white panel in markup**, which is the one structural difference
           from `EmicizumabCard`: `denecimig.webp` carries the white surface, the
@@ -650,8 +713,8 @@ function DenecimigCard() {
 
         {/* `denecimig-moa`'s whole body, read rather than sliced — see the topic.
             Black on the card's gradient, as the left column is: this list is in
-            the card, not on the scrim. */}
-        <BulletList items={DENECIMIG_MOA.body} className="text-xl leading-[1.6]" />
+            the card, not on the scrim, so it takes the card's own type ramp. */}
+        <BulletList items={DENECIMIG_MOA.body} className="text-base leading-[1.6] lg:text-xl" />
       </div>
     </div>
   );
@@ -665,24 +728,34 @@ function DenecimigCard() {
  * `items-start` because the two columns are of comparable height and the artboard
  * aligns their first lines, a fixed `w-112 shrink-0` at the right because both
  * columns growing would leave the left one ~210px narrower than drawn, and a
- * stack below `lg` with the prose first because at 375px the drawn split leaves
+ * stack below `xl` with the prose first because at 375px the drawn split leaves
  * the figure column narrower than the `+` that opened the card.
  *
+ * The breakpoint is `xl` since 2026-08-05, with the other two: at 1024 this
+ * card's body is 804 and the split left the prose 332px. Not the chapter's worst
+ * — that is `DenecimigCard`'s 241, which is where the argument was made — but
+ * all four cards stacking at one width is what keeps the rule legible to a
+ * reader opening them in sequence.
+ *
  * 20px bullets — the established pop-up body value, shared with the other three
- * cards. The artboard sets this card's type a shade smaller (it is drawn on a
- * 1141px card against `Popup`'s 1024), which is not re-measured here for the
- * reason `DenecimigCard` records: two cards a reader opens in sequence should be
- * one size, and the value is the same fact rather than a per-PNG reading.
+ * cards, stepping to 16 below `lg` with them. The artboard sets this card's type
+ * a shade smaller (it is drawn on a 1141px card against `Popup`'s 1024), which is
+ * not re-measured here for the reason `DenecimigCard` records: two cards a reader
+ * opens in sequence should be one size, and the value is the same fact rather
+ * than a per-PNG reading.
  */
 function Nxt007Card() {
   return (
-    <div className="flex flex-col items-start gap-8 py-6 lg:flex-row lg:gap-6">
-      <BulletList items={NXT007_OVERVIEW.body} className="flex-1 text-xl leading-[1.6]" />
+    <div className="flex flex-col items-start gap-8 py-6 xl:flex-row xl:gap-6">
+      <BulletList
+        items={NXT007_OVERVIEW.body}
+        className="flex-1 text-base leading-[1.6] lg:text-xl"
+      />
 
       {/* The right column: the panel, then the sentence under it. `w-112` is the
           drawn ~450px — 543 of the artboard's 1075px content column, which is
           448 of `Popup`'s 896 — leaving the left column the 424 it is drawn at. */}
-      <div className="flex w-full flex-col gap-3 lg:w-112 lg:shrink-0">
+      <div className="flex w-full flex-col gap-3 xl:w-112 xl:shrink-0">
         {/*
           **No white panel in markup**, as on the Denecimig card and unlike the
           Emicizumab one: `nxt007.webp` carries the white surface, the crimson
@@ -736,7 +809,7 @@ function Nxt007Card() {
           scrim, so it needs none of the Emicizumab enlargement's white-on-black
           treatment.
         */}
-        <p className="text-center text-xl leading-[1.6] text-black">
+        <p className="text-center text-base leading-[1.6] text-black lg:text-xl">
           {NXT007_STRUCTURE.body[0] as string}
         </p>
       </div>
@@ -754,21 +827,25 @@ function Nxt007Card() {
  * full 886 the picture gets its drawn height and the two bullets, which are one
  * line each at this measure, cost the 64px above it.
  *
- * That also means **no `lg:` breakpoint anywhere here.** The other three cards
+ * That also means **no layout breakpoint anywhere here.** The other three cards
  * carry one because their drawn split has to become a stack on a phone; this one
  * is already stacked, and it narrows to 375px by doing exactly what it does at
- * 1440.
+ * 1440. It was untouched when those three moved `lg` → `xl` on 2026-08-05, for
+ * the same reason it had nothing at `lg`.
  *
  * 20px bullets — the established pop-up body value, shared with the other three
- * cards. `leading-[1.6]` with them, where the artboard sets these two lines
- * tighter at ~1.2: this card has the vertical room to spare (two bullets against
- * NXT007's three plus a nested pair), and two cards a reader opens in sequence
- * should be one size. The same call `DenecimigCard` records for the size itself.
+ * cards, and stepping to 16 below `lg` with them: the type ramp is a question
+ * about measure rather than about layout, so it reaches this card as it reaches
+ * the rest. `leading-[1.6]` covers both steps, where the artboard sets these two
+ * lines tighter at ~1.2: this card has the vertical room to spare (two bullets
+ * against NXT007's three plus a nested pair), and two cards a reader opens in
+ * sequence should be one size. The same call `DenecimigCard` records for the
+ * size itself.
  */
 function Inno8Card() {
   return (
     <div className="flex flex-col gap-3 py-6">
-      <BulletList items={INNO8_OVERVIEW.body} className="text-xl leading-[1.6]" />
+      <BulletList items={INNO8_OVERVIEW.body} className="text-base leading-[1.6] lg:text-xl" />
 
       {/*
         **No white panel in markup**, as on the Denecimig and NXT007 cards:
@@ -828,6 +905,14 @@ function Inno8Card() {
  * four disclosures in two groups of two, so it is a different drawing, not a
  * fourth item.
  *
+ * **Below `sm` the pair becomes a column, centred.** Side by side, the widest
+ * caption's drawn 288px measure plus `gap-4` and the package's 65px button need
+ * 369, where a 375px phone gives the content column 311 — so the caption was
+ * being squeezed to 230 and losing the line breaks its measure exists to
+ * produce. Stacked it gets the full column, and `items-center` does both jobs
+ * without a second class: it centres the two boxes in the column below `sm` and
+ * centres the caption against the button above it.
+ *
  * `caption` is a node rather than a string because the two groups tone
  * themselves differently — slate over lagoon at the left, flat lagoon in the
  * panel — and a component that took a string would have to be told which.
@@ -858,7 +943,7 @@ function Disclosure({
   hasCard?: boolean;
 }) {
   return (
-    <li className="flex items-center gap-4">
+    <li className="flex flex-col items-center gap-4 sm:flex-row">
       {caption}
       <PopupButton
         label={label}
@@ -885,6 +970,16 @@ function Disclosure({
  * 26px at weights 900 and 500, which the scale has no step for (`text-2xl` is 26
  * at 600) — raw under §8's precedent, as the chapter's bullets are. DM Sans is
  * loaded as a variable font, so both weights are real rather than synthesised.
+ * It steps to 20px below `lg` with everything else on the page, which is what
+ * the other four chapters' disclosure captions already take.
+ *
+ * **`leading-tight` where the drawn value was `leading-7.5`.** An absolute 30px
+ * cannot survive a size step — held against 20px type it is a ratio of 1.5 — so
+ * the leading is stated as the ratio it actually renders at today: 30 over the
+ * shipped `text-2xl` is 1.25, which is `leading-tight` exactly, and one class
+ * covers both steps the way the chapter's bullets already do. Nothing moves at
+ * 1440. The drawn 30px/26px pair is recorded in docs/styling.md §11, which is
+ * where the transcription now lives rather than in these class names.
  *
  * **The tail is `--color-popup-caption`, not the `lagoon-75` drawn here.** This
  * is the fourth artboard to disagree with the first two about the caption colour
@@ -897,17 +992,28 @@ function AgentCaption({ title }: { title: string }) {
   const [lead, tail] = splitTitle(title);
 
   return (
-    <p className="w-72 text-center text-2xl leading-7.5 tracking-wide">
+    <p className="w-72 text-center text-xl leading-tight tracking-wide lg:text-2xl">
       <span className="block font-black text-brand-slate-100">{lead}</span>
       <span className="block font-medium text-popup-caption">{tail}</span>
     </p>
   );
 }
 
-/** A panel caption: one word, no status to tone against. Colour as above. */
+/**
+ * A panel caption: one word, no status to tone against. Colour as above, and the
+ * same one-step ramp.
+ *
+ * `leading-[1.08]` is `AgentCaption`'s move on this section's other drawn value:
+ * the artboard's 26px leading over the shipped `text-2xl` is 26/24, so the ratio
+ * is stated once and renders exactly what the absolute `leading-6.5` did at
+ * 1440. It is shared with the panel's own `<h2>`, which is the one place it has
+ * more than one line to act on.
+ */
 function PanelCaption({ children }: { children: ReactNode }) {
   return (
-    <p className="text-2xl leading-6.5 font-black tracking-wide text-popup-caption">{children}</p>
+    <p className="text-xl leading-[1.08] font-black tracking-wide text-popup-caption lg:text-2xl">
+      {children}
+    </p>
   );
 }
 
@@ -923,15 +1029,28 @@ function PanelCaption({ children }: { children: ReactNode }) {
  * `overflow-hidden` is what clips the fill to the rounded corner — the artboard
  * sets `overflow: clip` on the frame for the same reason.
  *
- * **The radius steps down below `lg`.** 117px is drawn on a 675px panel, where
- * it reads as a corner; on a 320px phone it would eat a third of the width and
- * the heading would have to dodge it. 60px is an invented comfort value, stated
- * as one step of the same shape — the call `ProphylaxisGuidance` makes stepping
- * its `<h1>` down, and for the same reason: the canvas is 1440 and nobody has
- * drawn a phone.
+ * **The radius steps down below `lg`, and that is deliberately NOT the
+ * breakpoint the layout moves on.** 117px is drawn on a 675px panel, where it
+ * reads as a corner; on a 320px phone it would eat a third of the width and the
+ * heading would have to dodge it. 60px is an invented comfort value, stated as
+ * one step of the same shape — the call `ProphylaxisGuidance` makes stepping its
+ * `<h1>` down, and for the same reason: the canvas is 1440 and nobody has drawn
+ * a phone. It stays on `lg` because between 1024 and 1279 this panel is
+ * full-width — 752 to 1008px, i.e. WIDER than the 675 the radius was drawn on —
+ * so the drawn corner reads there as drawn or better. Two breakpoints, two
+ * questions.
  *
- * `grow lg:grow-0` is the two layouts in one: it ends the page below `lg`, and
+ * `grow xl:grow-0` is the two layouts in one: it ends the page below `xl`, and
  * above it holds the drawn 675 while `items-stretch` gives it the row's height.
+ *
+ * **No `shrink-0`, and its absence is the pass.** The row as drawn needs a
+ * 1394px viewport (see the row above), so between `xl` and there something has
+ * to give, and this is it: the left group is `shrink-0`, so the whole deficit
+ * lands here and the panel paints 558px at 1280 — 83% of drawn — reaching the
+ * full 675 at 1397 and holding it to the 1440 canvas. It is the right axis
+ * because this panel is a fluid container rather than a reserved box: it already
+ * stretches past its drawn 350px height on a taller viewport, where
+ * `rebalancing-agents`' placeholders may not resize at all.
  *
  * Vertically centred content — the artboard leaves 87px above the heading and
  * 87px below the buttons — so it stays centred as the panel grows past its drawn
@@ -941,14 +1060,14 @@ function EmergingPanel({ children }: { children: ReactNode }) {
   return (
     <section
       aria-labelledby="emerging-heading"
-      className="grow overflow-hidden rounded-tl-[60px] bg-emerging-panel px-6 py-10 shadow-emerging-panel lg:w-168.75 lg:shrink-0 lg:grow-0 lg:rounded-tl-[117px]"
+      className="-mr-8 -mb-4 grow overflow-hidden rounded-tl-[60px] bg-emerging-panel px-6 py-10 shadow-emerging-panel sm:mr-0 lg:mb-0 lg:rounded-tl-[117px] xl:w-168.75 xl:grow-0"
     >
       <div className="flex h-full flex-col items-center justify-center">
         {/* An `<h2>`: the chapter owns the `<h1>`. Sentence case as drawn —
             this one is NOT shouted, where the chapter heading is. */}
         <h2
           id="emerging-heading"
-          className="max-w-148 text-center text-2xl leading-6.5 font-black tracking-wide text-brand-crimson-50"
+          className="max-w-148 text-center text-xl leading-[1.08] font-black tracking-wide text-brand-crimson-50 lg:text-2xl"
         >
           {PANEL_HEADING}
         </h2>

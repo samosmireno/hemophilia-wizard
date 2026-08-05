@@ -168,14 +168,26 @@ the others.
 Body copy mostly does not participate. 16px is a legibility floor and open item 9 has
 the reference **larger** than what ships, so there is nothing below it to step to.
 
-**Three pages are the exception, and the exception is what the rule was about.**
+**Four pages are the exception, and the exception is what the rule was about.**
 `rebalancing-agents` and `prophylaxis-guidance` transcribe their body at 26px off their
 own exports — they are the two chapters built around a single block of prose — so they
 ship at 24 and step to 20 below `lg`, which is a step on the scale rather than a
-collapse onto the other three's 16. **`/wizard/scenario` is the third**, off its own
-four artboards and for the same reason: lead, class list and caveat are the page. The
-floor is still the floor; those three simply start above it. §11 records the two chapter
-passes and §18 the wizard screen's.
+collapse onto the other two's 16. **`/wizard/scenario` is the third**, off its own
+four artboards and for the same reason: lead, class list and caveat are the page.
+**`fviiia-mimetics` is the fourth**, and it is the one that makes the rule a rule rather
+than a pair of chapters: its bullets, its two agent captions and its panel's heading are
+all the same drawn 26px, so the whole page moves on one step. The floor is still the
+floor; those four simply start above it. §11 records the three chapter passes and §18
+the wizard screen's.
+
+That fourth case is also where the **leadings** had to be answered, because it is the
+first page in this section whose transcribed leading was absolute. `leading-7.5` and
+`leading-6.5` are the drawn 30px and 26px; held against a 20px step they render 1.5 and
+1.3, i.e. the step loosens what it was meant to tighten. They ship as the ratios those
+values already rendered at `text-2xl` — `leading-tight` (1.25) and `leading-[1.08]` —
+so one class covers both steps and the 1440 canvas is unchanged. **A `leading-*` on the
+scale does not survive a size ramp; a ratio does.** The drawn pixels are recorded in
+§11's type table, which is where that transcription now lives.
 
 **Not `clamp()`.** §8 used one for the landing hero until 2026-08-04 and no
 longer does — the app now contains none — but the argument for keeping chapters
@@ -1028,6 +1040,7 @@ Everything above is arithmetic — see open item 41.
 | 41  | **`/wizard-intro` and `/education/prophylaxis-guidance`'s responsive passes of 2026-08-04 are arithmetic end to end**, like items 36 and 39 — verified in the compiled CSS (every new utility present, `text-2xl/5` resolving to a 20px line box and the three `/[1.05]` steps to `line-height:1.05`) and in Vitest (16 tests across the two pages, three of them new), but jsdom computes no layout so nothing about pixels can fail. **The weakest numbers are the two ink widths the `/wizard-intro` ramp is derived from.** "PROPHYLACTIC" at ~397px/72px comes from §8's own drawn line measurements (729px and ~830px) divided into letters at ~0.46em, and the CTA label's ~385px at 24px is back-derived from the 545px the package computes at 26 — so the 320px column clearing `text-4xl` by 57px is safe, while the base CTA step landing 321px in a 311px column is inside the error bar in both directions. That one is deliberately built to survive either outcome (`/tight` makes a wrapped label legible), but which outcome ships is unknown. The 1024 case rests on 729 < 752 with 23px of margin, i.e. on a measurement taken off the export rather than a render — and 1024 is already the app's least-tested width (items 30, 36, 39). `prophylaxis-guidance` carries less: one class, no layout change, and its one-screen claim at 375 × 667 (~460px of ink in a 557px box) is the only estimate in it. Nothing was opened in a browser for either page, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | §8, §11               |
 | 42  | **`/wizard`'s responsive pass of 2026-08-04 is arithmetic end to end**, like items 36, 39 and 41 — verified in the compiled CSS (every new utility present, `max-w-110` resolving to 440px and `max-lg:text-lg` to a `width < 64rem` rule that wins over the package's `text-[26px]`) and in Vitest (31 tests across the page and its component, five of them new), but jsdom computes no layout. **Every number in the ramp descends from two rendered measurements §14 already carried**: "Reduce monitoring requirement" at 369px and "Hemophilia A" at 153px, both at 24px, which agree on ~0.53em a character. The binding case is `lg` — ~308px of label inside a 318px pill, i.e. **10px of margin**, against the ~4px export/render discrepancy §14 records — so it is the one step that would flip if the font rounded differently than measured, and 1024 is already the app's least-tested width (items 30, 36, 39, 41). The base step has more room (246 in 263 at 375) and 320 is _known_ to wrap and is built for it. The legend windows (368–506px at 20px) are scaled from a **drawn** 589/809 rather than from a render, so "440 reproduces the designer's break below `lg`" is the softest claim here; it costs a line break rather than an overflow if it is wrong. Nothing was opened in a browser, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | §14                   |
 | 43  | **`/wizard/scenario`'s responsive pass of 2026-08-04 is arithmetic end to end**, like items 36, 39, 41 and 42 — verified in the compiled CSS and in Vitest (33 tests, eight of them new across the four branches), but jsdom computes no layout. **This screen has never been opened in a browser at any width**, which makes it weaker than its four predecessors rather than equal to them: their `lg` reasoning was untested, this page's 1440 case is too. The box row is the firmest thing in it — 227 and 185 are read off the exports, and 3 × 227 + 2 × 32 = 745 in 752 is arithmetic on `AppShell`'s own tokens with 7px of slack against item 39's zero. **The soft claim is the type ramp's premise.** "Nothing overflows at either size" rests on character-count estimates at §14's ~0.53em rather than on a render, and the uppercase bold caption is the one string estimated at a width its font was never measured at (~0.62em); it fails as a wrap rather than as an overflow either way. The 619px stacked block below `lg` is a deliberate cost rather than an unverified number (§18), but how it reads on a phone is a judgement no test makes. Nothing was opened in a browser, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | §18                   |
+| 44  | **`/education/fviiia-mimetics`'s responsive pass of 2026-08-05 is arithmetic end to end**, like items 36, 39, 41, 42 and 43 — verified in the compiled CSS and in Vitest (51 tests, six of them new), but jsdom computes no layout. **It rests on firmer ground than its five predecessors and reaches a worse conclusion, which is the thing to check first if this chapter is ever opened in a browser.** The row's 1122px is a sum of four transcribed or package-owned numbers — the drawn 78px indent, the drawn 288px caption, `gap-4`, and `PopupButton`'s `size-16.25 shrink-0` read out of the package's `dist` — so it rests on no character-width estimate at all, and the claim that the drawn row never fitted below a 1394px viewport is as strong as anything in this file that was not rendered. What follows from it is not: **that this chapter has been overflowing its content column at every width from 1024 to ~1394 since it shipped**, by ~285px at 1024, and that no test, no review and no screenshot caught it. If a render disagrees, the first two suspects are `PopupButton`'s rendered box (the package sets `size-16.25`, but its ring and shadow are drawn outside it) and whether the caption's own shrink was absorbing the overflow quietly rather than pushing the panel past the column. The card table's 241px is the same kind of number one layer down — `96vw` and a fixed `xl:w-145` against `Popup`'s padding — and it depends on the §13 correction this pass made rather than on anything measured. The two invented values (the pairs centring below `xl`, and the 60px radius holding to 1024 on a now-full-width panel) are judgements no arithmetic settles. Nothing was opened in a browser, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | §11, §13              |
 
 ---
 
@@ -2002,13 +2015,13 @@ a shadowed corner panel at the right carrying two more.
 
 Type, off the artboard:
 
-| Ink                      | Drawn                | Ships as                      |
-| ------------------------ | -------------------- | ----------------------------- |
-| heading, 2 lines         | 52px/57.2, Barlow Bd | `text-3xl`, `lg:text-5xl`     |
-| heading → bullets        | 32px                 | `mt-8` — the designer's value |
-| bullets                  | 26px/32, DM Sans 400 | `text-2xl leading-tight`      |
-| agent captions           | 26px/30, wt 900/500  | `text-2xl leading-7.5`        |
-| panel heading & captions | 26px/26, wt 900      | `text-2xl leading-6.5`        |
+| Ink                      | Drawn                | Ships as                             |
+| ------------------------ | -------------------- | ------------------------------------ |
+| heading, 2 lines         | 52px/57.2, Barlow Bd | `text-3xl lg:text-5xl`               |
+| heading → bullets        | 32px                 | `mt-8` — the designer's value        |
+| bullets                  | 26px/32, DM Sans 400 | `text-xl leading-tight lg:text-2xl`  |
+| agent captions           | 26px/30, wt 900/500  | `text-xl leading-tight lg:text-2xl`  |
+| panel heading & captions | 26px/26, wt 900      | `text-xl leading-[1.08] lg:text-2xl` |
 
 The bullets and captions were raw for the §8 reason the other chapters record —
 26px at weights 900 and 500, which the old scale's 26px step (weight 600) could
@@ -2016,6 +2029,13 @@ not carry. All three now take `text-2xl` and state their weight beside it, which
 is the whole of what changed; the drawn 26 renders at 24. Tracking
 is drawn at 0.608px on 26px (0.0234em); `tracking-wide` is 0.025em, within 0.04px, so
 it ships on the scale rather than as an arbitrary value.
+
+**The two leadings are ratios rather than the drawn pixels**, and the drawing is the
+table above rather than the class names — see §2. `leading-7.5` and `leading-6.5` were
+30px and 26px exactly, which is right at one size and wrong at two: they became 1.5 and
+1.3 the moment the type stepped to 20 below `lg`. `leading-tight` is 1.25, which is what
+30px already rendered at the shipped `text-2xl`, and `leading-[1.08]` is what 26px did,
+so the 1440 canvas is untouched and the phone inherits the same proportion.
 
 **The heading steps down to `text-3xl` below `lg`, the second chapter to need it.** Nine
 words at the old 52px took six lines and 328px of a 390 × 780 phone — 42% of the screen before
@@ -2064,17 +2084,28 @@ raised as open item 19. Reusing `--color-figure-note` was the third option and w
 rejected for welding a callout fill and a panel gradient to one value.
 
 **Geometry.** 675 × 350 at (653, 450) on the canvas: right edge at 1328 = 1440 − the
-112px gutter, so it stays inside the content column and breaks no shell padding, and
-bottom edge flush with the canvas. The chapter reaches that bottom edge with `grow`
-inside `AppShell`'s `flex flex-1 flex-col` wrapper — which is `lg:pb-0`, so the content
-box already ends at the viewport bottom. It **stretches** past the drawn 350px on a
-taller viewport rather than detaching from the corner; its content stays vertically
-centred, which the artboard's equal 87px above and below already implies.
+112px gutter, and bottom edge flush with the canvas. The chapter reaches that bottom
+edge with `grow` inside `AppShell`'s `flex flex-1 flex-col` wrapper — which is
+`lg:pb-0`, so the content box already ends at the viewport bottom. It **stretches** past
+the drawn 350px on a taller viewport rather than detaching from the corner; its content
+stays vertically centred, which the artboard's equal 87px above and below already
+implies.
+
+**Correction, 2026-08-05: the drawn panel does _not_ stay inside the content column**,
+which this paragraph asserted from its right edge landing on the 112px gutter. The
+column's right edge is not the gutter — it is `--spacing-gutter-rail`, 160px, because
+the rail has to be cleared as well (§12), so the column ends at 1280 and the drawn panel
+runs to 1328. The designer drew it 48px into the rail's clearance. What ships is the
+panel inside the column, i.e. 48px left of drawn, which is the same call every page
+makes about that strip; nothing about the chapter changes, but the reason it is right
+is that the shell owns the rail, not that the artboard agreed.
 
 The radius steps **117px → 60px below `lg`**. 117 is drawn on a 675px panel where it
 reads as a corner; on a 320px phone it eats a third of the width. An invented comfort
 value like the small-screen gutters and `prophylaxis-guidance`'s stepped heading — the
-canvas is 1440 and nobody has drawn a phone.
+canvas is 1440 and nobody has drawn a phone. **It stays on `lg` while the layout moves
+on `xl`** (below): between the two the panel is full-width, 752 to 1008px, so the drawn
+corner is being asked to sit on a panel wider than the one it was measured on.
 
 #### Four disclosures, and the four cards behind them
 
@@ -2104,6 +2135,137 @@ other way on the same authority: the designer shouts `MIM8`.
 
 A stray 355 × 19 vector at (997, 214) on the artboard renders as nothing in the export
 and overshoots the text block's right edge; treated as leftover and not reproduced.
+
+#### The responsive pass of 2026-08-05
+
+The fifth chapter to get one, and the first whose **drawn layout did not fit the app at
+any width below the design canvas**. The other four passes moved a breakpoint that was
+merely early; this one moved a breakpoint that was never right.
+
+**1. The bottom half's row needs a 1394px viewport, and it was turning on at 1024.**
+
+| Piece                       |       px |
+| --------------------------- | -------: |
+| `ps-19.5`, the drawn indent |       78 |
+| `AgentCaption` (`w-72`)     |      288 |
+| `gap-4`                     |       16 |
+| `PopupButton`               |       65 |
+| left group                  |  **447** |
+| `EmergingPanel`             |      675 |
+| the row                     | **1122** |
+
+The button is 65px and `shrink-0` in the package, so the only compressible thing in that
+group is the caption — whose 288px measure is what produces the artboard's line breaks,
+"Denecimig (Mim8):" filling one line with its status wrapped to three beneath. Against
+content columns of 752 at `lg` and 1008 at `xl` (§12), the row overflowed by ~285px at
+1024 and by ~114 at 1280, squeezing the captions on the way. This is
+`rebalancing-agents`' box row failing on the same pixel for the third time in the app:
+the width that turns a drawn row on is the width that takes 175px of gutter away.
+
+**2. The row moves to `xl`, and the panel is the axis that gives.** The left group is
+pinned — `xl:basis-112.5 xl:shrink-0`, where 450 is that 447 rounded up onto the scale's
+quarter step — so the deficit lands entirely on the panel, which drops its `shrink-0`
+and keeps `xl:w-168.75` as a maximum rather than a fixed width.
+
+| Viewport | Content column | Layout | Left group |             Panel |
+| -------- | -------------: | ------ | ---------: | ----------------: |
+| 375      |            311 | column |        311 |               311 |
+| 768      |            672 | column |        672 |               672 |
+| 1024     |            752 | column |        752 |               752 |
+| 1280     |           1008 | row    |        450 |               558 |
+| 1397     |           1125 | row    |        450 | 675 — drawn width |
+| 1440     |           1168 | row    |        493 |      675 as drawn |
+
+The panel is the right thing to shrink because it is a fluid container rather than a
+reserved box: it already stretches past its drawn 350px height on a taller viewport, and
+its content is centred in it at any size. `rebalancing-agents`' placeholders are the
+opposite case — a reserved box exists to hold the drawn size, so that pass shrank the
+_gap_ and left the boxes alone. Same question, opposite answer, because the objects
+differ.
+
+**3. The panel's radius stays on `lg`, and that split is deliberate.** Between 1024 and
+1279 the panel is full-width, 752 to 1008px — wider than the 675 the drawn 117px corner
+was measured on — so the drawn corner reads there as drawn or better, and the invented
+60px stays for the widths it was invented for. The ramp and the layout are two
+questions; `treatment-landscape` states the same separation.
+
+**4. Below `xl` the two left pairs centre, and below `sm` each pair becomes a column.**
+The 78px indent is an artboard fact about a half-width column, and once the pairs sit
+under full-width prose there is nothing for it to indent from; the block beneath them is
+the panel, which centres its own heading and buttons. A 369px group hugging the left of a
+752px column reads as an accident. Invented, like the small-screen radius above.
+
+That 369 is also the number that stacks the pair: caption + `gap-4` + button needs it,
+and a 375px phone gives the content column **311**, so side by side the caption was being
+squeezed to 230 — below the 288px measure that produces the artboard's line breaks, which
+is the one thing `w-72` is there for. Stacked, the caption gets the full column at its
+drawn width with the `+` centred beneath it. It is one class on `Disclosure`, so all four
+move together, and `items-center` covers both layouts: it centres the two boxes in the
+column below `sm` and the caption against the button above it.
+
+The panel's own two pairs still sit **side by side** at 375 — as columns, centred, and
+they fit (~140px of pair plus the 56px gap inside a 263px panel body), so `flex-wrap`
+remains the guard it has always been rather than the shipped behaviour.
+
+**5. The type takes §2's one step, and this chapter is the fourth case of that section's
+body-copy exception.**
+
+| Element                        | <`lg` | `lg`+ |
+| ------------------------------ | ----: | ----: |
+| `<h1>` (unchanged, §2)         |    30 |    48 |
+| page bullets                   |    20 |    24 |
+| agent captions                 |    20 |    24 |
+| panel heading & panel captions |    20 |    24 |
+| all four cards' bodies         |    16 |    20 |
+| the scrim caption on Pop up 10 |    16 |    20 |
+
+The page's four transcribed strings are all the same drawn 26px, so the whole page moves
+on one step. The two absolute leadings became ratios to survive it — see the type table
+above and §2, and note that nothing moves at 1440.
+
+The cards' 20 → 16 is `BenefitsChallengesCard`'s rule reused unchanged: `Popup` is
+`min(1140px, 92vw)` inside a `border-5` with `px-4 sm:px-8 lg:px-16`, so at 375 a
+`default` card's body is 345 − 10 − 32 = **303px** against the page's own 311px column,
+and a card may not set larger body type than the page that opened it in a narrower
+measure. Denecimig's `wide` card is `96vw`, i.e. 318px there — 15 wider, still narrower
+than the page at every width that matters. The Emicizumab enlargement's caption ramps
+with the cards rather than with its own 343px scrim measure: it is one gesture from the
+bullets it belongs to, and a step between them is the disproportion the ramp exists to
+remove.
+
+**6. The three two-column cards stack at `xl` too, and Denecimig is the argument.** Both
+card widths are viewport-bound, so at 1024 the split turned on while the card was at its
+narrowest:
+
+| Card               | Body @1024 | Figure col | Prose @1024 | Prose @1280 | Prose @1440 |
+| ------------------ | ---------: | ---------: | ----------: | ----------: | ----------: |
+| Emicizumab         |        804 |        448 |         308 |         506 |         506 |
+| Denecimig (`wide`) |        845 |        580 |     **241** |         487 |         618 |
+| NXT007             |        804 |        448 |         332 |         530 |         530 |
+
+241px for four bullets with a nested three, on the one card in the chapter that was
+widened _because_ its prose column was tight (§13), is the sharpest number this pass
+found after the row itself: `96vw` means `wide`'s extra 336px does not exist below
+~1417px, while the fixed 580px panel beside it does. Between 1024 and 1279 all three
+cards are a single column, prose first, with the figure at its drawn width beneath —
+which costs scrolling inside `Popup`'s own scroll region and buys back up to 496px of
+measure. Pop up 13 (Inno8) is untouched: it is drawn as a single column at 1440 already,
+for the 2.6:1 reason above, so it had nothing at `lg` to move.
+
+**7. Nothing else moves.** The five vertical gaps — `mt-8`, `mt-14` twice, the 80px
+between the two left pairs and the 40px from that group to the panel — hold at every
+width, deferred to open item 10 with the other chapters' rather than answered here. The
+`+` keeps `PopupButton`'s one fixed 65px scale, as on the other four chapters. The four
+diagrams stay illegible on a phone, which is open item 38 and a `PopupFigure` question:
+the same `min(886px, 100%)` cap governs seven figures across three chapters, and the
+scroll-region answer the tables took has to be taken for all of them at once or not at
+all.
+
+### Not verified in a browser
+
+Nothing on this chapter has been opened at any width since the §2 migration's 1440/375
+sweep of the `<h1>` (open item 30). Every number above is arithmetic on `AppShell`'s
+tokens, the package's own class strings and the artboard. Open item 44.
 
 ---
 
@@ -2365,13 +2527,22 @@ not the binding constraint.
 
 The second is §7.5's Denecimig card (Pop up 11), and it is the first use of the
 step for a reason other than a table. That card is the densest of the chapter's
-four — four bullets with a nested three in the left column, beside a fixed 448px
-panel carrying its own two sentences — and at `default` the left column is the
+four — four bullets with a nested three in the left column, beside a fixed panel
+carrying its own two sentences — and at `default` the left column is the
 drawn ~424px, where the bullets wrap past the artboard's line count and the card
-engages `Popup`'s scroll region on the 1440 canvas itself. Because the panel is
-`w-112 shrink-0`, the whole of `wide`'s extra 336px lands in the prose column
-(424 → 750), which is the dimension the overflow is in. The panel is unaffected,
-so `denecimig.webp` is still painted at the size it was drawn at.
+engages `Popup`'s scroll region on the 1440 canvas itself. Because that panel is
+fixed and `shrink-0`, the whole of `wide`'s extra width lands in the prose column,
+which is the dimension the overflow is in; the panel is unaffected, so
+`denecimig.webp` is still painted at the size it was drawn at.
+
+**The panel is `xl:w-145` (580px), not the 448 this paragraph claimed**, and the
+column arithmetic moves with it: 1222 − 24 − 580 = **618px** of prose at the 1440
+canvas rather than 750. The 448 was true when the step was chosen and stopped being
+true in `04dedae`'s spacing pass, which widened the panel without revisiting the note
+here. **The number this correction matters for is 241** — `wide` is `96vw`, so below
+~1417px the extra 336px does not exist while the fixed 580 does, and at 1024 the prose
+column was 845 − 24 − 580. That is what moved this card's split to `xl` on 2026-08-05;
+§11 records the pass.
 
 ### The title
 
@@ -3759,6 +3930,7 @@ The label tracking fits at 0.036em and ships at `tracking-wide` (0.025em) — op
 `Popup` is too narrow for the nine-column table it will hold — open item 27, since **half
 closed**: the card now takes `width="wide"` (1360px, ~136px a column) and what is left is
 the scroll region the grid needs on a phone, not the card. See §13's width scale.
+
 ---
 
 ## 18. `/wizard/scenario` — the classes-to-consider screen

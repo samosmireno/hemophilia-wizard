@@ -830,3 +830,178 @@ describe("the Inno8 card", () => {
     expect(card()).toHaveAttribute("open");
   });
 });
+
+/**
+ * The responsive pass of 2026-08-05 — docs/styling.md §11.
+ *
+ * jsdom computes no layout, so a class string is the only thing in this block
+ * that can fail; every pixel behind these values is arithmetic off the tokens
+ * and the artboard, and open item 44 records it as unverified.
+ */
+describe("fviiia-mimetics — the responsive pass", () => {
+  /** The bottom half's three boxes, reached through the one with a name. */
+  const bottomHalf = () => {
+    const panel = screen.getByRole("region", { name: PANEL_HEADING });
+    return { panel, list: panel.previousElementSibling!, row: panel.parentElement! };
+  };
+
+  /**
+   * **The pass's whole finding, in one assertion.** The row as drawn is 1122px
+   * — 78 of indent, a 288px caption, `gap-4`, the package's `shrink-0` 65px
+   * button, then the 675px panel — against content columns of 752 at `lg` and
+   * 1008 at `xl` (§12), so it fits only at a 1394px viewport. As `lg:flex-row`
+   * it overflowed its column by ~285px at 1024, which is `rebalancing-agents`'
+   * failure on the same pixel.
+   *
+   * Both halves are pinned because either alone reopens it: the row must turn on
+   * at `xl` and NOT at `lg`, the left group must stay `shrink-0` so the captions
+   * keep the measure that produces their drawn line breaks, and the panel must
+   * NOT be `shrink-0`, since it is the axis that absorbs the deficit (558px at
+   * 1280, the drawn 675 from 1397).
+   */
+  it("turns the bottom half's row on at xl, with the panel as the axis that gives", () => {
+    render(<FviiiaMimetics />);
+    const { panel, list, row } = bottomHalf();
+
+    expect(row).toHaveClass("flex-col", "xl:flex-row");
+    expect(row).not.toHaveClass("lg:flex-row");
+
+    expect(list).toHaveClass("xl:basis-112.5", "xl:shrink-0", "xl:ps-19.5");
+
+    expect(panel).toHaveClass("grow", "xl:w-168.75", "xl:grow-0");
+    expect(panel).not.toHaveClass("shrink-0");
+    expect(panel).not.toHaveClass("lg:shrink-0");
+  });
+
+  /**
+   * The radius keeps `lg` while the layout moves to `xl` — two questions, two
+   * breakpoints. Between them the panel is full-width, 752 to 1008px, i.e. wider
+   * than the 675 the drawn 117px corner was measured on.
+   */
+  it("keeps the panel's radius on its own breakpoint", () => {
+    render(<FviiiaMimetics />);
+    expect(bottomHalf().panel).toHaveClass("rounded-tl-[60px]", "lg:rounded-tl-[117px]");
+  });
+
+  /**
+   * Below `xl` the 78px indent is gone and the pairs sit under full-width prose,
+   * so they centre on the panel beneath them rather than hugging a gutter the
+   * artboard never drew them against. Invented, like the panel's small-screen
+   * radius.
+   */
+  it("centres the two left pairs below xl, and left-aligns them above", () => {
+    render(<FviiiaMimetics />);
+    expect(bottomHalf().list).toHaveClass("items-center", "xl:items-start");
+  });
+
+  /**
+   * **Below `sm` every pair is a column, centred** — all four, since they share
+   * one `Disclosure`. Side by side they need 369px (the caption's drawn 288, plus
+   * `gap-4` and the package's 65px button) where a 375px phone gives the content
+   * column 311, so the caption was being squeezed to 230 and losing the line
+   * breaks its `w-72` measure exists to produce.
+   *
+   * `items-center` is asserted with the direction because it is doing two jobs at
+   * once: centring the two boxes in the column below `sm`, and centring the
+   * caption against the button above it.
+   */
+  it("stacks each caption over its + below sm, centred", () => {
+    render(<FviiiaMimetics />);
+    const { panel, list } = bottomHalf();
+
+    const pairs = [...list.querySelectorAll("li"), ...panel.querySelectorAll("li")];
+    expect(pairs).toHaveLength(4);
+    for (const pair of pairs) {
+      expect(pair).toHaveClass("flex-col", "items-center", "sm:flex-row");
+    }
+  });
+
+  /**
+   * Every transcribed size on the page steps down one below `lg`, asserted
+   * together because it is one decision rather than four.
+   *
+   * **This chapter is the fourth case of §2's body-copy exception**, with
+   * `rebalancing-agents`, `prophylaxis-guidance` and `/wizard/scenario`: those
+   * four transcribe their body at their artboards' 26px, so each has exactly one
+   * step to give, where the other chapters sit on the 16px legibility floor.
+   *
+   * The two leadings are pinned as **ratios** because that is what survives a
+   * size step: `leading-7.5` and `leading-6.5` were the drawn 30px and 26px, and
+   * held against 20px type they would have rendered 1.5 and 1.3. Both ratios are
+   * what the absolute values already rendered at `text-2xl`, so nothing moves at
+   * 1440.
+   */
+  it("steps every transcribed size on the page down one below lg", () => {
+    render(<FviiiaMimetics />);
+    const { panel, list } = bottomHalf();
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveClass("text-3xl", "lg:text-5xl");
+    expect(screen.getByText(CHAPTER.body[0] as string).closest("ul")).toHaveClass(
+      "text-xl",
+      "lg:text-2xl",
+    );
+
+    const captions = [...list.querySelectorAll("p")];
+    expect(captions).toHaveLength(2);
+    for (const caption of captions) {
+      expect(caption).toHaveClass("text-xl", "leading-tight", "lg:text-2xl");
+    }
+
+    expect(within(panel).getByRole("heading", { level: 2 })).toHaveClass(
+      "text-xl",
+      "leading-[1.08]",
+      "lg:text-2xl",
+    );
+    for (const name of ["NXT007", "Inno8"]) {
+      expect(within(panel).getByText(name)).toHaveClass("text-xl", "leading-[1.08]", "lg:text-2xl");
+    }
+  });
+
+  /**
+   * The three two-column cards stack at `xl` too, and for a related reason: both
+   * `Popup` widths are viewport-bound (`92vw`, and `96vw` for `wide`), so at 1024
+   * the split turned on while the card was at its narrowest. It left the prose
+   * 308px on Emicizumab, 332 on NXT007 and **241** on Denecimig — the chapter's
+   * `wide` card, widened for a prose column that the extra width does not reach
+   * below ~1417px.
+   *
+   * Each card's body type steps 20 → 16 below `lg` on `BenefitsChallengesCard`'s
+   * rule: at 375 a `default` card's body is 303px against the page's own 311px
+   * column, and a card may not set larger body type than the page that opened it
+   * in a narrower measure.
+   */
+  it.each([
+    [`Expand ${EMICIZUMAB.title}`, 0],
+    [`Expand ${DENECIMIG.title}`, 1],
+    ["Expand NXT007", 2],
+  ])("stacks the %s card at xl and steps its body to 16px below lg", async (name, index) => {
+    const user = userEvent.setup();
+    render(<FviiiaMimetics />);
+    await user.click(screen.getByRole("button", { name }));
+
+    const card = screen.getAllByRole("dialog", { hidden: true })[index];
+    const bullets = card.querySelector("ul")!;
+
+    expect(bullets).toHaveClass("text-base", "lg:text-xl");
+    expect(bullets.parentElement).toHaveClass("flex-col", "xl:flex-row");
+    expect(bullets.parentElement).not.toHaveClass("lg:flex-row");
+  });
+
+  /**
+   * Inno8 is the exception and stays one, at both breakpoints: its panel is
+   * 2.6:1, so it is drawn as a single column at 1440 already (§11) and narrows to
+   * 375 by doing the same thing. The type ramp still reaches it — that is a
+   * question about measure, not about layout.
+   */
+  it("leaves the Inno8 card single-column, but ramps its type with the rest", async () => {
+    const user = userEvent.setup();
+    render(<FviiiaMimetics />);
+    await user.click(screen.getByRole("button", { name: "Expand Inno8" }));
+
+    const bullets = screen.getAllByRole("dialog", { hidden: true })[3].querySelector("ul")!;
+
+    expect(bullets).toHaveClass("text-base", "lg:text-xl");
+    expect(bullets.parentElement).toHaveClass("flex-col");
+    expect(bullets.parentElement).not.toHaveClass("xl:flex-row");
+  });
+});
