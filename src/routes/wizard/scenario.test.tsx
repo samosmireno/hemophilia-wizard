@@ -114,7 +114,7 @@ describe("wizard scenario — the illustration boxes", () => {
       worse than none. So they are counted through the DOM, which is the honest
       way to assert something deliberately invisible to assistive tech.
     */
-    expect(region.querySelectorAll("div.border-4")).toHaveLength(
+    expect(region.querySelectorAll("div.border-\\[0\\.25rem\\]")).toHaveLength(
       CLASSES_TO_CONSIDER[key].classes.length,
     );
   });
@@ -163,7 +163,7 @@ describe("wizard scenario — the illustration boxes", () => {
     "ramps the row's gap rather than the boxes, which stay drawn-size at every width, %s/%s",
     (type, inh, key) => {
       const region = renderScenario(type, inh, key);
-      const boxes = [...region.querySelectorAll("div.border-4")];
+      const boxes = [...region.querySelectorAll("div.border-\\[0\\.25rem\\]")];
 
       for (const box of boxes) {
         expect(box).toHaveClass("h-46.25", "max-w-56.75", "shrink-0", "lg:shrink");

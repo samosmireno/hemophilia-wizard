@@ -296,7 +296,10 @@ export default function RebalancingAgents() {
               // `lg:shrink` in the row is what brings a `w-full` basis down to
               // the track, and at `lg` it lands on exactly 224 — the gap above
               // is chosen so that `max-w-56` never has to clamp it.
-              className="h-48 w-full max-w-56 shrink-0 border-4 border-black lg:shrink"
+              // `border-[0.25rem]` not `border-4`: the numeric utility is px and
+              // would pin the outline while the box scales (§19). Editors will
+              // offer to "canonicalise" it — decline.
+              className="h-48 w-full max-w-56 shrink-0 border-[0.25rem] border-black lg:shrink"
             />
           ))}
         </div>

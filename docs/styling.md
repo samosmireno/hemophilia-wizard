@@ -1066,7 +1066,7 @@ that item's five cases. | §13, §17, ADR 0007 |
 | 46 | **`/explore`'s responsive pass of 2026-08-05 is the second measured one** (§17), so what stays open is what the render turned up rather than what it failed to check. **First, the fills now carry a reading nobody drew**: `bg-white/60` on the middle segment against `crimson-50/5` on the flanks makes the row read as a range with a peak side by side, and stacked as three separate cards it reads as one card being _different_ — selected, or current. Both values are drawn and one is solved exactly, so the pass kept them rather than invent a below-`xl` fill, but it is a designer question and it is new. **Second, the class labels equal the `<h1>` at 320 and 375** (both 24px), the deliberate consequence of ramping a heading three steps past a fixed box that does not step — the same shape as item 45's 20px-caption-over-16px-body, and answerable only by a designer who draws a phone. **Third, the arc clearance at 320 is 9.4px** on the middle segment's label: positive, but it is what a longer class label would spend, and `EXPLORE_SEGMENTS` is authored content that could gain one. **Fourth, the `<h1>` renders ten lines at 320 where the arithmetic predicted eight** — narrow-column line-breaking wastes ~20% of the column on short trailing words, which no estimate in this file models. Every other predicted figure in the pass landed, including the CTA wrapping at 375 by 1px. | §17, §2, §9 |
 | 47 | **Figure assets are budgeted for 1.00×, and §19 now draws some of them at 1.25×.** §13's rule is that a figure is stored at 2× its drawn width _and no wider_; `clotting-cascade-thumb.webp` is exactly 940px for a 470px figure. On a DPR-2 panel at the 1.25× step that figure is drawn at 587 CSS px and wants 1175 device px, so it renders at ~80% of ideal density. It is **one file**, not a class of problem — `denecimig` is 3852px, `inno8` 5224px, `hemostatic_mechanisms` 1772px, all far past what any step asks for. Re-export the thumb at 3× if a 5K screen shows it soft; do not re-export the set. | §13, §19 |
 | 48 | **`--shadow-popup` is not scaled, and it is the one shadow big enough for that to read.** Its 50.142px blur stays 50px on a card that is 1.25× larger, i.e. ~20% tight against the drawing. Left alone deliberately (§19): converting it means editing a value §13 documents as straight-from-export, and it is a one-line change if a 2560 render indicts it. Not yet examined at that size. | §13, §19 |
-| 49 | **§19 scaled the pop-up's 5px border but not the app's other visible borders.** `ArchBand`'s `border-t-4` and `Scenario`'s `border-4` are drawn edges of the same class as `Popup`'s, and they stay 4px while the objects they outline grow. They were not in the change because they are Tailwind scale utilities rather than arbitrary values, so the grep that built the conversion list never saw them — an inconsistency found during implementation, not a decision. Two-value fix if wanted; the alternative reading is that only `Popup`'s border is large enough to matter. | §19 |
+| 49 | ~~**§19 scaled the pop-up's 5px border but not the app's other visible borders.**~~ **Closed 2026-08-05, and the item under-counted itself while it was open** — it named `ArchBand`'s `border-t-4` and `Scenario`'s `border-4`, but `border-4` had **three** source sites, the other two being `rebalancing-agents`' and `treatment-landscape`' artwork placeholder boxes. All four are now `border-[0.25rem]` / `border-t-[0.25rem]`, which is the same 4px at a 16px root and scales above the canvas with the objects they edge. Verified in Chromium: 4px at 1440, 5px at 2560, and the nine canvas screenshots stay byte-identical. The reason they were missed twice is that they are Tailwind scale utilities rather than arbitrary values, so neither grep that built the §19 conversion list could see them. | §19 |
 
 ---
 
@@ -4559,6 +4559,20 @@ and `border-[0.3125rem]`, `ArchBand`'s `9.375rem`/`18.75rem`, `Explore`'s `8rem`
 `FviiiaMimetics`' `3.75rem`/`7.3125rem`, and `Scenario`'s box moved onto the spacing
 scale as `h-46.25 max-w-56.75`. Every one is the same number of pixels at a 16px
 root, which is why the canvas did not move.
+
+**Every drawn border scales too**, on the same shape argument, and this took two
+passes to get right. The first named only `Popup`'s 5px edge; `border-4` turned out
+to have three more source sites — `ArchBand`'s white top rule and the artwork
+placeholder boxes on `rebalancing-agents`, `treatment-landscape` and `scenario`.
+All four are now `border-[0.25rem]` / `border-t-[0.25rem]`, measured at 4px on the
+canvas and 5px at 1.25×.
+
+**`border-[0.25rem]` is not `border-4`, and an editor will tell you it is.** The
+Tailwind language server offers `suggestCanonicalClasses` on every one of these,
+because at a 16px root they compute the same. They are not the same: the numeric
+utility is **px** and pins the edge while the object it outlines grows. Accepting
+that suggestion silently reverts this. Each of the four call sites carries a comment
+saying so, because the warning is what a future reader sees first.
 
 **Shadows, hairlines and focus rings stay px, on purpose.** A root font-size step is
 text-and-spacing zoom, not page zoom; leaving those fixed is the definition of that

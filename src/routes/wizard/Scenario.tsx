@@ -45,7 +45,12 @@ import { isComplete, useWizardAnswers } from "../../state/wizardAnswers";
  * ramp that resolves that is on the row below, not on the box, which keeps its
  * drawn size at every width.
  */
-const BOX = "h-46.25 w-full max-w-56.75 shrink-0 border-4 border-black lg:shrink";
+/* Every length here is rem so the placeholder scales with the board above the
+   canvas (docs/styling.md §19); each is the drawn px at a 16px root, so 1440 is
+   unmoved. `border-[0.25rem]` is deliberately NOT `border-4` — Tailwind's numeric
+   border utilities are px and would pin the outline at 4px while the box grows.
+   Editors offer that swap; it is wrong here. */
+const BOX = "h-46.25 w-full max-w-56.75 shrink-0 border-[0.25rem] border-black lg:shrink";
 
 export default function Scenario() {
   const { answers } = useWizardAnswers();

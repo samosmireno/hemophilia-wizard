@@ -183,7 +183,7 @@ describe("rebalancing-agents chapter", () => {
    */
   it("ramps the box row's gap rather than the boxes, which stay drawn-size at every width", () => {
     const { container } = render(<RebalancingAgents />);
-    const boxes = [...container.querySelectorAll("div.border-4")];
+    const boxes = [...container.querySelectorAll("div.border-\\[0\\.25rem\\]")];
 
     expect(boxes).toHaveLength(REBALANCING_AGENTS.length);
     for (const box of boxes) {

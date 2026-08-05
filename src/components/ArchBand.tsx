@@ -102,8 +102,13 @@ export default function ArchBand({
 }) {
   return (
     <div
+      /* `border-t-[0.25rem]` is NOT `border-t-4`, and an editor will offer to
+         "canonicalise" it into one. Tailwind's numeric border utilities are px,
+         so that swap silently pins this rule at 4px while the arch it edges grows
+         above the canvas — the whole point of docs/styling.md §19. Same for the
+         two radii: they are rem so the curve scales with the band. */
       className={cn(
-        "relative isolate -mx-6 mt-4 -mb-4 grow overflow-hidden rounded-t-[9.375rem] border-t-4 border-white/40 bg-brand-crimson-50/15 pb-4 sm:mx-0 lg:mb-0 lg:pb-0 xl:rounded-t-[18.75rem]",
+        "relative isolate -mx-6 mt-4 -mb-4 grow overflow-hidden rounded-t-[9.375rem] border-t-[0.25rem] border-white/40 bg-brand-crimson-50/15 pb-4 sm:mx-0 lg:mb-0 lg:pb-0 xl:rounded-t-[18.75rem]",
         className,
       )}
     >
@@ -120,9 +125,9 @@ export default function ArchBand({
         The padding is the corner curve, expressed as a measure. `overflow-hidden`
         clips to the padding-box radius, so at the title's own depth the arch has
         already eaten a fixed amount off each side — and nothing else here stops
-        a long title running into it. Inner radius is the class value less
-        `border-t-4`, and the inset at depth y is `r − √(r² − (r−y)²)`; the `<h2>`
-        starts at `mt-9` = 36:
+        a long title running into it. Inner radius is the class value less the
+        4px top border, and the inset at depth y is `r − √(r² − (r−y)²)`; the
+        `<h2>` starts at `mt-9` = 36:
 
             r = 146 (<xl)   146 − √9216  =  50.0px
             r = 296 (xl+)   296 − √20016 = 154.5px
