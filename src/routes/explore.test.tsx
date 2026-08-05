@@ -9,6 +9,7 @@ import {
   EXPLORE_SEGMENTS,
   EXPLORE_TABLE_TITLE,
   SDM_CONCLUSION,
+  SDM_LEAD,
   SDM_POINTS,
 } from "../data/explore";
 import { routes } from "./router";
@@ -35,7 +36,16 @@ describe("explore — the SDM conclusion", () => {
     expect(within(page).getByRole("heading", { level: 1 })).toHaveAccessibleName(SDM_CONCLUSION);
   });
 
-  it("renders all four bullets verbatim", () => {
+  it("renders the lead sentence above the bullets", () => {
+    const page = renderExplore();
+    // Order is the assertion: the lead introduces the list, so a `<p>` that
+    // rendered after it would be a different page.
+    const lead = within(page).getByText(SDM_LEAD);
+    const list = within(page).getAllByRole("list")[0];
+    expect(lead.compareDocumentPosition(list)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it("renders all three bullets verbatim", () => {
     const page = renderExplore();
     const items = within(page)
       .getAllByRole("listitem")
@@ -61,20 +71,28 @@ describe("explore — the SDM conclusion", () => {
   });
 
   /**
-   * The space in "FVIIIa mimetics" is the assertion, and it is a regression test
-   * for a bug this page shipped with for one commit: `preserveCase` returns a
-   * span beside a bare text node, and a flex container makes each of those an
-   * anonymous flex item and **drops the whitespace between them** — rendering the
-   * label "FVIIIaMIMETICS". The centring now lives on a wrapper so the text is
-   * not a flex item. `textContent` is what catches it; no box assertion would.
+   * The space in the label is the assertion, and it is a regression test for a
+   * bug this page shipped with for one commit: `preserveCase` returns a span
+   * beside a bare text node, and a flex container makes each of those an
+   * anonymous flex item and **drops the whitespace between them** — rendering
+   * the label "FVIIIaMIMETICS". The centring now lives on a wrapper so the text
+   * is not a flex item. `textContent` is what catches it; no box assertion
+   * would.
+   *
+   * **The label lost its lower-case `a` on 2026-08-05** — it is "FVIII
+   * mimetics" now — so `preserveCase` matches nothing in it and emits no span,
+   * which is asserted below rather than assumed: with one text node the trap
+   * cannot fire, and a label that grew a cased term back would need the wrapper
+   * to still be there. The test above already checks all four label strings;
+   * this one stays pointed at the label that used to split.
    */
-  it("keeps FVIIIa's casing and its space through the uppercase transform", () => {
+  it("renders the FVIII label as one string, space intact", () => {
     const page = renderExplore();
-    const label = [...page.querySelectorAll("p")].find((p) => p.textContent?.startsWith("FVIIIa"));
+    const label = [...page.querySelectorAll("p")].find((p) => p.textContent?.startsWith("FVIII"));
 
-    expect(label).toHaveTextContent(/^FVIIIa mimetics$/);
-    // The lower-case `a` survives only because it is in its own opted-out span.
-    expect(within(label!).getByText("FVIIIa")).toHaveClass("normal-case");
+    expect(label).toHaveTextContent(/^FVIII mimetics$/);
+    // No cased term left in it, so nothing is opted out of the uppercase.
+    expect(label!.querySelector(".normal-case")).toBeNull();
   });
 });
 

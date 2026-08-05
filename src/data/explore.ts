@@ -14,41 +14,47 @@
  */
 
 /**
- * The page's `<h1>` — CONTEXT.md §9's SDM node, **as the artboard states it**.
+ * The page's `<h1>` — CONTEXT.md §9's SDM node, **shortened to its opening
+ * clause at the client's direction**.
  *
- * §9 stops at "…patient goals/preferences"; the artboard runs on into "when
- * making treatment decisions", which is what turns the fragment into a sentence
- * a page can be titled with. Transcribed with the tail, per the standing rule
- * that the artboard is the filing authority where it and `[PDF-V]` disagree.
+ * Both longer statements of it — §9's, which ends at "…patient
+ * goals/preferences", and the artboard's, which runs on into "when making
+ * treatment decisions" — are the same sentence at different lengths. The page
+ * now carries only its head, plural "patients"; the enumeration of risks,
+ * benefits, and options it dropped is what the bullets below already say.
  *
  * Sentence case, because `uppercase` is CSS on every heading in this app — the
  * accessible name stays the case it was written in.
  */
-export const SDM_CONCLUSION =
-  "Leverage multidisciplinary care and SDM with patient, emphasizing consideration of " +
-  "risks, benefits, alternative treatment options, and patient goals/preferences when " +
-  "making treatment decisions";
+export const SDM_CONCLUSION = "Leverage multidisciplinary care and SDM with patients";
 
 /**
- * The four bullets under it, verbatim from the artboard.
+ * The sentence between the heading and the bullets.
  *
- * CONTEXT.md §9 carries these **abridged** — "Focus on what matters to
- * patients/families; empower participation; improve understanding; support
- * adherence, quality of care, satisfaction" — which is a summary of the blueprint
- * rather than the blueprint's own sentences. The artboard supplies them in full,
- * so these are the longer form and §9 now records them.
+ * New on 2026-08-05 with the client's rewrite. The artboard drew four bullets of
+ * which the last two were statements about what SDM does ("Improves…",
+ * "Supports…") rather than the imperatives the first two are; the rewrite folds
+ * both into this one sentence and lifts it out of the list, which is what
+ * resolves the tense shift the artboard's set carried.
+ */
+export const SDM_LEAD =
+  "SDM engages patients in their care, improves quality of care, and increases patient " +
+  "satisfaction";
+
+/**
+ * The three bullets under that, per the client's 2026-08-05 rewrite.
  *
- * Note the tense shift the source makes and we keep: the first two bullets are
- * imperatives addressed to the clinician ("Focus…", "Empower…"), the last two are
- * statements about what SDM does ("Improves…", "Supports…"). It reads like a slip
- * and is not ours to repair.
+ * They are the artboard's first two, one of them shortened ("…in education and
+ * treatment decisions" for "…in education and decision-making around treatment
+ * selection"), plus "Utilize SDM to support improved adherence" — the adherence
+ * half of the old fourth bullet, restated as an imperative so all three now
+ * address the clinician in the same voice. The rest of that bullet and all of
+ * the old third one are in `SDM_LEAD` above. §9 records the artboard's set.
  */
 export const SDM_POINTS: readonly string[] = [
   "Focus on what matters most to patients, families, and caregivers",
-  "Empower patients and caregivers to actively participate in education and decision-making " +
-    "around treatment selection",
-  "Improves understanding of treatment options and engages patients in their care",
-  "Supports improved adherence, quality of care, and patient satisfaction",
+  "Empower patients and caregivers to actively participate in education and treatment decisions",
+  "Utilize SDM to support improved adherence",
 ];
 
 /** One labelled column of agents inside a segment. */
@@ -107,7 +113,7 @@ export interface ExploreSegment {
 export const EXPLORE_SEGMENTS: readonly ExploreSegment[] = [
   {
     width: 339,
-    columns: [{ label: "FVIIIa mimetics", agents: ["Emicizumab", "Denecimig"] }],
+    columns: [{ label: "FVIII mimetics", agents: ["Emicizumab", "Denecimig"] }],
   },
   {
     width: 524,

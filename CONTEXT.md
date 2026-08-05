@@ -192,13 +192,17 @@ shown before the reason question) `[PDF-V]`:
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **HB +inhib** | Hemostatic rebalancing agents. _Note: Bypassing agents (aPCC, rFVIIa) can manage breakthrough bleeds in patients with inhibitors, but sustained prophylaxis with these agents remains challenging._ |
 | **HB −inhib** | Hemostatic rebalancing agents · FIX prophylaxis · Gene therapy                                                                                                                                      |
-| **HA +inhib** | Factor VIIIa mimetic · Hemostatic rebalancing agents ᴮ                                                                                                                                              |
+| **HA +inhib** | Factor VIII mimetic ᶜ · Hemostatic rebalancing agents ᴮ                                                                                                                                             |
 | **HA −inhib** | Recombinant FVIII concentrates · Factor VIIIa mimetics · Hemostatic rebalancing agents                                                                                                              |
 
 ᴮ `[BUILD]` **the artboard sets this one plural where `[PDF-V]` sets it singular** ("Hemostatic
 rebalancing agent"). The app renders the plural, on the standing rule that the artboard is the
 filing authority where the two disagree — the same call recorded for the `fviiia-mimetics` cards'
 copy. Note the first item in the same list _is_ singular on both, deliberately.
+
+ᶜ `[CLIENT]` 2026-08-05 copy edit — the "a" was dropped from "Factor VIIIa mimetic" on this screen
+only. `HA −inhib` keeps the activated form the artboards and `[PDF-V]` draw, so the two screens now
+diverge on purpose.
 
 Each box carries the annotation _"Click on the box(es) below to learn more about each type of
 therapy"_ and links to the class-level education pop-ups. Encoded in `[BUILD]` `src/data/wizard.ts`
@@ -315,6 +319,21 @@ its `[x=…]` headers are page regions, and the lead-in and its children land in
 the same nominal x. `documents/out.txt` is layout-preserving and does: the top-level bullets of
 those notes start at **column 1755**, the age bullets at **1763**.
 
+**`[CLIENT]` copy edit of 2026-08-05, scoped to the HB +inhib _Reduce Treatment Burden_ note.**
+Two changes, both departures from `[PDF-V]`:
+
+1. Its two age bullets read **`≥`** where the source types a bare `>` — the edit asked for the `>`
+   to be underlined, the slide-deck drawing of "greater than or equal to", and the sense the
+   indications carry. Set as the character for the same reasons as `denecimig-overview`'s FRONTIER
+   bullets (see §7.5): the codebase already writes the symbol that way, and it is what a screen
+   reader announces. The identical bullets in the other three scenarios keep the bare `>` — the
+   edit named this one, and the table above still records the source's form.
+2. Its **Strategies** are now the three bullets the two **HA** scenarios carry ("less frequent or
+   more convenient SC dosing" · "less burdensome dosing … for younger patients" · "Plan follow-up
+   and education …"), supplied verbatim by the client. The HB wording they replace ("convenient SC
+   administration and alternative dosing schedules", two bullets) survives only in HB −inhib, so
+   that pair is no longer identical across the two HB scenarios.
+
 That measurement is also what keeps HB −inhib's trailing _"Gene therapy may reduce long-term
 treatment burden…"_ bullet **out** of the nest — it sits back at 1755, and on content grounds it is
 about gene therapy rather than about children, so a mechanical "group everything after the colon"
@@ -346,7 +365,8 @@ Indicated with inhibitors (Yes / No). "A + B" means eligible for both.
 >
 > **The same page indexes the [§6](#6-drug-information-sheets) sheets by class `[BUILD]`.** Below
 > the SDM copy the artboard draws three arched segments holding all seven agents that have a
-> sheet, under four verbatim class labels — "FVIIIa mimetics" · "Hemostatic rebalancing agents" ·
+> sheet, under four verbatim class labels — "FVIII mimetics" (drawn "FVIIIa mimetics"; the `a`
+> was dropped 2026-08-05) · "Hemostatic rebalancing agents" ·
 > "UHL clotting factor replacement" · "Gene therapy". Three of the four disagree with the
 > `TreatmentClass` enum in `treatments.ts` (plural where it is singular; "UHL" is a half-life the
 > enum has no term for), so they are transcribed rather than derived — the same call
@@ -408,14 +428,16 @@ Wired from `/wizard/therapies` (all 6 recommendable agents) **and from `/explore
 seven** — so Efanesoctocog alfa's sheet, built with no caller since the sheets landed, is reachable
 at last. See [§5](#5-explore-therapy-options-table-secondary-engine).
 
-Three per-sheet deviations the card reads as optional fields, all transcription:
+Two per-sheet deviations the card reads as optional fields, both transcription:
 
 - **`title`** — Denecimig alone. The card is headed _"Denecimig (emerging/investigational)"_ where
   the button says "Denecimig", the caption/title split §7.5's agent cards already use.
 - **`classHeading`** — Efanesoctocog alfa alone, whose section is headed _"Class"_ (it names a
   class with no molecular target) where the other six read _"Class/Target"_.
-- **`monitoringHeading`** — Denecimig alone: _"Monitoring: TBD; based on phase 3 clinical trial
-  data"_ qualifies the whole section rather than each bullet, and is a heading, not a bullet.
+
+A third, `monitoringHeading`, is **gone as of 2026-08-05 `[CLIENT]`** — see the Denecimig edits
+below. It held Denecimig's whole-section qualifier and had no other user, so the field went with
+the copy.
 
 **Trial citations cut, 2026-08-04 `[CLIENT]`.** Direction: _"Delete the colon and everything after
 on each bullet (ie, only the clinical trials name (NCT…) would be kept."_ Only Denecimig's four
@@ -423,6 +445,21 @@ entries carried a tail; they were drawn as blue links but the source supplied no
 them. `ClinicalTrial` therefore has no `citation` field, every trial renders `Name (NCTxxxxx)`, and
 the card contains no link at all. The four tails are recorded below and remain in
 `documents/out_raw.txt`, but are stored nowhere in the code.
+
+**"Factor VIIIa–mimetic" → "Factor VIII mimetic", 2026-08-05 `[CLIENT]`.** The Class/Target line of
+the two mimetic sheets drops the activated form's "a" and the dash — Denecimig's first, Emicizumab's
+a step later, so the two sheets agree. It is the same terminology pass §7.5 records (see the note
+under that heading); the artboards and `[PDF-V]` still draw the activated form, and the class labels
+elsewhere in this file are unaffected except where footnoted.
+
+**Two more edits on the Denecimig sheet, 2026-08-05 `[CLIENT]`.** (1) Its Indication reads
+_"patients ≥1 year"_ where the source writes a bare `>` — the direction asked for the `>` to be
+underlined, which is the slide-deck drawing of "greater than or equal to". Scoped to this sheet:
+Concizumab's and Marstacimab's _">12 years"_ are untouched, and §7.5 records the same edit reaching
+`denecimig-overview` a step earlier. (2) The whole-section Monitoring qualifier _"TBD; based on
+phase 3 clinical trial data"_ is deleted, so the sheet is headed plain _"Monitoring:"_ like the
+other six; the Indication's own _"TBD based on FDA approval"_ was not part of the direction and
+stands.
 
 Etranacogene's dose is stored `"2 × 10¹³ genome copies/kg body weight"` in Unicode — the earlier
 `10^13` renders literally, and a dose reading as ten-thousand-and-thirteen is a hazard rather than
@@ -434,16 +471,16 @@ perioperative management. _Dosage:_ IV, 50 IU/kg once weekly; optimize via plasm
 (aPTT one-stage assay). _Monitoring:_ hypersensitivity/anaphylaxis; neutralizing antibodies
 (inhibitors); ADAs. _Trials:_ Study 1 (NCT04161495), Study 2 (NCT04759193).
 
-**Emicizumab** — _Class/Target:_ FVIIIa-mimetic, FIXa×FX BsAb. _Indication:_ HA ±inhibitors,
+**Emicizumab** — _Class/Target:_ Factor VIII mimetic, FIXa×FX BsAb. _Indication:_ HA ±inhibitors,
 newborn & older. _Dosage:_ SC (vial & syringe); load 3 mg/kg weekly ×4 wks; maintenance
 1.5 mg/kg weekly, 3 mg/kg q2wks, or 6 mg/kg monthly. _Monitoring:_ injection-site reactions;
 lab coagulation test interference (don't use intrinsic-pathway clotting tests — ACT, Bethesda,
 aPTT-based — for FVIII inhibitor titers); thrombotic microangiopathy/thrombotic events; aPCC
 interaction; ADAs. _Trials:_ HAVEN 3 (NCT02847637), HAVEN 4 (NCT03020160), HAVEN 2 (NCT02795767).
 
-**Denecimig (emerging/investigational)** — _Class/Target:_ FVIIIa-mimetic BsAb, FIXa×FX.
-_Indication:_ TBD (FDA); trials in HA ±inhibitors, patients >1 yr. _Dosage:_ SC prefilled pen
-w/ attachable syringe; no washout when switching from emicizumab. _Monitoring:_ TBD (phase 3):
+**Denecimig (emerging/investigational)** — _Class/Target:_ Factor VIII mimetic BsAb, FIXa×FX.
+_Indication:_ TBD (FDA); trials in HA ±inhibitors, patients ≥1 yr. _Dosage:_ SC prefilled pen
+w/ attachable syringe; no washout when switching from emicizumab. _Monitoring:_
 mostly mild transient injection-site reactions; no thromboembolic/TMA events; no
 hypersensitivity; no clinically relevant lab findings. _Trials:_ FRONTIER2 (NCT05053139);
 FRONTIER3 (NCT05306418); FRONTIER4 (NCT05685238); FRONTEIR5 (NCT05878938). _(Source spells
@@ -572,6 +609,27 @@ inter-individual variability and uncertain duration.
 
 ### 7.5 FVIIIa-mimetic BsAbs (approved & emerging agents for HA)
 
+`[BUILD]` **the chapter says "FVIII mimetic" where this section says "FVIIIa-mimetic"**, on a
+client copy edit of 2026-08-05: the `a` and the hyphen come out of every string the app paints on
+`/education/fviiia-mimetics` — the `<h1>`, all four chapter bullets, both MOA bullets, the panel
+heading, and the Inno8 band. This section keeps `[PDF-V]`'s wording below, because that is what
+the source says and this is the transcription of it. Two strings in the app were held back at
+first — `denecimig-moa.title` and the quoted heading in `DENECIMIG_FIGURE_ALT` quote the line
+baked into `denecimig.webp`'s pixels rather than copy the app sets — and the client then supplied
+a re-export painting "FVIII MIMETIC BSAB", so both now quote that and the hold is spent. The route
+slug, the topic ids and the component name are unaffected — `fviiia-mimetics` is contractual
+(issue 08 cross-links to it). Elsewhere in the app the source's wording still stands: `/explore`'s
+"FVIIIa mimetics" column, the glossary, and the §7.7 wizard notes were outside the edit.
+
+`[BUILD]` **two more client edits of 2026-08-05, both scoped to the Denecimig pop-up.** (1) The
+FRONTIER age limits are set with `≥` where this section transcribes the source's bare `>` — the
+edit asked for the `>` to be underlined, which is the slide-deck drawing of "greater than or equal
+to", and the symbol is what this codebase already writes elsewhere (`prophylaxis-guidance`'s
+"levels ≥2 IU/dL"). It reached `denecimig-overview` first and the §6 Denecimig sheet a step later,
+on the same direction; the §7.7 wizard notes and the other six sheets keep the bare `>`.
+(2) `denecimig-moa`'s pre-clinical bullet reads
+"denecimig (Mim8) potency" where the source writes "Mim8 potency" flat.
+
 - **Class.** BsAbs simultaneously target two antigens; FVIIIa-mimetic BsAbs are engineered to
   **bridge FIXa and FX**, mimicking FVIII cofactor function and triggering the coagulation cascade.
   Emicizumab established FVIIIa-mimetic therapy as a **first-in-class SC nonfactor prophylaxis**
@@ -617,7 +675,8 @@ inter-individual variability and uncertain duration.
     heavy-chain regions with two distinct light chains carrying charged-residue mutations to
     optimize chain pairing/cofactor activity). In vitro, NXT007-treated plasma achieved coagulation
     activity equivalent to **100 IU/dL FVIII** in a TF-triggered thrombin-generation assay. Trials:
-    NXTAGE (jRCT2080224835), WP44714 (NCT05987449).
+    NXTAGE (jRCT2080224835), WP44714 (NCT05987449) — **superseded in the app**, see the `[BUILD]`
+    note below; kept here as what the source states.
     `[BUILD]` the "derived from emicizumab" sentence is modelled as its own topic
     (`nxt007-structure`, titled with the figure caption below), because Pop up 12 draws it under the
     diagram and the rest beside it — the same split as `emicizumab-overview`/`emicizumab-moa`. The
@@ -631,6 +690,20 @@ inter-individual variability and uncertain duration.
     already names the agent, and the artboard is the filing authority where it and `[PDF-V]`
     disagree — the same call recorded for the panel itself and for the denecimig card's opening
     bullet. `inno8-overview` sheds its own two the same way; see below.
+    `[BUILD]` **the agent displays as "Zemocimig (NXT007)"** — the INN ahead of the code name, a
+    client-directed label change of 2026-08-05, where both the source and the artboard draw the
+    code name alone. It is on the panel's button and on Pop up 12's band, held as one chapter
+    literal: this is the one agent whose caption and card heading agree, so a second copy could
+    drift. It also opens the sentence under the structure diagram, which is the one place the INN
+    reaches the data module ("Zemocimig (NXT007) is derived from emicizumab heavy-chain
+    regions…"). Both `title`s still transcribe the bare "NXT007", as does the prose above and the
+    "NXT007-treated plasma" bullet beside the diagram; the heading baked into the figure raster is
+    unreachable in any case. The source and the artboard draw the code name throughout.
+    `[BUILD]` **the trials bullet carries the client's phase 3 program, not the source's** (same
+    2026-08-05 pass): "Initiated in phase 3 trials:" over **ZEBRHA 1 (NCT07416526)** and **ZEBRHA 2
+    (NCT07416604)**, replacing the NXTAGE/WP44714 pair transcribed above. Two children under a
+    colon either way, so the artboard's nesting is untouched; the phase moved into the parent
+    bullet, so the children drop the "study" the source's names carried.
   - **Inno8** — novel **VHH-based, once-daily oral** FVIIIa-mimetic for HA; under evaluation in the
     nonrandomized open-label phase 1 **VOYAGER2** trial (NCT07220564).
     `[BUILD]` **no figure topic is split off this overview**, unlike the other three agents': Pop up
@@ -639,7 +712,11 @@ inter-individual variability and uncertain duration.
     states its own title for the control.
     `[BUILD]` **the card drops the "Inno8" prefix** the source puts in front of both bullets
     ("Inno8: Novel VHH-based…", "Inno8 is currently under evaluation…") — the same call as NXT007's
-    and on the same authority, since the band above reads "Inno8: Oral FVIIIa Mimetic for HA".
+    and on the same authority, since the band above reads "Inno8: Oral FVIII Mimetic for HA".
+    `[BUILD]` **the app calls VOYAGER2 a phase 1/2 trial**, where the source says phase 1 — a client
+    copy edit of 2026-08-05, in the same pass as the `a`/hyphen edit noted at the head of this
+    section. "1/2" is the span of phases as the client wrote it, not a fraction, and is not to be
+    set as one.
     Figure: "Inno8 Mechanism of Action" (image), shown as a thumbnail that enlarges bare over the
     card; **its heading is baked into the raster** as denecimig's and NXT007's are, and here the
     painted line ("Inno8: Novel Factor VIII Mimetic Bispecific Binder Engineered for Oral
@@ -660,7 +737,7 @@ inter-individual variability and uncertain duration.
   older populations.
 - **Hemostatic rebalancing agents in treatment of HA/HB** — enhance thrombin generation by
   targeting endogenous anticoagulant pathways (**TFPI, AT, and the APC/protein S system**).
-  - _Anti-TFPI mAbs:_ TFPI limits coagulation by inhibiting FXa and the tissue factor–FVIIa
+  - _Anti-TFPI mAbs:_ TFPI limits coagulation by inhibiting FXa and the TF–FVIIa
     complex; **concizumab and marstacimab** selectively bind the **K2 domain of TFPI**, reducing
     TFPI-mediated inhibition of FXa and enabling FXa generation via the FVIIa–TF pathway.
   - _AT-directed siRNA:_ AT neutralizes thrombin and FXa; **fitusiran** uses RNA interference to
@@ -746,14 +823,14 @@ Validated Hemophilia Regimen Treatment Adherence Scale–Prophylaxis · VWD von 
   `[BUILD]` **This node is the `/explore` page** — see
   [§5](#5-explore-therapy-options-table-secondary-engine) and
   `docs/adr/0007-explore-is-the-sdm-conclusion.md`. The `/explore` artboard renders it as the
-  page's `<h1>` and **continues the sentence past where the blueprint stops**, with "…when making
-  treatment decisions"; the app ships the longer form, on the standing rule that the artboard is
-  the filing authority where the two disagree.
+  page's `<h1>`, and continues the sentence past where the blueprint stops with "…when making
+  treatment decisions". **The app ships neither long form**: on 2026-08-05 the client cut the
+  heading back to its opening clause, "Leverage multidisciplinary care and SDM with patients"
+  (plural). The enumeration it drops is covered by the lead and bullets below.
 
   Its four bullets were previously recorded here abridged ("Focus on what matters to
   patients/families; empower participation; improve understanding; support adherence, quality of
-  care, satisfaction"). The artboard supplies them in full, and these are now verbatim `[BUILD]`
-  (`src/data/explore.ts` → `SDM_POINTS`):
+  care, satisfaction"). The artboard supplies them in full:
 
   - "Focus on what matters most to patients, families, and caregivers"
   - "Empower patients and caregivers to actively participate in education and decision-making
@@ -761,9 +838,19 @@ Validated Hemophilia Regimen Treatment Adherence Scale–Prophylaxis · VWD von 
   - "Improves understanding of treatment options and engages patients in their care"
   - "Supports improved adherence, quality of care, and patient satisfaction"
 
-  Note the tense shift the source makes and the app keeps: the first two are imperatives addressed
-  to the clinician, the last two are statements about what SDM does. It reads like a slip and is
-  not ours to repair.
+  Note the tense shift the source makes: the first two are imperatives addressed to the clinician,
+  the last two are statements about what SDM does.
+
+  `[BUILD]` **The client rewrote this set on 2026-08-05**, and the rewrite is what ships. The two
+  statements are folded into one sentence that now sits between the `<h1>` and the list
+  (`src/data/explore.ts` → `SDM_LEAD`), leaving three bullets that are all imperatives
+  (→ `SDM_POINTS`):
+
+  > "SDM engages patients in their care, improves quality of care, and increases patient
+  > satisfaction"
+  - "Focus on what matters most to patients, families, and caregivers"
+  - "Empower patients and caregivers to actively participate in education and treatment decisions"
+  - "Utilize SDM to support improved adherence"
 
 ---
 

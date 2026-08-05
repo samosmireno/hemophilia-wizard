@@ -8,6 +8,7 @@ import {
   EXPLORE_SEGMENTS,
   EXPLORE_TABLE_TITLE,
   SDM_CONCLUSION,
+  SDM_LEAD,
   SDM_POINTS,
   type ExploreSegment,
 } from "../data/explore";
@@ -23,7 +24,7 @@ import { preserveCase } from "../lib/preserveCase";
  * `docs/adr/0007-explore-is-the-sdm-conclusion.md` records why the artboard won.
  *
  * Three things stack here, and only the first is the blueprint's: the SDM
- * conclusion (heading + four bullets), the button that opens the table, and a
+ * conclusion (heading + lead + three bullets), the button that opens the table, and a
  * class-grouped index into the §6 drug sheets drawn as three arched segments.
  * That last one is **Efanesoctocog alfa's first caller anywhere** — CONTEXT.md §6
  * has recorded its sheet as built-and-unreachable since the sheets landed.
@@ -63,8 +64,17 @@ export default function Explore() {
   return (
     <section aria-labelledby="explore-heading" className="flex flex-1 flex-col lg:-mr-rail">
       {/*
-        **Drawn at 42px, not the 52 every other page sets.** This heading is a
-        four-line sentence and the designer dropped it. Fitted rather than
+        **The client cut this heading to one clause on 2026-08-05.** It was the
+        190-character sentence the notes below are written about; it is now 53
+        characters and sets in one line at the canvas. Everything here still
+        holds — the size was fitted to the drawing, and the drawing has not
+        changed — but the two caps it derives are now slack rather than load-
+        bearing, which is why they are kept rather than re-argued: neither can
+        bind a string this short, and both would be needed again if the sentence
+        comes back.
+
+        **Drawn at 42px, not the 52 every other page sets.** The heading as drawn
+        was a four-line sentence and the designer dropped it. Fitted rather than
         guessed: least squares over all four drawn lines in Barlow Condensed 700
         returns 42px at 0.0234em of tracking — `tracking-wide` to within a
         thousandth — with residuals under 1.1px on lines up to 1139px wide. Cap
@@ -119,15 +129,33 @@ export default function Explore() {
       </h1>
 
       {/*
-        22px at the drawn 32px pitch. Verified by rendering: DM Sans 400 at 22px
-        sets the four bullets 655/1110/817/718 against the export's
-        651/1106/813/715 — a constant 4px, which is the bullet indent's origin
-        rather than a size error, since it does not grow with the string.
+        The lead sentence, which the artboard has no element for — it arrived
+        with the client's 2026-08-05 rewrite, out of the two bullets that used to
+        end the list.
 
-        Full band width and no measure cap: the export wraps bullet 2 after
+        So it takes the list's type rather than inventing any: same size, same
+        ramp, same 1.6. `ps-6` is the list's own `pl-6`, which puts this
+        sentence's left edge on the bullets' TEXT rather than on their discs, so
+        the four lines read as one block instead of two indents. `mt-6` above it
+        and `mt-4` below (in place of the list's own `mt-6`) keep the heading-to-
+        bullets distance the drawing has; the sentence is spliced into that gap
+        rather than added on top of it.
+      */}
+      <p className="mt-6 ps-6 text-base/[1.6] text-black lg:text-xl/[1.6]">{SDM_LEAD}</p>
+
+      {/*
+        22px at the drawn 32px pitch. Verified by rendering: DM Sans 400 at 22px
+        set the artboard's four bullets 655/1110/817/718 against the export's
+        651/1106/813/715 — a constant 4px, which is the bullet indent's origin
+        rather than a size error, since it did not grow with the string. Three of
+        those four strings survive the rewrite, two of them unchanged, so the fit
+        still stands.
+
+        Full band width and no measure cap: the export wrapped bullet 2 after
         "treatment", and 22px type in the 1216px band puts "selection" at 1202px
-        against ~1178px of room, so the drawn break falls out of the width rather
-        than needing to be forced.
+        against ~1178px of room, so the drawn break fell out of the width rather
+        than needing to be forced. That bullet is now shorter — it ends at
+        "treatment decisions" — and sets in one line.
 
         **This page's one body step, and it lands on the floor** — 20 → 16 below
         `lg`, which makes `/explore` §2's sixth exception page and the second
@@ -142,7 +170,7 @@ export default function Explore() {
         step. 1.6 is the ratio 20/32 already renders at, so one class covers both
         and the canvas is unchanged.
       */}
-      <BulletList items={SDM_POINTS} className="mt-6 text-base/[1.6] lg:text-xl/[1.6]" />
+      <BulletList items={SDM_POINTS} className="mt-4 text-base/[1.6] lg:text-xl/[1.6]" />
 
       {/*
         The package `Button`, at `WizardIntro`'s recipe and not `WizardIntro`'s
@@ -529,11 +557,17 @@ function Segment({
             */}
             <div className={cn("mt-6 flex items-center justify-center", "xl:mt-0 xl:h-20")}>
               {/*
-                `preserveCase` is required, not decorative: `uppercase` renders
+                `preserveCase` was required, not decorative: `uppercase` renders
                 "FVIIIa mimetics" as "FVIIIA MIMETICS" and destroys the one letter
                 that says *activated* factor VIII. The artboard draws that `a` in
-                lower case for exactly that reason, and `FVIIIa` is already in the
-                helper's term list.
+                lower case for exactly that reason, and `FVIIIa` is in the helper's
+                term list.
+
+                **That label is "FVIII mimetics" as of 2026-08-05**, so none of the
+                four now contains a cased term and the call is a `split` that finds
+                no delimiter. Kept rather than removed: the labels are transcribed
+                copy that has changed once already, and the wrapper above only
+                earns its keep while this call is here.
               */}
               <p className="text-center font-display text-2xl leading-5.5 font-semibold tracking-wide text-brand-crimson-50 uppercase">
                 {preserveCase(column.label)}

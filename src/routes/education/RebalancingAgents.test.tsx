@@ -301,21 +301,22 @@ describe("rebalancing-agents chapter", () => {
   });
 
   /**
-   * The prose card glosses all three abbreviations its copy introduces, where
-   * the export glosses only AT — a deliberate, recorded divergence
-   * (docs/styling.md §11). This is what stops it being quietly reverted to the
-   * drawn single line.
+   * The prose card carries **no** abbreviation footnote (2026-08-05), where it
+   * used to gloss all three terms its copy introduces — the divergence open item
+   * 17 raised, now settled by deleting the row. The figure card behind it keeps
+   * its own gloss, which the assertion below is what distinguishes: a footnote
+   * anywhere on the prose card fails, whichever card it was copied from.
+   *
+   * The CTA is asserted in the same test because the two are the point: the row
+   * lost its text and kept its button.
    */
-  it("glosses all three abbreviations the prose card introduces", async () => {
+  it("drops the abbreviation footnote from the prose card but keeps its CTA", async () => {
     const user = userEvent.setup();
     render(<RebalancingAgents />);
     const card = within(await openProseCard(user));
 
-    expect(
-      card.getByText(
-        "APC = activated protein C; AT = antithrombin; TFPI = tissue factor pathway inhibitor.",
-      ),
-    ).toBeInTheDocument();
+    expect(card.queryByText(/=/)).not.toBeInTheDocument();
+    expect(card.getByRole("button", { name: "View mechanism" })).toBeInTheDocument();
   });
 
   /**

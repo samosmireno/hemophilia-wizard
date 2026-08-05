@@ -185,12 +185,12 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
   },
   {
     id: "fviiia-mimetics",
-    title: "FVIIIa-Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
+    title: "FVIII Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
     body: [
       "BsAbs work by simultaneously targeting two antigens",
-      "FVIIIa mimetic BsAbs are engineered to bridge FIXa and FX, mimicking the cofactor functions of FVIII and triggering the coagulation cascade",
-      "Emicizumab established FVIIIa-mimetic therapy as a first-in-class subcutaneous, nonfactor prophylaxis option for HA",
-      "Emerging FVIIIa-mimetic therapies, including denecimig/Mim8, are being developed to further optimize hemostatic activity while improving dosing convenience",
+      "FVIII mimetic BsAbs are engineered to bridge FIXa and FX, mimicking the cofactor functions of FVIII and triggering the coagulation cascade",
+      "Emicizumab established FVIII mimetic therapy as a first-in-class subcutaneous, nonfactor prophylaxis option for HA",
+      "Emerging FVIII mimetic therapies, including denecimig (Mim8), are being developed to further optimize hemostatic activity while improving dosing convenience",
     ],
   },
   /**
@@ -232,7 +232,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     id: "emicizumab-moa",
     title: "Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa",
     body: [
-      "FVIIIa-mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
+      "FVIII mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
     ],
   },
   /**
@@ -249,7 +249,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * **The first bullet is the artboard's, not `[PDF-V]`'s.** §7.5 authors this
    * sentence for emicizumab (it is `emicizumab-moa`'s whole body) and gives
    * denecimig the monovalent-arm sentence instead; the card nonetheless opens
-   * with it, as a class-level statement of what a FVIIIa-mimetic BsAb does.
+   * with it, as a class-level statement of what a FVIII mimetic BsAb does.
    * Transcribed here rather than shared with `emicizumab-moa` as one constant —
    * two agents state the same class fact, and a card reading the *other* agent's
    * topic would make an edit to emicizumab's copy silently rewrite this one. The
@@ -260,24 +260,37 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * bullet that ends in a colon — the source subordinates them too ("supported
    * by the phase 3 FRONTIER program: FRONTIER2 …"), so flat siblings were a
    * modelling miss the artboard made visible rather than a change of content.
+   *
+   * **Their age limits are `≥`, where `[PDF-V]` types a bare `>`.** A client
+   * copy edit of 2026-08-05 asked for the `>` to be underlined — which is the
+   * slide-deck way of drawing "greater than or equal to", and the sense the
+   * source means: FRONTIER2 enrolled from 12 years, FRONTIER3 from 1. It is set
+   * as the character rather than as an underlined `>` because this codebase
+   * already writes the symbol that way (`prophylaxis-guidance`'s "levels ≥2
+   * IU/dL"), and one chapter drawing it two ways is the drift the edit was
+   * asked to remove. It is also the form a screen reader announces.
+   *
+   * The edit reaches this topic only. The same trials are cited in §7.7's
+   * wizard notes and in the drug sheets with the source's bare `>`, and those
+   * were outside it — see CONTEXT.md §7.5.
    */
   {
     id: "denecimig-overview",
-    title: "Denecimig (Mim8): Investigational; currently under FDA review",
+    title: "Denecimig (Mim8): Investigational currently under FDA review",
     body: [
-      "FVIIIa-mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
+      "FVIII mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
       "BLA submitted for use as routine prophylaxis in adult and pediatric patients with HA with or without inhibitors",
       {
         text: "FDA submission supported by results from the phase 3 FRONTIER clinical program:",
         children: [
-          "FRONTIER2: Denecimig SC administered monthly or weekly in patients >12 years of age",
-          "FRONTIER3: Denecimig monthly or weekly in patients >1 year of age",
+          "FRONTIER2: Denecimig SC administered monthly or weekly in patients ≥12 years of age",
+          "FRONTIER3: Denecimig monthly or weekly in patients ≥1 year of age",
           "FRONTIER4: OLE",
         ],
       },
       "Tiered dosing based on body weight avoids dose calculations, reduces treatment burden, and minimizes medication waste",
     ],
-    figures: ["Mechanism of Action for Denecimig (Mim8): FVIIIa-mimetic BsAb"],
+    figures: ["Mechanism of Action for Denecimig (Mim8): FVIII mimetic BsAb"],
   },
   /**
    * The MOA panel in the Denecimig card, and the two sentences drawn beneath it.
@@ -291,15 +304,27 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * here is name the figure for the trigger and the enlargement's accessible
    * name; the chapter does not draw it a second time.
    *
+   * **It read "FVIIIa-mimetic" until the raster caught up.** The 2026-08-05
+   * terminology pass dropped the `a` and the hyphen from every string this app
+   * paints, and this one was held back deliberately: a name that disagreed with
+   * the heading in the picture would send a screen-reader user looking for a
+   * line the raster did not carry. `denecimig.webp` was then re-exported
+   * painting "FVIII MIMETIC BSAB", so the hold is spent and this now quotes the
+   * new pixels. `DENECIMIG_FIGURE_ALT` in the chapter quotes the same painted
+   * line and moved with it; both move again if the asset does.
+   *
    * `body` is two bullets because the card draws two under the panel. Both are
-   * §7.5's own prose, moved off `denecimig-overview` rather than copied.
+   * §7.5's own prose, moved off `denecimig-overview` rather than copied — the
+   * second with the agent's name restored ahead of its code name, a client copy
+   * edit of the same date. The source writes "Mim8 potency" flat, which reads as
+   * a different agent from the "Denecimig (Mim8)" the card is titled with.
    */
   {
     id: "denecimig-moa",
-    title: "Mechanism of Action for Denecimig (Mim8): FVIIIa-mimetic BsAb",
+    title: "Mechanism of Action for Denecimig (Mim8): FVIII mimetic BsAb",
     body: [
       "A monovalent anti-FIXa arm enhances FIXa proteolytic activity to facilitate FX activation and subsequent thrombin generation and clot formation",
-      "Pre-clinical studies demonstrated Mim8 potency up to 18-fold greater than emicizumab-equivalent analog",
+      "Pre-clinical studies demonstrated denecimig (Mim8) potency up to 18-fold greater than emicizumab-equivalent analog",
     ],
   },
   /**
@@ -327,7 +352,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
         // `disease-mechanism`'s HA/HB pair above.
         text: "Novel therapeutic classes:",
         children: [
-          "FVIIIa-mimetic BsAbs (HA)",
+          "FVIII mimetic BsAbs (HA)",
           "Hemostatic rebalancing agents (HA/HB)",
           "Gene therapy (HB)",
         ],
@@ -427,7 +452,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       {
         text: "Anti-TFPI monoclonal antibodies",
         children: [
-          "TFPI limits coagulation by inhibiting FXa and tissue factor–FVIIa complex",
+          "TFPI limits coagulation by inhibiting FXa and TF–FVIIa complex",
           "Concizumab and marstacimab selectively bind the K2 domain of TFPI, reducing TFPI-mediated inhibition of FXa and enabling FXa generation by the FVIIa–TF pathway, promoting thrombin generation, clot formation, and hemostasis in HA/HB",
         ],
       },
@@ -459,7 +484,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    *
    * `title` is each card's own heading, not the chapter's caption for it: the
    * panel labels the buttons "NXT007" and "Inno8" flat, where Pop up 13 heads
-   * its card "Inno8: Oral FVIIIa Mimetic for HA". The same caption-vs-title
+   * its card "Inno8: Oral FVIII Mimetic for HA". The same caption-vs-title
    * split `Disclosure` documents.
    *
    * ---
@@ -473,19 +498,28 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * diagram rather than beside it, and prose that renders somewhere else gets
    * moved rather than sliced off this array by an index.
    *
-   * **Both "NXT007" prefixes are dropped**, which is the one place these topics
-   * are rephrased and is the artboard's own doing: the card's crimson band
-   * already says NXT007, so it draws "Next-generation BsAb engineered by…" and
-   * "Ongoing clinical trials:" flat rather than naming the agent three times on
-   * one card. `inno8-overview` sheds its two the same way, for the same reason
-   * and on the same authority; see there. (The artboard sets "Next- generation" —
-   * the same PDF soft-hyphen artifact this module's header says it strips, so it
-   * is one word here.)
+   * **Both "NXT007" prefixes are dropped**, which is the artboard's own doing:
+   * the card's crimson band already names the agent, so it draws
+   * "Next-generation BsAb engineered by…" and the trials bullet flat rather than
+   * naming it three times on one card. `inno8-overview` sheds its two the same
+   * way, for the same reason and on the same authority; see there. (The artboard
+   * sets "Next- generation" — the same PDF soft-hyphen artifact this module's
+   * header says it strips, so it is one word here.)
    *
    * The two trials are a `NestedBullet` because the artboard subordinates them
    * under a bullet ending in a colon — the same shape `denecimig-overview` gives
    * the FRONTIER program, and the same reading of a source that already wrote
    * them after a colon.
+   *
+   * **The trials themselves are the client's, not the source's** (2026-08-05,
+   * with the INN — CONTEXT.md §7.5): "Initiated in phase 3 trials:" over ZEBRHA 1
+   * (NCT07416526) and ZEBRHA 2 (NCT07416604), where the PDF lists NXTAGE
+   * (jRCT2080224835) and WP44714 (NCT05987449) as ongoing. Different trials, not
+   * a re-wording of the same two — CONTEXT.md keeps the superseded pair on the
+   * record rather than losing what the PDF said. The colon and
+   * the count are unchanged, so the artboard's shape still holds; the phase is
+   * now stated in the parent bullet, which is why "study" is gone from the two
+   * children.
    */
   {
     id: "nxt007-overview",
@@ -494,8 +528,8 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "Next-generation BsAb engineered by modifying emicizumab to enhance hemostasis in HA",
       "In vitro studies demonstrated that NXT007-treated plasma samples achieved coagulation activity equivalent to 100 IU/dL FVIII in a tissue factor–triggered thrombin generation assay",
       {
-        text: "Ongoing clinical trials:",
-        children: ["NXTAGE study (jRCT2080224835)", "WP44714 study (NCT05987449)"],
+        text: "Initiated in phase 3 trials:",
+        children: ["ZEBRHA 1 (NCT07416526)", "ZEBRHA 2 (NCT07416604)"],
       },
     ],
     figures: ["NXT007 BsAb Structure"],
@@ -518,12 +552,19 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    *
    * `body` is one bullet because the card draws one sentence under the panel,
    * moved off `nxt007-overview` rather than copied.
+   *
+   * **The sentence opens on the agent's display name — "Zemocimig (NXT007)"**,
+   * a client-directed change of 2026-08-05 where the source writes the bare code
+   * name (CONTEXT.md §7.5). It is the one rephrasing in this topic, and the one
+   * place the INN reaches this module: `title` here and on `nxt007-overview`
+   * still transcribe the source, and so does the "NXT007-treated plasma"
+   * sentence next door — that one is a compound the client did not respell.
    */
   {
     id: "nxt007-structure",
     title: "NXT007 BsAb Structure",
     body: [
-      "NXT007 is derived from emicizumab heavy-chain regions and incorporates two distinct light chains with charged-residue mutations designed to optimize antibody chain pairing and cofactor activity",
+      "Zemocimig (NXT007) is derived from emicizumab heavy-chain regions and incorporates two distinct light chains with charged-residue mutations designed to optimize antibody chain pairing and cofactor activity",
     ],
   },
   /**
@@ -538,11 +579,17 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    *
    * **Both "Inno8" prefixes are dropped**, which is `nxt007-overview`'s call one
    * card later and on the same authority: the crimson band already reads "Inno8:
-   * Oral FVIIIa Mimetic for HA", so the artboard draws "Novel VHH-based…" and
+   * Oral FVIII Mimetic for HA", so the artboard draws "Novel VHH-based…" and
    * "Currently under evaluation…" rather than naming the agent three times on one
    * card. The comment above used to say this topic kept its prefix *because
    * nobody had drawn the card yet* — the card is drawn now, and the artboard is
    * the filing authority where it and `[PDF-V]` disagree.
+   *
+   * **VOYAGER2 is a phase 1/2 trial, not the phase 1 the source states** — a
+   * client copy edit of 2026-08-05, the same pass that took the `a` and the
+   * hyphen out of this card's heading and first bullet (CONTEXT.md §7.5). "1/2"
+   * is the two phase numbers the trial spans, written as the client wrote them;
+   * it is not a fraction and is not to be set as one.
    *
    * `title` is the card's own heading and not the panel's caption for it, which
    * is the caption-vs-title split `Disclosure` documents: the button says "Inno8"
@@ -550,10 +597,10 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    */
   {
     id: "inno8-overview",
-    title: "Inno8: Oral FVIIIa Mimetic for HA",
+    title: "Inno8: Oral FVIII Mimetic for HA",
     body: [
-      "Novel VHH-based FVIIIa-mimetic; once-daily oral treatment of HA",
-      "Currently under evaluation in nonrandomized open-label phase 1 VOYAGER2 trial (NCT07220564)",
+      "Novel VHH-based FVIII mimetic; once-daily oral treatment of HA",
+      "Currently under evaluation in nonrandomized open-label phase 1/2 VOYAGER2 trial (NCT07220564)",
     ],
     figures: ["Inno8 Mechanism of Action"],
   },
@@ -652,60 +699,63 @@ export interface TreatmentOptionRow {
 /**
  * The rows as the §7.7 "Table 1" pop-up draws them.
  *
- * **Reconciled with the artboard, not with CONTEXT.md §7.3.** The transcription
- * this started as compressed the source into table shorthand — `↑ FVIII by 2
- * IU/dL per IU/kg`, `HA/HB`, `→` — which was right while these strings were a
- * record of PPTX slide 7 and wrong the moment they became on-screen copy. The
- * artboard spells all of it out, and the artboard is the authority for what the
- * screen says (docs/styling.md §11), so the shorthand is expanded here rather
- * than re-expanded by the renderer. §7.3 keeps the source's own wording.
+ * **The shorthand is the copy, on the client's 2026-08-05 instruction.** These
+ * strings were expanded out of table shorthand when they stopped being a record
+ * of PPTX slide 7 and became on-screen copy, since the artboard spells all of it
+ * out. The client has since asked for the shorthand back — `↑` for "increase(s)",
+ * `→` for "delivers a", `HA`/`HB` for the spelled-out disease names — so the
+ * abbreviations here now override the artboard's longhand. §7.3 keeps the
+ * source's own wording.
  *
  * Three drawn strings are **not** reproduced, on the "FACOTOR" precedent — an
  * unambiguous slip is a slip, not copy: the export's "anti–THPI" (the same row's
  * MOA says TFPI), its second "IU/dl", and "inter-individiual" in footnote c.
  *
- * One divergence is deliberate and open: the export gives AAV gene therapy the
- * population "Hemophilia A/B without inhibitors", which contradicts the MOA cell
- * beside it (an F9 transgene is hemophilia B) and CONTEXT.md §7.3. Held at B and
- * raised for the designer.
+ * The AAV row's population was the one open divergence — the export drew "A/B"
+ * against an MOA cell naming an F9 transgene, and it was held at B for the
+ * designer. **Confirmed HB on 2026-08-05**, in the same pass, so the question is
+ * closed.
  */
 export const TREATMENT_OPTIONS_MATRIX: readonly TreatmentOptionRow[] = [
   {
     option: "FVIII/FIX concentrates",
-    moa: "Increase FVIII levels by 2 IU/dL per IU/kg and FIX levels by 1 IU/dL per IU/kg",
-    population: "Hemophilia A/B without inhibitors",
+    moa: "↑ FVIII levels by 2 IU/dL per IU/kg and FIX levels by 1 IU/dL per IU/kg",
+    population: "HA/HB without inhibitors",
     indication: ["Prophylaxis", "Treatment of bleeding episodes and surgery"],
     route: "IV",
     footnote: "a",
   },
   {
     option: "FVIII mimetics",
-    moa: "Mimics activity of FVIII 1st generation equivalent to FVIII ~10–12 IU/dL",
-    population: "Hemophilia A with/without inhibitors",
+    // The client's 2026-08-05 wording, confirmed on a second pass: "FVIII 1st
+    // generation" out, "emicizumab" in, as one span. Left exactly as given —
+    // asked and answered, so a later reader should not re-litigate it.
+    moa: "Mimics activity of emicizumab equivalent to FVIII ~10–12 IU/dL",
+    population: "HA with/without inhibitors",
     indication: ["Prophylaxis"],
     route: "SC",
     footnote: "b",
   },
   {
     option: "Rebalancing: siRNA",
-    moa: "Reduced antithrombin; increases thrombin generation",
-    population: "Hemophilia A/B with/without inhibitors",
+    moa: "Reduced antithrombin; ↑ thrombin generation",
+    population: "HA/HB with/without inhibitors",
     indication: ["Prophylaxis"],
     route: "SC",
     footnote: "b",
   },
   {
     option: "Rebalancing: anti-TFPI",
-    moa: "Inhibits TFPI; increases thrombin generation",
-    population: "Hemophilia A/B with/without inhibitors",
+    moa: "Inhibits TFPI; ↑ thrombin generation",
+    population: "HA/HB with/without inhibitors",
     indication: ["Prophylaxis"],
     route: "SC",
     footnote: "b",
   },
   {
     option: "AAV gene therapy",
-    moa: "Recombinant AAV vector delivers a functional copy of the F9 gene into hepatocytes",
-    population: "Hemophilia B without inhibitors",
+    moa: "Recombinant AAV vector → functional copy of the F9 gene into hepatocytes",
+    population: "HB without inhibitors",
     indication: ["Long-term prophylaxis/treatment break"],
     route: "IV",
     footnote: "c",

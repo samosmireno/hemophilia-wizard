@@ -81,7 +81,12 @@ function DrugSheetBody({ sheet }: { sheet: DrugSheet }) {
       <Section heading={sheet.classHeading ?? "Class/Target"} items={sheet.classTarget} first />
       <Section heading="Indication" items={sheet.indication} />
       <Section heading="Dosage and Administration" items={sheet.dosing} />
-      <Section heading={sheet.monitoringHeading ?? "Monitoring"} items={sheet.monitoring} />
+      {/*
+        One label for all seven. Denecimig's used to carry the source's whole-
+        section qualifier ("Monitoring: TBD; based on phase 3 clinical trial
+        data"); the client cut it on 2026-08-05 — see drug-sheets.ts.
+      */}
+      <Section heading="Monitoring" items={sheet.monitoring} />
       {/*
         `Name (NCTxxxxx)`, and nothing after it. The four Denecimig entries used
         to carry a citation tail drawn as a blue link; the client cut them on

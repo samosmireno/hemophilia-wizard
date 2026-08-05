@@ -66,16 +66,6 @@ export interface DrugSheet {
    * contains.
    */
   classHeading?: string;
-  /**
-   * Label over `monitoring`, same convention as `classHeading`. Defaults to
-   * "Monitoring".
-   *
-   * Denecimig's is a whole sentence — it has no approved label to monitor
-   * against, so the source qualifies the entire section at its heading rather
-   * than caveating each bullet. It was transcribed as `monitoring[0]` before the
-   * card existed to draw it; it is a heading, and it lives here now.
-   */
-  monitoringHeading?: string;
   /** "Class" / "Class/Target" — 1–2 source lines. */
   classTarget: string[];
   /** "Indication(s)" bullets. */
@@ -117,7 +107,15 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   },
   {
     agent: "Emicizumab",
-    classTarget: ["Factor VIIIa–mimetic", "FIXa x FX BsAb"],
+    /*
+      **"Factor VIII mimetic", not the source's "Factor VIIIa–mimetic"** — client
+      copy edit, 2026-08-05, dropping the activated form's `a` and the dash. It is
+      the same terminology pass that took Denecimig's sibling bullet below and every
+      string the §7.5 chapter paints (see `denecimig-moa` in education.ts); this
+      card was named a step later, so the two sheets agree again. Not a typo to
+      reconcile against the artboard, which still draws the activated form.
+    */
+    classTarget: ["Factor VIII mimetic", "FIXa x FX BsAb"],
     indication: ["HA +/- inhibitors, newborn + older patients"],
     dosing: [
       "Subcutaneous injection (vial and syringe)",
@@ -140,16 +138,33 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: "Denecimig",
     title: "Denecimig (emerging/investigational)",
-    classTarget: ["Factor VIIIa–mimetic BsAb", "FIXa x FX BsAb"],
+    /**
+     * **"Factor VIII mimetic", not "Factor VIIIa–mimetic" (2026-08-05)** — a client
+     * copy edit: drop the activated form's `a` and the dash. It landed on this
+     * sheet first and on Emicizumab's above a step later, so the two agree; see
+     * that one for the pass they both belong to.
+     */
+    classTarget: ["Factor VIII mimetic BsAb", "FIXa x FX BsAb"],
+    /*
+      `≥`, not the source's bare `>` — client copy edit, 2026-08-05 ("underline
+      the > sign, ie, greater than or equal to"). It landed here first and on the
+      three rebalancing-agent sheets below a step later, so every age threshold in
+      this module now reads `≥`. It also agrees with what the education chapter
+      has always said about FRONTIER3 ("patients ≥1 year of age").
+    */
     indication: [
-      "TBD based on FDA approval; clinical trial populations evaluated HA +/- inhibitors, patients >1 year",
+      "TBD based on FDA approval; clinical trial populations evaluated HA +/- inhibitors, patients ≥1 year",
     ],
     dosing: [
       "SC injection, prefilled pen with attachable syringe",
       "No washout required when switching from emicizumab",
     ],
-    // The source's own qualifier over the whole section, not a bullet in it.
-    monitoringHeading: "Monitoring: TBD; based on phase 3 clinical trial data",
+    /*
+      The source qualified this whole section at its heading — "Monitoring: TBD;
+      based on phase 3 clinical trial data" — which is why `DrugSheet` used to
+      carry a `monitoringHeading`. Cut by client direction, 2026-08-05, leaving
+      the plain default; the field went with it, since it had no other user.
+    */
     monitoring: [
       "Injection site reactions (mostly mild, transient)",
       "No thromboembolic events or thrombotic microangiopathies",
@@ -168,7 +183,8 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: "Concizumab",
     classTarget: ["Hemostatic rebalancing agent; TFPI mAB"],
-    indication: ["Routine prophylaxis, patients >12 years with HA/HB +/- FVIII/FIX inhibitors"],
+    // `≥`, not the source's bare `>` — see the Denecimig sheet for the edit.
+    indication: ["Routine prophylaxis, patients ≥12 years with HA/HB +/- FVIII/FIX inhibitors"],
     dosing: [
       "SC injection, prefilled pen",
       "D1: Loading dose, 1 mg/kg",
@@ -190,7 +206,9 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: "Marstacimab",
     classTarget: ["Hemostatic rebalancing agent; TFPI mAB"],
-    indication: ["Routine prophylaxis, patients >6 years with HA/HB +/- FVIII/FIX inhibitors"],
+    // `≥`, not the source's bare `>` — see the Denecimig sheet for the edit. The
+    // dosing bullet's ">50 kg" is a weight, not an age, so it stays as authored.
+    indication: ["Routine prophylaxis, patients ≥6 years with HA/HB +/- FVIII/FIX inhibitors"],
     dosing: [
       "SC injection (prefilled pen or syringe)",
       "Loading dose: 300 mg (two 150-mg injections)",
@@ -211,7 +229,9 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: "Fitusiran",
     classTarget: ["Hemostatic rebalancing agent; AT-directed siRNA"],
-    indication: ["Routine prophylaxis, patients >12 years with HA/HB +/- FVIII/FIX inhibitors"],
+    // `≥`, not the source's bare `>` — see the Denecimig sheet for the edit. The
+    // monitoring bullet's "> 6 months" is a duration, not an age, so it stays.
+    indication: ["Routine prophylaxis, patients ≥12 years with HA/HB +/- FVIII/FIX inhibitors"],
     dosing: [
       "SC injection (prefilled pen or syringe and vial for lower dose)",
       "Starting dose: 50 mg once every 2 months",

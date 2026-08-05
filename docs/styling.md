@@ -1028,7 +1028,7 @@ Everything above is arithmetic — see open item 41.
 | 14  | `--color-agent-mab` (`#003d93`) is a sixth hue: it derives from no brand ramp, and the nearest steps are a different colour rather than a different step. Transcribed verbatim pending a designer answer on whether the agent classes are meant to be brand colours at all. Its pair, `--color-agent-sirna`, is `crimson-50` exactly.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | §11                   |
 | 15  | The artboards disagree on the disclosure-caption colour: `#074655` on the first two, `lagoon-75` (`#076278`) on `rebalancing-agents` **and now `fviiia-mimetics`** — so it is 2 v 2 and the tie is no longer breakable by weight of evidence. All four chapters use `--color-popup-caption`, the first value, pending a designer answer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | §11                   |
 | 16  | `rebalancing-agents` draws three figure boxes under a caption telling the reader to click them, but §7.7 names no target for any of the three and the export draws "PLACEHOLDER" in all of them. Needs the designer to say what a box opens.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | §11                   |
-| 17  | The mechanisms prose card glosses only `AT`, but its own copy introduces `TFPI` and `APC` as well; the figure card behind it glosses only `TFPI`. Shipped with all three on the prose card (§11), which also normalises the export's "AT=" to the "TFPI = " spacing it uses one card later. The alternative reading is that the two cards are meant as one and the gloss is split deliberately — needs the designer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | §11                   |
+| 17  | ~~The mechanisms prose card glosses only `AT`, but its own copy introduces `TFPI` and `APC` as well; the figure card behind it glosses only `TFPI`. Shipped with all three on the prose card, which also normalises the export's "AT=" spacing.~~ **Closed 2026-08-05** — neither reading. The prose card's footnote is **deleted**: no gloss, no row, and the CTA stays on the same right edge (`CardFooter`'s `note` is optional). The figure card keeps its `TFPI` line. Kept as a row so the numbering below it does not shift.                                                                                                                                                                                                                                                                                                                                                                             | §11                   |
 | 18  | `NavArrowButton` and `Button` are not `forwardRef`, so `ref` does not typecheck on either (`PopupButton` is). That is what blocks focus management when the mechanisms card swaps steps — there is no handle to focus. Package change, tracked in `.scratch/mlg-reskin/`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | §11, mlg-reskin       |
 | 19  | `--background-image-emerging-panel`'s mint (`#c6eee5`) is dE .0136 from `color-mix(teal-25 30%, teal-0)` — between the ~.002 every derived token clears and the .042 that made item 7 literal, so the file's own rule does not decide it. Shipped literal; ask the designer whether it is meant to be a teal step.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | §11                   |
 | 20  | ~~`fviiia-mimetics` ships four `+` disclosures that open nothing.~~ **Closed.** All four cards (Pop ups 10–13) are built; the diagrams arrived as rasters rather than the SVG exports this item asked for, which is why three of them carry their heading in their own pixels. Kept as a row rather than deleted, so the numbering below it does not shift.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | §11                   |
@@ -1340,7 +1340,8 @@ bottom bar. The bar mlg-components actually renders is `h-12` buttons inside
 ```
 
 So the clearance overshoots the thing it clears by **15px**, and the arch — which
-`grow`s to the bottom of `<main>`'s content box — stopped 15px short of the nav
+reaches the bottom of `<main>`'s content box, by `grow` when this was written and
+by `mt-auto` since 2026-08-05 (§16, §19) — stopped 15px short of the nav
 with page gradient showing between them. `-mb-4` is 16px: the discrepancy rounded
 up to the next scale step, landing the band 1px behind the bar's top edge so no
 seam can open. `lg:mb-0` because at `lg` there is no bar and `pb` is already 0.
@@ -1613,26 +1614,29 @@ same rule settles four more items on it.
 
 The band reads **"TABLE 1"** — the only card whose title names a figure number rather
 than its own subject, and therefore the only dialog whose accessible name says nothing
-about what is in it. Shipped as drawn: the trigger's caption ("Novel therapy classes
-for HA/HB") is what a reader followed to get there, so the context exists a beat
+about what is in it. Shipped as drawn: the trigger's caption ("Novel Therapies for
+HA/HB") is what a reader followed to get there, so the context exists a beat
 earlier in the reading order. Worth a designer's second look all the same.
 
-`TREATMENT_OPTIONS_MATRIX` is **reconciled with the artboard, not with §7.3**. It began
-as a transcription of PPTX slide 7 and compressed it into table shorthand — `↑ FVIII by
-2 IU/dL per IU/kg`, `HA/HB`, `→` — which was right for a record of the source and wrong
-the moment the strings became on-screen copy. The export spells all of it out, so the
-data module now does too, and §7.3 keeps the source's own wording. (Same call the §7.6
-`severe --> mild` edit made, in the same direction.)
+`TREATMENT_OPTIONS_MATRIX` **carries the source's shorthand, on the client's 2026-08-05
+instruction**. It began as a transcription of PPTX slide 7 and compressed it into table
+shorthand — `↑ FVIII by 2 IU/dL per IU/kg`, `HA/HB`, `→` — which was right for a record
+of the source and looked wrong the moment the strings became on-screen copy, so it was
+expanded to match the export's longhand. The client has since asked for the shorthand
+back: `↑` for "increase(s)", `→` for "delivers a", and `HA`/`HB` throughout. Those
+abbreviations now **override the artboard**, which is the one place on this chapter
+where the copy does not follow the drawing. §7.3 keeps the source's own wording.
 
 Three drawn strings are **not** reproduced, on the "FACOTOR" precedent: "anti–THPI"
 (the same row's MOA cell says TFPI), a second "IU/dl" in a cell that writes "IU/dL"
 either side of it, and "inter-individiual".
 
-One divergence is deliberate and **open**: the export gives AAV gene therapy the
-population "Hemophilia A/B without inhibitors", which contradicts both §7.3 and the MOA
-cell beside it — an _F9_ transgene is hemophilia B. Not a typo, so not silently fixed
-either; held at B, because a table that tells a clinician the class is indicated for HA
-is a worse error to ship than a stale cell, and raised for the designer.
+One divergence was deliberate and open, and is now **closed**: the export gave AAV gene
+therapy the population "Hemophilia A/B without inhibitors", which contradicted both
+§7.3 and the MOA cell beside it — an _F9_ transgene is hemophilia B. It was held at B
+rather than silently fixed, because a table that tells a clinician the class is
+indicated for HA is a worse error to ship than a stale cell. The client confirmed **HB
+only** on 2026-08-05, in the same pass that asked for the shorthand above.
 
 **Its type is measured, not assumed** — and this paragraph had the measurements wrong
 until 2026-08-04. It read "20px column headings, 16px in the three middle columns, 24px
@@ -1773,9 +1777,10 @@ the `Bullet` union rather than splitting on punctuation or slicing at an index.
 
 **Its type is measured off the 2000px export and is approximate**, that being a raster
 rather than Figma: ~26px for the lead set tight, ~20px for the bullets, 32px bold for
-the two headings, 14px/300 solid for the footnote. All four now ship as steps —
-the headings at `text-3xl` (30, from a measured 32), the lead and bullets at
-`text-2xl` and `text-xl`, the footnote at `text-sm` exactly. The 20px is
+the two headings, 14px/300 solid for the footnote (the figure card's, since the prose
+card's is gone — see below). All four ship as steps — the headings at `text-3xl`
+(30, from a measured 32), the lead and bullets at `text-2xl` and `text-xl`, the
+footnote at `text-sm` exactly. The 20px is
 `BenefitsChallengesCard`'s own pop-up body value reused rather than re-derived.
 None of this is worth much precision either way: the source is a raster and the
 sizes are approximate, so a ±2px snap is inside the measurement error.
@@ -1785,14 +1790,20 @@ draws ~353×49 where the component computes ~358×68, so the width agrees and th
 does not. The override is the one its doc invites. **It ramps as of 2026-08-04**, and its
 height override moved to `py-2.5` with it; see the responsive pass below.
 
-**One deliberate, open divergence.** The export glosses only `AT` under the prose card,
-but that card's own copy introduces `TFPI` (its first heading is "Anti-TFPI monoclonal
-antibodies") and `APC` (its lead names "the APC/protein S system") — so as drawn it
-defines one of the three terms it uses. It ships with all three, in
-`figures[0]`'s wording and order, which also normalises the export's "AT=" to the
-"TFPI = " spacing the very next card uses. Raised for the designer, not silently
-settled: the alternative reading is that the two cards are meant to be read as one and
-the gloss is split across them on purpose.
+**The prose card has no footnote at all (2026-08-05), which settles open item 17.** It
+shipped with all three abbreviations glossed where the export glosses only `AT` — that
+card's own copy introduces `TFPI` (its first heading is "Anti-TFPI monoclonal
+antibodies") and `APC` (its lead names "the APC/protein S system"), so as drawn it
+defined one of the three terms it used, and the divergence was raised rather than
+silently settled. The answer is that the row goes: the gloss is deleted, not
+rebalanced back to the drawn single line. The figure card behind it keeps its own
+`TFPI` footnote, so the two cards no longer share a footnote treatment.
+
+**The CTA does not move with it.** `CardFooter` still wraps it — `note` is optional now
+and renders no `<p>` when omitted — so the row keeps its `mt-8`, its `items-end` and the
+`ms-auto` that puts the button on the right edge. At any width where footnote and button
+shared a line, the button's box is pixel-identical; below that, it rises by the line it
+no longer has to clear.
 
 **No focus management between the cards**, which is a package limitation rather than a
 choice: `NavArrowButton` and `Button` are not `forwardRef`, so `ref` does not typecheck
@@ -1807,9 +1818,11 @@ from a 1772×860 file, and its card does not scroll at 1440 (574px of content in
 of body). The prose card does scroll, which it must — it is ~660px of copy.
 
 One thing the suite could not have caught, and the reason the footnote row carries the
-three width classes it does: the prose card's gloss is ~530px of ink, so with the CTA
-it overruns the 886px body by ~25px and a plain `flex-wrap` broke the line — putting
-the button bottom-**left**, where the export draws it bottom-right. Fixed by letting
+three width classes it does: the prose card's gloss was ~530px of ink, so with the CTA
+it overran the 886px body by ~25px and a plain `flex-wrap` broke the line — putting
+the button bottom-**left**, where the export draws it bottom-right. That gloss is gone
+as of 2026-08-05, but the classes stay: the figure card's footnote sits in the same row
+and hits the same failure at a narrower viewport. Fixed by letting
 the footnote wrap its own text instead (`min-w-0 flex-1 basis-80`), with `ms-auto` on
 the action for the phone, where the two genuinely cannot share a line. jsdom applies no
 Tailwind, so this was invisible to `npm test` in both directions.
@@ -2609,9 +2622,9 @@ step and is wrong at 48: measured against the default card's real band width
 (1140 − `border-5`×2 − `px-25`×2 = 930px), all four of the longest titles in the
 app set in exactly two lines at 48px, the same as at 45.469 —
 
-- `FVIIIa-Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis`
+- `FVIII Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis`
 - `Considerations for Reducing Treatment Burden and Improving QoL`
-- `Mechanism of Action for Denecimig (Mim8): FVIIIa-mimetic BsAb`
+- `Mechanism of Action for Denecimig (Mim8): FVIII mimetic BsAb`
 - `Hemostatic Rebalancing Agents in Treatment of HA/HB`
 
 The band grows ~5px on a two-line title (98.7px of type against 93.5), which the
@@ -3029,7 +3042,10 @@ card. **Twenty cards, forty openings.**
   scrolls its body region rather than growing past `95dvh`.
 - `preserveCase` survives the header becoming a flex container: "Inno8: Oral
   FVIIIa Mimetic for HA" renders with both cased terms and both spaces intact,
-  and its `textContent` equals the raw title exactly.
+  and its `textContent` equals the raw title exactly. (That band reads "Oral
+  FVIII Mimetic" since the 2026-08-05 copy edit — one cased term now, `Inno8`,
+  since every letter of `FVIII` is already a capital. The title above is what
+  this pass measured.)
 - The three cards that gain a line — severity, bleeding, cascade — all still fit
   without scrolling at 1440.
 
@@ -3723,7 +3739,11 @@ question at the styling gate.
 
 ### The arch is pinned, not flowed
 
-`ArchBand` with `mt-auto grow-0`, where `DisclosureBand` uses the default `grow`.
+`ArchBand` with `mt-auto grow-0` — **which is now the component's base rather
+than this page's override** (2026-08-05, §19). The reading below is still this
+page's, and it is what the shared component does because `disease-background`
+turned out to need the same pin above the canvas.
+
 Both artboards put the arch's top edge at **the same y (553)** with panels of
 152px and 335px above it, which is a band anchored to the bottom of the column
 rather than one that follows the content down — so the arch does not jump when
@@ -4029,13 +4049,26 @@ place on this page the code deliberately does not match the file.
 | element     | value                                                                 | how it was fixed                                                                                                                                                      |
 | ----------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `<h1>`      | `text-2xl/none sm:text-3xl/none lg:text-4xl/none`, display, uppercase | least squares over all four drawn lines returns size 42 at 0.0234em, residuals ≤1.1px on lines up to 1139px; cap height agrees independently (30px ink / 0.70 = 42.9) |
+| lead        | `text-base/[1.6] lg:text-xl/[1.6] ps-6`                               | no drawn element — see the copy note below; takes the bullets' type, and `ps-6` sets it on their text edge rather than their discs                                    |
 | bullets     | `text-base/[1.6] lg:text-xl/[1.6]`                                    | rendered widths 655/1110/817/718 vs drawn 651/1106/813/715 — a constant +4, i.e. the indent, not the size                                                             |
 | CTA         | `text-base/tight sm:text-xl/tight lg:text-2xl/5`, **sentence case**   | ink measures 24px ascender-to-descender; the drawn label is mixed case                                                                                                |
 | caption     | `text-xl leading-5 font-bold text-brand-slate-100`                    | pixel-exact to `/wizard/therapies`; `leading-5` from the 20px baseline pitch of "Efanesoctocog / alfa"                                                                |
 | class label | `text-2xl leading-5.5 tracking-wide`, display, uppercase              | 18px cap ink / Barlow Condensed's 0.70 = 25.7 → 26 = `text-2xl`; 22px line pitch off the three-line label                                                             |
 
+**The copy under this heading changed on 2026-08-05, after everything below was
+measured.** The client cut the `<h1>` from the 190-character sentence the artboard draws
+to its opening clause — "Leverage multidisciplinary care and SDM with patients", 53
+characters, one line at the canvas — and rewrote the four bullets as a lead sentence plus
+three. Nothing in the type below moves: the sizes were fitted to the drawing and the
+drawing has not changed. What the change does retire is the _reason_ two of them were
+needed. The three-step ramp and `max-w-content` were both arguments about a sentence that
+no longer exists, and both are now slack rather than load-bearing; they are kept because
+neither can bind a string this short and both would be wanted again if the sentence came
+back. Read the paragraphs below as the record of how the numbers were derived, not as a
+description of what the page now wraps.
+
 **The `<h1>` is drawn at 42px where every other page in the app sets `text-5xl` (drawn 52,
-renders 48).** It is a four-line sentence and the designer dropped it.
+renders 48).** It is a four-line sentence as drawn and the designer dropped it.
 
 It shipped raw at `text-[42px]` until 2026-08-04, as §13's 45.5px pop-up title
 still does. It now takes `text-4xl` and renders at **36px — a 6px drop, the
@@ -4078,9 +4111,12 @@ genuinely are not in one row and the fixed heights would only be gaps.
 
 ### `preserveCase` and the flex-item whitespace trap
 
-"FVIIIa mimetics" needs `preserveCase` — `uppercase` renders it "FVIIIA MIMETICS" and
+"FVIIIa mimetics" needed `preserveCase` — `uppercase` renders it "FVIIIA MIMETICS" and
 destroys the letter that says _activated_ factor VIII, which is why the artboard draws
-that `a` lower case.
+that `a` lower case. **The label became "FVIII mimetics" on 2026-08-05**, which has no
+cased term in it, so the helper now matches nothing and returns the string whole. The call
+stays: it costs a `split` that finds no delimiter, and the wrapper below is what the next
+label with an `a` in it would need.
 
 The helper returns a `<span>` beside a bare text node, and **a flex container makes each
 of those an anonymous flex item and drops the whitespace between them**, rendering the
@@ -4173,7 +4209,9 @@ bottom edge is just a shape that stops.
   because padding against an edge that is not drawn only pushes the labels out of their
   measured row.
 - `gap-6 xl:gap-0` — the page's own 24px rhythm, the same `mt-6` that separates heading,
-  bullets, CTA and the row. `xl:gap-0` is not tidiness: the three tile the band exactly
+  lead, CTA and the row. (The bullets take `mt-4` under the lead, so the 2026-08-05
+  sentence is spliced into the heading-to-bullets gap rather than added on top of it.)
+  `xl:gap-0` is not tidiness: the three tile the band exactly
   (339 + 524 + 353 = 1216) and any gap breaks the drawn tiling.
 
 **64px is also what clears the curve.** At distance _d_ from a horizontal edge a 128px
@@ -4606,6 +4644,50 @@ is one scale factor read off an export, and re-expressing that as `0.0625rem` wo
 make the provenance prose worse. Tailwind inlines `--shadow-*` at build time (§1),
 which is the layer where mistakes are silent; it is the last place to make a
 speculative edit.
+
+### A box that `grow`s is a box that does not scale
+
+Scaling the root moves everything sized in rem. It does nothing for a box whose
+height is _leftover_ — and `ArchBand` was one, because `DisclosureBand` took its
+default `grow` inside `AppShell`'s `min-h-dvh` column. Every pixel the viewport had
+spare went into the arch while the type inside it stepped 1.125× and 1.25×, so the
+crescent grew away from its own contents. Measured on `/education/disease-background`:
+
+| viewport    | root | arch, `grow` | arch, pinned | its own content |
+| ----------- | ---: | -----------: | -----------: | --------------: |
+| 1280 × 800  | 16px |          293 |          293 |             293 |
+| 1440 × 800  | 16px |          337 |          293 |             293 |
+| 1920 × 1080 | 18px |          559 |          329 |             329 |
+| 2560 × 1440 | 20px |          861 |          366 |             366 |
+
+861 against a 337 canvas is **2.6×** where the type is 1.25×, with the three
+disclosures stranded at the top of it and ~500px of empty arch underneath — the
+shape the change was raised against. Pinned, the arch is its own content height at
+every size and steps 293 → 329 → 366, i.e. ×1.123 and ×1.249 against the root's own
+×1.125 and ×1.25. `/wizard/therapies` measures 249 → 280 → 311 on the same three
+boards, which is the same ratio, because it had the pin already.
+
+**The fix was to delete the difference, not to add a cap.** §16 had already argued
+the pin from two artboards; `mt-auto grow-0` moved from that page's `className` into
+`ArchBand`'s base and both callers now get it. The alternative on the table was
+`grow` plus a rem `max-h` — it preserves the canvas exactly, but 337px is an
+_emergent_ number (viewport minus content, not a drawn value), and `overflow-hidden`
+means outgrowing it clips in silence.
+
+**The canvas moves 44px, and that is the whole price.** At 1440 × 800 the arch goes
+337 → 293 and its top edge 463 → 507; page height is 800 either way, so nothing
+scrolls that did not. This is the first §19 change that is not pixel-identical at
+1440, and it is deliberate: the arch becomes the drawing it is at every other width
+instead of a residual. **At 1280 × 800 the two are identical** (807px page height
+both ways — a 7px scroll that predates this and is not caused by it).
+
+**`mt-4` could not survive the pin**, and its replacement had to move to the other
+side of it. `mt-auto` and `mt-4` are the same property, so tailwind-merge keeps one;
+taking `mt-auto` alone dropped the 16px floor to **0 at 320, 375, 768 and 1024** —
+every width where the chapter scrolls and there is no free space for `mt-auto` to
+absorb. It is now `mb-4` on the block above the band, which is a margin the pin does
+not compete with: measured back at 16px at all four, and unchanged above them.
+`/wizard/therapies` never had the floor and still does not.
 
 ### Verified in a browser
 

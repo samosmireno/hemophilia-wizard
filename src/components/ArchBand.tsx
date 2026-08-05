@@ -20,11 +20,29 @@ import { cn } from "../lib/cn";
  * the two genuinely differ: three by type against two-to-five by scenario, and a
  * `PopupButton` that opens a card against one that does not open yet.
  *
- * **Parent contract:** `grow` means this expects a growing flex column — see
+ * **Parent contract:** `mt-auto` means this expects a growing flex column — see
  * `education/DiseaseBackground`, whose `<section>` is `flex flex-1 flex-col`
- * inside `AppShell`'s `min-h-dvh` wrapper. In a non-flex parent `grow` is inert
- * and the band simply ends under its own content, which is a degraded but not
- * broken layout.
+ * inside `AppShell`'s `min-h-dvh` wrapper. In a non-flex parent `mt-auto` is
+ * inert and the band simply ends under its own content, which is a degraded but
+ * not broken layout.
+ *
+ * **The band is pinned to the bottom of that column, not grown to fill it**
+ * (docs/styling.md §16, §19). `grow` was the default until 2026-08-05 and both
+ * callers now get the pin, because growing makes the arch a residual rather than
+ * a drawing: every pixel the viewport has spare goes into the crescent while the
+ * type inside it does not move, so at 2560 × 1440 `disease-background`'s arch
+ * measured **861px against a 337px canvas** — 2.6 × — with its three disclosures
+ * stranded at the top of it. Pinned, the arch is its own content height at every
+ * size and steps with the root: 249 → 280 → 311 across §19's three boards.
+ * The slack sits above the band instead, where it is page gradient rather than
+ * an empty arch.
+ *
+ * `mt-auto` replaced a `mt-4` that can no longer apply, so the 16px floor under
+ * the chapter's content is given up in one case: when the content already
+ * overflows the column there is no free space, `mt-auto` collapses to 0, and the
+ * band runs straight on from the last line. That is the state the page is in
+ * when it scrolls anyway, and it is the degradation `/wizard/therapies` has
+ * shipped since it took the pin.
  *
  * The heading is an `<h2>`: pages own the `<h1>`.
  *
@@ -73,18 +91,18 @@ export default function ArchBand({
 }: {
   title: string;
   /**
-   * Extra classes for the arch box — in practice how it takes its height.
+   * Extra classes for the arch box.
    *
-   * The default `grow` is `DisclosureBand`'s: a chapter's band starts under the
-   * content and fills whatever is left. `/wizard/therapies` needs the other
-   * behaviour and passes `mt-auto grow-0`, because its two artboards put the
-   * arch's top edge at the SAME y whichever note is open — 553 with a 152px
-   * panel above it and 553 with a 335px one — which is a band pinned to the
-   * bottom of the column, not one that follows the content down.
+   * Neither caller passes any today: the pin is the base, so how the band takes
+   * its height is no longer a per-caller decision. `/wizard/therapies` used to
+   * pass `mt-auto grow-0` here — its two artboards put the arch's top edge at
+   * the SAME y whichever note is open, 553 with a 152px panel above it and 553
+   * with a 335px one — and that reading is now simply what the component does.
    *
-   * `grow-0` rather than omitting `grow` from the base: tailwind-merge resolves
-   * the flex-grow conflict, so the caller wins, and the default stays visible
-   * here rather than being assembled at two call sites.
+   * `grow-0` stays written out in the base even though flex items do not grow by
+   * default: it is the half of the pin a caller is most likely to undo by
+   * accident, and stating it makes tailwind-merge resolve an override rather
+   * than let two rules race.
    */
   className?: string;
   /**
@@ -108,7 +126,7 @@ export default function ArchBand({
          above the canvas — the whole point of docs/styling.md §19. Same for the
          two radii: they are rem so the curve scales with the band. */
       className={cn(
-        "relative isolate -mx-6 mt-4 -mb-4 grow overflow-hidden rounded-t-[9.375rem] border-t-[0.25rem] border-white/40 bg-brand-crimson-50/15 pb-4 sm:mx-0 lg:mb-0 lg:pb-0 xl:rounded-t-[18.75rem]",
+        "relative isolate -mx-6 mt-auto -mb-4 grow-0 overflow-hidden rounded-t-[9.375rem] border-t-[0.25rem] border-white/40 bg-brand-crimson-50/15 pb-4 sm:mx-0 lg:mb-0 lg:pb-0 xl:rounded-t-[18.75rem]",
         className,
       )}
     >

@@ -79,7 +79,7 @@ describe("treatment-landscape chapter", () => {
         .getAllByRole("listitem")
         .map((li) => li.textContent),
     ).toEqual([
-      "FVIIIa-mimetic BsAbs (HA)",
+      "FVIII mimetic BsAbs (HA)",
       "Hemostatic rebalancing agents (HA/HB)",
       "Gene therapy (HB)",
     ]);
@@ -90,7 +90,7 @@ describe("treatment-landscape chapter", () => {
   it.each([
     "Benefits and challenges of clotting replacement therapies",
     "Benefits and challenges of NFTs",
-    "Novel therapy classes for HA/HB",
+    "Novel Therapies for HA/HB",
   ])("renders the %s disclosure as a trigger with a visible caption", (caption) => {
     render(<TreatmentLandscape />);
     expect(screen.getByRole("button", { name: `Expand ${caption}` })).toBeInTheDocument();
@@ -166,7 +166,7 @@ describe("treatment-landscape chapter", () => {
     const expected = [
       "Expand Benefits and challenges of clotting replacement therapies",
       "Expand Benefits and challenges of NFTs",
-      "Expand Novel therapy classes for HA/HB",
+      "Expand Novel Therapies for HA/HB",
     ];
 
     expect(advertised).toHaveLength(expected.length);
@@ -270,11 +270,9 @@ describe("treatment-landscape chapter", () => {
     const user = userEvent.setup();
     render(<TreatmentLandscape />);
 
-    await user.click(
-      screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
-    );
+    await user.click(screen.getByRole("button", { name: "Expand Novel Therapies for HA/HB" }));
 
-    expect(screen.getByRole("dialog")).toHaveAccessibleName("Novel therapy classes for HA/HB");
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Novel Therapies for HA/HB");
   });
 
   /**
@@ -288,9 +286,7 @@ describe("treatment-landscape chapter", () => {
     const user = userEvent.setup();
     render(<TreatmentLandscape />);
 
-    await user.click(
-      screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
-    );
+    await user.click(screen.getByRole("button", { name: "Expand Novel Therapies for HA/HB" }));
     const dialog = within(screen.getByRole("dialog"));
 
     for (const { option, moa, population, indication, route } of TREATMENT_OPTIONS_MATRIX) {
@@ -314,9 +310,7 @@ describe("treatment-landscape chapter", () => {
     const user = userEvent.setup();
     render(<TreatmentLandscape />);
 
-    await user.click(
-      screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
-    );
+    await user.click(screen.getByRole("button", { name: "Expand Novel Therapies for HA/HB" }));
 
     expect(
       within(screen.getByRole("dialog"))
@@ -348,9 +342,7 @@ describe("treatment-landscape chapter", () => {
     const user = userEvent.setup();
     render(<TreatmentLandscape />);
 
-    await user.click(
-      screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
-    );
+    await user.click(screen.getByRole("button", { name: "Expand Novel Therapies for HA/HB" }));
     const dialog = within(screen.getByRole("dialog"));
     const table = dialog.getByRole("table");
 
@@ -375,9 +367,7 @@ describe("treatment-landscape chapter", () => {
     const user = userEvent.setup();
     render(<TreatmentLandscape />);
 
-    await user.click(
-      screen.getByRole("button", { name: "Expand Novel therapy classes for HA/HB" }),
-    );
+    await user.click(screen.getByRole("button", { name: "Expand Novel Therapies for HA/HB" }));
     const dialog = within(screen.getByRole("dialog"));
 
     for (const key of ["a", "b", "c"] as FootnoteKey[]) {

@@ -65,19 +65,15 @@ describe("drug sheets", () => {
     }
   });
 
-  it("state the three optional fields only where the source deviates", () => {
+  it("state the two optional fields only where the source deviates", () => {
     /*
-      All three default in the card, so a value present on a sheet that does not
-      need one is invisible rather than wrong — which is exactly the kind of drift
+      Both default in the card, so a value present on a sheet that does not need
+      one is invisible rather than wrong — which is exactly the kind of drift
       worth pinning. Each is a single-sheet deviation transcribed from the PDF:
-      Denecimig is the one sheet the source titles beyond the agent's name and the
-      one whose Monitoring heading is a whole sentence, and Efanesoctocog alfa is
-      the one that names a class with no target.
+      Denecimig is the one sheet the source titles beyond the agent's name, and
+      Efanesoctocog alfa is the one that names a class with no target.
     */
     expect(DRUG_SHEETS.filter((s) => s.title).map((s) => s.agent)).toEqual(["Denecimig"]);
-    expect(DRUG_SHEETS.filter((s) => s.monitoringHeading).map((s) => s.agent)).toEqual([
-      "Denecimig",
-    ]);
     expect(DRUG_SHEETS.filter((s) => s.classHeading).map((s) => s.agent)).toEqual([
       "Efanesoctocog alfa",
     ]);
@@ -88,7 +84,37 @@ describe("drug sheets", () => {
        arrived with one would render "Class::". */
     for (const sheet of DRUG_SHEETS) {
       expect(sheet.classHeading ?? "").not.toMatch(/:$/);
-      expect(sheet.monitoringHeading ?? "").not.toMatch(/:$/);
+    }
+  });
+
+  it("keep the client's 2026-08-05 edits on the Denecimig sheet", () => {
+    /*
+      Three copy edits landing on one sheet, pinned as data rather than as
+      rendering: the mimetic bullet loses the activated form's `a` and its dash,
+      the age threshold becomes `≥`, and the whole-section "TBD; based on phase 3
+      clinical trial data" qualifier is gone. Each would re-appear from the PDF on
+      any re-transcription, which is what makes them worth stating.
+    */
+    const denecimig = DRUG_SHEETS.find((s) => s.agent === "Denecimig")!;
+
+    expect(denecimig.classTarget[0]).toBe("Factor VIII mimetic BsAb");
+    expect(denecimig.indication[0]).toContain("patients ≥1 year");
+    expect(JSON.stringify(denecimig)).not.toMatch(/VIIIa|>1 year|TBD;/);
+  });
+
+  it("write every age threshold as `≥`", () => {
+    /*
+      The same 2026-08-05 edit, extended to the three rebalancing-agent sheets a
+      step later ("underline the > sign, ie, greater than or equal to"). Asserted
+      across every sheet rather than the four named ones, so a sheet transcribed
+      later from the PDF's bare `>` fails here. Only ages are covered — Marstacimab
+      dosing's ">50 kg" and Fitusiran monitoring's "> 6 months" are a weight and a
+      duration, and stay as authored.
+    */
+    for (const sheet of DRUG_SHEETS) {
+      for (const line of sheet.indication) {
+        expect(line, sheet.agent).not.toMatch(/>\s*\d+\s*(year|yr|month)/i);
+      }
     }
   });
 
@@ -179,7 +205,7 @@ describe("explore segments", () => {
   it("label columns in the artboard's wording, not the TreatmentClass enum", () => {
     const labels = EXPLORE_SEGMENTS.flatMap((s) => s.columns.map((c) => c.label));
     expect(labels).toEqual([
-      "FVIIIa mimetics",
+      "FVIII mimetics",
       "Hemostatic rebalancing agents",
       "UHL clotting factor replacement",
       "Gene therapy",

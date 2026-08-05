@@ -269,8 +269,12 @@ export const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
      * records twice for its own copy — and the singular reads as a source slip
      * rather than a distinction, since the same list's FIRST item is deliberately
      * singular here where `A-without`'s is plural.
+     *
+     * **"Factor VIII mimetic", not "Factor VIIIa" (2026-08-05)** — a client copy
+     * edit on this screen only, so `A-without` keeps the activated form the
+     * artboards draw. Deliberate divergence; not a typo to reconcile.
      */
-    classes: ["Factor VIIIa mimetic", "Hemostatic rebalancing agents"],
+    classes: ["Factor VIII mimetic", "Hemostatic rebalancing agents"],
     caption: BOXES_CAPTION,
   },
   "B-without": {
@@ -388,10 +392,17 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Prefilled dosing pens simplify preparation and administration, reduce dosing complexity, and support at-home treatment",
           {
             text: "Frequent IV therapy is particularly challenging for children:",
+            /* `≥`, not the source's bare `>` — the fourth and last pass of the
+               2026-08-05 client copy edit, which had already reached `B-with`,
+               `B-without`, and `A-with`. Every scenario now carries `≥`; the
+               bare `>` the source set survives only in `treatments.ts` and
+               `drug-sheets.ts`, which the edit did not name. The denecimig
+               bullet keeps its "of age" — the edit changed the sign, not the
+               wording, so it still differs from `A-with`'s "≥1 year". */
             children: [
-              "Emicizumab is indicated for younger patients, including newborns; denecimig was evaluated in patients >1 year of age",
-              "Marstacimab is indicated for patients > age 6 years",
-              "Other FDA-approved options are indicated for children >12 years",
+              "Emicizumab is indicated for younger patients, including newborns; denecimig was evaluated in patients ≥1 year of age",
+              "Marstacimab is indicated for patients ≥ age 6 years",
+              "Other FDA-approved options are indicated for children ≥12 years",
             ],
           },
         ],
@@ -411,7 +422,8 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
         points: [
           "NFTs avoid the need for routine FVIII/FIX peak/trough monitoring and PK-guided dose optimization",
           "Monitoring patients on NFTs presents unique challenges; traditional tests, such as aPTT do not accurately measure bleeding risk",
-          "NFTs require monitoring of clinical bleed control and product-specific safety monitoring, such as thrombotic risk, liver function, AT, or drug concentration, depending on the agent",
+          "FVIII mimetics require monitoring of clinical bleed control and product-specific safety considerations; for emicizumab, monitor for thrombotic microangiopathy or thromboembolic events if aPCC is administered",
+          "Thoughtful patient selection for NFTs is essential",
         ],
       },
       strategies: {
@@ -419,7 +431,6 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
         points: [
           "Develop protocols for bleed control and product-specific monitoring",
           "Use appropriate assays when laboratory assessment is needed",
-          "Thoughtful patient selection for NFTs is essential",
         ],
       },
     },
@@ -478,13 +489,19 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Prefilled dosing pens simplify preparation and administration, reduce dosing complexity, and support at-home treatment",
           {
             /* Same lead-in as `A-without`, and its first child differs by two
-               words — ">1 year" here, ">1 year of age" there. Transcribed as the
+               words — "≥1 year" here, "≥1 year of age" there. Transcribed as the
                source sets each rather than reconciled. */
             text: "Frequent IV therapy is particularly challenging for children:",
+            /* `≥`, not the source's bare `>` — a third pass of the 2026-08-05
+               client copy edit extended to this scenario what it asked for in
+               `B-with` and then `B-without`, and a fourth pass finished
+               `A-without`. The denecimig bullet moves with the other two:
+               `education.ts`'s FRONTIER3 bullet already writes that age limit
+               as "≥1 year of age". */
             children: [
-              "Emicizumab is indicated for younger patients, including newborns; denecimig was evaluated in patients >1 year",
-              "Marstacimab is indicated for patients > age 6 years",
-              "Other FDA-approved options are indicated for children >12 years",
+              "Emicizumab is indicated for younger patients, including newborns; denecimig was evaluated in patients ≥1 year",
+              "Marstacimab is indicated for patients ≥ age 6 years",
+              "Other FDA-approved options are indicated for children ≥12 years",
             ],
           },
         ],
@@ -536,7 +553,7 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Monitor for decreased clinical response or loss of bleed control",
           "Anticipate treatment interactions when managing breakthrough bleeding, especially thrombotic risk with high or repeated doses of clotting factor concentrates or bypassing agents",
           "Develop a plan for breakthrough bleeding, including when clotting factor concentrates or bypassing agents may be needed for serious bleeding episodes or major surgery",
-          "Use product-specific safety monitoring, including thrombotic risk, hypersensitivity, liver function, antithrombin activity, or drug concentration, depending on the selected agent",
+          "Use product-specific monitoring, including thrombotic risk, hypersensitivity, liver function, antithrombin activity, or drug concentration, depending on the selected agent",
         ],
       },
     },
@@ -569,9 +586,13 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Prefilled dosing pens simplify preparation and administration, reduce dosing complexity, and support at-home treatment",
           {
             text: "Frequent IV therapy is particularly challenging for children:",
+            /* `≥`, not the source's bare `>` — a second pass of the 2026-08-05
+               client copy edit extended to this scenario what it first asked
+               for in `B-with` below. Two further passes carried it to `A-with`
+               and `A-without`. */
             children: [
-              "Marstacimab is indicated for patients > age 6 years",
-              "Concizumab and fitusiran are approved for children >12 years",
+              "Marstacimab is indicated for patients ≥ age 6 years",
+              "Concizumab and fitusiran are approved for children ≥12 years",
             ],
           },
           /* Top level, NOT a third child, and this scenario is the only one where
@@ -660,17 +681,30 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Prefilled dosing pens simplify preparation and administration and support at-home treatment",
           {
             text: "Frequent IV therapy is particularly challenging for children:",
+            /* A client copy edit of 2026-08-05 asked for these `>` signs to be
+               underlined — the slide-deck way of drawing "greater than or equal
+               to", and the sense the indications carry. Set as the character for
+               the same reasons as `education.ts`'s FRONTIER bullets: the codebase
+               already writes it that way, and it is what a screen reader
+               announces. The edit named this scenario first, then `B-without`,
+               then `A-with`, then `A-without` — all four scenarios now carry
+               `≥`. */
             children: [
-              "Marstacimab is indicated for patients > age 6 years",
-              "Concizumab and fitusiran are approved for children >12 years",
+              "Marstacimab is indicated for patients ≥ age 6 years",
+              "Concizumab and fitusiran are approved for children ≥12 years",
             ],
           },
         ],
       },
       strategies: {
         title: "Strategies for Reducing Treatment Burden and Improving QoL",
+        /* The same copy edit replaced this set with the three bullets the `A-*`
+           scenarios carry — the client supplied them verbatim, so the HB
+           wording ("convenient SC administration and alternative dosing
+           schedules") is gone rather than merged. */
         points: [
-          "Discuss options for convenient SC administration and alternative dosing schedules with appropriate patients",
+          "Discuss options for less frequent or more convenient SC dosing with appropriate patients",
+          "Consider options for less burdensome dosing and administration for younger patients when possible",
           "Plan follow-up and education to support safe at-home administration and timely management of breakthrough bleeds",
         ],
       },
@@ -682,6 +716,7 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "NFTs avoid routine FVIII/FIX peak/trough monitoring and PK-guided dose optimization",
           "Monitoring with NFTs shifts from factor activity levels to clinical bleed control and product-specific safety or exposure monitoring",
           "Product-specific monitoring may include thrombotic risk, liver function, AT activity, or drug concentration, depending on the selected agent",
+          "Thoughtful patient selection for hemostatic rebalancing agents is essential",
         ],
       },
       strategies: {
@@ -690,7 +725,6 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Develop monitoring protocols for clinical bleed control and product-specific toxicities, including thrombotic events",
           "Concizumab and marstacimab may increase fibrin-D and prothrombin fragment levels",
           "Fitusiran requires monitoring for AT and AST/ALT",
-          "Thoughtful patient selection for hemostatic rebalancing agents is essential",
         ],
       },
     },

@@ -16,7 +16,17 @@ const DENECIMIG_MOA = topicById("denecimig-moa")!;
 const NXT007_STRUCTURE = topicById("nxt007-structure")!;
 
 /** The panel's group heading — a chapter literal, no topic holds it. */
-const PANEL_HEADING = "Investigational FVIIIa-mimetic therapies in early-stage development:";
+const PANEL_HEADING = "Investigational FVIII mimetic therapies in earlier-stage development:";
+
+/**
+ * NXT007's display name — a chapter literal too, and since 2026-08-05 the INN
+ * ahead of the code name, where `NXT007.title` still transcribes the source's
+ * bare "NXT007". The chapter uses it for both the panel's caption and the card's
+ * band, so it is one const here as well; the pair being identical is what makes
+ * "Close Zemocimig (NXT007)" ambiguous in the document, and the queries below
+ * scope around that.
+ */
+const NXT007_CAPTION = "Zemocimig (NXT007)";
 
 describe("fviiia-mimetics chapter", () => {
   /**
@@ -52,28 +62,27 @@ describe("fviiia-mimetics chapter", () => {
    */
   it("keeps the punctuation its two-tone headings split on", () => {
     expect(CHAPTER.title).toBe(
-      "FVIIIa-Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
+      "FVIII Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
     );
     expect(EMICIZUMAB.title).toBe("Emicizumab (FDA-approved)");
-    expect(DENECIMIG.title).toBe("Denecimig (Mim8): Investigational; currently under FDA review");
+    expect(DENECIMIG.title).toBe("Denecimig (Mim8): Investigational currently under FDA review");
     // The paren comes first in the string; the colon is the drawn break.
     expect(DENECIMIG.title.indexOf(" (")).toBeLessThan(DENECIMIG.title.indexOf(": "));
   });
 
   /**
    * `uppercase` is a CSS transform, so nothing here can be asserted by reading
-   * text — what is assertable is that the two abbreviations are carried in their
-   * own elements, which is the only way they can opt out of it. A heading that
-   * shouted them would render "FVIIIA-MIMETIC BSABS" and destroy both.
+   * text — what is assertable is that the abbreviation is carried in its own
+   * element, which is the only way it can opt out of it. A heading that shouted
+   * it would render "BSABS" and destroy it. (`FVIII` needs no such span: every
+   * letter of it is already a capital, so the transform is a no-op.)
    */
-  it("keeps FVIIIa and BsAbs out of the heading's uppercase transform", () => {
+  it("keeps BsAbs out of the heading's uppercase transform", () => {
     render(<FviiiaMimetics />);
     const heading = screen.getByRole("heading", { level: 1 });
 
-    for (const term of ["FVIIIa", "BsAbs"]) {
-      const span = within(heading).getByText(term);
-      expect(span).toHaveClass("normal-case");
-    }
+    const span = within(heading).getByText("BsAbs");
+    expect(span).toHaveClass("normal-case");
   });
 
   /**
@@ -96,7 +105,7 @@ describe("fviiia-mimetics chapter", () => {
    */
   it("renders a named disclosure for each of the four agents", () => {
     render(<FviiiaMimetics />);
-    for (const name of [EMICIZUMAB.title, DENECIMIG.title, "NXT007", "Inno8"]) {
+    for (const name of [EMICIZUMAB.title, DENECIMIG.title, NXT007_CAPTION, "Inno8"]) {
       expect(screen.getByRole("button", { name: `Expand ${name}` })).toBeInTheDocument();
     }
   });
@@ -106,7 +115,9 @@ describe("fviiia-mimetics chapter", () => {
     render(<FviiiaMimetics />);
     const panel = screen.getByRole("region", { name: PANEL_HEADING });
 
-    expect(within(panel).getByRole("button", { name: "Expand NXT007" })).toBeInTheDocument();
+    expect(
+      within(panel).getByRole("button", { name: `Expand ${NXT007_CAPTION}` }),
+    ).toBeInTheDocument();
     expect(within(panel).getByRole("button", { name: "Expand Inno8" })).toBeInTheDocument();
     // The other two are the chapter's, not the panel's.
     expect(
@@ -120,20 +131,25 @@ describe("fviiia-mimetics chapter", () => {
    *
    * Scoped to the panel, and that is not decoration: NXT007's card is the one
    * whose band draws exactly the panel's caption for it, so with the card up the
-   * document holds two buttons named "Close NXT007" — this disclosure and the
-   * card's ✕. `within(panel)` is what keeps this asserting on the disclosure.
+   * document holds two buttons named "Close Zemocimig (NXT007)" — this
+   * disclosure and the card's ✕. `within(panel)` is what keeps this asserting on
+   * the disclosure.
    */
   it("shows at most one disclosure open at a time", async () => {
     const user = userEvent.setup();
     render(<FviiiaMimetics />);
     const panel = screen.getByRole("region", { name: PANEL_HEADING });
 
-    await user.click(within(panel).getByRole("button", { name: "Expand NXT007" }));
-    expect(within(panel).getByRole("button", { name: "Close NXT007" })).toBeInTheDocument();
+    await user.click(within(panel).getByRole("button", { name: `Expand ${NXT007_CAPTION}` }));
+    expect(
+      within(panel).getByRole("button", { name: `Close ${NXT007_CAPTION}` }),
+    ).toBeInTheDocument();
 
     await user.click(within(panel).getByRole("button", { name: "Expand Inno8" }));
     expect(within(panel).getByRole("button", { name: "Close Inno8" })).toBeInTheDocument();
-    expect(within(panel).getByRole("button", { name: "Expand NXT007" })).toBeInTheDocument();
+    expect(
+      within(panel).getByRole("button", { name: `Expand ${NXT007_CAPTION}` }),
+    ).toBeInTheDocument();
 
     // Clicking the open one closes it, leaving all four shut.
     await user.click(within(panel).getByRole("button", { name: "Close Inno8" }));
@@ -157,7 +173,7 @@ describe("fviiia-mimetics chapter", () => {
     for (const name of [
       `Expand ${EMICIZUMAB.title}`,
       `Expand ${DENECIMIG.title}`,
-      "Expand NXT007",
+      `Expand ${NXT007_CAPTION}`,
       "Expand Inno8",
     ]) {
       expect(screen.getByRole("button", { name })).toHaveAttribute("aria-haspopup", "dialog");
@@ -372,7 +388,7 @@ describe("the Denecimig card", () => {
     await open(user);
 
     expect(card()).toHaveAccessibleName("Denecimig (Mim8)");
-    expect(DENECIMIG.title).toBe("Denecimig (Mim8): Investigational; currently under FDA review");
+    expect(DENECIMIG.title).toBe("Denecimig (Mim8): Investigational currently under FDA review");
   });
 
   /**
@@ -523,15 +539,15 @@ describe("the NXT007 card", () => {
 
   /**
    * The panel's disclosure, not the card's ✕ — the two share the name "Close
-   * NXT007" once the card is up, which is the collision the chapter's own
-   * one-open-at-a-time test scopes around.
+   * Zemocimig (NXT007)" once the card is up, which is the collision the
+   * chapter's own one-open-at-a-time test scopes around.
    */
   const disclosure = (name: string) =>
     within(screen.getByRole("region", { name: PANEL_HEADING })).getByRole("button", { name });
 
   const open = async (user: ReturnType<typeof userEvent.setup>) => {
     render(<FviiiaMimetics />);
-    await user.click(disclosure("Expand NXT007"));
+    await user.click(disclosure(`Expand ${NXT007_CAPTION}`));
   };
 
   it("resolves the structure topic split out of the overview", () => {
@@ -542,16 +558,22 @@ describe("the NXT007 card", () => {
    * **The one card whose band and whose `+` say the same thing.** The other two
    * agents shed a regulatory status on the way into the dialog; this one has none
    * to shed, so the caption-vs-title split collapses — and that collapse is worth
-   * pinning, because it is what makes "Close NXT007" ambiguous in the document
-   * and would otherwise be rediscovered as a flaky query.
+   * pinning, because it is what makes "Close Zemocimig (NXT007)" ambiguous in the
+   * document and would otherwise be rediscovered as a flaky query.
+   *
+   * The name is the chapter's display literal, NOT `NXT007.title`: the client's
+   * INN went on both the button and the band on 2026-08-05, where the data
+   * module still transcribes the source's bare code name. Both are asserted, so
+   * a "fix" that pushes the display name back into the topic fails here.
    */
   it("opens a dialog named exactly as the panel's caption for it", async () => {
     const user = userEvent.setup();
     await open(user);
 
-    expect(card()).toHaveAccessibleName("NXT007");
+    expect(card()).toHaveAccessibleName(NXT007_CAPTION);
     expect(NXT007.title).toBe("NXT007");
-    expect(screen.getAllByRole("button", { name: "Close NXT007" })).toHaveLength(2);
+    expect(NXT007_CAPTION).toContain(NXT007.title);
+    expect(screen.getAllByRole("button", { name: `Close ${NXT007_CAPTION}` })).toHaveLength(2);
   });
 
   /**
@@ -612,8 +634,9 @@ describe("the NXT007 card", () => {
       const text = typeof bullet === "string" ? bullet : bullet.text;
       expect(text.startsWith("NXT007")).toBe(false);
     }
-    // The card names the agent exactly once, in its band.
-    expect(within(card()).getByRole("heading", { name: "NXT007" })).toBeInTheDocument();
+    // The card names the agent exactly once, in its band — under the display
+    // name, which carries the code name the bullets shed.
+    expect(within(card()).getByRole("heading", { name: NXT007_CAPTION })).toBeInTheDocument();
   });
 
   /** The panel is a control, named the way every other expandable figure is. */
@@ -660,7 +683,7 @@ describe("the NXT007 card", () => {
 
     expect(figure()).not.toHaveAttribute("open");
     expect(card()).toHaveAttribute("open");
-    expect(disclosure("Close NXT007")).toBeInTheDocument();
+    expect(disclosure(`Close ${NXT007_CAPTION}`)).toBeInTheDocument();
   });
 
   /** The three cards cannot be up at once; see the Denecimig block's own pin. */
@@ -671,7 +694,7 @@ describe("the NXT007 card", () => {
     await user.click(screen.getByRole("button", { name: `Expand ${DENECIMIG.title}` }));
     expect(dialogs()[1]).toHaveAttribute("open");
 
-    await user.click(disclosure("Expand NXT007"));
+    await user.click(disclosure(`Expand ${NXT007_CAPTION}`));
     expect(dialogs()[1]).not.toHaveAttribute("open");
     expect(card()).toHaveAttribute("open");
   });
@@ -722,30 +745,31 @@ describe("the Inno8 card", () => {
     const user = userEvent.setup();
     await open(user);
 
-    expect(card()).toHaveAccessibleName("Inno8: Oral FVIIIa Mimetic for HA");
-    expect(INNO8.title).toBe("Inno8: Oral FVIIIa Mimetic for HA");
+    expect(card()).toHaveAccessibleName("Inno8: Oral FVIII Mimetic for HA");
+    expect(INNO8.title).toBe("Inno8: Oral FVIII Mimetic for HA");
     expect(disclosure("Close Inno8")).toBeInTheDocument();
   });
 
   /**
    * The band shouts everything except the agent's name, which is what the
    * artboard draws — so "Inno8" is carried in its own element to opt out of the
-   * `uppercase`, exactly as `FVIIIa` is. Nothing about this is assertable by
-   * reading text: `uppercase` is a CSS transform, and the element is the only
-   * mechanism.
+   * `uppercase`. Nothing about this is assertable by reading text: `uppercase` is
+   * a CSS transform, and the element is the only mechanism.
+   *
+   * It is the band's only cased term since the 2026-08-05 terminology pass —
+   * "FVIIIa Mimetic" became "FVIII Mimetic", every letter of which is already a
+   * capital, so the transform has nothing left to destroy there.
    *
    * The sibling card lands the other way on the same authority — the designer
    * shouts "MIM8" — which is why this is worth pinning rather than reading as a
    * general rule about product names.
    */
-  it("keeps Inno8 and FVIIIa out of the band's uppercase transform", async () => {
+  it("keeps Inno8 out of the band's uppercase transform", async () => {
     const user = userEvent.setup();
     await open(user);
     const band = within(card()).getByRole("heading", { name: INNO8.title });
 
-    for (const term of ["Inno8", "FVIIIa"]) {
-      expect(within(band).getByText(term)).toHaveClass("normal-case");
-    }
+    expect(within(band).getByText("Inno8")).toHaveClass("normal-case");
   });
 
   /**
@@ -822,7 +846,7 @@ describe("the Inno8 card", () => {
     const user = userEvent.setup();
     render(<FviiiaMimetics />);
 
-    await user.click(disclosure("Expand NXT007"));
+    await user.click(disclosure(`Expand ${NXT007_CAPTION}`));
     expect(dialogs()[2]).toHaveAttribute("open");
 
     await user.click(disclosure("Expand Inno8"));
@@ -952,7 +976,7 @@ describe("fviiia-mimetics — the responsive pass", () => {
       "leading-[1.08]",
       "lg:text-2xl",
     );
-    for (const name of ["NXT007", "Inno8"]) {
+    for (const name of [NXT007_CAPTION, "Inno8"]) {
       expect(within(panel).getByText(name)).toHaveClass("text-xl", "leading-[1.08]", "lg:text-2xl");
     }
   });
@@ -973,7 +997,7 @@ describe("fviiia-mimetics — the responsive pass", () => {
   it.each([
     [`Expand ${EMICIZUMAB.title}`, 0],
     [`Expand ${DENECIMIG.title}`, 1],
-    ["Expand NXT007", 2],
+    [`Expand ${NXT007_CAPTION}`, 2],
   ])("stacks the %s card at xl and steps its body to 16px below lg", async (name, index) => {
     const user = userEvent.setup();
     render(<FviiiaMimetics />);

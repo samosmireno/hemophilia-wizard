@@ -157,14 +157,16 @@ export default function Therapies() {
         The sentence itself is the blueprint's, verbatim from CONTEXT.md §4.2,
         with the reason interpolated in its `sourceLabel` form.
 
-        `mt-auto grow-0` is what pins the arch to the bottom of the column — see
-        `ArchBand`'s `className`, and the two artboards that put its top edge at
-        the same y with panels of very different heights above it.
+        **The `mt-auto grow-0` this used to pass is now `ArchBand`'s base**
+        (2026-08-05). The reading is unchanged and still this page's — the two
+        artboards put the arch's top edge at the same y with panels of very
+        different heights above it — but `disease-background` turned out to need
+        the same pin above the 1440 canvas, so it moved into the component rather
+        than being restated at both call sites.
       */}
       <ArchBand
         title={`Novel therapies to consider if ${reason.sourceLabel} is the primary reason for switching therapies:`}
         titleClassName="mx-auto max-w-215 leading-none"
-        className="mt-auto grow-0"
       >
         {/*
           Equal-width items at an equal gap, which is what makes the BUTTON

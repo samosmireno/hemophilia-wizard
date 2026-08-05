@@ -64,11 +64,8 @@ const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
     content: <SeverityTable />,
   },
   {
-    label: "Typical bleeding manifestations in males and females with HA/HB",
-    // Same string the `severity-bleeding` topic lists as its figure caption —
-    // stated here rather than read out of that array, which is an unordered
-    // list of captions and not a keyed lookup.
-    title: "Bleeding in males and females with hemophilia",
+    label: "Bleeding manifestations in HA/HB",
+    title: "Bleeding Manifestations in HA/HB",
     content: (
       <PopupFigure
         src={bleedingUrl}
@@ -98,9 +95,10 @@ const DISCLOSURE_FIGURES = [diagnosticUrl, bleedingUrl];
 export default function DiseaseBackground() {
   usePreloadImages(DISCLOSURE_FIGURES);
 
-  // A growing flex column so the severity band below can take the leftover
-  // height — the shell hands every page a `flex-1` wrapper inside a `min-h-dvh`
-  // `<main>`, so `flex-1` here resolves against the viewport.
+  // A growing flex column so the severity band below can be pinned to the bottom
+  // of it — the shell hands every page a `flex-1` wrapper inside a `min-h-dvh`
+  // `<main>`, so `flex-1` here resolves against the viewport. The leftover height
+  // lands ABOVE the band rather than inside it; see the band's own note.
   return (
     <section aria-labelledby="chapter-heading" className="flex flex-1 flex-col">
       {/* Uppercase is CSS, not copy: the accessible name stays title-case, the
@@ -135,7 +133,12 @@ export default function DiseaseBackground() {
       {/* 29.375rem === the drawn 470px at a 16px root, so the canvas is
           unchanged; as px the figure track held still while the prose track grew
           above 1440 and the composition drifted (docs/styling.md §19). */}
-      <div className="mt-5 grid xl:grid-cols-[1fr_29.375rem] xl:gap-x-8">
+      {/* `mb-4` is the band's old `mt-4`, moved here because `mt-auto` displaced
+          it (see the band below). It has to live on this side of the pin: a
+          margin on the band would be the pin, so the 16px floor would vanish on
+          exactly the viewports that have no free space — every width where this
+          chapter scrolls. Measured 0px there before it was restored. */}
+      <div className="mt-5 mb-4 grid xl:grid-cols-[1fr_29.375rem] xl:gap-x-8">
         <div className="xl:mt-3">
           {/* `text-3xl` from `lg` only — §2's `<h1>` rule applied one level
               down. A sub-heading does not overflow the way a display `<h1>`
@@ -182,15 +185,23 @@ export default function DiseaseBackground() {
       </div>
 
       {/*
-        The band closes the page: `grow` takes whatever height is left under the
-        disclosures on a short chapter, and is inert once the content itself
-        passes the fold (`min-h-dvh` is a floor, so there is no free space to
-        take) — which is why the `<section>` above is a flex column.
+        The band closes the page: `ArchBand`'s `mt-auto` pins it to the bottom of
+        the column, which is why the `<section>` above is a flex column. It is
+        inert once the content itself passes the fold (`min-h-dvh` is a floor, so
+        there is no free space to take), and the band then follows the content.
+
+        **It `grow`ed until 2026-08-05**, which made the arch a residual: the
+        leftover height went into the crescent rather than above it, so a tall
+        viewport drew an 861px arch (2560 × 1440) with the three disclosures
+        stranded at its top. Now the arch is its own height at every board and
+        the leftover is page gradient above it — the shape `/wizard/therapies`
+        has always drawn. See `ArchBand` and docs/styling.md §16.
 
         The 44px above it was the band heading's own top margin collapsing out
         through the (padding-less) div. A flex item establishes its own
-        formatting context, which stops that; the gap is stated directly as a
-        margin instead, so nothing inside moved.
+        formatting context, which stops that; the gap was stated directly as
+        `mt-4` instead, and `mt-auto` now supersedes it — bigger everywhere
+        except on the overflowing column, where it is 0.
       */}
       <DisclosureBand title="Hemophilia Severity and Bleeding Patterns" disclosures={DISCLOSURES} />
     </section>

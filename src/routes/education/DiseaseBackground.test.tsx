@@ -105,7 +105,7 @@ describe("disease-background chapter", () => {
     const captions = [
       "Diagnostic algorithm for HA/HB",
       "Disease severity and bleeding in HA/HB",
-      "Typical bleeding manifestations in males and females with HA/HB",
+      "Bleeding manifestations in HA/HB",
     ];
     for (const caption of captions) {
       expect(screen.getByRole("button", { name: `Expand ${caption}` })).toBeInTheDocument();
@@ -114,16 +114,14 @@ describe("disease-background chapter", () => {
   });
 
   // The caption names the target from the §7.7 click-through index; the card
-  // wears the figure's own title. All three pairs differ, and neither string is
-  // derivable from the other — so this is what catches a card that fell back to
-  // its caption because the `title` was dropped.
+  // wears the figure's own title. Every pair differs — the last only in
+  // capitalisation, which `toHaveAccessibleName` still tells apart — so this is
+  // what catches a card that fell back to its caption because the `title` was
+  // dropped.
   it.each([
     ["Diagnostic algorithm for HA/HB", "Diagnostic approach for Hemophilia A/B"],
     ["Disease severity and bleeding in HA/HB", "Hemophilia Severity Based on Factor VIII/IX Level"],
-    [
-      "Typical bleeding manifestations in males and females with HA/HB",
-      "Bleeding in males and females with hemophilia",
-    ],
+    ["Bleeding manifestations in HA/HB", "Bleeding Manifestations in HA/HB"],
   ])("titles the %s pop-up with its own heading, not its caption", async (caption, title) => {
     render(<DiseaseBackground />);
     await userEvent.click(screen.getByRole("button", { name: `Expand ${caption}` }));

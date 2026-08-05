@@ -50,12 +50,12 @@ const CARD_TITLE = "Emicizumab";
  * The Denecimig card's heading, and a literal for exactly the reason above: the
  * band draws "DENECIMIG (MIM8)" where the topic's title carries "Investigational;
  * currently under FDA review" as well. Same pair on the way in — "Expand Denecimig
- * (Mim8): Investigational; currently under FDA review" on the `+`, "Denecimig
+ * (Mim8): Investigational currently under FDA review" on the `+`, "Denecimig
  * (Mim8)" on the dialog.
  *
  * **No `preserveCase` term is needed for `Mim8`.** The band's `uppercase` renders
- * it "MIM8", which is what the artboard draws — unlike `FVIIIa` or `BsAb`, the 8
- * is not a case distinction that carries meaning.
+ * it "MIM8", which is what the artboard draws — unlike `BsAb`, the 8 is not a
+ * case distinction that carries meaning.
  */
 const DENECIMIG_CARD_TITLE = "Denecimig (Mim8)";
 
@@ -93,14 +93,20 @@ const MOA_FIGURE = { width: 704, height: 734 } as const;
  * `denecimig-moa.title` names the figure for the trigger and the enlargement's
  * accessible name, and nothing paints it.
  *
+ * That quoted heading kept the old "FVIIIa-mimetic" wording after the rest of
+ * the chapter shed it on 2026-08-05, because it is a quote of pixels rather than
+ * copy this app sets. The asset was then re-exported painting "FVIII MIMETIC
+ * BSAB", so it quotes that instead — see `denecimig-moa`, which holds the same
+ * line for the same reason. Both move again if the asset does.
+ *
  * The rest is the **pathway**, not the structure — the drawing is a left-to-right
  * sequence ending in a clot, where the emicizumab diagram is a static set of
  * bindings. Neither is a house style the other should be edited into; each says
  * what its own picture shows.
  */
 const DENECIMIG_FIGURE_ALT =
-  "Diagram titled “Mechanism of Action for Denecimig (Mim8): FVIIIa-mimetic BsAb”. " +
-  "Mim8, a Y-shaped bispecific antibody, binds factor IXa and factor X on an activated " +
+  "Diagram titled “Mechanism of Action for Denecimig (Mim8): FVIII mimetic BsAb”. " +
+  "Denecimig (Mim8), a Y-shaped bispecific antibody, binds factor IXa and factor X on an activated " +
   "platelet surface and bridges them, converting factor X to factor Xa. Factor Xa with " +
   "factor Va then converts factor II to factor IIa, which forms a blood clot.";
 
@@ -222,18 +228,30 @@ const INNO8_FIGURE = { width: 2612, height: 1006 } as const;
  * trailing colon IS drawn and is kept: the panel's two buttons are what it
  * introduces.
  */
-const PANEL_HEADING = "Investigational FVIIIa-mimetic therapies in early-stage development:";
+const PANEL_HEADING = "Investigational FVIII mimetic therapies in earlier-stage development:";
 
 /**
  * The two panel captions, flat where the cards behind them carry longer titles.
  *
- * `NXT007` is the one place in this chapter where the caption and the card's
- * heading agree — Pop up 12's band draws the agent's name and it has no status
- * to shed, so the `+` promises "Expand NXT007" and the dialog is named NXT007.
- * Still two strings: this one is the panel's word for the button, and the card
- * reads `nxt007-overview.title`, which is the split the other three record.
+ * `NXT007` carries the agent's INN ahead of its code name — "Zemocimig
+ * (NXT007)", a client-directed label change of 2026-08-05 (CONTEXT.md §7.5)
+ * that the source and the artboard both predate, since both draw the code name
+ * alone.
+ *
+ * It stays the one place in this chapter where the caption and the card's
+ * heading agree: the other two agents shed a regulatory status on the way into
+ * the dialog and this one has none to shed, so the `+` promises "Expand
+ * Zemocimig (NXT007)" and the dialog is named the same. **That makes "Close
+ * Zemocimig (NXT007)" ambiguous in the document** — this disclosure and the
+ * card's ✕ — which is what the chapter's tests scope around.
+ *
+ * One const for both, where the deviation used to be a literal per site: the
+ * two strings are no longer independent readings of a source, they are one
+ * client-supplied display name, and a second copy of it in the card is a copy
+ * that can drift. `nxt007-overview.title` keeps the source's "NXT007" — the
+ * data module transcribes, and this is presentation.
  */
-const NXT007 = "NXT007";
+const NXT007 = "Zemocimig (NXT007)";
 const INNO8 = "Inno8";
 
 /**
@@ -325,7 +343,7 @@ export default function FviiiaMimetics() {
         rather than belt-and-braces. Between the two-tone split and the cased
         terms this heading is five elements deep, and the accessible-name
         algorithm concatenates each element's contribution with a separating
-        space — announcing "FVIIIa -Mimetic BsAbs : Approved…". Labelling from
+        space — announcing "FVIII Mimetic BsAbs : Approved…". Labelling from
         `CHAPTER.title` states the one string the fragments are made of, so the
         name cannot drift from them: both come from the same const. `textContent`
         is unaffected by all this and stays exact, which is what the router test
@@ -361,7 +379,7 @@ export default function FviiiaMimetics() {
           their body at the artboards' 26px, so they have exactly one step to
           give, where the other chapters sit on the 16px legibility floor.
           `leading-tight` is a ratio and is stated once for both steps. */}
-      <BulletList items={CHAPTER.body} className="mt-8 text-xl leading-tight lg:text-2xl" />
+      <BulletList items={CHAPTER.body} className="mt-8 text-xl leading-normal lg:text-2xl" />
 
       {/*
         The bottom half: two disclosures at the left, the corner panel at the
@@ -484,14 +502,11 @@ export default function FviiiaMimetics() {
         {openId === "denecimig" && <DenecimigCard />}
       </Popup>
 
-      {/* The band draws the agent's name, which for this one agent is also the
-          panel's caption for it — see `NXT007`. Read off the topic rather than
-          the caption const, so the card is titled by its own content. */}
-      <Popup
-        open={openId === "nxt007"}
-        title={NXT007_OVERVIEW.title}
-        onClose={() => setOpenId(null)}
-      >
+      {/* The band draws the agent's display name, which for this one agent is
+          also the panel's caption for it — the caption const, not
+          `nxt007-overview.title`, because the INN is a presentation decision
+          and the data module holds the source's bare "NXT007". See `NXT007`. */}
+      <Popup open={openId === "nxt007"} title={NXT007} onClose={() => setOpenId(null)}>
         {openId === "nxt007" && <Nxt007Card />}
       </Popup>
 
@@ -569,7 +584,7 @@ function EmicizumabCard() {
         // already inside a card whose own band and ✕ would then be stacked
         // under a second pair. See `ExpandableFigure`'s `variant`.
         variant="bare"
-        className="max-w-112 rounded-3xl bg-white p-4 xl:flex-1 xl:basis-112"
+        className="max-w-md rounded-3xl bg-white p-4 xl:flex-1 xl:basis-md"
       >
         {/*
           `reserve` is 9rem against the 10rem default, and the two are not the
@@ -755,7 +770,7 @@ function Nxt007Card() {
       {/* The right column: the panel, then the sentence under it. `w-112` is the
           drawn ~450px — 543 of the artboard's 1075px content column, which is
           448 of `Popup`'s 896 — leaving the left column the 424 it is drawn at. */}
-      <div className="flex w-full flex-col gap-3 xl:w-112 xl:shrink-0">
+      <div className="flex w-full flex-col gap-3 xl:w-md xl:shrink-0">
         {/*
           **No white panel in markup**, as on the Denecimig card and unlike the
           Emicizumab one: `nxt007.webp` carries the white surface, the crimson

@@ -10,16 +10,16 @@ import DrugSheetPopup from "./DrugSheetPopup";
  * sheet — so the sweep below asserts the *rendered* order rather than restating
  * the component's list of fields.
  *
- * The two optional headings are resolved here exactly as the component resolves
- * them, which is what makes "Class" on Efanesoctocog and Denecimig's sentence
- * assertions rather than coincidences.
+ * The one optional heading is resolved here exactly as the component resolves it,
+ * which is what makes "Class" on Efanesoctocog an assertion rather than a
+ * coincidence.
  */
 function sections(sheet: DrugSheet): [heading: string, items: string[]][] {
   return [
     [sheet.classHeading ?? "Class/Target", [...sheet.classTarget]],
     ["Indication", [...sheet.indication]],
     ["Dosage and Administration", [...sheet.dosing]],
-    [sheet.monitoringHeading ?? "Monitoring", [...sheet.monitoring]],
+    ["Monitoring", [...sheet.monitoring]],
     ["Clinical Trials", sheet.trials.map((t) => `${t.name} (${t.id})`)],
   ];
 }
@@ -74,12 +74,12 @@ describe("DrugSheetPopup — all seven sheets", () => {
   });
 });
 
-describe("DrugSheetPopup — the two heading overrides", () => {
+describe("DrugSheetPopup — the heading override", () => {
   /*
-    Both are single-sheet deviations transcribed from the source, so each is
-    pinned twice: that the one sheet has it, and that a neighbouring sheet does
-    not. Asserting only the first would let a default that had drifted to the
-    override's value pass.
+    A single-sheet deviation transcribed from the source, so it is pinned twice:
+    that the one sheet has it, and that a neighbouring sheet does not. Asserting
+    only the first would let a default that had drifted to the override's value
+    pass.
   */
   it("heads Efanesoctocog alfa's first section 'Class', not 'Class/Target'", () => {
     const card = openCard("Efanesoctocog alfa");
@@ -96,18 +96,21 @@ describe("DrugSheetPopup — the two heading overrides", () => {
     ).toBeInTheDocument();
   });
 
-  it("carries Denecimig's TBD qualifier as the Monitoring heading, not as a bullet", () => {
+  it("heads Denecimig's Monitoring plainly, with no TBD qualifier anywhere", () => {
+    /*
+      Client cut, 2026-08-05: the source qualified the whole section at its
+      heading ("Monitoring: TBD; based on phase 3 clinical trial data"). Denecimig
+      is the only sheet that could regress, and the qualifier could come back
+      either as a heading or as the `monitoring[0]` bullet it was first
+      transcribed as — so the card is asserted to be free of it, not just the
+      heading.
+    */
     const card = openCard("Denecimig");
-    const qualifier = "Monitoring: TBD; based on phase 3 clinical trial data:";
 
-    expect(within(card).getByRole("heading", { level: 3, name: qualifier })).toBeInTheDocument();
-    /* It was transcribed as `monitoring[0]` before a card existed to draw it. */
-    expect(within(card).queryByRole("listitem", { name: qualifier })).toBeNull();
     expect(
-      within(card)
-        .getAllByRole("listitem")
-        .map((li) => li.textContent),
-    ).not.toContain(qualifier);
+      within(card).getByRole("heading", { level: 3, name: "Monitoring:" }),
+    ).toBeInTheDocument();
+    expect(card).not.toHaveTextContent(/TBD; based on phase 3/);
   });
 
   it("titles Denecimig's card with its status qualifier", () => {

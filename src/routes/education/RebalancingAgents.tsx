@@ -74,20 +74,6 @@ const MECHANISMS_LABEL =
 const MECHANISM_FIGURE_TITLE =
   "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade";
 
-/**
- * The prose card's footnote.
- *
- * **All three abbreviations, where the export glosses only AT.** That is a
- * deliberate, recorded divergence (docs/styling.md §11): the card's own copy
- * uses TFPI and APC as well — the lead names "the APC/protein S system" and the
- * first heading is "Anti-TFPI monoclonal antibodies" — so as drawn it defines
- * one of the three terms it introduces. The wording and order are
- * `MECHANISMS.figures[0]`'s own; the export's missing space in "AT=" goes with
- * it, since the same design writes "TFPI = " one card later.
- */
-const MECHANISM_ABBREVIATIONS =
-  "APC = activated protein C; AT = antithrombin; TFPI = tissue factor pathway inhibitor.";
-
 /** The figure card's footnote, as drawn. */
 const FIGURE_ABBREVIATION = "TFPI = tissue factor pathway inhibitor.";
 
@@ -299,7 +285,7 @@ export default function RebalancingAgents() {
               // `border-[0.25rem]` not `border-4`: the numeric utility is px and
               // would pin the outline while the box scales (§19). Editors will
               // offer to "canonicalise" it — decline.
-              className="h-48 w-full max-w-56 shrink-0 border-[0.25rem] border-black lg:shrink"
+              className="h-48 w-full max-w-56 shrink-0 border-4 border-black lg:shrink"
             />
           ))}
         </div>
@@ -429,7 +415,23 @@ function MechanismsCard({ onViewMechanism }: { onViewMechanism: () => void }) {
         ),
       )}
 
-      <CardFooter note={MECHANISM_ABBREVIATIONS}>
+      {/*
+        **No footnote on this card (2026-08-05).** It carried the gloss of all
+        three abbreviations its copy introduces — a divergence from an export
+        that glosses only AT, raised for the designer as open item 17 — and the
+        answer is that the row goes. The footnote is dropped, not moved: the
+        figure card behind this one keeps its own.
+
+        The CTA stays exactly where it was drawn, which is why `CardFooter`
+        still wraps it rather than being replaced by a bare right-aligned div.
+        `ms-auto` is what put the button on the right edge, and it does that
+        with or without a `<p>` beside it; `mt-8` and `items-end` are unchanged,
+        so on any width where the two shared a line the button's box does not
+        move by a pixel. Below that width it rises by the height of the line it
+        no longer has to clear, which is the only thing deleting a footnote can
+        mean.
+      */}
+      <CardFooter>
         {/*
           The package CTA, whose doc invites the override: "`cn` is
           tailwind-merge, so your classes win."
@@ -538,6 +540,11 @@ function MechanismFigureCard({ onBack }: { onBack: () => void }) {
  * The row both cards end on: the abbreviation footnote at the left, the one
  * control that moves you at the right.
  *
+ * **`note` is optional as of 2026-08-05**, because the prose card's footnote was
+ * deleted and its CTA was not. Omitting it renders no `<p>` at all rather than
+ * an empty one — the row is then a single `ms-auto` item, which is the same
+ * right edge the two-item row lands on.
+ *
  * Inside the card's body rather than as a `Popup` region, which is what the
  * artboard draws — it sits after the prose, not pinned over it — and what keeps
  * `PopupFigure`'s height cap honest: that `10rem` is measured off `Popup`'s
@@ -554,10 +561,12 @@ function MechanismFigureCard({ onBack }: { onBack: () => void }) {
  * centre, as drawn.
  *
  * **The three width classes on the footnote are what keep the button on the
- * right**, and they are not interchangeable. The prose card's gloss is ~530px of
- * ink against an 886px body, so at its natural width it plus the CTA overflow by
- * ~25px — and a plain `flex-wrap` answers that by breaking the line, which drops
- * the button to the *left* of the next row. `basis-80` states a hypothetical
+ * right**, and they are not interchangeable. They were derived against the prose
+ * card's ~530px gloss, which no longer exists: at its natural width it plus the
+ * CTA overflowed an 886px body by ~25px, and a plain `flex-wrap` answered that
+ * by breaking the line, which dropped the button to the *left* of the next row.
+ * They stay because the figure card's own footnote sits in the same row and the
+ * failure mode is the same one at a narrower viewport. `basis-80` states a hypothetical
  * width small enough that the two never trip that on a wide card; `flex-1` then
  * lets the footnote take the real leftover and wrap its own text instead; and
  * `min-w-0` is what permits that, a flex item's default `min-width:auto`
@@ -572,10 +581,14 @@ function MechanismFigureCard({ onBack }: { onBack: () => void }) {
  * it is what lets the 357px CTA come down to the 220px body instead of hanging
  * off the side of it.
  */
-function CardFooter({ note, children }: { note: string; children: ReactNode }) {
+function CardFooter({ note, children }: { note?: string; children: ReactNode }) {
   return (
     <div className="mt-8 flex flex-wrap items-end gap-x-6 gap-y-4">
-      <p className="min-w-0 flex-1 basis-80 text-sm leading-tight font-light text-black">{note}</p>
+      {note !== undefined && (
+        <p className="min-w-0 flex-1 basis-80 text-sm leading-tight font-light text-black">
+          {note}
+        </p>
+      )}
       <div className="ms-auto">{children}</div>
     </div>
   );

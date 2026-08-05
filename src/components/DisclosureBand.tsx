@@ -47,7 +47,7 @@ export interface Disclosure {
  * the heading, all shared with `/wizard/therapies`, which the artboards draw as
  * the same object. What is left here is the part that is a chapter's: three
  * disclosures, mutually exclusive, over one dialog. See `ArchBand` for the
- * stacking recipe and the parent contract `grow` assumes.
+ * stacking recipe and the parent contract `mt-auto` assumes.
  */
 export default function DisclosureBand({
   title,
