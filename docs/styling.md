@@ -1067,6 +1067,7 @@ that item's five cases. | §13, §17, ADR 0007 |
 | 47 | **Figure assets are budgeted for 1.00×, and §19 draws some of them at 1.25×.** §13's rule is that a figure is stored at 2× its drawn width _and no wider_, so at the 1.25× step a figure at full drawn width wants 2.5× and the file has 2×. On DPR 1 this is invisible (a 720-drawn figure renders at 900 CSS px against 1440 stored — still 1.6× oversampled); on a DPR-2 panel it is ~0.8× and mildly soft. **This item said the opposite until 2026-08-05.** It described the symptom as softening, when `PopupFigure`'s `px` cap was in fact _preventing_ softening and paying for it in size: measured at 2560 × 1330, `disease-background`'s two figures held 720px inside a 1413px body, 15% and 19% under the drawing's own proportion. The cap is now `rem` (`min(45rem, 100%)`), so size is correct everywhere and the 2× guarantee is given up on retina large screens — size was judged the more visible half, since an undersized figure is wrong on _every_ large screen and a soft one only on retina ones. What remains open is whether to re-export: `clotting-cascade-thumb.webp` is the tightest at exactly 940 for a 470 figure, while `denecimig` (3852), `inno8` (5224) and `hemostatic_mechanisms` (1772) have ample headroom. Re-export the tight ones at 3× if a 5K screen shows it; do not re-export the set. | §13, §19 |
 | 48 | **`--shadow-popup` is not scaled, and it is the one shadow big enough for that to read.** Its 50.142px blur stays 50px on a card that is 1.25× larger, i.e. ~20% tight against the drawing. Left alone deliberately (§19): converting it means editing a value §13 documents as straight-from-export, and it is a one-line change if a 2560 render indicts it. Not yet examined at that size. | §13, §19 |
 | 49 | ~~**§19 scaled the pop-up's 5px border but not the app's other visible borders.**~~ **Closed 2026-08-05, and the item under-counted itself while it was open** — it named `ArchBand`'s `border-t-4` and `Scenario`'s `border-4`, but `border-4` had **three** source sites, the other two being `rebalancing-agents`' and `treatment-landscape`' artwork placeholder boxes. All four are now `border-[0.25rem]` / `border-t-[0.25rem]`, which is the same 4px at a 16px root and scales above the canvas with the objects they edge. Verified in Chromium: 4px at 1440, 5px at 2560, and the nine canvas screenshots stay byte-identical. The reason they were missed twice is that they are Tailwind scale utilities rather than arbitrary values, so neither grep that built the §19 conversion list could see them. | §19 |
+| 50 | **`/explore`'s arch row is pinned rather than grown as of 2026-08-05 (§17), and the pin has 7px of vertical clearance at the bottom.** The row now takes its natural height, which is the drawn height to within 9px — but the deepest ink on the page is the three-line `UHL CLOTTING FACTOR REPLACEMENT` label, centred in an `xl:h-20` box whose bottom edge IS the page's, so it bottoms out 7px above it at 1440 and 8–9px on the scaled boards. Nothing is clipped at any width measured, and the drawing is no roomier (the artboard's own label row runs to y≈802 on an 800 canvas). Two things would spend it: a **fourth line** on any class label, since `EXPLORE_SEGMENTS` is authored content, and the **20px this page owes the drawing** — §17 records the drawn label row as 100px where the code ships `h-20`, which is the whole of the 9px top-edge discrepancy and would buy 10px of clearance back if the designer confirms it. This is the vertical twin of item 46's 9.4px arc clearance at 320, and the same instruction applies: re-check it if a label grows. | §17, §19, §9 |
 
 ---
 
@@ -4235,6 +4236,51 @@ only by each one's automatic minimum. Denying the row its own `grow` below `xl` 
 free space to distribute, which makes the factors inert there without touching what they do
 at the canvas; `basis-auto xl:basis-0` is the other half.
 
+**The row's own `xl:grow` is gone as of 2026-08-05 — see the next section.** What survives
+is the reading above: the row grows at no width now, so the factors are inert in the column
+direction everywhere, and this stopped being a breakpoint question at all.
+
+#### The row is pinned to the bottom, not grown into it
+
+`xl:grow` was the last of the three growing boxes on this page, and the same argument that
+retired `ArchBand`'s (§19) retires it: an arch that takes the leftover height is a residual,
+not a drawing. Measured before the change, with nothing in the segments moving:
+
+| viewport    | root | segments, `grow` | segments, pinned | dead space under the labels |
+| ----------- | ---: | ---------------: | ---------------: | --------------------------: |
+| 1440 × 800  | 16px |              446 |              313 |                         162 |
+| 1440 × 900  | 16px |              546 |              313 |                         262 |
+| 1920 × 1080 | 18px |              682 |              352 |                         362 |
+| 2560 × 1440 | 20px |              998 |              391 |                         643 |
+
+998px of arch where the same content needs 391 is **2.6×** — the number
+`disease-background` measured, on the same board, for the same reason. The pinned column
+steps 313 → 352 → 391, i.e. ×1.125 and ×1.250 against the root's own, so the drawing scales
+where the residual did not. These segments also have no crescent to hide the emptiness in:
+the class labels sit against a plain vertical wall with 643px of it underneath.
+
+**Pinning reproduces the artboard rather than approximating it, and that is the finding
+that makes the change safe.** The natural height of a segment IS its drawn height, which
+nobody had checked while `grow` was papering over it — content bottoms out 313px below the
+row's top edge, against 322 for the drawn middle (478 → the 800 canvas) and 286 for a flank
+measured from the same top. So `xl:mt-auto` on the row lands the tops at **523 / 487 / 523
+at 1440 × 800 where the artboard draws 514 / 478 / 514** — 9px on all three, and in the
+same direction, which is the `xl:h-20` label row standing 20px short of the drawn 100. Under
+`grow` that same middle top sat at 354, i.e. 124px high and worsening with every board.
+
+The arches are still cut rather than closed. `<main>` is `lg:pb-0`, so the column ends where
+the viewport does and the pinned bottom edge lands on it; on a column that overflows,
+`mt-auto` collapses to 0 and the row ends the document instead. The leftover height is page
+gradient above the row — 257px at 1440 × 900, 636 at 2560 × 1440 — which is what
+`/wizard/therapies` and `disease-background` have always drawn.
+
+**`mt-6` could not survive the pin either**, and the fix is `disease-background`'s verbatim:
+`mt-auto` and `mt-6` are the same property, so the 24px floor moved to the far side of the
+pin as **`xl:mb-6` on the CTA**. Stated on the row it would vanish on exactly the viewports
+with no free space to absorb — every width where this page scrolls. Below `xl` the row keeps
+its own `mt-6` and the CTA's margin adds nothing, which is why the pin and the floor are
+both `xl:`.
+
 **The columns.** Only the three segments ever stacked. The right-hand one's two columns
 stayed side by side at every width, each `flex-1` of a phone-width segment holding an item
 that is `basis-40 shrink-0` and will not give. Measured at 320 before the fix: a **149px
@@ -4675,6 +4721,15 @@ shape the change was raised against. Pinned, the arch is its own content height 
 every size and steps 293 → 329 → 366, i.e. ×1.123 and ×1.249 against the root's own
 ×1.125 and ×1.25. `/wizard/therapies` measures 249 → 280 → 311 on the same three
 boards, which is the same ratio, because it had the pin already.
+
+**`/explore` was the third case and it is fixed the same way.** Its arch row is not an
+`ArchBand` — three tiled segments with their own drawn widths — but it took `grow` for the
+same reason (the artboard cuts the arches at the canvas edge) and paid the same price:
+998px of segment at 2560 × 1440 where the content needs 391, with the class labels stranded
+against 643px of empty wall. `xl:mt-auto` on the row, and the 24px floor moved to `xl:mb-6`
+on the CTA above it, exactly as `mt-4` became `mb-4` here. The pinned tops land 9px off the
+artboard's own at 1440 × 800, which is closer than `grow` was at any width. Measurements in
+§17.
 
 **The fix was to delete the difference, not to add a cap.** §16 had already argued
 the pin from two artboards; `mt-auto grow-0` moved from that page's `className` into

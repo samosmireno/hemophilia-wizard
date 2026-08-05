@@ -143,19 +143,32 @@ describe("explore — the responsive pass", () => {
   });
 
   /**
-   * The row must not `grow` below `xl`. The segments carry the drawn widths as
-   * `flex-grow` factors, and in a column those split leftover HEIGHT — a stacked
-   * segment would be as tall as the viewport allowed rather than as tall as its
-   * contents. Denying the row its own growth leaves nothing to distribute.
+   * The row is **pinned** to the bottom of the column at `xl` and never grows,
+   * at any width. `xl:grow` was here until 2026-08-05 and made the segments a
+   * residual — 998px of arch with 643px of dead space under the class labels at
+   * 2560 × 1440, against a drawn 322 — which is `ArchBand`'s own fixed bug on a
+   * third page. Pinned, the natural height IS the drawn height: measured tops of
+   * 523 / 487 / 523 at 1440 × 800 against the artboard's 514 / 478 / 514.
+   *
+   * `grow` in any form is the regression, and the assertion covers the whole
+   * class of it: in a column the segments' own `flex-grow` factors would split
+   * leftover HEIGHT in the drawn ratio, so a stacked segment would be as tall as
+   * the viewport allowed rather than as tall as its contents. A row with no free
+   * space has nothing to distribute.
    */
-  it("stacks the segments as cards, and grows only at xl", () => {
+  it("stacks the segments as cards, and pins the row at xl without growing", () => {
     const page = renderExplore();
     const segments = [...page.querySelectorAll<HTMLElement>(".rounded-\\[8rem\\]")];
     const row = segments[0].parentElement!;
 
     expect(segments).toHaveLength(EXPLORE_SEGMENTS.length);
-    expect(row).toHaveClass("gap-6", "xl:grow", "xl:flex-row", "xl:gap-0");
-    expect(row.className).not.toMatch(/(^|\s)grow(\s|$)/);
+    expect(row).toHaveClass("mt-6", "gap-6", "xl:mt-auto", "xl:flex-row", "xl:gap-0");
+    expect(row.className).not.toMatch(/(^|\s)(xl:)?grow(\s|$)/);
+
+    // The 24px floor has to live on the far side of the pin: `mt-auto` IS a
+    // margin, so a gap stated on the row would vanish on exactly the viewports
+    // with no free space — every width where this page scrolls.
+    expect(within(page).getByRole("button", { name: EXPLORE_TABLE_TITLE })).toHaveClass("xl:mb-6");
 
     for (const [index, segment] of segments.entries()) {
       // Closed below `xl`, cut at it; padding mirrored against the new edge.

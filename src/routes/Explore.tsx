@@ -212,9 +212,17 @@ export default function Explore() {
         A control that opens a dialog, so it is a `<button>` by rights rather than
         by the `Button`-has-no-`href` compromise `Landing` and `WizardIntro` both
         accept.
+
+        **`xl:mb-6` is the arch row's `mt-6`, moved to this side of the pin** —
+        `disease-background`'s `mb-4` for the same reason, and it has to live here
+        for the same reason too. At `xl` the row takes `mt-auto`, and a margin on
+        the pinned item IS the pin: the 24px floor would vanish on exactly the
+        viewports that have no free space, i.e. every width where this page
+        scrolls, leaving the CTA touching the arches. Below `xl` the row keeps its
+        own `mt-6` and this adds nothing.
       */}
       <Button
-        className="mt-6 self-center px-8 py-3 text-base/tight sm:px-12 sm:py-3.5 sm:text-xl/tight lg:px-16 lg:py-4.5 lg:text-2xl/5"
+        className="mt-6 self-center px-8 py-3 text-base/tight sm:px-12 sm:py-3.5 sm:text-xl/tight lg:px-16 lg:py-4.5 lg:text-2xl/5 xl:mb-6"
         aria-haspopup="dialog"
         onClick={() => setTableOpen(true)}
       >
@@ -227,8 +235,35 @@ export default function Explore() {
         keeps the three in proportion as the band narrows, rather than letting the
         widest give first.
 
-        `xl:grow` runs them off the bottom of the column, which is how the
-        artboard draws them — cut by the canvas edge, not closed.
+        **`xl:mt-auto` pins the row to the bottom of the column; it does not grow
+        into it.** That is `ArchBand`'s call of 2026-08-05 arriving on the third
+        page that needed it (docs/styling.md §16, §17, §19). `xl:grow` was here
+        until then, on the reading that the arches run off the bottom of the
+        canvas — which is what the artboard draws, but growing is not how it draws
+        it. Grown, the row is a residual: every spare pixel goes into empty arch
+        BELOW the class labels while nothing inside moves, so at 2560 × 1440 the
+        segments measured **998px with 643px of dead space under the labels**,
+        against a drawn 322. That is the same 2.6× `disease-background`'s arch was
+        showing, on a shape with no crescent to hide it in.
+
+        Pinned, the drawing falls out rather than being aimed at, because **the
+        segments' natural height IS the drawn height**: content bottoms out 313px
+        below the row's top edge, against 322 for the drawn middle (478 → the 800
+        canvas) and 286 for a flank measured from the same top. At 1440 × 800 the
+        pin puts the middle's top at 487 and the flanks' at 523 where the artboard
+        draws 478 and 514 — 9px on both — and the slack sits above the row as page
+        gradient. Grown, that same middle top sits at 354.
+
+        The arches are still cut rather than closed. `<main>` is `lg:pb-0`, so the
+        column ends where the viewport does and the pinned bottom edge lands on
+        it; on a column that overflows, `mt-auto` collapses to 0 and the row ends
+        the document instead — the degradation `/wizard/therapies` and
+        `disease-background` both ship, and the reason the CTA above carries the
+        `xl:mb-6` that keeps a 24px floor there.
+
+        `xl:` only, like everything else about the drawn state: below it the
+        segments are closed cards in flow under the CTA, and a pin would strand
+        them at the bottom of a viewport they already overflow.
 
         **Below `xl` the row stacks.** Summed, the columns need roughly 1015px
         before a caption wraps ("Marstacimab" is 143px, "Etranacogene
@@ -237,15 +272,16 @@ export default function Explore() {
         same wall at the same place. Stacked, each segment is full width and its
         buttons wrap inside, which is legible where a clipped drug name is not.
 
-        **`grow` is `xl:` only, and that is a fix rather than a tidy-up.** In a
-        column, the segments' `flex-grow` factors (339 / 524 / 353 — see below)
-        split leftover HEIGHT in the drawn ratio, so a stacked segment ended up
-        as tall as the viewport allowed rather than as tall as its contents, held
-        up only by each one's automatic minimum. That was invisible while the
-        segments had no bottom edge to see it against; a closed arch and a gap
-        between the cards is exactly what would have shown it. Denying the row
-        its own `grow` leaves no free space to distribute, which makes the
-        factors inert below `xl` without touching what they do at it.
+        **The row itself never grows, and that keeps the segments' own grow
+        factors honest.** In a column, those factors (339 / 524 / 353 — see below)
+        split leftover HEIGHT in the drawn ratio, so a stacked segment came out as
+        tall as the viewport allowed rather than as tall as its contents, held up
+        only by each one's automatic minimum; a closed arch with a gap under it is
+        exactly the shape that shows that. A row with no free space has nothing to
+        distribute, which makes the factors inert in the column direction and
+        leaves them doing the one job they were written for — dividing the band's
+        WIDTH at `xl`. It was `xl:grow` that made this a breakpoint question;
+        under the pin it is not one.
 
         `gap-6` is the page's own rhythm — the same 24px `mt-6` puts between
         heading, bullets, CTA and this row — and it is `xl:gap-0` because the
@@ -253,7 +289,7 @@ export default function Explore() {
         would break the drawn tiling. Between two facing 128px arcs it reads
         looser than 24px, since the curves pull apart either side of the centre.
       */}
-      <div className="mt-6 flex flex-col gap-6 xl:grow xl:flex-row xl:gap-0">
+      <div className="mt-6 flex flex-col gap-6 xl:mt-auto xl:flex-row xl:gap-0">
         {EXPLORE_SEGMENTS.map((segment, index) => (
           <Segment
             key={segment.columns[0].label}
