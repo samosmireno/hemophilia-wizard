@@ -140,4 +140,80 @@ describe("wizard scenario — the illustration boxes", () => {
       expect(region.querySelector(".flex-col-reverse") !== null).toBe(single);
     },
   );
+
+  /**
+   * The 2026-08-04 responsive pass ramped the **gap** and left the boxes alone —
+   * the same fix `rebalancing-agents` took for the same row on the same pixel.
+   * `lg:gap-x-30` put the drawn 120px gap into the column that had just lost
+   * 175px to the gutter step (§12), so the row turned on 169px too wide and
+   * `lg:shrink` took it out of the boxes: 171 × 185, a quarter under drawn and
+   * portrait where the artboard draws landscape.
+   *
+   * Both halves are pinned, because either alone reopens it. The drawn gap must
+   * stay at `xl`, where the 921px group fits its 1008px column, and the `lg`
+   * step must stay unstated so the row keeps the stack's own 32px
+   * (3 × 227 + 2 × 32 = 745 in 752). The box's drawn size is asserted rather
+   * than inferred from the row fitting, since a future gap change would resume
+   * shrinking it silently.
+   *
+   * jsdom computes no layout, so a class string is the only thing here that can
+   * fail; the pixel arithmetic behind these values is unverified (open item 43).
+   */
+  it.each(BRANCHES)(
+    "ramps the row's gap rather than the boxes, which stay drawn-size at every width, %s/%s",
+    (type, inh, key) => {
+      const region = renderScenario(type, inh, key);
+      const boxes = [...region.querySelectorAll("div.border-4")];
+
+      for (const box of boxes) {
+        expect(box).toHaveClass("h-[185px]", "max-w-[227px]", "shrink-0", "lg:shrink");
+      }
+
+      const row = boxes[0].parentElement!;
+      expect(row).toHaveClass("flex-col", "gap-8", "lg:flex-row", "xl:gap-x-30");
+      expect(row).not.toHaveClass("lg:gap-x-30");
+    },
+  );
+});
+
+describe("wizard scenario — the responsive pass", () => {
+  /**
+   * Every transcribed size on the screen steps down one below `lg`, asserted in
+   * one test because they are one decision rather than four.
+   *
+   * **This screen is the third case of §2's body-copy exception**, with
+   * `rebalancing-agents` and `prophylaxis-guidance`: the other chapters sit on
+   * the 16px floor with nowhere to go, while these three transcribe their body
+   * at the artboards' 26 and so have exactly one step to give. 20 is a step on
+   * the scale, not a collapse onto the other chapters' value.
+   *
+   * The `<h1>` is asserted alongside them because it is the reason the rest
+   * ramp: it drops 48 → 30 below `lg` under §2's app-wide rule, and prose left
+   * at 24 would read at 0.8× the heading on a phone where the artboard draws
+   * 0.5×.
+   */
+  it.each(BRANCHES)("steps every transcribed size down one below lg, %s/%s", (type, inh, key) => {
+    const data = CLASSES_TO_CONSIDER[key];
+    const region = renderScenario(type, inh, key);
+
+    expect(within(region).getByRole("heading", { level: 1 })).toHaveClass(
+      "text-3xl",
+      "lg:text-5xl",
+    );
+    expect(region.querySelector("ul")).toHaveClass("text-xl", "lg:text-2xl");
+    expect(within(region).getByText(data.caption)).toHaveClass("text-xl", "lg:text-2xl");
+
+    /*
+      The lead and the caveat are found through the elements they are split
+      across: `formatInline` puts an `<em>` inside the lead, so no full-string
+      query matches it, and RTL joins only an element's direct text nodes.
+    */
+    const paragraphs = [...region.querySelectorAll("p")].filter(
+      (p) => p.textContent !== data.caption,
+    );
+    expect(paragraphs).toHaveLength(data.caveat ? 2 : 1);
+    for (const paragraph of paragraphs) {
+      expect(paragraph).toHaveClass("text-xl", "lg:text-2xl");
+    }
+  });
 });

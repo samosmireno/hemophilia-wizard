@@ -39,9 +39,11 @@ import { isComplete, useWizardAnswers } from "../../state/wizardAnswers";
  * inside this screen's own measured spread, and the same reserved box on both
  * pages that have one.
  *
- * The gap is `gap-x-30` — 120px, the scale step next to that measured 119. Three
- * boxes plus two gaps is 921px against the 1168px content column, so the row fits
- * with room to spare at the design width.
+ * The drawn gap is `gap-x-30` — 120px, the scale step next to that measured 119.
+ * Three boxes plus two gaps is 921px, which fits the 1168px content column with
+ * room to spare at the design width and does NOT fit the 752px one at `lg`; the
+ * ramp that resolves that is on the row below, not on the box, which keeps its
+ * drawn size at every width.
  */
 const BOX = "h-[185px] w-full max-w-[227px] shrink-0 border-4 border-black lg:shrink";
 
@@ -66,14 +68,58 @@ export default function Scenario() {
    */
   const captionBelow = screen.classes.length === 1;
 
+  /*
+    `text-xl lg:text-2xl` — the boxes caption takes the same one step down below
+    `lg` that `rebalancing-agents` gives its own, which is the same object with
+    the same copy. All four chapters and both box rows now agree on caption size
+    (open item 15 is about the colour, not the ramp).
+  */
   const caption = (
-    <p className="text-center text-2xl font-bold text-popup-caption uppercase">{screen.caption}</p>
+    <p className="text-center text-xl font-bold text-popup-caption uppercase lg:text-2xl">
+      {screen.caption}
+    </p>
   );
 
   /*
     Column on a phone, row from `lg`, exactly as `rebalancing-agents` stacks its
     own three — `shrink-0` while stacked so a box keeps its height, `lg:shrink`
     so the row can give if a narrow viewport asks it to.
+
+    **The gap ramps, and the boxes never do (2026-08-04)** — the same fix, on the
+    same pixel, as the row on `rebalancing-agents`. `lg:gap-x-30` put the drawn
+    120px gap into the column that had just lost 175px to the gutter step (§12),
+    so the pixel that turned the row on was the pixel that made it too wide:
+    3 × 227 + 2 × 120 = 921 against a 752px column. `lg:shrink` then took the
+    difference out of the only axis allowed to give, and the boxes rendered
+    **171 × 185** — a quarter under drawn, and portrait where the artboard draws
+    landscape.
+
+    So the drawn gap moves to `xl`, where the drawn 921 group fits (1008px of
+    column, 87 to spare), and at `lg` the row simply keeps the 32px the stack
+    above it already states: 3 × 227 + 2 × 32 = 745 in 752. That is a class this
+    block does not have to write, where the largest gap that fits is 35.5px —
+    off the scale, and 35 would leave one pixel of slack. `rebalancing-agents`
+    derived its middle step to fill the column exactly and open item 39 records
+    that zero slack as the weakest number in the pass; seven pixels is the same
+    move with room in it.
+
+      Viewport   Column   Layout   Gap             Box
+      375           311   column    32       227 × 185
+      768           672   column    32       227 × 185
+      1024          752      row    32       227 × 185
+      1280         1008      row   120       227 × 185
+      1440         1168      row   120   227 × 185 (drawn)
+
+    `lg:shrink` stays, and is now a guard rather than the shipped behaviour: no
+    width reaches the row with a group wider than its column, so nothing shrinks
+    unless the gutter, the border or `--spacing` moves underneath it.
+
+    Below `lg` the three stack at drawn size — 619px of empty bordered rectangle
+    under a caption that says to click them. That is `rebalancing-agents`' own
+    accepted cost (640px there, argued in §11): a reserved box exists to hold the
+    drawn size, and a smaller one reserves the wrong thing. It is bounded by open
+    item 16 rather than by this pass — what a box opens is what decides how much
+    of a phone it deserves.
 
     Centred on the content column. The artboards centre this block on the full
     1440 canvas instead, which puts it ~24px right of where `mx-auto` lands,
@@ -82,7 +128,7 @@ export default function Scenario() {
     sits in, to honour a number the design did not mean to state.
   */
   const boxes = (
-    <div className="flex flex-col items-center gap-8 lg:flex-row lg:justify-center lg:gap-x-30">
+    <div className="flex flex-col items-center gap-8 lg:flex-row lg:justify-center xl:gap-x-30">
       {/*
         Empty `<div>`s rather than `<img>`s without a `src`, and rather than
         buttons — `rebalancing-agents` records the reasoning: a broken image
@@ -122,10 +168,22 @@ export default function Scenario() {
         `mt-8` is the 32px h1 gap every education chapter uses, and 26px is their
         body size — the artboard sets this screen's prose at the same step.
 
+        **`text-xl lg:text-2xl` is that step ramped**, and this page is the third
+        case of §2's body-copy exception rather than a fourth reading of it: the
+        floor is 16px and three chapters sit on it with nowhere to go, while the
+        two that transcribe their body at 26 (`rebalancing-agents`,
+        `prophylaxis-guidance`) have exactly one step to give and take it. This
+        screen transcribes at the same 26 off its own artboards, so it gives the
+        same one — 20 is a step on the scale, not a collapse onto the other
+        three's value. The argument is proportion, not fit: nothing here
+        overflows at either size, but the `<h1>` drops 48 → 30 below `lg` (§2)
+        while the prose sat at 24, rendering body at 0.8× the heading on a phone
+        where the artboard draws 0.5×. At 20 it is 0.67×.
+
         Through `formatInline` for the italic polarity word, which is the whole
         reason that helper exists.
       */}
-      <p className="mt-8 text-2xl text-black">{formatInline(screen.lead)}</p>
+      <p className="mt-8 text-xl text-black lg:text-2xl">{formatInline(screen.lead)}</p>
 
       {/*
         No top margin: the artboard runs the bullets straight on from the lead at
@@ -136,11 +194,13 @@ export default function Scenario() {
         a paired-delimiter parser is that pointing it at unmarked strings costs
         nothing, and emphasising a word later becomes a data change.
       */}
-      <BulletList items={screen.classes} className="text-2xl" format={formatInline} />
+      <BulletList items={screen.classes} className="text-xl lg:text-2xl" format={formatInline} />
 
       {/* Only HB +inhibitors has one. Plain prose under the list, not a bullet
           in it — it qualifies the whole list rather than joining it. */}
-      {screen.caveat && <p className="mt-8 text-2xl text-black">{formatInline(screen.caveat)}</p>}
+      {screen.caveat && (
+        <p className="mt-8 text-xl text-black lg:text-2xl">{formatInline(screen.caveat)}</p>
+      )}
 
       {/*
         `mt-40` is 160px, against the 164 the exports draw from the last line of
@@ -148,6 +208,14 @@ export default function Scenario() {
         where their box geometry does not. Rounded to the whole scale step when
         this file's spacing was normalised; the rhythm it reproduces is the
         artboard's, four pixels tighter.
+
+        It does not ramp, and at 160px it is the largest gap in the app, so the
+        reason is stated rather than left to open item 10: at 375 this screen is
+        ~1250px of column against a 667px phone — the box block alone is 619 of
+        it — so it scrolls whatever happens here, and halving the one gap
+        recovers 6% and buys no screenful. The same call `/wizard` makes for its
+        own `mt-20` (§14), and the opposite of the one `/wizard-intro` faced,
+        where the question was whether a hero fit at all.
       */}
       {/*
         `flex-col-reverse` rather than a branch that renders the two in the other

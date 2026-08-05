@@ -168,12 +168,14 @@ the others.
 Body copy mostly does not participate. 16px is a legibility floor and open item 9 has
 the reference **larger** than what ships, so there is nothing below it to step to.
 
-**Two chapters are the exception, and the exception is what the rule was about.**
+**Three pages are the exception, and the exception is what the rule was about.**
 `rebalancing-agents` and `prophylaxis-guidance` transcribe their body at 26px off their
 own exports — they are the two chapters built around a single block of prose — so they
 ship at 24 and step to 20 below `lg`, which is a step on the scale rather than a
-collapse onto the other three's 16. The floor is still the floor; those two simply start
-above it. §11 records both passes.
+collapse onto the other three's 16. **`/wizard/scenario` is the third**, off its own
+four artboards and for the same reason: lead, class list and caveat are the page. The
+floor is still the floor; those three simply start above it. §11 records the two chapter
+passes and §18 the wizard screen's.
 
 **Not `clamp()`.** §8 used one for the landing hero until 2026-08-04 and no
 longer does — the app now contains none — but the argument for keeping chapters
@@ -1025,6 +1027,7 @@ Everything above is arithmetic — see open item 41.
 | 40  | **`docs/styling.md` is inside Tailwind v4's default source scan, so every class name this file writes in prose is compiled into the bundle.** v4 auto-detects sources from the project root and does not exclude Markdown; `src/styles/tokens.css` adds one `@source` for the package's `dist` and overrides nothing. Confirmed by `px-22`, which has zero occurrences under `src/` — it is the superseded value item 33 records — and ships as a real rule. So do the historical `text-[26px]`, `min-w-105` and `rounded-t-[150px]` mentions, and the count grows every time this file explains a class it is retiring. Harmless to correctness and small against a 72kB sheet, but it means the CSS is not a record of what the app uses, which is exactly what the 2026-08-04 passes were reading it as. Fixed by an explicit `@source` narrowing the scan to `src/`, or by `@source not "docs/"`; either is a one-line change, and it wants a rebuild diff rather than a blind edit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | §1, §9                |
 | 41  | **`/wizard-intro` and `/education/prophylaxis-guidance`'s responsive passes of 2026-08-04 are arithmetic end to end**, like items 36 and 39 — verified in the compiled CSS (every new utility present, `text-2xl/5` resolving to a 20px line box and the three `/[1.05]` steps to `line-height:1.05`) and in Vitest (16 tests across the two pages, three of them new), but jsdom computes no layout so nothing about pixels can fail. **The weakest numbers are the two ink widths the `/wizard-intro` ramp is derived from.** "PROPHYLACTIC" at ~397px/72px comes from §8's own drawn line measurements (729px and ~830px) divided into letters at ~0.46em, and the CTA label's ~385px at 24px is back-derived from the 545px the package computes at 26 — so the 320px column clearing `text-4xl` by 57px is safe, while the base CTA step landing 321px in a 311px column is inside the error bar in both directions. That one is deliberately built to survive either outcome (`/tight` makes a wrapped label legible), but which outcome ships is unknown. The 1024 case rests on 729 < 752 with 23px of margin, i.e. on a measurement taken off the export rather than a render — and 1024 is already the app's least-tested width (items 30, 36, 39). `prophylaxis-guidance` carries less: one class, no layout change, and its one-screen claim at 375 × 667 (~460px of ink in a 557px box) is the only estimate in it. Nothing was opened in a browser for either page, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | §8, §11               |
 | 42  | **`/wizard`'s responsive pass of 2026-08-04 is arithmetic end to end**, like items 36, 39 and 41 — verified in the compiled CSS (every new utility present, `max-w-110` resolving to 440px and `max-lg:text-lg` to a `width < 64rem` rule that wins over the package's `text-[26px]`) and in Vitest (31 tests across the page and its component, five of them new), but jsdom computes no layout. **Every number in the ramp descends from two rendered measurements §14 already carried**: "Reduce monitoring requirement" at 369px and "Hemophilia A" at 153px, both at 24px, which agree on ~0.53em a character. The binding case is `lg` — ~308px of label inside a 318px pill, i.e. **10px of margin**, against the ~4px export/render discrepancy §14 records — so it is the one step that would flip if the font rounded differently than measured, and 1024 is already the app's least-tested width (items 30, 36, 39, 41). The base step has more room (246 in 263 at 375) and 320 is _known_ to wrap and is built for it. The legend windows (368–506px at 20px) are scaled from a **drawn** 589/809 rather than from a render, so "440 reproduces the designer's break below `lg`" is the softest claim here; it costs a line break rather than an overflow if it is wrong. Nothing was opened in a browser, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | §14                   |
+| 43  | **`/wizard/scenario`'s responsive pass of 2026-08-04 is arithmetic end to end**, like items 36, 39, 41 and 42 — verified in the compiled CSS and in Vitest (33 tests, eight of them new across the four branches), but jsdom computes no layout. **This screen has never been opened in a browser at any width**, which makes it weaker than its four predecessors rather than equal to them: their `lg` reasoning was untested, this page's 1440 case is too. The box row is the firmest thing in it — 227 and 185 are read off the exports, and 3 × 227 + 2 × 32 = 745 in 752 is arithmetic on `AppShell`'s own tokens with 7px of slack against item 39's zero. **The soft claim is the type ramp's premise.** "Nothing overflows at either size" rests on character-count estimates at §14's ~0.53em rather than on a render, and the uppercase bold caption is the one string estimated at a width its font was never measured at (~0.62em); it fails as a wrap rather than as an overflow either way. The 619px stacked block below `lg` is a deliberate cost rather than an unverified number (§18), but how it reads on a phone is a judgement no test makes. Nothing was opened in a browser, at the user's standing instruction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | §18                   |
 
 ---
 
@@ -3756,3 +3759,98 @@ The label tracking fits at 0.036em and ships at `tracking-wide` (0.025em) — op
 `Popup` is too narrow for the nine-column table it will hold — open item 27, since **half
 closed**: the card now takes `width="wide"` (1360px, ~136px a column) and what is left is
 the scroll region the grid needs on a phone, not the card. See §13's width scale.
+---
+
+## 18. `/wizard/scenario` — the classes-to-consider screen
+
+`src/routes/wizard/Scenario.tsx`, from **four** 1440 × 800 artboards rather than one:
+the screen is `CLASSES_TO_CONSIDER[scenario]` end to end, so type, inhibitor status and
+box count all vary and the four drawings disagree with each other in ways a template
+would have flattened. Its geometry is documented at the call site — the boxes' size, the
+`mt-40`, the caption's two positions — and only the responsive pass is recorded here,
+which is the first thing about this screen that is one decision across all four.
+
+### The responsive pass of 2026-08-04
+
+Two ramps: **the box row's gap, which was wrong, and the prose, which was merely
+undrawn.**
+
+| Element                | <`lg` | `lg`+ |
+| ---------------------- | ----: | ----: |
+| `<h1>` (unchanged, §2) |    30 |    48 |
+| lead                   |    20 |    24 |
+| class list             |    20 |    24 |
+| caveat (`B-with` only) |    20 |    24 |
+| boxes caption          |    20 |    24 |
+
+**1. The gap ramps; the boxes never do.** This is `rebalancing-agents`' row, on the same
+pixel, failing the same way (§11) — the two screens draw the same reserved placeholder,
+so they were always going to need the same fix. `lg:gap-x-30` put the drawn 120px gap
+into the column that had just lost 175px to the gutter step (§12), so the pixel that
+turned the row on was the pixel that made it too wide: 3 × 227 + 2 × 120 = **921**
+against a 752px column. `lg:shrink` then took the difference out of the only axis
+allowed to give, and the boxes rendered **171 × 185** — a quarter under drawn, and
+portrait where all four artboards draw landscape.
+
+The drawn gap moves to `xl`, where the drawn 921 group fits (1008px of column, 87 to
+spare), and **at `lg` the row keeps the 32px the stack above it already states**:
+3 × 227 + 2 × 32 = 745 in 752. So the middle step is a class this block does not have to
+write. `rebalancing-agents` derived its own middle gap to fill the `lg` column exactly
+and open item 39 records that zero slack as the weakest number in that pass; here the
+largest gap that fits is 35.5px — off the scale, and 35 would leave one pixel — so
+taking the stack's 32 is the same move with seven pixels in it.
+
+| Viewport | Content column | Layout | Gap |             Box |
+| -------- | -------------: | ------ | --: | --------------: |
+| 375      |            311 | column |  32 |       227 × 185 |
+| 768      |            672 | column |  32 |       227 × 185 |
+| 1024     |            752 | row    |  32 |       227 × 185 |
+| 1280     |           1008 | row    | 120 |       227 × 185 |
+| 1440     |           1168 | row    | 120 | 227 × 185 drawn |
+
+`lg:shrink` stays and is now a guard rather than the shipped behaviour: no width reaches
+the row with a group wider than its column, so nothing shrinks unless the gutter, the
+border width or `--spacing` moves underneath it. The `shrink-0` / `lg:shrink` split
+itself is unchanged — §15 already cites it as this screen's idiom.
+
+**2. Below `lg` the boxes stack, at the same size.** Three 185px boxes and two 32px gaps
+is **619px of empty bordered rectangle** under a caption telling the reader to click
+them, which is about a screenful of a 375 × 667 phone. It is `rebalancing-agents`' 640px
+cost taken again, with its argument: a reserved box exists to hold the drawn size, and a
+smaller one reserves the wrong thing. Bounded by open item 16, not by this pass — what a
+box opens is what decides how much of a phone it deserves. On this screen it is also
+bounded by the data: `B-with` draws one box and `A-with` two, so only half the branches
+pay the full 619.
+
+**3. The prose takes §2's one step down, and this screen is the third case of that
+section's body-copy exception** — the other two being `rebalancing-agents` and
+`prophylaxis-guidance`. The four artboards set lead, class list and caveat at the
+chapters' own 26px (open item 9), so there is exactly one step to give and 20 is a step
+rather than a collapse onto the other chapters' 16.
+
+The argument is proportion, not fit: nothing overflows at either size at any width, and
+the longest string on the screen is `B-with`'s 155-character caveat, which wraps as
+prose does. What moves is the relationship to the heading — the `<h1>` drops 48 → 30
+below `lg` under §2's app-wide rule while the prose sat at 24, rendering body at 0.8× the
+heading on a phone where the artboard draws 0.5×. At 20 it is 0.67×. The comfort grade of
+§2's argument, as on `prophylaxis-guidance`, not the correctness grade the `<h1>` itself
+has.
+
+The caption lands on `text-xl lg:text-2xl`, which is what `rebalancing-agents`' boxes
+caption and all four chapters' disclosure captions already take, so **every caption in
+the app now agrees on size as well as on colour** (open item 15 is about the value, not
+the ramp).
+
+**4. `mt-40` does not ramp**, and at 160px it is the largest gap in the app, so it is
+stated rather than deferred to open item 10. At 375 this screen is ~1250px of column
+against a 667px viewport — the box block alone is 619 of it — so it scrolls whatever
+happens to that gap; halving it recovers 6% and buys no screenful. The same call §14
+records for `/wizard`'s `mt-20`, and the opposite of the one `/wizard-intro` faced, where
+the question was whether a hero fit at all. `mt-8` after the `<h1>` is §11's chapter gap
+and moves with it, not with this page.
+
+### Not verified in a browser
+
+Nothing on this screen has been opened at any width, before this pass or in it — the
+`<h1>` was covered by the §2 migration's 1440/375 sweep (open item 30) and nothing else
+here was. Open item 43.
