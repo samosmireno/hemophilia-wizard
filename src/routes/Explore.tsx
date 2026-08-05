@@ -77,10 +77,23 @@ export default function Explore() {
         back under §8's precedent rather than reaching for `text-5xl`, which at
         48 is further from the drawing than 36 is.
 
-        `leading-9` is the drawn 36px pitch, well inside the font's own step —
-        the same tightening `/wizard/therapies` applies to its arch title, and
-        for the same reason: this is a display heading that wraps, and the
-        natural step opens gaps the artboard does not draw.
+        **Three steps, not §2's one**, and the sentence is why: at 190 characters
+        it is the longest `<h1>` in the app by some distance, and the app-wide
+        30px would set it in ~10 lines and ~315px of a 320px viewport — 40% of
+        the screen before the bullets start. 24 takes that to ~8 lines. The
+        shape is `/wizard-intro`'s, whose own hero ramps in three for the same
+        reason (§8), and `sm`'s 30px is where every other page already sits
+        below `lg`.
+
+        **`leading-none`, where this was `leading-9` until the responsive pass.**
+        36px against `text-4xl` IS a ratio of 1.0, so nothing moves at the
+        canvas — but as an absolute it would have followed the type down and
+        rendered 1.2 at 30px and 1.5 at 24, i.e. the step loosening what the
+        drawing tightens. §2's rule, taken for the fourth time: a `leading-*` on
+        the scale does not survive a size ramp, a ratio does. The drawn pitch is
+        tighter still (36/42 = 0.857), and uppercase Barlow Condensed has no
+        descenders to collide, which is what makes 1.0 safe on a heading that
+        wraps to eight lines.
 
         `max-w-content` is a LINE-BREAK cap, not styling — `/wizard/therapies`'
         `max-w-215` is the same device. The artboard breaks this sentence into
@@ -100,7 +113,7 @@ export default function Explore() {
       */}
       <h1
         id="explore-heading"
-        className="mx-auto max-w-content text-center font-display text-4xl leading-9 font-bold tracking-wide text-brand-crimson-50 uppercase"
+        className="mx-auto max-w-content text-center font-display text-2xl/none font-bold tracking-wide text-brand-crimson-50 uppercase sm:text-3xl/none lg:text-4xl/none"
       >
         {SDM_CONCLUSION}
       </h1>
@@ -115,8 +128,21 @@ export default function Explore() {
         "treatment", and 22px type in the 1216px band puts "selection" at 1202px
         against ~1178px of room, so the drawn break falls out of the width rather
         than needing to be forced.
+
+        **This page's one body step, and it lands on the floor** — 20 → 16 below
+        `lg`, which makes `/explore` §2's sixth exception page and the second
+        (after `/wizard/therapies`) whose step ends where the education chapters
+        already sit rather than above them. The argument is proportion, not fit:
+        the `<h1>` above drops to 24 at 375, and 20px bullets under it would
+        read at 0.83× the heading where the artboard draws 0.52×. It buys ~135px
+        of column at 375 as well.
+
+        `leading-8` had to become `/[1.6]` with it, for the reason the heading's
+        `leading-9` did: 32px is absolute and would render 2.0 against a 16px
+        step. 1.6 is the ratio 20/32 already renders at, so one class covers both
+        and the canvas is unchanged.
       */}
-      <BulletList items={SDM_POINTS} className="mt-6 text-xl leading-8" />
+      <BulletList items={SDM_POINTS} className="mt-6 text-base/[1.6] lg:text-xl/[1.6]" />
 
       {/*
         The package `Button`, at `WizardIntro`'s recipe and not `WizardIntro`'s
@@ -135,24 +161,32 @@ export default function Explore() {
 
         The three values are the drawn ones — 24px type, 64/18px padding —
         `WizardIntro`'s verbatim, since both buttons are the package's own
-        `px-16 py-[18px]` at the canvas.
+        `px-16 py-[18px]` at the canvas, **and they are now `lg:` only.**
 
-        **`leading-5` is now unsafe and knowingly so.** All three were `clamp()`s
-        until 2026-08-04, and this comment used to record that the clamp was what
-        made the tight leading work: the size only left its 1rem floor above
-        ~960px, so at every width where the label wrapped it was 16px inside a
-        20px box. Fixed at 24px that no longer holds — the label is taller than
-        its own line box at every width, and at 375 it wraps to four lines with
-        the descenders sitting into the caps below. `Landing` refuses the trick
-        outright and uses `leading-tight`; that is the fix here too if the
-        cramping is not wanted. Styling open item 33.
+        **The drawn 56px pill is a 1440 composition, not a rule**, and holding it
+        at every width was styling open item 33's last live case. All three
+        values were `clamp()`s until 2026-08-04; the clamp is what had made the
+        tight leading work, since the size only left its 1rem floor above ~960px,
+        so wherever the label wrapped it was 16px inside a 20px box. Fixed at
+        24px that stopped being true — the label was taller than its own line box
+        at every width, and at 375 it wrapped to four lines with the descenders
+        sitting into the caps below.
+
+        The fix is `/wizard-intro`'s, verbatim, because that CTA is the same
+        package `Button` at the same drawn recipe and closed the same item one
+        day earlier: the drawn 24px-in-a-20px-box survives at `lg` alone, where
+        the label is 396px of ink in 672px of room and cannot wrap, and below it
+        the type steps to 20 and 16 against a 1.25 ratio. The label is 33
+        characters at ~0.50em — the drawn pill's own 398px of ink over 24px — so
+        it sets one line from 640 up and two at 375 and 320, which `/tight`
+        makes legible rather than overlapping. **That closes item 33 outright.**
 
         A control that opens a dialog, so it is a `<button>` by rights rather than
         by the `Button`-has-no-`href` compromise `Landing` and `WizardIntro` both
         accept.
       */}
       <Button
-        className="mt-6 self-center px-16 py-4.5 text-2xl leading-5"
+        className="mt-6 self-center px-8 py-3 text-base/tight sm:px-12 sm:py-3.5 sm:text-xl/tight lg:px-16 lg:py-4.5 lg:text-2xl/5"
         aria-haspopup="dialog"
         onClick={() => setTableOpen(true)}
       >
@@ -165,8 +199,8 @@ export default function Explore() {
         keeps the three in proportion as the band narrows, rather than letting the
         widest give first.
 
-        `grow` runs them off the bottom of the column, which is how the artboard
-        draws them — cut by the canvas edge, not closed.
+        `xl:grow` runs them off the bottom of the column, which is how the
+        artboard draws them — cut by the canvas edge, not closed.
 
         **Below `xl` the row stacks.** Summed, the columns need roughly 1015px
         before a caption wraps ("Marstacimab" is 143px, "Etranacogene
@@ -174,8 +208,24 @@ export default function Explore() {
         1024px viewport leaves the band only 800. `/wizard/therapies` found the
         same wall at the same place. Stacked, each segment is full width and its
         buttons wrap inside, which is legible where a clipped drug name is not.
+
+        **`grow` is `xl:` only, and that is a fix rather than a tidy-up.** In a
+        column, the segments' `flex-grow` factors (339 / 524 / 353 — see below)
+        split leftover HEIGHT in the drawn ratio, so a stacked segment ended up
+        as tall as the viewport allowed rather than as tall as its contents, held
+        up only by each one's automatic minimum. That was invisible while the
+        segments had no bottom edge to see it against; a closed arch and a gap
+        between the cards is exactly what would have shown it. Denying the row
+        its own `grow` leaves no free space to distribute, which makes the
+        factors inert below `xl` without touching what they do at it.
+
+        `gap-6` is the page's own rhythm — the same 24px `mt-6` puts between
+        heading, bullets, CTA and this row — and it is `xl:gap-0` because the
+        three tile the band exactly (339 + 524 + 353 = 1216) and any gap at all
+        would break the drawn tiling. Between two facing 128px arcs it reads
+        looser than 24px, since the curves pull apart either side of the centre.
       */}
-      <div className="mt-6 flex grow flex-col xl:flex-row">
+      <div className="mt-6 flex flex-col gap-6 xl:grow xl:flex-row xl:gap-0">
         {EXPLORE_SEGMENTS.map((segment, index) => (
           <Segment
             key={segment.columns[0].label}
@@ -241,10 +291,11 @@ export default function Explore() {
  * **A segment is a drawn group, not a class** — the right-hand one holds two
  * class labels under one arch. See `EXPLORE_SEGMENTS`.
  *
- * `rounded-t-[128px]` is verified against the export's own curve, not read off
- * it: at x=200 the left segment's top edge sits at 524, and `518 + 128 −
+ * The 128px radius is verified against the export's own curve, not read off it:
+ * at x=200 the left segment's top edge sits at 524, and `518 + 128 −
  * √(128² − 40²)` is 524.4. The same test passes on the opposite corner (544
- * measured, 543.8 predicted).
+ * measured, 543.8 predicted). Below `xl` the same radius closes the bottom, so
+ * a stacked segment is a card rather than a cut-off arch.
  */
 function Segment({
   segment,
@@ -265,13 +316,33 @@ function Segment({
 }) {
   return (
     <div
-      // The drawn width as a grow factor against a zero basis. Inline because it
-      // is data — `EXPLORE_SEGMENTS` carries the three numbers, and a lookup
-      // table of three arbitrary `flex-[…]` classes here would be the same
-      // numbers written twice.
-      style={{ flex: `${segment.width} 1 0%` }}
+      // The drawn width as a grow factor. Inline because it is data —
+      // `EXPLORE_SEGMENTS` carries the three numbers, and a lookup table of three
+      // arbitrary `flex-[…]` classes here would be the same numbers written
+      // twice.
+      //
+      // **The zero basis it used to carry is now `xl:` only**, and the grow
+      // factor stays unconditional because it has nothing to act on below `xl`
+      // (see the row). `basis-auto` there is what makes a stacked segment as tall
+      // as its own contents; at `xl` the basis goes back to 0 and the three
+      // divide the band in the drawn ratio rather than letting the widest give
+      // first.
+      style={{ flexGrow: segment.width }}
       className={cn(
-        "rounded-t-[128px]",
+        /*
+          **Closed below `xl`, cut at it.** The artboard draws three arches
+          running off the bottom of the canvas, so `xl:rounded-b-none` is the
+          drawn state and the bottom radius is the stacked one. Same 128px as the
+          top, verified against the drawn curve at both corners — one radius on
+          the page, and it is the measured one. At 320 the segment is 272px wide,
+          so both ends read as near-semicircles and the card is a lozenge; that
+          is what mirroring an arch this size onto a phone column looks like.
+        */
+        "rounded-[128px] xl:rounded-b-none",
+        // The other half of the grow factor above. `basis-auto` is the initial
+        // value and is written out because it is load-bearing here rather than
+        // inherited by accident.
+        "basis-auto xl:basis-0",
         /*
           `bg-brand-crimson-50/5` on the flanks, where the export solves to
           Tailwind's `red-600` at that alpha. Substituted deliberately: at α=0.05
@@ -297,8 +368,24 @@ function Segment({
           the middle, 36 + 52 on either side of it.
         */
         middle ? "xl:pt-22" : "xl:mt-9 xl:pt-13",
-        // Stacked, there is no range to draw and no shared button line to hold.
-        "pt-16",
+        /*
+          Stacked, there is no range to draw and no shared button line to hold,
+          so all three take one padding — and it is mirrored below the label,
+          because below `xl` the segment has a bottom edge to be measured
+          against. 64px above the buttons and 64px under the class label; the
+          box is symmetric, which is what the closed arch asks for.
+
+          `xl:pb-0` because at the canvas the segment has no bottom: it runs off
+          the edge, and padding against an edge that is not drawn would only push
+          the labels up out of their measured row.
+
+          64px is also what clears the curve. At that distance from either edge a
+          128px radius has opened to 17.15px (`128 − √(128² − 64²)`), against the
+          16px `px-4` below gives the inner row — so the box corners sit ~1px
+          inside the arc and the content stays clear of it, because both the
+          buttons and the wrapped labels are centred well short of their box.
+        */
+        "pt-16 pb-16 xl:pb-0",
       )}
     >
       {/*
@@ -309,8 +396,23 @@ function Segment({
         drawn case has no padding and needs none: at the button's own height the
         128px radius has already opened to within 25px of the segment edge, and
         the nearest button is 27px clear of that.
+
+        **The columns stack below `sm`, and that is a fix for a bug this page had
+        shipped since it landed.** Only the three SEGMENTS stacked below `xl`; the
+        right-hand one's two columns stayed side by side at every width, each
+        `flex-1` of a phone-width segment holding an item that is `basis-40
+        shrink-0` and refuses to give. Measured at 320: a 149px column with a
+        160px item in it, ink 44px past the arch's own background and
+        `document.scrollWidth` at 340 against the viewport's 320 — the horizontal
+        overflow §17's first sweep would have caught had it looked below 375.
+
+        `sm` rather than a fitted width: two columns need 2 × 160 + 32 = 352px of
+        segment, i.e. a 400px viewport, and `sm` is the nearest step above it
+        that the rest of the shell already turns on (the gutter goes 24 → 48
+        there). Between 400 and 639 the pair would fit and stacks anyway, which
+        is the price of a named step over an arbitrary one.
       */}
-      <div className="flex h-full px-4 xl:px-0">
+      <div className="flex h-full flex-col gap-y-8 px-4 sm:flex-row sm:gap-y-0 xl:px-0">
         {segment.columns.map((column) => (
           /*
             `flex-1` per column, which is what places the buttons: a segment with
@@ -320,8 +422,13 @@ function Segment({
             the one place it drifts is the middle segment — whose buttons the
             export draws 8px right of its own centred label, so the rule is
             arguably truer than the drawing.
+
+            **`sm:` only**, for the reason the segment's own basis is `xl:` only:
+            stacked, `flex-1` is a HEIGHT ratio, and two columns of one agent
+            each would be forced to equal heights against captions that wrap to
+            different depths. Below `sm` a column is simply as tall as it is.
           */
-          <div key={column.label} className="flex flex-1 flex-col">
+          <div key={column.label} className="flex flex-col sm:flex-1">
             {/*
               **Wraps below `xl`, nowraps at it.** A column's agents need their
               captions' width and no less — three of them come to 373px before the

@@ -78,6 +78,103 @@ describe("explore — the SDM conclusion", () => {
   });
 });
 
+/**
+ * The responsive pass of 2026-08-05, pinned.
+ *
+ * jsdom computes no layout, so none of this proves a pixel — what it proves is
+ * that the four decisions the pass turned on are still expressed. Each is a
+ * thing a later tidy-up would plausibly undo without noticing: the two leadings
+ * are ratios BECAUSE they have to survive a size step, `grow` is `xl:` only
+ * BECAUSE it distributes height in a column, and the CTA's drawn box is `lg:`
+ * only BECAUSE it overlaps itself when the label wraps. The measurements
+ * themselves are in docs/styling.md §17's browser table.
+ */
+describe("explore — the responsive pass", () => {
+  /**
+   * Three steps rather than §2's one — the heading is 190 characters, and 30px
+   * would spend ~315px of a 320px viewport on it. `/none` rather than
+   * `leading-9`: 36px against `text-4xl` is the same 1.0 ratio at the canvas,
+   * but as an absolute it would render 1.5 at the 24px step.
+   */
+  it("ramps the heading in three steps, on a ratio", () => {
+    const heading = within(renderExplore()).getByRole("heading", { level: 1 });
+
+    expect(heading).toHaveClass("text-2xl/none", "sm:text-3xl/none", "lg:text-4xl/none");
+    expect(heading.className).not.toMatch(/(^|\s)leading-/);
+  });
+
+  /** This page's one body step, and it lands on the 16px floor. */
+  it("steps the bullets to the floor below lg, on a ratio", () => {
+    const list = within(renderExplore()).getAllByRole("listitem")[0].closest("ul");
+
+    expect(list).toHaveClass("text-base/[1.6]", "lg:text-xl/[1.6]");
+    expect(list!.className).not.toMatch(/(^|\s)leading-/);
+  });
+
+  /**
+   * Styling open item 33's last case. The drawn 24px type in a 20px line box is
+   * kept at `lg` alone, where the label cannot wrap; everything below it is
+   * `/tight`. A bare `text-2xl` or `leading-5` here is the regression.
+   */
+  it("keeps the CTA's drawn box at lg only", () => {
+    const cta = within(renderExplore()).getByRole("button", { name: EXPLORE_TABLE_TITLE });
+
+    expect(cta).toHaveClass("text-base/tight", "sm:text-xl/tight", "lg:text-2xl/5");
+    expect(cta).toHaveClass("px-8", "py-3", "sm:px-12", "sm:py-3.5", "lg:px-16", "lg:py-4.5");
+    expect(cta.className).not.toMatch(/(^|\s)(text-2xl|leading-5)(\s|$)/);
+  });
+
+  /**
+   * The row must not `grow` below `xl`. The segments carry the drawn widths as
+   * `flex-grow` factors, and in a column those split leftover HEIGHT — a stacked
+   * segment would be as tall as the viewport allowed rather than as tall as its
+   * contents. Denying the row its own growth leaves nothing to distribute.
+   */
+  it("stacks the segments as cards, and grows only at xl", () => {
+    const page = renderExplore();
+    const segments = [...page.querySelectorAll<HTMLElement>(".rounded-\\[128px\\]")];
+    const row = segments[0].parentElement!;
+
+    expect(segments).toHaveLength(EXPLORE_SEGMENTS.length);
+    expect(row).toHaveClass("gap-6", "xl:grow", "xl:flex-row", "xl:gap-0");
+    expect(row.className).not.toMatch(/(^|\s)grow(\s|$)/);
+
+    for (const [index, segment] of segments.entries()) {
+      // Closed below `xl`, cut at it; padding mirrored against the new edge.
+      expect(segment).toHaveClass("xl:rounded-b-none", "pt-16", "pb-16", "xl:pb-0");
+      // The drawn ratio is inert below `xl` and exact at it.
+      expect(segment).toHaveClass("basis-auto", "xl:basis-0");
+      expect(segment.style.flexGrow).toBe(String(EXPLORE_SEGMENTS[index].width));
+      expect(segment.style.flexBasis).toBe("");
+    }
+  });
+
+  /**
+   * A regression test for a bug this page shipped with from its first commit:
+   * only the three segments stacked, so the right-hand one's two columns stayed
+   * side by side at every width, each `flex-1` of a phone-width segment holding
+   * a `basis-40 shrink-0` item that will not give. Measured at 320 before the
+   * fix: `document.scrollWidth` 340 against a 320 viewport, with the caption
+   * painted 44px outside the arch's own background.
+   */
+  it("stacks a segment's columns below sm, and only ratios them above it", () => {
+    const page = renderExplore();
+    // The right-hand segment is the only one drawn with two columns.
+    const twoColumn = EXPLORE_SEGMENTS.findIndex((s) => s.columns.length > 1);
+    const segment = page.querySelectorAll<HTMLElement>(".rounded-\\[128px\\]")[twoColumn];
+    const row = segment.firstElementChild!;
+
+    expect(row).toHaveClass("flex-col", "sm:flex-row");
+    expect(row.className).not.toMatch(/(^|\s)flex-row(\s|$)/);
+    for (const column of row.children) {
+      // `flex-1` is a HEIGHT ratio once the columns stack, which would force two
+      // columns of one agent each to match on captions that wrap differently.
+      expect(column).toHaveClass("sm:flex-1");
+      expect(column.className).not.toMatch(/(^|\s)flex-1(\s|$)/);
+    }
+  });
+});
+
 describe("explore — the comparison table", () => {
   it("opens the table's card from the CTA", async () => {
     const user = userEvent.setup();
