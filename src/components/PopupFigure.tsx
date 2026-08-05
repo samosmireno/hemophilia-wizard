@@ -23,6 +23,20 @@
  *   the same numbers supply the `aspect-ratio` below, a pair that does not match
  *   the file reserves a box of the wrong shape and the card resettles when the
  *   picture lands.
+ *
+ *   **The cap is applied in `rem`, so above the canvas it scales with the board**
+ *   (docs/styling.md §19). It was `px` until 2026-08-05, which pinned the picture
+ *   at its drawn width while the card around it grew: measured at 2560 × 1330,
+ *   the two `disease-background` figures held 720px inside a 1413px body and came
+ *   out 15% and 19% narrower than the drawing's own proportion. The paragraph
+ *   above is still the reason the cap EXISTS — the argument it makes is against
+ *   upscaling past the asset, and the `rem` form does not do that at DPR 1: at
+ *   1.25x a 720 drawn figure renders at 900 CSS px against 1440 stored, which is
+ *   still 1.6x oversampled. What it gives up is the 2x guarantee on a DPR-2 panel,
+ *   where 900 CSS px wants 1800 device px and the file has 1440 — mildly soft, and
+ *   the trade §19's open item 47 records. Size was judged the more visible half:
+ *   an undersized figure is wrong on every large screen, a slightly soft one only
+ *   on retina large screens.
  * - The height cap subtracts the card's chrome from its own `max-h-[95dvh]` — a
  *   117px crimson band (the title wraps to two lines at 1440) plus
  *   the body region's 16px of `py-2`, rounded up to 10rem so a title that wraps
@@ -115,7 +129,10 @@ export default function PopupFigure({
       alt={alt}
       style={{
         aspectRatio: `${width} / ${height}`,
-        maxWidth: `min(${width}px, 100%)`,
+        /* `rem`, not `px`, so the cap rides the board above the canvas — see the
+           note on the width cap above. `/ 16` is the drawn px at the root's own
+           16px, so every width at or below 1440 is unmoved. */
+        maxWidth: `min(${width / 16}rem, 100%)`,
         maxHeight: `calc(95dvh - ${reserve})`,
       }}
       className="mx-auto"
