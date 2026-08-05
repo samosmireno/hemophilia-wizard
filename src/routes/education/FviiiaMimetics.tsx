@@ -1060,7 +1060,7 @@ function EmergingPanel({ children }: { children: ReactNode }) {
   return (
     <section
       aria-labelledby="emerging-heading"
-      className="-mr-8 -mb-4 grow overflow-hidden rounded-tl-[60px] bg-emerging-panel px-6 py-10 shadow-emerging-panel sm:mr-0 lg:mb-0 lg:rounded-tl-[117px] xl:w-168.75 xl:grow-0"
+      className="-mr-6 -mb-4 grow overflow-hidden rounded-tl-[60px] bg-emerging-panel px-6 py-10 shadow-emerging-panel sm:mr-0 lg:mb-0 lg:rounded-tl-[117px] xl:w-168.75 xl:grow-0"
     >
       <div className="flex h-full flex-col items-center justify-center">
         {/* An `<h2>`: the chapter owns the `<h1>`. Sentence case as drawn —
