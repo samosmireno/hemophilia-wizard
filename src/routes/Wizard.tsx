@@ -192,18 +192,45 @@ export default function Wizard() {
             once `OptionGroup` takes its base step. `text-lg` is that +2 on the
             scale.
 
-            A `max-*` variant rather than the three ascending steps everything
-            else on the page takes, because this is the one size in the app the
-            APP does not own — `Button` ships `text-[26px]`, and 26 is on no
-            scale step. An ascending ramp has to restate its own top, so it could
-            only end in an arbitrary `text-[26px]` the app no longer has anywhere
-            (styling open item 33) or in `text-2xl`, which would quietly round
-            the drawn 26 to 24 and drop the 2px §14 measured. `max-lg:` emits no
-            rule at or above `lg` at all, so the package's value stands untouched
-            exactly where the artboard draws it, and only the phone case is
-            stated. The height does not move either way: 2 × 18px of padding plus
-            the 20px `leading-5` box is 56 at both sizes, so the drawn pill
-            survives the step.
+            **`lg:text-2xl` is the top of that ramp, and it costs the +2 on
+            purpose.** Until 2026-08-05 there was no `lg:` step here at all: a
+            bare `max-lg:` variant emits no rule at or above `lg`, which let the
+            package's own `text-[26px]` stand exactly where the artboard draws
+            it — the +2 preserved, at the price of the app not owning the size.
+
+            That price was invisible while nothing above 1440 moved. §19 now
+            scales the board to 1.5×, and 26 is a **px** the root step cannot
+            reach, so the drawn relationship inverted the moment it could: pill
+            against button measured 24/26 (+2) at the canvas, 27/26 (−1) at
+            1.125×, 30/26 (−4) at 1.25× and 36/26 (−10) at 1.5×. The button read
+            SMALLER than the options it submits on every board but one.
+
+            `text-2xl` rounds the drawn 26 down to 24, so the +2 becomes 0 and
+            the button now matches the pills rather than topping them. That is a
+            real loss of a measured value and it buys the thing the +2 was
+            evidence FOR: both sizes are on the same rem scale, so they move
+            together at every rung instead of diverging by 10px at the top. The
+            alternative that keeps the 26 is `lg:text-[1.625rem]`, which scales
+            correctly and re-introduces the arbitrary font size open item 33
+            spent a day removing.
+
+            **`lg:px-7.5` and `lg:py-4.5` finish the box, and they exist for two
+            different reasons.** The padding is the same fault as the type:
+            `py-[18px]` is the package's other px value, so the box was going
+            56 → 66 where proportion wants 84 — the type scaling while the
+            padding did not, i.e. a pill that gets squatter as the board grows.
+            `py-4.5` is 18px at the canvas and 27 at 1.5×, so the box is 84 and
+            the drawn 56 survives the step.
+
+            `px-7.5` is not a scale fix but a COMPENSATION, and it is the one
+            number here that is neither drawn nor transcribed. Rounding the type
+            26 → 24 narrows the label, and 24px of `px-6` around it computes a
+            210.3px pill where §14 transcribes the drawn 223. 30px a side puts it
+            at 222.3, inside the ~1px the drawn value is itself known to. It is
+            an invented value chosen to preserve a drawn one — which is exactly
+            the shape §12 warns about — so it is stated here rather than left to
+            look like a transcription. All three are `lg:` so the phone case
+            keeps the package's box untouched.
 
             `disabled` is the real attribute, not `aria-disabled`: the gate is
             visible in the three unanswered groups above it, so a focusable
@@ -212,7 +239,7 @@ export default function Wizard() {
           <Button
             type="submit"
             disabled={!complete}
-            className="bg-brand-lagoon-50 px-6 leading-5 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75 max-lg:text-lg"
+            className="bg-brand-lagoon-50 px-6 leading-5 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl"
           >
             Submit inputs
           </Button>

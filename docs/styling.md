@@ -1021,7 +1021,7 @@ Everything above is arithmetic — see open item 41.
 | 7   | The inner gradient's second stop is off-scale (`rgba(114.61, 213.07, 191.53)`, dE .042 from `teal-25`) while the other three stops are exact palette. Probably meant to be `teal-25`; kept literal pending a designer answer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | §6                    |
 | 8   | The landing footage does not loop — it is a continuous dolly-in, 46.5/255 apart end to end. Ping-ponging it is a workaround; **ask the designer for an 8–12 s clip that loops cleanly**. That would halve the asset and remove the direction reversal.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | §7, ADR 0002          |
 | 9   | The references do not agree with the §2 scale **or with each other**: `disease-background` measures ~32px sub-headings, ~18px body and ~22px captions against the scale's 26/16/20, while `rebalancing-agents` measures ~24px body and ~25px captions. **The three chapters answered it differently until 2026-08-04**, when the §2 migration put all of them on `text-2xl` and removed the divergence — but only by making every reading round to the same step, not by resolving which reading is right. Still needs the designer's sizes.                                                                                                                                                                                                                                                                                                                                                                    | §11                   |
-| 10  | The chapter is specified to fit one screen and currently does not (818px at 1440×800). Wants one rule across all four chapters rather than per-page constants. **The 818 is stale: re-measured 788px on 2026-08-05 (§11, §19), so it now fits 1440 × 800 — as item 32 recorded independently. It remains the tallest route, and §19's height gate is derived from it.**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | §11                   |
+| 10  | The chapter is specified to fit one screen and currently does not (818px at 1440×800). Wants one rule across all four chapters rather than per-page constants. **The 818 is stale: re-measured 788px on 2026-08-05 (§11, §19), so it now fits 1440 × 800 — as item 32 recorded independently. It remains the tallest route, and §19's height gate is derived from it. The 788 is itself stale by the end of the same day: `029caec` took another 32px out and it is 756, which moved no gate because §19 rounds up to the next 100.**                                                                                                                                                                                                                                                                                                                                                                           | §11                   |
 | 11  | Four of the eight vertical gaps are ink-to-ink measurements off the reference PNG rather than the designer's box gaps, so they render slightly loose.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | §11                   |
 | 12  | The pop-up export has **no scrim** — nothing dims the page behind a dialog that traps focus. The shipped `rgb(0 0 0 / .5)` is inferred, like §4.3's tooltip and §4.5's sidebar. The card's own 55%-black shadow was drawn against Figma's dark canvas and does much less work over the light `bg-page`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | §13                   |
 | 13  | ~~The pop-up title is 45.47px, off the §2 scale, and ships as a raw value under §8's precedent.~~ **Closed 2026-08-04** — but not the way it was written. 45.47px is the _drawn_ size; what shipped was a clamp capped at 36px, and had been since day one. The code now matches the drawing, so the raw value is genuinely on screen and the question this row asked (is an off-scale title acceptable?) is answered by §8's precedent as it always was. Kept as a row so the numbering below it does not shift.                                                                                                                                                                                                                                                                                                                                                                                               | §13                   |
@@ -1064,10 +1064,11 @@ that item's five cases. | §13, §17, ADR 0007 |
 | 44 | **`/education/fviiia-mimetics`'s responsive pass of 2026-08-05 is arithmetic end to end**, like items 36, 39, 41, 42 and 43 — verified in the compiled CSS and in Vitest (51 tests, six of them new), but jsdom computes no layout. **It rests on firmer ground than its five predecessors and reaches a worse conclusion, which is the thing to check first if this chapter is ever opened in a browser.** The row's 1122px is a sum of four transcribed or package-owned numbers — the drawn 78px indent, the drawn 288px caption, `gap-4`, and `PopupButton`'s `size-16.25 shrink-0` read out of the package's `dist` — so it rests on no character-width estimate at all, and the claim that the drawn row never fitted below a 1394px viewport is as strong as anything in this file that was not rendered. What follows from it is not: **that this chapter has been overflowing its content column at every width from 1024 to ~1394 since it shipped**, by ~285px at 1024, and that no test, no review and no screenshot caught it. If a render disagrees, the first two suspects are `PopupButton`'s rendered box (the package sets `size-16.25`, but its ring and shadow are drawn outside it) and whether the caption's own shrink was absorbing the overflow quietly rather than pushing the panel past the column. The card table's 241px is the same kind of number one layer down — `96vw` and a fixed `xl:w-145` against `Popup`'s padding — and it depends on the §13 correction this pass made rather than on anything measured. The two invented values (the pairs centring below `xl`, and the 60px radius holding to 1024 on a now-full-width panel) are judgements no arithmetic settles. Nothing was opened in a browser, at the user's standing instruction. | §11, §13 |
 | 45 | **`/wizard/therapies` responsive pass of 2026-08-05 is the first in the series that is NOT arithmetic** — items 36, 39, 41, 42, 43 and 44 all end "jsdom computes no layout", and this one was measured in Chromium across all sixteen leaves, both accordion states and seven widths (112 renders, §15). Nothing in it is predicted. What stays open is what the measurements turned up rather than what they failed to check. **First, 320 remains the worst measure in the app at ~190px** — roughly where 375 sat before the pass, and still ~23 characters a line of clinical prose. The only lever left there is `mx-3` or `BulletList` `pl-6`, both of which this pass argues should not move. **Second, the agent captions render 20px bold against a 16px body at 375**, which is the visible cost of the deliberate non-step and is a designer question rather than a bug: no artboard exists below 1440 to say whether a fixed 160px box should keep its caption size when the prose around it shrinks. **Third, the five-agent row shrinks its items to 144px at 1280** — the only width at which they are not the drawn 160, previously unrecorded — which is `xl:flex-nowrap` meeting 1120px of content in a 1040px band. Nothing clips, because the absence of `min-w-0` floors each item at its own caption, but it is the drawn item giving way at exactly one width and the designer drew no five-agent leaf to check it against. **Fourth, and from the same day: the below-`sm` gutter narrowed 32 -> 24px within hours of this pass**, so §15's 320 and 375 rows are carried forward at +16px rather than re-rendered — the gutter change was checked visually rather than instrumented, at the user's call, and the derived figures wear a tilde there to say so. Everything from 640 up is untouched by it and stays measured. What is genuinely unknown is the header-band height at 320: it was 112px, four lines, with ~32px less to set in, so it very likely reads three now and nothing has confirmed it. | §15, §2, §12 |
 | 46 | **`/explore`'s responsive pass of 2026-08-05 is the second measured one** (§17), so what stays open is what the render turned up rather than what it failed to check. **First, the fills now carry a reading nobody drew**: `bg-white/60` on the middle segment against `crimson-50/5` on the flanks makes the row read as a range with a peak side by side, and stacked as three separate cards it reads as one card being _different_ — selected, or current. Both values are drawn and one is solved exactly, so the pass kept them rather than invent a below-`xl` fill, but it is a designer question and it is new. **Second, the class labels equal the `<h1>` at 320 and 375** (both 24px), the deliberate consequence of ramping a heading three steps past a fixed box that does not step — the same shape as item 45's 20px-caption-over-16px-body, and answerable only by a designer who draws a phone. **Third, the arc clearance at 320 is 9.4px** on the middle segment's label: positive, but it is what a longer class label would spend, and `EXPLORE_SEGMENTS` is authored content that could gain one. **Fourth, the `<h1>` renders ten lines at 320 where the arithmetic predicted eight** — narrow-column line-breaking wastes ~20% of the column on short trailing words, which no estimate in this file models. Every other predicted figure in the pass landed, including the CTA wrapping at 375 by 1px. | §17, §2, §9 |
-| 47 | **Figure assets are budgeted for 1.00×, and §19 draws some of them at 1.25×.** §13's rule is that a figure is stored at 2× its drawn width _and no wider_, so at the 1.25× step a figure at full drawn width wants 2.5× and the file has 2×. On DPR 1 this is invisible (a 720-drawn figure renders at 900 CSS px against 1440 stored — still 1.6× oversampled); on a DPR-2 panel it is ~0.8× and mildly soft. **This item said the opposite until 2026-08-05.** It described the symptom as softening, when `PopupFigure`'s `px` cap was in fact _preventing_ softening and paying for it in size: measured at 2560 × 1330, `disease-background`'s two figures held 720px inside a 1413px body, 15% and 19% under the drawing's own proportion. The cap is now `rem` (`min(45rem, 100%)`), so size is correct everywhere and the 2× guarantee is given up on retina large screens — size was judged the more visible half, since an undersized figure is wrong on _every_ large screen and a soft one only on retina ones. What remains open is whether to re-export: `clotting-cascade-thumb.webp` is the tightest at exactly 940 for a 470 figure, while `denecimig` (3852), `inno8` (5224) and `hemostatic_mechanisms` (1772) have ample headroom. Re-export the tight ones at 3× if a 5K screen shows it; do not re-export the set. | §13, §19 |
-| 48 | **`--shadow-popup` is not scaled, and it is the one shadow big enough for that to read.** Its 50.142px blur stays 50px on a card that is 1.25× larger, i.e. ~20% tight against the drawing. Left alone deliberately (§19): converting it means editing a value §13 documents as straight-from-export, and it is a one-line change if a 2560 render indicts it. Not yet examined at that size. | §13, §19 |
+| 47 | **Figure assets are budgeted for 1.00×, and §19 draws some of them at 1.5× as of 2026-08-05** (this item was written against a 1.25× cap and every number in it is one rung low — at the top rung a 720-drawn figure renders at 1080 CSS px, so DPR 1 is 1.33× oversampled and still safe, while DPR 2 wants 2160 against the 1440 stored and lands at **0.67×**, which is where softening stops being theoretical. The re-export question below is unchanged in kind and sharper in degree: `clotting-cascade-thumb.webp`'s 940-for-470 is now 0.67× on a retina 4K panel). §13's rule is that a figure is stored at 2× its drawn width _and no wider_, so at the 1.25× step a figure at full drawn width wants 2.5× and the file has 2×. On DPR 1 this is invisible (a 720-drawn figure renders at 900 CSS px against 1440 stored — still 1.6× oversampled); on a DPR-2 panel it is ~0.8× and mildly soft. **This item said the opposite until 2026-08-05.** It described the symptom as softening, when `PopupFigure`'s `px` cap was in fact _preventing_ softening and paying for it in size: measured at 2560 × 1330, `disease-background`'s two figures held 720px inside a 1413px body, 15% and 19% under the drawing's own proportion. The cap is now `rem` (`min(45rem, 100%)`), so size is correct everywhere and the 2× guarantee is given up on retina large screens — size was judged the more visible half, since an undersized figure is wrong on _every_ large screen and a soft one only on retina ones. What remains open is whether to re-export: `clotting-cascade-thumb.webp` is the tightest at exactly 940 for a 470 figure, while `denecimig` (3852), `inno8` (5224) and `hemostatic_mechanisms` (1772) have ample headroom. Re-export the tight ones at 3× if a 5K screen shows it; do not re-export the set. | §13, §19 |
+| 48 | **`--shadow-popup` is not scaled, and it is the one shadow big enough for that to read.** Its 50.142px blur stays 50px on a card that is now **1.5×** larger, i.e. ~33% tight against the drawing (it was ~20% while the cap was 1.25×). Left alone deliberately (§19): converting it means editing a value §13 documents as straight-from-export, and it is a one-line change if a 2560 render indicts it. Not yet examined at that size. | §13, §19 |
 | 49 | ~~**§19 scaled the pop-up's 5px border but not the app's other visible borders.**~~ **Closed 2026-08-05, and the item under-counted itself while it was open** — it named `ArchBand`'s `border-t-4` and `Scenario`'s `border-4`, but `border-4` had **three** source sites, the other two being `rebalancing-agents`' and `treatment-landscape`' artwork placeholder boxes. All four are now `border-[0.25rem]` / `border-t-[0.25rem]`, which is the same 4px at a 16px root and scales above the canvas with the objects they edge. Verified in Chromium: 4px at 1440, 5px at 2560, and the nine canvas screenshots stay byte-identical. The reason they were missed twice is that they are Tailwind scale utilities rather than arbitrary values, so neither grep that built the §19 conversion list could see them. | §19 |
-| 50 | **`/explore`'s arch row is pinned rather than grown as of 2026-08-05 (§17), and the pin has 7px of vertical clearance at the bottom.** The row now takes its natural height, which is the drawn height to within 9px — but the deepest ink on the page is the three-line `UHL CLOTTING FACTOR REPLACEMENT` label, centred in an `xl:h-20` box whose bottom edge IS the page's, so it bottoms out 7px above it at 1440 and 8–9px on the scaled boards. Nothing is clipped at any width measured, and the drawing is no roomier (the artboard's own label row runs to y≈802 on an 800 canvas). Two things would spend it: a **fourth line** on any class label, since `EXPLORE_SEGMENTS` is authored content, and the **20px this page owes the drawing** — §17 records the drawn label row as 100px where the code ships `h-20`, which is the whole of the 9px top-edge discrepancy and would buy 10px of clearance back if the designer confirms it. This is the vertical twin of item 46's 9.4px arc clearance at 320, and the same instruction applies: re-check it if a label grows. | §17, §19, §9 |
+| 50 | **`/explore`'s arch row is pinned rather than grown as of 2026-08-05 (§17), and the pin has 7px of vertical clearance at the bottom.** The row now takes its natural height, which is the drawn height to within 9px — but the deepest ink on the page is the three-line `UHL CLOTTING FACTOR REPLACEMENT` label, centred in an `xl:h-20` box whose bottom edge IS the page's, so it bottoms out 7px above it at 1440 and 8/9/10px on the three scaled boards (re-measured at all four when the 1.5× rung landed: 793 of 800, 892 of 900, 991 of 1000, 1190 of 1200 — the clearance scales with the board, so the top rung is the roomiest rather than the tightest). Nothing is clipped at any width measured, and the drawing is no roomier (the artboard's own label row runs to y≈802 on an 800 canvas). Two things would spend it: a **fourth line** on any class label, since `EXPLORE_SEGMENTS` is authored content, and the **20px this page owes the drawing** — §17 records the drawn label row as 100px where the code ships `h-20`, which is the whole of the 9px top-edge discrepancy and would buy 10px of clearance back if the designer confirms it. This is the vertical twin of item 46's 9.4px arc clearance at 320, and the same instruction applies: re-check it if a label grows. | §17, §19, §9 |
+| 51 | **`/wizard`'s Submit button is the last thing in the app still on the package's fixed pixel scale, and above the canvas it now reads smaller than the options it submits.** §14 argues at length for `max-lg:text-lg` — a `max-*` variant precisely so that at `lg` and above the package's drawn `text-[26px]` "stands untouched exactly where the artboard draws it", preserving the +2px the design gives this button over the 24px option pills. That reasoning was written when nothing above 1440 moved. It does now, and 26 is a **px** the root step cannot reach, so the drawn relationship inverts at every rung — measured 2026-08-05: pill/button type **24/26 (+2)** at the canvas, **27/26 (−1)** at 1.125×, **30/26 (−4)** at 1.25× and **36/26 (−10)** at 1.5×, with the pill growing 56 → 84px tall against the button's 56 → 66. This is the fourth instance of §19's "the px that had to move" and the only one a grep _could_ have found, except that the value is not in this repo — it is in mlg-components, reached through a deliberate `max-lg:` hole. It is also what makes `/wizard` the one row of §19's height table that is not proportional (18px short at 1.5×). **The type half was fixed the same day with `lg:text-2xl`**, which rounds the drawn 26 down to 24 and buys proportionality with it: the pill/button delta is now **0 at every board from `lg` up** (24/24, 27/27, 30/30, 36/36) instead of inverting, and 375 keeps its drawn +2 through the untouched `max-lg:text-lg`. The alternative that keeps the 26 was `lg:text-[1.625rem]`, rejected because it re-introduces the arbitrary font size open item 33 spent a day removing. **The box was finished in the same pass** with `lg:px-7.5 lg:py-4.5`, so all three of the package's fixed values are now overridden at `lg` and above and the button scales whole. `py-4.5` is the twin of the type fix — 18px at the canvas, 27 at 1.5×, so the box is 84 where proportion wants 84 instead of the 66 the pinned padding gave. **`px-7.5` is the one to re-read later**: it is not a conversion but a _compensation_, 30px a side chosen to put the narrowed 24px label back at 222.3 against the drawn 223. That makes it an invented number preserving a transcribed one — §12's warning shape — and it means the pill's width no longer follows from its type the way the artboard's does. **What stays open is the premise, not the arithmetic**: this whole repair assumes the drawn 223 × 56 is a shape to hold at every board size rather than a canvas-only transcription. If the designer says the latter, `px-7.5` should go and the pill should simply be narrower above `lg`. **Not verified in a browser** — the type measurements above are real, the 222.3 and the 84 are arithmetic from them at the user's instruction. | §14, §19, §4, §12 |
 
 ---
 
@@ -1404,10 +1405,11 @@ the other three exist, not eight numbers per page. Deferred deliberately.
 
 **The 818px above is stale, and the item is closer to closed than it reads.**
 Re-measured in Chromium on 2026-08-05 with `main`'s `min-h-dvh` neutralised, the
-page is **788px** — the 2026-08-04 pass that moved its split to `xl` took 30px out
-and nobody came back to this paragraph. At 1440 × 800 it fits, which open item 32
-already recorded from the other direction. It is still the tallest route in the
-app, which is why §19's height gate is derived from it.
+page is **756px** — the 2026-08-04 pass that moved its split to `xl` took 30px out
+and nobody came back to this paragraph, and `029caec` took another 32 the following
+day. At 1440 × 800 it fits, which open item 32 already recorded from the other
+direction. It is still the tallest route in the app, which is why §19's height gates
+are derived from it.
 
 ### Open: the type is smaller than the reference
 
@@ -2374,11 +2376,12 @@ the design canvas, so nothing moves at or below 1440 and the column centres
 above it.
 
 **Every number in this table is still a 1440 number, but above 1440 they are no
-longer the rendered ones.** §19 steps the root font size at 1800 and 2160, and
-because all five tokens are rem the whole table scales with it — the gutter runs
-112 → 126 → 140 and `--container-content` 1168 → 1314 → 1460. The cap above still
-does exactly what this section says it does; it is simply expressed in a rem that
-is 18 or 20px rather than 16 up there. The measure in characters does not change,
+longer the rendered ones.** §19 steps the root font size on a three-rung ladder
+(1800 × 900, 1800 × 1000, 2160 × 1200), and because all five tokens are rem the
+whole table scales with it — the gutter runs 112 → 126 → 140 → 168 and
+`--container-content` 1168 → 1314 → 1460 → 1752. The cap above still does exactly
+what this section says it does; it is simply expressed in a rem that is 18, 20 or
+24px rather than 16 up there. The measure in characters does not change,
 which is why scaling was chosen over raising the cap.
 
 The wrapper is `flex w-full flex-1 flex-col`, which is load-bearing: §8's
@@ -3336,14 +3339,15 @@ stated once and covers all three type steps, because a v4 `leading-*` sets
 Four ramps, one argument: **below `lg` the block is a single column of
 drawn-width pills, and at `lg` the artboard's two columns come back.**
 
-| Box              | Base                | `lg`        | `xl`        |
-| ---------------- | ------------------- | ----------- | ----------- |
-| fieldset cap     | `max-w-110` (440)   | 900         | 900         |
-| grid             | one column          | two columns | two columns |
-| legend           | `text-xl` (20)      | `text-3xl`  | `text-3xl`  |
-| pill label       | `text-base` (16)    | `text-xl`   | `text-2xl`  |
-| Submit label     | `max-lg:text-lg`    | 26 (pkg)    | 26 (pkg)    |
-| Submit row's cap | 440, matching above | 900         | 900         |
+| Box              | Base                | `lg`                  | `xl`          |
+| ---------------- | ------------------- | --------------------- | ------------- |
+| fieldset cap     | `max-w-110` (440)   | 900                   | 900           |
+| grid             | one column          | two columns           | two columns   |
+| legend           | `text-xl` (20)      | `text-3xl`            | `text-3xl`    |
+| pill label       | `text-base` (16)    | `text-xl`             | `text-2xl`    |
+| Submit label     | `max-lg:text-lg`    | `lg:text-2xl`         | `lg:text-2xl` |
+| Submit box       | pkg `px-6` + 18px   | `lg:px-7.5 lg:py-4.5` | same          |
+| Submit row's cap | 440, matching above | 900                   | 900           |
 
 **The 440px cap is the drawn pill, not a new number** — `(900 − 20) / 2` is what
 a pill measures at the canvas, so out of the grid the block is one column of
@@ -3391,18 +3395,40 @@ the label does not wrap, which it never does. What ramps is the +2px this sectio
 measured between this button and the pills beside it — 26 against 24 drawn, 18
 against 16 once the pills take their base step.
 
-It is the one `max-*` variant in the app, and it is there because **26px is the
-one size on this page the app does not own**: `Button` ships `text-[26px]`, which
+It is the one `max-*` variant in the app, and it is there because **26px was the
+one size on this page the app did not own**: `Button` ships `text-[26px]`, which
 is on no scale step. An ascending ramp has to restate its own top, so it could
 only end in an arbitrary `text-[26px]` — which the app no longer has anywhere
 (item 33) — or in `text-2xl`, rounding the drawn 26 to 24 and dropping the very
 2px the step exists to preserve. `max-lg:` emits no rule at or above `lg`, so the
-package's value stands untouched where the artboard draws it and only the phone
-case is stated. The two survive `twMerge` together because a modifier and a bare
+package's value stood untouched where the artboard draws it and only the phone
+case was stated. The two survive `twMerge` together because a modifier and a bare
 size are different groups to it; that is asserted in `wizard.test.tsx` rather
 than assumed, since an unprefixed `text-lg` would have evicted the drawn value
 silently. The pill height is unaffected at either size: 2 × 18px of padding plus
 the 20px `leading-5` box is 56 both times.
+
+**`lg:text-2xl` was added on 2026-08-05 and takes the rounding this paragraph
+rejected.** What changed is not the reasoning above but the premise under it: §19
+now scales the board to 1.5× above the canvas, and a px size is the one thing a
+root step cannot move, so keeping the drawn 26 stopped meaning "the +2 is
+preserved" and started meaning "the +2 inverts to −10 at the top rung". Rounding
+26 → 24 puts the button on the same rem scale as the pills, which holds the
+_relationship_ at every board (delta 0 from `lg` up) at the cost of the drawn
+value at one. The 375 case is untouched: `max-lg:text-lg` still states its +2.
+
+**The cost was 13.7px of drawn width, and `lg:px-7.5` buys it back.** A 24px
+label in `px-6` computes 210.3 where this section transcribes 223; 30px a side
+computes 222.3, inside the ~1px the drawn value is itself known to. `lg:py-4.5`
+went in beside it for a different reason — the package's `py-[18px]` is the same
+px fault as the type, leaving the box 66 tall at 1.5× where proportion wants 84.
+
+So the button now states all three of the package's fixed values at `lg`, and the
+Base column below is the only place any of them still apply. **`px-7.5` is the
+value to distrust**: unlike the other two it converts nothing, it compensates —
+an invented number holding a transcribed one in place, which is the shape §12
+warns about, and it decouples the pill's width from its type in a way the
+artboard does not. Open item 51 carries the question that would settle it.
 
 Any other consumer of a package-defaulted size wanting a phone step should reach
 for the same device rather than restating the package's value.
@@ -4477,14 +4503,22 @@ at 1168px and centred it, so a 2560px monitor showed the same island with 672/72
 of air either side. The top breakpoint in the whole app was `xl`; there was no
 `2xl:` anywhere.
 
-The rule added on 2026-08-05 is that above 1440 the drawing **scales**. Two media
+The rule added on 2026-08-05 is that above 1440 the drawing **scales**. Three media
 queries at the foot of `tokens.css` step the root font size:
 
 | Viewport                      | root   | factor | board       |
 | ----------------------------- | ------ | -----: | ----------- |
 | 1441–1799 (any height)        | 16px   |  1.00× | 1440 × 800  |
 | ≥1800 wide **and** ≥900 tall  | 112.5% | 1.125× | 1620 × 900  |
-| ≥2160 wide **and** ≥1000 tall | 125%   |  1.25× | 1800 × 1000 |
+| ≥1800 wide **and** ≥1000 tall | 125%   |  1.25× | 1800 × 1000 |
+| ≥2160 wide **and** ≥1200 tall | 150%   |  1.50× | 2160 × 1200 |
+
+**The ladder was two rungs deep for the first half of 2026-08-05** — 1.125× at
+1800 × 900 and 1.25× at 2160 × 1000 — and gained the third that afternoon when the
+top factor was raised. What moved with it: the 1.25× step took over the 1800 width
+(gaining a height gate of its own), and 1.5× took the 2160. The queries overlap and
+are ordered shortest-to-tallest, so a 2560 × 1440 panel matches all three and the
+last one wins; they only ever move together.
 
 ### Why scaling rather than widening
 
@@ -4493,7 +4527,7 @@ column grow. Three things ruled it out.
 
 The measure is the first. 1168px is already at the top of a comfortable line
 length; widening it makes the prose worse, not better. **Scaling does not touch
-the measure** — the column grows to 1460px at 1.25× but the type grows with it, so
+the measure** — the column grows to 1752px at 1.5× but the type grows with it, so
 the line length in _characters_ is exactly what the artboard drew. That is a
 property no reflow option can offer.
 
@@ -4508,7 +4542,7 @@ this is invented, and §12's rule for invented values applies pointed upward —
 which is why the four numbers in the table above are plain values in a media query
 rather than tokens. Naming them would claim an authority they do not have.
 
-### Why the cap is 1.25× and not "fill the screen"
+### Why the cap is 1.5× and not "fill the screen"
 
 Filling 2560 means 1.78×, and that is the wrong size for the hardware. A 14"
 laptop is ~127 CSS ppi; a 27" QHD is ~109 and a 32" is ~92. A big monitor already
@@ -4525,10 +4559,22 @@ as the reference:
 |  1.50× |            0.220″ |                 1.31× |
 |  1.78× |            0.262″ |                 1.55× |
 
-1.25× lands closest to parity. 1.78× is presentation sizing, and this is
-self-paced CME — a solo reading activity at a desk.
+**1.25× is the parity answer and 1.5× is what ships**, and the gap between those
+two sentences is a preference rather than a measurement. This table is the argument
+_against_ the top rung: 1.31× the reference is deliberately larger than the
+drawing reads on the laptop it was drawn for, so the reason to take it is that the
+canvas is conservative on a 27–32" panel and not that the arithmetic asks for it.
+The table stayed here unedited when the cap was raised on 2026-08-05, because the
+counter-argument is the thing worth keeping on the record — if the top rung is ever
+questioned, this is the row that questions it.
 
-**Presentation is not handled here, deliberately.** ⌘+ is full page zoom, it
+1.78× remains out. Filling the screen makes the factor a property of the window
+rather than of the hardware, which is how a 32" panel and an ultrawide end up at
+different type sizes for the same reading distance.
+
+**Presentation is still not handled here, deliberately**, and 1.5× is not a
+back-door version of it — it is keyed to ≥2160 × ≥1200, which no projector reports.
+⌘+ is full page zoom, it
 scales a rem design perfectly (including the borders and shadows this rule leaves
 alone), and it is the presenter's call rather than something guessed from a
 viewport width. Adding a "presentation" step would also have been keyed to the
@@ -4548,40 +4594,74 @@ of air a side, which is the same character as the 1440 canvas itself.
 
 A width-only step can take a page that fits and make it scroll **because the
 screen got wider**. A 2560 × 1080 ultrawide is the case that proves it: it clears
-2160 on width, and at 1.25× the tallest chapter would need 985px against a ~975px
-viewport. With the height gate it takes the 1.125× step instead and still fits.
+2160 on width, and at 1.5× the tallest chapter would need 1134px against a ~1000px
+viewport. With the height gate it takes the 1.25× step instead (945) and still fits.
 
 Each threshold is the tallest route at that step, rounded up to the next 100.
-Measured in Chromium at 1440 × 800 on 2026-08-05, with `main`'s `min-h-dvh`
+Re-measured in Chromium on 2026-08-05 when the third rung was added, at **every**
+rung rather than at the canvas and multiplied, with `main`'s `min-h-dvh`
 neutralised so the floor did not mask the natural height:
 
-| route                             | 1.00× | 1.125× | 1.25× |
-| --------------------------------- | ----: | -----: | ----: |
-| `/education/disease-background`   |   788 |    887 |   985 |
-| `/education/treatment-landscape`  |   729 |    821 |   912 |
-| `/education/rebalancing-agents`   |   727 |    818 |   909 |
-| `/wizard`                         |   724 |    815 |   905 |
-| `/explore`                        |   723 |    814 |   904 |
-| `/education/fviiia-mimetics`      |   705 |    794 |   882 |
-| `/`                               |   413 |    465 |   517 |
-| `/wizard-intro`                   |   361 |    407 |   452 |
-| `/education/prophylaxis-guidance` |   282 |    318 |   353 |
+| route                             | 1.00× | 1.125× | 1.25× | 1.50× |
+| --------------------------------- | ----: | -----: | ----: | ----: |
+| `/education/disease-background`   |   756 |    850 |   945 |  1134 |
+| `/education/fviiia-mimetics`      |   735 |    827 |   919 |  1103 |
+| `/education/treatment-landscape`  |   729 |    821 |   912 |  1094 |
+| `/education/rebalancing-agents`   |   727 |    818 |   909 |  1091 |
+| `/wizard`                         |   724 |    810 |   896 |  1068 |
+| `/explore`                        |   667 |    751 |   834 |  1001 |
+| `/`                               |   413 |    465 |   517 |   620 |
+| `/wizard-intro`                   |   361 |    406 |   451 |   542 |
+| `/education/prophylaxis-guidance` |   282 |    318 |   353 |   423 |
 
-887 → **900** and 985 → **1000**. Those multiples are exact rather than estimated:
-the board scales proportionally, so line counts are preserved and height scales
-with the factor.
+850 → **900**, 945 → **1000** and 1134 → **1200**.
 
-Two notes on that table. **§11's long-standing "818px" for `disease-background` was
-stale** — the 2026-08-04 pass that moved its split to `xl` took 30px out and nobody
-re-measured; it is 788. And the five placeholder routes (`/resources`,
-`/references`, `/glossary`, `/acronyms`, `/survey`) are 94px of bare padding today,
-so they are not in the table. **Re-measure when issues 12/13 land** — the ~40-citation
-bibliography in particular will exceed one screen at every factor, and a page that
-scrolls anyway is not what this gate protects.
+**Measuring each rung rather than multiplying the first is what this re-run was
+for, and it earned its keep on the ninth row.** Eight of the nine routes are within
+1px of their canvas height times the factor, which is the proportionality the old
+table asserted. `/wizard` is not: it lands 810 / 896 / 1068 where proportion wants
+814.5 / 905 / 1086, running **4.5, 9 and 18px short**. A page that comes in _under_
+proportion is a page containing something that did not grow, and the deficit
+doubling with the factor says it is one thing rather than an accumulation of
+rounding. It is — see open item 51. Nothing here is a scroll risk (short is the
+safe direction for a height gate), which is exactly why multiplying the canvas
+would have hidden it.
+
+**Three of the nine 1.00× numbers moved since the table was first written**, and
+none of them moved a gate. `disease-background` 788 → 756, `fviiia-mimetics`
+705 → 735 and `/explore` 723 → 667 are exactly the three routes touched by `029caec`
+and `27785fe`, both of which landed after `e090aa9` measured the original. Rounding
+up to the next 100 absorbed all three: the gates would be 900/1000/1200 on either
+set of numbers. That is the rounding earning its keep rather than a coincidence —
+a gate derived to the pixel would have gone stale twice in one day.
+
+The five placeholder routes (`/resources`, `/references`, `/glossary`, `/acronyms`,
+`/survey`) are 94px of bare padding today, so they are not in the table.
+**Re-measure when issues 12/13 land** — the ~40-citation bibliography in particular
+will exceed one screen at every factor, and a page that scrolls anyway is not what
+this gate protects.
 
 Rounding to 900 rather than a tidier 950 matters: a 1920 × 1080 desktop with a
 bookmarks bar has a ~920px viewport, and 950 would have locked the single most
-common desktop configuration out of scaling despite it having 33px to spare.
+common desktop configuration out of scaling despite it having 33px to spare. The
+same configuration is why the 1.25× rung kept 1800 as its width rather than
+inheriting 2160 — at 1920 × 1080 with no bookmarks bar the page takes 1.25×, and
+with one it steps down to 1.125× instead of falling off the ladder entirely.
+
+### The width gates are exact fits, and 1.125×'s is not
+
+Each width is where that step's board fills the viewport exactly, i.e. 1440 × the
+factor: at 1800 the 1.25× board spends 140 + 1460 + 200, and at 2160 the 1.5× board
+spends 168 + 1752 + 240. Nothing overflows below those widths — the layout is fluid
+and `--container-content` is a cap, not a width — so what the gate buys is that the
+column is never sitting _under_ its cap at the very width that turned the step on.
+Above them the column re-centres and the surplus becomes air, which is the 1440
+canvas's own behaviour at 1441.
+
+**1.125× is the exception and keeps the 1800 it was given.** Its exact fit is 1620,
+and taking it would reopen the 1441–1799 dead band below, which is a deliberate
+decision rather than an oversight. So the first rung is conservative by 180px and
+the two above it are not.
 
 ### What the breakpoints do NOT do
 
@@ -4608,6 +4688,17 @@ class at all:
 | `DiseaseBackground` (§11)   | `xl:grid-cols-[1fr_470px]`                         | `xl:grid-cols-[1fr_29.375rem]`      |
 | `TreatmentLandscape` (§11)  | `sm:grid-cols-[200px_1fr]`, `xl:[1fr_200px_300px]` | `12.5rem`, `[1fr_12.5rem_18.75rem]` |
 | `PopupFigure` (§13)         | inline `maxWidth: min(${width}px, 100%)`           | `min(${width / 16}rem, 100%)`       |
+
+**There is a fifth, found when the third rung was added, and it is half fixed.**
+`/wizard`'s Submit button took the package's `text-[26px]` on purpose — §14's
+`max-lg:` variant is written to let it stand — so it was the one size on the page
+the root could not reach. It hid from the same greps for a fourth reason: the
+value is not in this repo at all. `lg:text-2xl lg:px-7.5 lg:py-4.5` overrides
+all three of the package's fixed values at `lg` and above, which is why this is
+not a row in the table above: the other four converted a value in place, while
+this one gives the drawn 26 up (rounding it to 24) and then compensates for the
+13.7px of pill width that costs. Open item 51 carries the compensation, which is
+the part that does not follow from the drawing.
 
 **The fourth was found by a question, not by a tool**, and it is the reason the
 other three are worth stating as a class: an inline `style` object is invisible to
@@ -4639,6 +4730,13 @@ After the fix, verified at 2560 × 1330 against the canvas — every ratio holds
 | `treatment-landscape` tracks | 620/200/300 |  775/250/375 |
 | `PopupFigure` cap            |       720px |        900px |
 
+**2560 × 1330 was the 1.25× board when this was measured and is the 1.5× board
+now**, so multiply the right-hand column by 1.2 for today's numbers. The table is
+left in its measured form on purpose: what it demonstrates is that the ratios hold
+under a root step, and re-typing it against a different factor would prove exactly
+the same thing while losing the provenance of the run that caught the four `px`
+bugs above.
+
 The figure row reads differently from the others and it is not a fault: those two
 figures render at **711 and 675** on the canvas, i.e. _below_ their 720 cap, because
 `max-height: calc(95dvh - reserve)` binds first on an 800px-tall viewport. At
@@ -4656,8 +4754,9 @@ what bites anyway.
 
 Everything the shell is built from was already rem — Tailwind's spacing and type
 scales, and all five §12 tokens — so the geometry table moves in proportion for
-free. Verified in Chromium: the column runs 1168 → 1314 → 1460 and `main`'s
-padding 112/160 → 126/180 → 140/200, which is exactly ×1.125 and ×1.25.
+free. Verified in Chromium: the column runs 1168 → 1314 → 1460 → 1752 and `main`'s
+padding 112/160 → 126/180 → 140/200 → 168/240, which is exactly ×1.125, ×1.25
+and ×1.5.
 
 **Radii and the pop-up's border were converted to rem** (2026-08-05), because a
 radius is _shape_: holding a fixed 40px corner while the card grows 1.25× changes
@@ -4673,7 +4772,7 @@ passes to get right. The first named only `Popup`'s 5px edge; `border-4` turned 
 to have three more source sites — `ArchBand`'s white top rule and the artwork
 placeholder boxes on `rebalancing-agents`, `treatment-landscape` and `scenario`.
 All four are now `border-[0.25rem]` / `border-t-[0.25rem]`, measured at 4px on the
-canvas and 5px at 1.25×.
+canvas, 5px at 1.25× and 6px at 1.5×.
 
 **`border-[0.25rem]` is not `border-4`, and an editor will tell you it is.** The
 Tailwind language server offers `suggestCanonicalClasses` on every one of these,
@@ -4722,6 +4821,13 @@ every size and steps 293 → 329 → 366, i.e. ×1.123 and ×1.249 against the r
 ×1.125 and ×1.25. `/wizard/therapies` measures 249 → 280 → 311 on the same three
 boards, which is the same ratio, because it had the pin already.
 
+**The root column above is the two-rung ladder** and is kept as measured, because
+the `grow` column cannot be re-measured — that code is gone. On the three-rung
+ladder those same two viewports take 20px and 24px, and the pinned arch measures
+**366 and 440** — 293 × 1.25 and × 1.5 to the pixel, which is the same result one
+rung further out. The point the table makes does not depend on which ladder it was
+taken on: a residual box does not scale, and a pinned one does.
+
 **`/explore` was the third case and it is fixed the same way.** Its arch row is not an
 `ArchBand` — three tiled segments with their own drawn widths — but it took `grow` for the
 same reason (the artboard cuts the arches at the canvas edge) and paid the same price:
@@ -4755,21 +4861,32 @@ not compete with: measured back at 16px at all four, and unchanged above them.
 
 ### Verified in a browser
 
-Chromium, 2026-08-05, ten viewport sizes against `/education/disease-background`.
-Every root size landed as designed and nothing scrolled at any of them:
+Chromium, 2026-08-05, fifteen viewport sizes against `/education/disease-background`
+— ten for the original two rungs, re-run and extended to fifteen when the third was
+added. Every root size landed as designed and **nothing scrolled on either axis** at
+any of them:
 
-| viewport    | root | column | padding | what it is                    |
-| ----------- | ---: | -----: | ------- | ----------------------------- |
-| 1440 × 800  | 16px |   1168 | 112/160 | the canvas                    |
-| 1512 × 850  | 16px |   1168 | 112/160 | 16" MBP, inside the dead band |
-| 1799 × 1000 | 16px |   1168 | 112/160 | one px under step 1           |
-| 1800 × 900  | 18px |   1314 | 126/180 | step 1 exactly                |
-| 1920 × 975  | 18px |   1314 | 126/180 | 1920 × 1080 desktop           |
-| 1920 × 920  | 18px |   1314 | 126/180 | …with a bookmarks bar         |
-| 2160 × 1000 | 20px |   1460 | 140/200 | step 2 exactly                |
-| 2560 × 1330 | 20px |   1460 | 140/200 | 2560 × 1440 QHD / 5K          |
-| 2560 × 975  | 18px |   1314 | 126/180 | ultrawide — the height gate   |
-| 2560 × 860  | 16px |   1168 | 112/160 | very wide, very short         |
+| viewport    | root | column | padding | what it is                     |
+| ----------- | ---: | -----: | ------- | ------------------------------ |
+| 1440 × 800  | 16px |   1168 | 112/160 | the canvas                     |
+| 1512 × 850  | 16px |   1168 | 112/160 | 16" MBP, inside the dead band  |
+| 1799 × 1000 | 16px |   1168 | 112/160 | one px under step 1            |
+| 1800 × 900  | 18px |   1314 | 126/180 | step 1 exactly                 |
+| 1920 × 975  | 18px |   1314 | 126/180 | 1920 × 1080 desktop            |
+| 1920 × 920  | 18px |   1314 | 126/180 | …with a bookmarks bar          |
+| 1800 × 1000 | 20px |   1460 | 140/200 | step 2 exactly                 |
+| 2160 × 1000 | 20px |   1460 | 140/200 | step 2's old width             |
+| 2159 × 1200 | 20px |   1460 | 140/200 | one px under step 3 on width   |
+| 2160 × 1199 | 20px |   1460 | 140/200 | …and one px under it on height |
+| 2160 × 1200 | 24px |   1752 | 168/240 | step 3 exactly                 |
+| 2560 × 1330 | 24px |   1752 | 168/240 | 2560 × 1440 QHD / 5K           |
+| 3840 × 2160 | 24px |   1752 | 168/240 | 4K at DPR 1                    |
+| 2560 × 1050 | 20px |   1460 | 140/200 | ultrawide — the height gate    |
+| 2560 × 860  | 16px |   1168 | 112/160 | very wide, very short          |
+
+The two one-px-under rows are the pair worth keeping: the gate has to fail on
+_either_ axis alone, and a step written with `and` reading as `or` would show up
+nowhere else.
 
 **1440 is pixel-identical, and that was proved rather than asserted.** All nine
 built routes were screenshotted at 1440 × 800 with the change applied, then again
@@ -4778,4 +4895,12 @@ confirms the method is not vacuous: stashed reports `root=16px` there, applied
 reports `18px`, so HMR does pick the stash up and the identity at the canvas is a
 real result.
 
-Open items 47–49 record what this pass did not settle.
+**Two later changes spend that identity, and both are named rather than absorbed.**
+`ArchBand`'s pin moves the arch 337 → 293 and its top edge 463 → 507 (argued
+above); `/wizard`'s `lg:text-2xl` narrows the Submit pill 224 → 210.3, which
+`lg:px-7.5` then returns to 222.3 — so that one lands ~1.7px off the canvas
+rather than 13.7, but it is off it (open item 51). Page height is unchanged at
+1440 in both cases, so nothing scrolls that did not. The invariant this section states is still the one to hold new work to — it
+is worth keeping precisely because breaking it now requires saying so.
+
+Open items 47–49 and 51 record what this pass did not settle.

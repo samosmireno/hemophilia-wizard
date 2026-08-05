@@ -111,18 +111,24 @@ describe("wizard — patient characteristics", () => {
   });
 
   /**
-   * The one `max-*` variant in the app, and it is load-bearing: `Button`'s own
-   * `text-[26px]` is the size the artboard draws, it is on no scale step, and an
-   * ascending ramp would have to restate it to keep it. `max-lg:` steps the
-   * phone case without emitting a rule where the design applies (§14).
+   * Submit's type is stated at BOTH ends on purpose, and the `lg:` half is the
+   * newer one. `Button`'s own `text-[26px]` is what the artboard draws, but it
+   * is **px**, so once §19 started scaling the board above 1440 it was the one
+   * size on this page the root step could not reach — the +2px this button is
+   * drawn with over the option pills measured −10 at 1.5×. `lg:text-2xl` rounds
+   * the drawn 26 to 24 and buys back proportionality at every rung (§14, §19,
+   * styling open item 51).
    */
-  it("steps Submit down below `lg` without restating the package's own size", () => {
+  it("states Submit's type at both ends of the package's fixed size", () => {
     renderAt("/wizard");
 
-    // Both survive the merge, which is the claim: a modifier and a bare size are
-    // different groups to tailwind-merge, so the step does not evict the drawn
-    // value the way an unprefixed `text-*` would.
-    expect(submit()).toHaveClass("max-lg:text-lg", "text-[26px]", "leading-5");
+    // All three survive the merge: a `max-*` modifier, a `lg:` modifier and a
+    // bare size are three groups to tailwind-merge, so neither step evicts the
+    // package value the way an unprefixed `text-*` would. What settles it in the
+    // browser is source order — Tailwind emits variant rules after bare ones at
+    // equal specificity, so `lg:text-2xl` wins from `lg` up and `text-[26px]`
+    // never applies at any width the app ships.
+    expect(submit()).toHaveClass("max-lg:text-lg", "lg:text-2xl", "text-[26px]", "leading-5");
   });
 
   describe("the submit gate", () => {

@@ -459,7 +459,7 @@
    `%` rather than `px` so a user's own browser font-size stays multiplied in
    rather than overridden.
 
-   These four numbers are INVENTED — no artboard exists above 1440 — so they are
+   These six numbers are INVENTED — no artboard exists above 1440 — so they are
    plain values here rather than tokens, which is §12's rule for the below-`sm`
    gutters pointed the other way: transcribe what the designer gave you, and leave
    what you made up looking like what it is.
@@ -472,11 +472,26 @@
 
    WIDTH AND HEIGHT, because a width-only step can take a page that fits and make
    it scroll purely because the screen got wider — a 2560×1080 ultrawide being the
-   case that proved it. Each threshold is the tallest route at that step, rounded
-   up to the next 100: measured 2026-08-05 in Chromium at 1440×800, the tallest is
-   `/education/disease-background` at 788px, so 887 → 900 and 985 → 1000. Note
-   that §11's long-standing "818px" for that page was stale — the 2026-08-04 pass
-   that moved its split to `xl` took 30px out and nobody re-measured.
+   case that proved it.
+
+   Each HEIGHT is the tallest route at that step, rounded up to the next 100:
+   measured 2026-08-05 in Chromium AT EVERY STEP rather than at the canvas and
+   multiplied, the tallest is `/education/disease-background` at 756/850/945/1134,
+   so 900, 1000 and 1200. The rounding is what makes these survive content edits —
+   that page has been 818, then 788, then 756 in two days and the gates never
+   moved.
+
+   Each WIDTH is where that step's board fits the viewport exactly, i.e. 1440 ×
+   the factor: at 1800 the 1.25× board spends 140 + 1460 + 200 and at 2160 the
+   1.5× board spends 168 + 1752 + 240. Nothing overflows below those widths — the
+   layout is fluid and `--container-content` is a cap — so the gate is what stops
+   the column sitting under its cap at the very width the step turned on. 1.125×
+   keeps the 1800 it has always had rather than dropping to its own exact-fit
+   1620, which would reopen §19's deliberate 1441–1799 dead band.
+
+   The three queries OVERLAP and are ordered shortest-to-tallest on purpose: a
+   2560 × 1440 panel matches all three and takes the last. The rungs only ever
+   move together, so keep them in this order.
 
    Re-measure when issues 12/13 land. `/resources`, `/references`, `/glossary`,
    `/acronyms` and `/survey` are 94px placeholders today; the bibliography in
@@ -488,8 +503,14 @@
   }
 }
 
-@media (min-width: 2160px) and (min-height: 1000px) {
+@media (min-width: 1800px) and (min-height: 1000px) {
   :root {
     font-size: 125%; /* 20px — board 1800 × 1000 */
+  }
+}
+
+@media (min-width: 2160px) and (min-height: 1200px) {
+  :root {
+    font-size: 150%; /* 24px — board 2160 × 1200 */
   }
 }
