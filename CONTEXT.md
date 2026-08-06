@@ -537,7 +537,7 @@ chapters:
 | `disease-background`   | §7.2                                                              |
 | `treatment-landscape`  | §7.1, §7.3, §7.4 (first bullet + benefits/challenges)             |
 | `rebalancing-agents`   | §7.6 NFTs + rebalancing agents (wizard cross-link target)         |
-| `fviii-mimetics`      | §7.5, incl. the investigational agents (wizard cross-link target) |
+| `fviii-mimetics`       | §7.5, incl. the investigational agents (wizard cross-link target) |
 | `prophylaxis-guidance` | §7.4 prophylaxis guidance (last chapter)                          |
 
 The §7.7 "Click here:" figures are **in-chapter local-state pop-ups** — not routes, and not the
