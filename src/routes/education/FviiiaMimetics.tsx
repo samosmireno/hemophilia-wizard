@@ -113,12 +113,23 @@ const DENECIMIG_FIGURE_ALT =
 /**
  * The panel's drawn size, and its aspect ratio.
  *
- * Half of `denecimig.webp`'s 3852 × 2464, per the rule `PopupFigure` states —
- * but note this asset is **not** the 2× export the rule was written for: the
- * panel is drawn at ~450px in the card, so the file is nearer 8×. Half is still
- * the right number to pass, because it is the widest this raster can be painted
- * at 2× density; it simply never binds here, and the height cap is what settles
- * the enlargement. The ratio is what the reservation actually needs.
+ * Half of `denecimig.webp` **as it was at 3852 × 2464** — the file is 2176 × 1392
+ * since the 029caec re-export, so this pair is no longer half of it.
+ *
+ * **The ratio is what the reservation actually needs, and that survived the
+ * re-export**: 1926/1232 and 2176/1392 agree to within 1e-4, which is why nothing
+ * moved when the asset shrank. `nxt007.webp` came out of the same re-export with
+ * a different ratio, and the stale pair there was visible — see `NXT007_FIGURE`.
+ *
+ * The width is left at the old half rather than re-halved to 1088, and that is a
+ * decision rather than an oversight: it is a *cap*, and at this ratio it is inert
+ * until the viewport is ~1381px tall, where 1088 would start binding at ~817 and
+ * shrink the enlargement on an ordinary 1440 × 900 laptop from 1211px to 1088.
+ * What the old number costs is the 2× guarantee on a retina panel — 1926 CSS px
+ * against 2176 stored is still oversampled at DPR 1 — which is the
+ * size-over-sharpness trade docs/styling.md §19 already records for the `rem`
+ * cap. This asset is not the 2× export that rule was written for in any case: the
+ * panel is drawn at ~450px in the card, so the file is nearer 5×.
  */
 const DENECIMIG_FIGURE = { width: 1926, height: 1232 } as const;
 
@@ -135,24 +146,52 @@ const DENECIMIG_FIGURE = { width: 1926, height: 1232 } as const;
  * the Fc stem) rather than following a reaction. The charge glyphs at the chain
  * interfaces are named because they are the whole point of the sentence drawn
  * under the panel: the "charged-residue mutations" are these.
+ *
+ * **Re-transcribed on 2026-08-06**, because the 029caec re-export rewrote three
+ * of the lines this quotes: the crimson heading became "ZEMOCIMIG (NXT007) BsAb
+ * structure" over two lines (which is where the file's extra 108px of height went
+ * — see `NXT007_FIGURE`), the subtitle became "Emicizumab-derived heavy chains",
+ * and both arm labels became "Novel light chain" where they read "Non-common
+ * Lch". This is a quote of pixels, as `DENECIMIG_FIGURE_ALT` is, so it moves when
+ * the asset does.
+ *
+ * That re-export leaves `nxt007-structure.title` — "NXT007 BsAb Structure", which
+ * names the trigger and the enlargement — as the one place still reading the
+ * painted heading as it was. It is deliberately NOT repaired here: the data module
+ * transcribes the source, and carrying the INN into it is the presentation
+ * decision `NXT007` records. Flagged rather than fixed.
  */
 const NXT007_FIGURE_ALT =
-  "Diagram titled “NXT007 BsAb Structure”, subtitled “Further optimized Hch (heavy chain) of " +
-  "emicizumab”. NXT007 is a Y-shaped bispecific antibody whose two arms are labelled anti-FIXa " +
-  "and anti-FX. Each arm pairs a heavy chain with its own non-common light chain, and plus and " +
+  "Diagram titled “Zemocimig (NXT007) BsAb structure”, subtitled “Emicizumab-derived heavy " +
+  "chains”. NXT007 is a Y-shaped bispecific antibody whose two arms are labelled anti-FIXa " +
+  "and anti-FX. Each arm pairs a heavy chain with its own novel light chain, and plus and " +
   "minus symbols mark the charged residues at the two interfaces. The paired stem below is " +
   "labelled as having increased binding activity against FcRn.";
 
 /**
  * The panel's drawn size, and its aspect ratio.
  *
- * Half of `nxt007.webp`'s 2176 × 1392, per the rule `PopupFigure` states — and,
+ * Half of `nxt007.webp`'s 2176 × 1500, per the rule `PopupFigure` states — and,
  * as with `denecimig.webp`, this asset is not the 2× export that rule was written
  * for: the panel is drawn at ~450px in the card, so the file is nearer 5×. Half
  * is still the right number to pass, because it is the widest this raster can be
  * painted at 2× density; the height cap is what settles the enlargement.
+ *
+ * **The height was 696 until 2026-08-06, and that was a stretched picture rather
+ * than a stale note.** The 029caec re-export took the file from 2176 × 1392 to
+ * 2176 × 1500 — the crimson heading gained a second line — while this pair kept
+ * the old numbers, so it declared a ratio of 1.563 for a raster of 1.451.
+ * `PopupFigure` writes the pair straight into `aspect-ratio`, and an `<img>`
+ * *fills* the box it is given (`object-fit` is `fill` unless something says
+ * otherwise), so the enlargement was painted 7.8% too wide rather than
+ * letterboxed inside it — the failure `PopupFigure`'s own note predicts for a
+ * pair that does not match the file.
+ *
+ * Only the enlargement: `ExpandableFigure`'s thumbnail is a bare `w-full` image
+ * with no ratio of its own, so the card was unaffected and the stretch appeared
+ * on zoom and nowhere else.
  */
-const NXT007_FIGURE = { width: 1088, height: 696 } as const;
+const NXT007_FIGURE = { width: 1088, height: 750 } as const;
 
 /**
  * The Inno8 panel's heading — a **literal**, and the only one of the four this
@@ -208,12 +247,16 @@ const INNO8_FIGURE_ALT =
 /**
  * The panel's drawn size, and its aspect ratio.
  *
- * Half of `inno8.webp`'s 5224 × 2012, per the rule `PopupFigure` states — and, as
- * with the other two baked-heading assets, this file is not the 2× export that
- * rule was written for: the panel is drawn at ~886px in the card, so it is nearer
- * 6×. Half is still the right number to pass, because it is the widest this
- * raster can be painted at 2× density; here neither cap binds and it is the
- * card's own width that settles the picture.
+ * Half of `inno8.webp` **as it was at 5224 × 2012** — the file is 4352 × 1676
+ * since the 029caec re-export, so this pair, like `DENECIMIG_FIGURE`, is no longer
+ * half of it. The ratio survived that re-export (2.5964 against 2.5967), which is
+ * why nothing moved, and the width stays the old half for the reason recorded
+ * there: it is a cap, and this one is inert until the viewport is ~2676px wide.
+ * Below that it is the lightbox's own width that settles the picture.
+ *
+ * As with the other two baked-heading assets, this file is not the 2× export the
+ * halving rule was written for: the panel is drawn at ~886px in the card, so it is
+ * nearer 5×.
  */
 const INNO8_FIGURE = { width: 2612, height: 1006 } as const;
 
@@ -236,7 +279,11 @@ const PANEL_HEADING = "Investigational FVIII mimetic therapies in earlier-stage 
  * `NXT007` carries the agent's INN ahead of its code name — "Zemocimig
  * (NXT007)", a client-directed label change of 2026-08-05 (CONTEXT.md §7.5)
  * that the source and the artboard both predate, since both draw the code name
- * alone.
+ * alone. The **raster** no longer does: `nxt007.webp` paints "ZEMOCIMIG (NXT007)"
+ * since the 029caec re-export, so the caption and the picture behind it now agree
+ * without this const having to reach the asset. See `NXT007_FIGURE_ALT`, which
+ * quotes that heading, and which records the one place still holding the bare
+ * code name.
  *
  * It stays the one place in this chapter where the caption and the card's
  * heading agree: the other two agents shed a regulatory status on the way into
@@ -409,7 +456,7 @@ export default function FviiiaMimetics() {
         captions keep the measure that produces their drawn line breaks at every
         width the row exists at.
       */}
-      <div className="mt-14 flex grow flex-col gap-10 xl:flex-row xl:gap-0">
+      <div className="mt-14 flex grow flex-col gap-10 xl:flex-row xl:gap-4">
         {/*
           78px in from the content column's left edge — the artboard indents
           this group rather than aligning it to the gutter the heading and
@@ -567,7 +614,7 @@ function EmicizumabCard() {
         Geometry is measured off the supplied PNG, which is the 1066px card at
         0.875 scale rather than a Figma node — so the radius and padding are
         approximations, the same caveat `MechanismsCard` records for its type.
-        `basis-112` states the drawn ~450px column while leaving the figure free
+        `basis-md` states the drawn ~450px column while leaving the figure free
         to shrink; `xl:` only, so the panel goes full width once stacked.
 
         The classes reach `ExpandableFigure`'s BUTTON, which is what makes the
@@ -670,19 +717,21 @@ function DenecimigCard() {
       <BulletList items={DENECIMIG.body} className="flex-1 text-base leading-[1.6] lg:text-xl" />
 
       {/*
-        The right column: the panel, then the two sentences under it. `w-112` is
-        the drawn ~450px, the same number `EmicizumabCard` lands on from a
-        different artboard — 540 of the 1065px content column there, 448 here.
+        The right column: the panel, then the two sentences under it. `w-145` is
+        580px — **not** the drawn ~450 this paragraph claimed until 2026-08-06,
+        which is the correction docs/styling.md §13 already carried and this
+        comment had not.
 
-        **A fixed width with `shrink-0`, not `flex-1 basis-112`.** That pair is
-        what `EmicizumabCard` writes, but it means "448 *plus a share of what is
+        **A fixed width with `shrink-0`, not `flex-1 basis-md`.** That pair is
+        what `EmicizumabCard` writes, but it means "580 *plus a share of what is
         left*" — and this card is the chapter's `wide` one, so what is left is
         336px more than the artboard has: a growing panel would take most of it
         and paint `denecimig.webp` well past the size it was drawn at. Fixed, the
         whole of the extra width lands in the left column, which is where the
-        four bullets that motivated `wide` actually are — 750px against the drawn
-        424. (`EmicizumabCard` gets away with the growing pair only because its
-        figure carries a `max-w-112` that caps the overgrown column back down.)
+        four bullets that motivated `wide` actually are — 1222 − 24 − 580 = 618px
+        at the 1440 canvas, against the drawn 424. (`EmicizumabCard` gets away
+        with the growing pair only because its figure carries a `max-w-md` that
+        caps the overgrown column back down.)
       */}
       <div className="flex w-full flex-col gap-3 xl:w-145 xl:shrink-0">
         {/*
@@ -741,7 +790,7 @@ function DenecimigCard() {
  *
  * The Denecimig card's shape rather than the Emicizumab one, and for its reasons:
  * `items-start` because the two columns are of comparable height and the artboard
- * aligns their first lines, a fixed `w-112 shrink-0` at the right because both
+ * aligns their first lines, a fixed `w-md shrink-0` at the right because both
  * columns growing would leave the left one ~210px narrower than drawn, and a
  * stack below `xl` with the prose first because at 375px the drawn split leaves
  * the figure column narrower than the `+` that opened the card.
@@ -767,7 +816,7 @@ function Nxt007Card() {
         className="flex-1 text-base leading-[1.6] lg:text-xl"
       />
 
-      {/* The right column: the panel, then the sentence under it. `w-112` is the
+      {/* The right column: the panel, then the sentence under it. `w-md` is the
           drawn ~450px — 543 of the artboard's 1075px content column, which is
           448 of `Popup`'s 896 — leaving the left column the 424 it is drawn at. */}
       <div className="flex w-full flex-col gap-3 xl:w-md xl:shrink-0">
@@ -777,13 +826,21 @@ function Nxt007Card() {
           heading and the rounded corners in its own pixels, with real alpha
           outside the radius. A `bg-white rounded-3xl p-4` wrapper here would
           paint a second, larger corner around the first — and the artboard's
-          panel is this asset's own box, measured: 543 × 348 against the file's
+          panel WAS this asset's own box, measured: 543 × 348 against the file at
           2176 × 1392, the same ratio to within a pixel.
+
+          **The 029caec re-export broke that agreement**, which is worth knowing
+          before anyone re-measures this against the artboard: the file is
+          2176 × 1500 now — a second line of crimson heading — so at the drawn
+          448 the panel paints ~309px tall against the artboard's 287. Taller than
+          drawn, by the height of a line the client added. The width is untouched,
+          which is why nothing else in this column moves.
 
           `rounded-3xl` is therefore about the BUTTON, not the picture — it clips
           the hover wash to the corner the asset already has. The baked radius is
-          117px of 2176, which at the drawn 448 comes to ~24px; that is this step
-          exactly, where Denecimig's shallower ratio lands a step below.
+          117px of 2176 and came through the re-export unchanged, which at the
+          drawn 448 comes to ~24px; that is this step exactly, where Denecimig's
+          shallower ratio lands a step below.
         */}
         <ExpandableFigure
           thumbSrc={nxt007Url}
@@ -875,7 +932,7 @@ function Inno8Card() {
         the hover wash to the corner the asset already has. The baked radius is
         145px of 5224, which at the drawn 886 comes to ~25px; this step is 24.
 
-        No width class at all, where the other two cards set `w-112` on a column:
+        No width class at all, where the other two cards set a width on a column:
         this panel is the card's full measure, which is what `ExpandableFigure`'s
         own `w-full` already gives it.
       */}
@@ -1089,7 +1146,7 @@ function EmergingPanel({ children }: { children: ReactNode }) {
 
         {/* 56px between the two pairs, off the artboard; `flex-wrap` is for the
             phone, where they genuinely cannot share a line. */}
-        <ul className="mt-14 flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
+        <ul className="mt-14 flex flex-wrap items-center justify-center gap-x-14 gap-y-8 sm:justify-end">
           {children}
         </ul>
       </div>
