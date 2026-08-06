@@ -9,7 +9,8 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-06 (`/acronyms` built — §8 records the list's three shipped-as-is
+- **Last reviewed:** 2026-08-06 (`/glossary` built — §8 records the twelve definitions shipping
+  verbatim, including the source's one "sic"); previously 2026-08-06 (`/acronyms` built — §8 records the list's three shipped-as-is
   transcription facts and the six app abbreviations it does not gloss; §5.1 records the `mAB` → `mAb`
   correction, the first place the app departs from `[PDF-V]` on a spelling rather than a layout);
   previously 2026-08-04 (the `/explore` artboard: the route is §9's SDM conclusion node, not
@@ -808,6 +809,18 @@ Use this vocabulary in issues/ADRs/tests. Definitions (abridged from source):
 - **Hemostatic rebalancing agent** — NFT enhancing thrombin generation by targeting endogenous anticoagulant pathways.
 - **Inhibitors** — neutralizing alloantibodies that reduce/eliminate response to factor replacement.
 - **Nonfactor therapy (NFT)** — improves hemostasis without directly replacing FVIII/FIX (mimetics, rebalancing agents).
+- **Prophylaxis** — scheduled therapy administered to prevent or reduce bleeding episodes.
+
+`[BUILD]` **This list ships as `/glossary`** (2026-08-06) — all twelve entries, definitions and array
+order exactly as in `src/data/glossary.ts` → `GLOSSARY`, which carries the source sentences in full
+where the bullets above abridge them. Two transcription facts:
+
+- **The source's own typo ships.** "Nonfactor therapy" is defined as including "homeostatic
+  balancing agents" where the term everywhere else — including the bullet two rows up — is
+  _hemostatic rebalancing_ agents. It is a definition in a reference list, so it is transcribed and
+  marked `sic` in the data file rather than silently repaired. **A client content question**, in
+  the same class as the six unglossed abbreviations below.
+- **Source order is alphabetical and complete** — unlike the acronym list, no inversion to preserve.
 
 ### Acronyms `[PDF-V]`
 

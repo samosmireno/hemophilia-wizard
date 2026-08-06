@@ -262,7 +262,7 @@ unblocks it (designer / browser / code), and where it bites.
 | 51  | `/wizard`'s Submit: type fixed (`lg:text-2xl` — pill/button delta 0 at every board; 375 keeps its drawn +2 via `max-lg:text-lg`) and box (`lg:px-7.5 lg:py-4.5`). **`px-7.5` is a compensation, not a conversion** — an invented number preserving the drawn 223px width. Open premise: is 223 × 56 a shape to hold at every board, or a canvas-only transcription? Designer; arithmetic, not browser-verified.                                                      | §14, §19, §4, §12     |
 | 52  | Gate-release cue half-shipped, wholly invented: the Submit pulse is measured (Chromium 2026-08-06 — peak 1.05, un-dim eases 0.35 → 1, reduced-motion correct); the sidebar arrow still snaps (package change, mlg-reskin debt 7); the pulse's numbers are derived but no artboard draws motion (designer); the scaled boards are arithmetic only.                                                                                                                    | §20, mlg-reskin       |
 
-| 53 | `AppShell`'s `<main>` is `lg:pb-0` — **no page can breathe at the bottom edge at ≥1024**. Never bit, because every route fit one screen; `/acronyms` (§22) is the first that does not, and pads itself. The shell-wide fix is one class, but items 10/32 record every chapter at `scrollHeight` exactly 800 — bottom padding breaks that measurement for nine routes at once. Designer/code, with 10 and 32. | §12, §22, §9 |
+| 53 | `AppShell`'s `<main>` is `lg:pb-0` — **no page can breathe at the bottom edge at ≥1024**. Never bit, because every route fit one screen; `/acronyms` (§22) is the first that does not and `/glossary` (§23) the second, and both pad themselves. **Two routes repeating the same class is the point at which the shell-wide fix starts costing less than the workaround** — but items 10/32 record every chapter at `scrollHeight` exactly 800, and bottom padding breaks that measurement for nine routes at once. Designer/code, with 10 and 32. | §12, §22, §23, §9 |
 
 **Invention ledger (summary)** — shipped values that are not straight transcriptions:
 
@@ -721,7 +721,7 @@ a reserved gutter would shift the centring §19's gates were measured against. V
 2026-08-06: resolves to `teal-25` exactly on the root and a nested scroll container, confirming
 inheritance.
 
-## 22. `/acronyms` — the app's one scrolling page
+## 22. `/acronyms` — the first scrolling page
 
 **No artboard exists for this route.** Gate 2 delivered palette and typography only, and issue 12's
 four content pages were never drawn. Every value here is invented within the palette (ledger, §9),
@@ -729,16 +729,19 @@ which is a weaker footing than any other section in this file — a later export
 
 **Shape.** One column, 41 entries, chosen over the two-column alternative that would have fitted
 800px. At the chapter body ramp (`text-base/[1.6]` → `lg:text-xl/[1.6]`, so 20px on a 32px line at
-`lg`) the rows come to ~1312px, so **the page scrolls — the only route in the app that does**. What
-makes that affordable rather than a defect: the `bg-page` backdrop is `fixed inset-0`
+`lg`) the rows come to ~1312px, so **the page scrolls — the first route in the app that does**, and
+§23 is now the second. What makes that affordable rather than a defect: the `bg-page` backdrop is `fixed inset-0`
 (`AppShell.tsx`), so the §6 gradient stays put instead of tiling, and §21 already tints scrollbars
 into the teal ramp. What it costs is item 53 — `<main>` is `lg:pb-0`, so the page carries its own
 `lg:pb-16` rather than moving nine other routes off a measured constant. Below `lg`, `pb-bar`
 already clears the bottom bar.
 
-**The list** (`src/components/AcronymList.tsx`, kept out of the route so `/glossary` can take it).
-A `<dl>`, terms on a `max-content` grid track so every expansion aligns on the widest term
-(`VERITAS-Pro`) without a pinned width; `sm:gap-x-8`. Below `sm` the grid is off and the pair stacks
+**The list** (`src/components/DefinitionList.tsx`, shared with §23). The component holds only what
+both pages share — the `<dl>` pairing, the body ramp, the two colours; **the grid track and the
+breakpoint it turns on at are the route's**, because an expansion and a sentence do not want the
+same column. `/acronyms` passes terms on a `max-content` track so every expansion aligns on the
+widest term (`VERITAS-Pro`) without a pinned width, `sm:gap-x-8`, `sm:gap-y-2`. Below `sm` the grid
+is off and the pair stacks (the `<dt>` takes `mt-4`)
 — that track plus a 41-character expansion does not survive 320px side by side. Terms bold
 `brand-crimson-50` (the drug-sheet section-label idiom, §16: it gives the column a scannable edge,
 which is what earns its keep over 1312px), expansions `text-black` (§11's chapter body).
@@ -763,3 +766,39 @@ the fixed backdrop holding under a scrolling page all behave. The **numbers** ab
 row height, the `max-content` track width, the below-`sm` stack point — are still arithmetic: no
 `scrollHeight` or `getBoundingClientRect` reading was taken, and no width other than the one looked
 at was opened. Enough to say the page is not broken; not enough to close item 30 for this route.
+
+---
+
+## 23. `/glossary` — the same list, a different column
+
+Built 2026-08-06 as the near-twin of §22, and everything §22 says about its footing applies here
+unchanged: **no artboard exists**, every value is invented within the palette, a later export
+overrules all of it. Same `<h1>` (§11's chapter treatment, `uppercase`, left-aligned), same
+`DefinitionList`, same crimson-term/black-definition pairing, same `lg:pb-16` against item 53.
+
+**What could not carry over is the column.** `/acronyms` sizes its term track to `max-content`;
+here the widest term is a phrase — "Factor VIIIa-mimetic bispecific antibody", **406px** at the
+`lg` ramp — so `max-content` would spend a third of the width on one entry _and_ forbid it wrapping.
+The track is a flat `20rem` (320px) instead, which fits eleven of the twelve terms on one line and
+wraps only that one.
+
+**The pair stacks below `xl`, not below `sm`.** Measured in Chromium (2026-08-06): the content
+column is `min(73rem, 100vw − 272px)` at `lg` and up, so the definition track resolves to
+
+| board | definition track      |                                                                         |
+| ----- | --------------------- | ----------------------------------------------------------------------- |
+| 1440  | 816px (~78 chars)     | the design width — the measure this layout is for                       |
+| 1280  | 656px (~62 chars)     | the `xl` floor, still a column                                          |
+| 1024  | **400px (~38 chars)** | why `lg` is wrong: a sentence set that narrow is a gutter, not a column |
+
+So `xl:grid xl:grid-cols-[20rem_1fr] xl:gap-x-8 xl:gap-y-6`, and 1024–1279 stacks with the full
+752px (~72 chars) to itself. `gap-y-6` where §22 takes `gap-y-2`: these rows run two and three lines,
+and 8px between them would not read as separation. Stacked, the `<dt>` takes `mt-6` for the same
+reason.
+
+**Scroll.** 1082px at 1440×900, 1530px at 1024×768, 1633px at 375×812 — it scrolls at every board,
+like §22 and for the same reasons, with no horizontal overflow at any of the five measured. The
+`uppercase` prohibition also carries over and is _not_ only inherited pedantry: `Factor VIIIa-mimetic`
+uppercased reads `VIIIA`, which names nothing. `src/routes/glossary.test.tsx` pins it the same way.
+
+**No ids, no search.** Same as §22 — the sidebar button is the only way in, nothing links a term.
