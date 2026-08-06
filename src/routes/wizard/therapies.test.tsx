@@ -1,7 +1,7 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Bullet } from "../../data/education";
 import {
@@ -11,7 +11,7 @@ import {
   type SwitchReason,
   type WizardHemophiliaType,
 } from "../../data/wizard";
-import { seedWizardAnswers } from "../../test/setup";
+import { seedWizardAnswers, setReducedMotion } from "../../test/setup";
 import { routes } from "../router";
 
 /**
@@ -209,6 +209,83 @@ describe("wizard therapies — the one-open accordion", () => {
       );
 
     expect(items).toEqual(flatten(note.considerations.points));
+  });
+});
+
+describe("wizard therapies — the accordion payoff scroll", () => {
+  /**
+   * On a phone the Strategies panel can open entirely below the fold, so the
+   * page scrolls the opened panel into view — `block: "nearest"`, which is a
+   * no-op wherever the panel is already visible.
+   *
+   * jsdom computes no layout and implements no scrolling, so `scrollIntoView`
+   * is stubbed onto the prototype and the assertions are about WHEN it fires
+   * and with what, not where the page ends up. The timing is the substance:
+   * at click time the grid row is still `0fr`, so a scroll fired there would
+   * measure a zero-height box — it has to wait for the height transition to
+   * land, except under reduced motion, where no transition ever fires and the
+   * open flip itself scrolls, instantly.
+   */
+  const scrollIntoView = vi.fn();
+  const original = HTMLElement.prototype.scrollIntoView;
+
+  beforeEach(() => {
+    scrollIntoView.mockClear();
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+  });
+
+  afterEach(() => {
+    HTMLElement.prototype.scrollIntoView = original;
+  });
+
+  it("scrolls the opened panel into view when its expansion lands", async () => {
+    const user = userEvent.setup();
+    const { note } = recommend("B", true, "bleeding-control");
+    const region = renderTherapies("B", true, "bleeding-control");
+
+    await user.click(headers(region)[1]);
+
+    /* Not at click time — the row is still 0fr and "nearest" would stop at the
+       header. The transition's end is what carries the real geometry. */
+    expect(scrollIntoView).not.toHaveBeenCalled();
+
+    const panel = within(region).getByRole("region", { name: note.strategies.title });
+    const wrapper = panel.parentElement!.parentElement!;
+
+    /* The panel's own opacity transition bubbles through the wrapper 70ms
+       before the height lands, and must not fire the scroll — that is what the
+       handler's target === currentTarget check is for. */
+    fireEvent.transitionEnd(panel);
+    expect(scrollIntoView).not.toHaveBeenCalled();
+
+    fireEvent.transitionEnd(wrapper);
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "nearest" });
+
+    /*
+      The landing pad: "nearest" aligns to the viewport's bottom, but below `lg`
+      the sidebar's fixed bottom bar owns the last 80px of it. `scroll-mb-bar`
+      is the same clearance `<main>` reserves as `pb-bar`, dropped at `lg` with
+      it — measured at 375×667, without it the panel's final lines settle
+      behind the bar.
+    */
+    expect(wrapper).toHaveClass("scroll-mb-bar", "lg:scroll-mb-0");
+  });
+
+  it("jumps instead of animating under prefers-reduced-motion", async () => {
+    setReducedMotion(true);
+    const user = userEvent.setup();
+    const region = renderTherapies("B", true, "bleeding-control");
+
+    /* Considerations opens on mount, and mount must not yank the page. */
+    expect(scrollIntoView).not.toHaveBeenCalled();
+
+    await user.click(headers(region)[1]);
+
+    /* `motion-reduce:transition-none` means no transitionend will ever come, so
+       the open flip itself scrolls — with no `behavior: "smooth"`, because a
+       smooth scroll is exactly the motion the preference declines. */
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest" });
   });
 });
 

@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { PopupButton } from "mlg-components";
 
 import ArchBand from "../../components/ArchBand";
@@ -117,7 +117,7 @@ export default function Therapies() {
         in a way the prose screens do not, and the 32px gap they share is a fact
         about a heading over prose rather than about headings.
       */}
-      <div className="mt-3">
+      <div className="mt-3 mb-4 lg:mb-0">
         <NoteDisclosure
           block={note.considerations}
           open={open === "considerations"}
@@ -328,6 +328,39 @@ function NoteDisclosure({
   const headerId = useId();
   const panelId = useId();
 
+  /**
+   * The collapsing wrapper, held so the newly opened panel can be scrolled into
+   * view. On a phone the Strategies band sits low enough that its panel can open
+   * entirely below the fold — the click lands, the accordion animates, and the
+   * learner sees nothing move. `block: "nearest"` is what makes this safe to run
+   * unconditionally: it scrolls the minimum that makes the panel visible and is
+   * a no-op wherever it already is, so desktop never twitches.
+   *
+   * The scroll fires from `onTransitionEnd` below, NOT from the click: at click
+   * time the row is still `0fr`, so "nearest" would measure a zero-height box
+   * and stop at the header, leaving the expansion to finish off-screen anyway.
+   * When the height lands the geometry is real, and the smooth scroll reads as
+   * the second half of one movement.
+   */
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * The reduced-motion path. `motion-reduce:transition-none` means the swap is
+   * instant and no `transitionend` ever fires, so the scroll has to come from
+   * the open flip itself — after render, when the panel already stands at full
+   * height. An instant jump rather than `behavior: "smooth"`, because a smooth
+   * scroll is exactly the motion the preference declines. Seeded with the mount
+   * state so the Considerations panel opening on arrival does not yank the page.
+   */
+  const wasOpen = useRef(open);
+  useEffect(() => {
+    const justOpened = open && !wasOpen.current;
+    wasOpen.current = open;
+    if (justOpened && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      wrapperRef.current?.scrollIntoView({ block: "nearest" });
+    }
+  }, [open]);
+
   return (
     <>
       {/*
@@ -428,8 +461,30 @@ function NoteDisclosure({
         header.
       */}
       <div
+        ref={wrapperRef}
+        /*
+          The target check matters: the panel's own opacity transition bubbles
+          through here 70ms earlier, and scrolling on that one would measure the
+          row mid-expansion. Only this element transitions on this element, so
+          target === currentTarget is the grid-rows landing and nothing else.
+        */
+        onTransitionEnd={(e) => {
+          if (open && e.target === e.currentTarget) {
+            e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+        }}
         className={cn(
           "grid transition-[grid-template-rows] duration-220 ease-out motion-reduce:transition-none",
+          /*
+            The scroll's landing pad. "Nearest" aligns the panel's bottom to the
+            VIEWPORT's bottom, but below `lg` the sidebar's fixed bottom bar owns
+            the last 80px of it — measured: without this the panel settles at
+            y=666.8 in a 667px viewport, its final lines behind the bar. The
+            margin is the same `--spacing-bar` clearance `<main>` reserves as
+            `pb-bar`, dropped at `lg` exactly where `<main>` drops it, because
+            the rail that replaces the bar hangs on the right edge instead.
+          */
+          "scroll-mb-bar lg:scroll-mb-0",
           open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
         )}
       >
