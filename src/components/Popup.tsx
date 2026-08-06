@@ -3,8 +3,9 @@ import { PopupButton } from "mlg-components";
 
 import { cn } from "../lib/cn";
 import { preserveCase } from "../lib/preserveCase";
+import { useExitContent } from "../lib/useExitContent";
 import { CLOSE_BUTTON_SIZE } from "./closeButton";
-import ModalLayer from "./ModalLayer";
+import ModalLayer, { MODAL_EXIT_MS } from "./ModalLayer";
 
 /**
  * The crimson band's horizontal padding, shared by the title and the subtitle.
@@ -137,11 +138,32 @@ export default function Popup({
   const titleId = useId();
   const subtitleId = useId();
 
+  /**
+   * What the card paints, which is not always what the caller is passing right
+   * now: `ModalLayer` fades this card out over `MODAL_EXIT_MS`, and every
+   * caller drops its content on the same render that closes. Held together as
+   * one bundle because they blank together and have to come back together — a
+   * card fading out under its own title with an empty body would be the same
+   * bug half-fixed.
+   *
+   * **The three that blank, and only those.** `surface` and `width` are fixed
+   * per call site — `wide` belongs to the Denecimig card whether it is open or
+   * not — so freezing them would be machinery guarding nothing. `open` itself
+   * is deliberately NOT held: it is what drives the close, and holding it would
+   * defer the close rather than animate it.
+   *
+   * This is why no caller needed changing for the exit fade. `Lightbox`, the
+   * other presentation, needs none of this either — its one caller
+   * (`ExpandableFigure`) renders its children unconditionally, so nothing there
+   * blanks on close.
+   */
+  const shown = useExitContent(open, { title, subtitle, children }, MODAL_EXIT_MS);
+
   return (
     <ModalLayer
       open={open}
       onClose={onClose}
-      aria-labelledby={subtitle ? `${titleId} ${subtitleId}` : titleId}
+      aria-labelledby={shown.subtitle ? `${titleId} ${subtitleId}` : titleId}
     >
       {/* Every width is a `min()` rather than a bare px: the card is a content
           container and the app runs down to 375px. `overflow-hidden` is what
@@ -246,31 +268,31 @@ export default function Popup({
           */}
           <h2
             id={titleId}
-            aria-label={title}
+            aria-label={shown.title}
             className={cn(
               BAND_INSET,
               "text-center font-display text-2xl leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase sm:text-3xl lg:text-5xl",
             )}
           >
-            {preserveCase(title)}
+            {preserveCase(shown.title)}
           </h2>
 
           {/* Same inset as the title, so the two lines share one centre and one
               clearance from the ✕. 20px lands on `text-xl` exactly, but that
               token carries weight 600 and the design draws 500 — hence the
               explicit `font-medium` rather than a raw size. */}
-          {subtitle && (
+          {shown.subtitle && (
             <p
               id={subtitleId}
               // Same treatment and the same reason as the title above: this line
               // is `uppercase` too, and it joins the accessible name.
-              aria-label={subtitle}
+              aria-label={shown.subtitle}
               className={cn(
                 BAND_INSET,
                 "mt-1 text-center font-display text-xl font-medium tracking-wide text-white uppercase",
               )}
             >
-              {preserveCase(subtitle)}
+              {preserveCase(shown.subtitle)}
             </p>
           )}
 
@@ -286,7 +308,7 @@ export default function Popup({
               above be "the button at this step, plus 22". */}
           <div className="absolute top-1/2 right-5.5 -translate-y-1/2">
             <PopupButton
-              label={title}
+              label={shown.title}
               open
               className={CLOSE_BUTTON_SIZE}
               onClick={() => onClose()}
@@ -309,7 +331,9 @@ export default function Popup({
             Only the horizontal padding ramps. `py-2` is 16px of clearance
             between the band and the content, which is the same job at every
             width — and `PopupFigure`'s `reserve` is measured off it. */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2 sm:px-8 lg:px-16">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2 sm:px-8 lg:px-16">
+          {shown.children}
+        </div>
       </div>
     </ModalLayer>
   );

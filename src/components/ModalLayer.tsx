@@ -3,6 +3,21 @@ import { type ReactNode, useEffect, useRef } from "react";
 import { cn } from "../lib/cn";
 
 /**
+ * How long the exit fade runs, in milliseconds.
+ *
+ * **This and the `duration-150` on the closed state below are one number stated
+ * twice, and they must agree.** The CSS runs the animation; this is what tells a
+ * caller how long the fading card still has to be *rendered* for. Set this
+ * shorter than the CSS and the content blanks mid-fade — the exact bug the
+ * retention exists to fix; set it longer and the subtree lingers, hidden, past
+ * the point anything can see it.
+ *
+ * Exported rather than duplicated because the only consumer is `Popup`, which
+ * cannot read a Tailwind class. See `useExitContent`.
+ */
+export const MODAL_EXIT_MS = 150;
+
+/**
  * The `<dialog>` itself: a transparent, viewport-filling layer with a scrim,
  * and the four behaviours every modal in this app needs. It draws nothing.
  *
@@ -30,6 +45,13 @@ import { cn } from "../lib/cn";
  * **`open` is the single source of truth.** The `cancel` handler
  * preventDefaults, so the element never closes itself behind React's back — ESC
  * routes through `onClose` like every other close, and the two cannot disagree.
+ *
+ * **It fades and scales both ways, and that is CSS on the `[open]` flip** — no
+ * JS timing and nothing awaiting an animation, so the sentence above stays
+ * true. `close()` is still called the moment `open` goes false; the exit is the
+ * platform holding a closed element painted, not this component deferring the
+ * close. See the class list, and `MODAL_EXIT_MS` for the one thing a caller
+ * owes the exit.
  */
 export default function ModalLayer({
   open,
@@ -160,6 +182,54 @@ export default function ModalLayer({
       }}
       className={cn(
         "fixed inset-0 m-0 hidden size-full max-h-none max-w-none place-items-center border-0 bg-transparent p-0 backdrop:bg-black/50 open:grid",
+        /*
+          Enter and exit, and all of it is CSS on the `[open]` flip — the layer
+          fades from transparent and grows from 0.95, and the scrim fades under
+          it. The layer is what scales, and the content is centred in it, so
+          what reads is the card growing into place.
+
+          Three platform pieces carry it, and each degrades to an instant
+          open/close where unsupported rather than breaking:
+
+          - **`starting:*` is `@starting-style`, and it is required rather than
+            belt-and-braces.** `display` goes `none → grid` on open, so the
+            element has no previously-rendered style to transition FROM;
+            without a starting style there is nothing to interpolate and the
+            entry is a hard cut with every transition here still in place.
+          - **`transition-discrete` (`transition-behavior: allow-discrete`)
+            plus `display` and `overlay` in the property list is the exit.**
+            `close()` drops `[open]` immediately — the platform still gets its
+            close event on time, and the scroll lock still lifts on it — but
+            the discrete transition holds the rendered `display` and the
+            top-layer membership until the fade finishes. `overlay` is the
+            load-bearing half: without it the element leaves the top layer at
+            once and is re-clipped by the ancestors it escaped, so a
+            `DisclosureBand` card would vanish into the arch's `overflow-hidden`
+            instead of fading.
+          - The `::backdrop` needs its own copy of every state because it does
+            not inherit from the dialog.
+
+          **220ms in, 150ms out**, both on the app's existing duration scale
+          (`OptionGroup` 120, `ExpandableFigure` 150, `Therapies` 220), and out
+          faster than in because a dismissal is a confirmation rather than
+          content to read. A transition takes its duration from the state it is
+          heading TO, so the base `duration-150` times the exit and
+          `open:duration-220` the entry — one pair of classes, both directions.
+
+          **`pointer-events-none` while closed is a consequence of the exit,
+          not polish.** For those 150ms the layer is still a full-viewport paint
+          target, but `[open]` is gone, so the page behind it is no longer
+          inert — without this the fading scrim would swallow the first click
+          aimed at the page under it. (The `::backdrop` was never a hit target;
+          see the element comment above.)
+
+          `motion-reduce` drops both transitions and restores the instant
+          open/close this component has always had.
+        */
+        "pointer-events-none scale-95 opacity-0 open:pointer-events-auto open:scale-100 open:opacity-100 starting:open:scale-95 starting:open:opacity-0",
+        "transition-[opacity,scale,display,overlay] transition-discrete duration-150 ease-out open:duration-220 motion-reduce:transition-none",
+        "backdrop:opacity-0 open:backdrop:opacity-100 starting:open:backdrop:opacity-0",
+        "backdrop:transition-[opacity,display,overlay] backdrop:transition-discrete backdrop:duration-150 backdrop:ease-out open:backdrop:duration-220 motion-reduce:backdrop:transition-none",
         className,
       )}
     >

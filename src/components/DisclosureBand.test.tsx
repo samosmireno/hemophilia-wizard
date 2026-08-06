@@ -60,7 +60,16 @@ describe("DisclosureBand", () => {
     await userEvent.click(trigger("First figure"));
     await userEvent.click(trigger("First figure", "Close"));
 
-    expect(screen.queryByText("first panel")).not.toBeInTheDocument();
+    /*
+      Closed is the dialog's `open`, not the panel's absence from the document.
+      `Popup` holds the last open content rendered for `MODAL_EXIT_MS` so its
+      exit fade has a card to paint — this band is exactly the caller that
+      needed it, since `{open?.content}` goes `undefined` on the same render
+      that closes. The panel is therefore still in the DOM here, and hidden by
+      the closed dialog's `display: none`, which is UA CSS jsdom does apply.
+    */
+    expect(dialog()).not.toHaveAttribute("open");
+    expect(screen.getByText("first panel")).not.toBeVisible();
   });
 
   // The placeholder state issue 11 accepts: a trigger with no assets behind it

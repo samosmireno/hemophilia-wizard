@@ -19,6 +19,27 @@ const NXT007_STRUCTURE = topicById("nxt007-structure")!;
 const PANEL_HEADING = "Investigational FVIII mimetic therapies in earlier-stage development:";
 
 /**
+ * Every card that is currently up — which for this chapter should never be more
+ * than one, and is what the three mutual-exclusion tests below actually mean.
+ *
+ * **Stated as "which are open" rather than by position**, unlike the per-block
+ * `dialogs()[n]` helpers. `Popup` holds its last open content rendered for the
+ * length of `MODAL_EXIT_MS` so the exit fade has a card to paint, so for that
+ * window a just-closed card still carries its body — and, for the three that
+ * hold a figure, that body's nested `<dialog>`. Indices between two cards are
+ * therefore transient, and the mutual-exclusion tests are the only ones that
+ * span a close and an open closely enough to see it.
+ *
+ * **Not by accessible name either**, which is the obvious alternative and does
+ * not work: a closed dialog is `display: none`, and the name algorithm ignores
+ * hidden content, so every shut card computes to `""` no matter what its band
+ * still says. Only an open dialog can be found by name — which is exactly what
+ * the assertions pair this with.
+ */
+const openCards = () =>
+  screen.getAllByRole("dialog", { hidden: true }).filter((d) => d.hasAttribute("open"));
+
+/**
  * NXT007's display name — a chapter literal too, and since 2026-08-05 the INN
  * ahead of the code name, where `NXT007.title` still transcribes the source's
  * bare "NXT007". The chapter uses it for both the panel's caption and the card's
@@ -530,11 +551,14 @@ describe("the Denecimig card", () => {
     render(<FviiiaMimetics />);
 
     await user.click(screen.getByRole("button", { name: `Expand ${EMICIZUMAB.title}` }));
-    expect(dialogs()[0]).toHaveAttribute("open");
+    expect(openCards()).toHaveLength(1);
+    expect(openCards()[0]).toHaveAccessibleName("Emicizumab");
 
     await user.click(screen.getByRole("button", { name: `Expand ${DENECIMIG.title}` }));
-    expect(dialogs()[0]).not.toHaveAttribute("open");
-    expect(card()).toHaveAttribute("open");
+    // One card up, and it is the new one — the Emicizumab card being shut is
+    // the same fact as it not being in this list.
+    expect(openCards()).toHaveLength(1);
+    expect(openCards()[0]).toHaveAccessibleName("Denecimig (Mim8)");
   });
 });
 
@@ -732,11 +756,12 @@ describe("the NXT007 card", () => {
     render(<FviiiaMimetics />);
 
     await user.click(screen.getByRole("button", { name: `Expand ${DENECIMIG.title}` }));
-    expect(dialogs()[1]).toHaveAttribute("open");
+    expect(openCards()).toHaveLength(1);
+    expect(openCards()[0]).toHaveAccessibleName("Denecimig (Mim8)");
 
     await user.click(disclosure(`Expand ${NXT007_CAPTION}`));
-    expect(dialogs()[1]).not.toHaveAttribute("open");
-    expect(card()).toHaveAttribute("open");
+    expect(openCards()).toHaveLength(1);
+    expect(openCards()[0]).toHaveAccessibleName(NXT007_CAPTION);
   });
 });
 
@@ -887,11 +912,12 @@ describe("the Inno8 card", () => {
     render(<FviiiaMimetics />);
 
     await user.click(disclosure(`Expand ${NXT007_CAPTION}`));
-    expect(dialogs()[2]).toHaveAttribute("open");
+    expect(openCards()).toHaveLength(1);
+    expect(openCards()[0]).toHaveAccessibleName(NXT007_CAPTION);
 
     await user.click(disclosure("Expand Inno8"));
-    expect(dialogs()[2]).not.toHaveAttribute("open");
-    expect(card()).toHaveAttribute("open");
+    expect(openCards()).toHaveLength(1);
+    expect(openCards()[0]).toHaveAccessibleName("Inno8: Oral FVIII Mimetic for HA");
   });
 });
 

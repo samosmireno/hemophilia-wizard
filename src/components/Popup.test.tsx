@@ -35,6 +35,73 @@ describe("Popup", () => {
     expect(dialog()).not.toHaveAttribute("open");
   });
 
+  /**
+   * The enter/exit animation, held as classes for the reason the width tests
+   * give: jsdom applies no Tailwind and runs no transitions, so a class is the
+   * only thing about this a test here can fail on.
+   *
+   * Two of these are the ones whose loss is *silent* — the others still compile
+   * and still look right in review while the animation quietly stops:
+   *
+   * - `starting:open:opacity-0` is `@starting-style`. `display` goes
+   *   `none → grid` on open, so without a starting style there is no
+   *   previously-rendered style to transition from and the entry is a hard cut.
+   * - `transition-discrete` is `transition-behavior: allow-discrete`, and with
+   *   `display`/`overlay` in the property list it is the whole exit: it keeps
+   *   the closed element painted, and in the top layer, while it fades.
+   *
+   * `motion-reduce:transition-none` is the other half of the contract: the app
+   * drops every transition it owns under `prefers-reduced-motion` (`Therapies`,
+   * `ExpandableFigure`), and this is the modal's copy of that rule.
+   */
+  it("carries the enter and exit transition classes, including the silent two", () => {
+    render(
+      <Popup open title={TITLE} onClose={vi.fn()}>
+        <p>body</p>
+      </Popup>,
+    );
+
+    expect(dialog()).toHaveClass(
+      "starting:open:opacity-0",
+      "starting:open:scale-95",
+      "open:opacity-100",
+      "open:scale-100",
+      "transition-[opacity,scale,display,overlay]",
+      "transition-discrete",
+      "pointer-events-none",
+      "open:pointer-events-auto",
+      "motion-reduce:transition-none",
+    );
+  });
+
+  /**
+   * The exit's other half, and the reason it needed a follow-up rather than
+   * coming free with the CSS: the card has to still be *rendered* while it
+   * fades, but every caller drops its content on the same render that closes.
+   * `DisclosureBand` is the worst case and the one modelled here — it passes
+   * `undefined` children *and* an empty title, so without the hold the fade
+   * would paint an empty card under a blank band.
+   *
+   * jsdom runs no transitions, so what a test can hold is the DOM half: the old
+   * title and body are still there after a close that dropped both, and the
+   * closed dialog hides them. The timer that ends the window is not asserted —
+   * `useExitContent`'s own suite owns that.
+   */
+  it("keeps the last open title and body rendered after close, for the exit fade", () => {
+    const { rerender } = render(
+      <Popup open title={TITLE} onClose={vi.fn()}>
+        <p>body</p>
+      </Popup>,
+    );
+
+    // Exactly what `DisclosureBand` passes once nothing is selected.
+    rerender(<Popup open={false} title="" onClose={vi.fn()} />);
+
+    expect(dialog()).not.toHaveAttribute("open");
+    expect(screen.getByRole("heading", { hidden: true })).toHaveTextContent(TITLE);
+    expect(screen.getByText("body")).not.toBeVisible();
+  });
+
   it("names the dialog with its title", () => {
     render(
       <Popup open title={TITLE} onClose={vi.fn()}>
