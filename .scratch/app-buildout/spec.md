@@ -63,7 +63,7 @@ the line, each reachable anytime from its own sidebar button.
 
 1. `/` — **Landing page** (net-new; not in the blueprint). Dedicated page, not a redirect.
    2–5. `/education/:section` — Education is a **multi-chapter module**; chapters in order:
-   `disease-background`, `treatment-landscape`, `rebalancing-agents`, `fviiia-mimetics`
+   `disease-background`, `treatment-landscape`, `rebalancing-agents`, `fviii-mimetics`
    (last two are wizard cross-link targets, so their URLs must be stable). Bare `/education`
    redirects to `disease-background`; unknown `:section` → `disease-background` (first chapter).
 2. `/wizard` — branching decision tree (Q1 type → Q2 inhibitors → Q3 reason → leaf).

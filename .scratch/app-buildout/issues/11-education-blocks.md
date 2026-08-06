@@ -20,8 +20,8 @@ Build the multi-chapter background/education module as `/education/:section` sub
     matrix** (§7.3, `[PPTX]` slide 7); clotting-factor-replacement benefits/challenges (§7.4).
   - `rebalancing-agents` — NFTs & hemostatic rebalancing agents + emerging agents
     NXT007/Inno8 (§7.6).
-  - `fviiia-mimetics` — FVIIIa-mimetic BsAbs incl. emicizumab + Mim8/denecimig (§7.5).
-- `rebalancing-agents` and `fviiia-mimetics` are **cross-link targets from the wizard's
+  - `fviii-mimetics` — FVIIIa-mimetic BsAbs incl. emicizumab + Mim8/denecimig (§7.5).
+- `rebalancing-agents` and `fviii-mimetics` are **cross-link targets from the wizard's
   branch-landing panels** (issue 08) — their URLs must be stable/addressable.
 - Long-form content within a chapter uses `Accordion` (issue 03) where appropriate; the
   source's **"Click here" figures** (§7.7) are **in-chapter local-state popups** — NOT
@@ -37,7 +37,7 @@ Build the multi-chapter background/education module as `/education/:section` sub
   bare `/education` lands on the first chapter; unknown section → first chapter (no not-found page).
 - All education content from CONTEXT.md present and correctly sourced.
 - Cross-links to glossary (issue 12) resolve; wizard deep-links to `rebalancing-agents`
-  and `fviiia-mimetics` resolve.
+  and `fviii-mimetics` resolve.
 
 ## Notes
 
@@ -297,4 +297,4 @@ is contradicted — but the badge is net-new visible UI no artboard draws, so pu
 in front of the client at the next visual review alongside the mlg-reskin all-five
 check. Rationale in `docs/styling.md` ("The figure that opens itself") and the
 component's own comments; verified in Chromium under emulated `hover: none` on
-both `disease-background` and the `fviiia-mimetics` cards.
+both `disease-background` and the `fviii-mimetics` cards.

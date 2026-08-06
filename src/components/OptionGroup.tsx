@@ -230,12 +230,16 @@ export default function OptionGroup<T extends string>({
 
                   Hover and press are undrawn — the artboard has two frames, both
                   at rest — so they follow the model the Button skin states: the
-                  ground LIFTS on hover and PUSHES one step darker on press.
+                  ground LIFTS on hover and PUSHES one step darker on press. The
+                  press moves the GROUND only; the label keeps its hover colour,
+                  because every press here releases into the chosen skin's white,
+                  and a 120ms dip to #939393 between two light frames reads as a
+                  blink on each click.
 
                   Hover on a passed-over option lifts it back to the resting skin
                   ("you can pick me"), which is the one invented behaviour here.
                   Its press is then the same declaration as the untouched one's,
-                  and lands on the colour it already rests at — i.e. pressing it
+                  and lands on the ground it already rests at — i.e. pressing it
                   drops the hover lift, which is exactly the press it should be.
                 */
                 selected &&
@@ -246,7 +250,7 @@ export default function OptionGroup<T extends string>({
                 !selected &&
                   !answered &&
                   "bg-ui-btn-bg text-ui-btn-fg hover:bg-ui-btn-bg-hover hover:text-ui-btn-fg-hover",
-                !selected && "active:bg-ui-btn-bg-active active:text-ui-btn-fg-active",
+                !selected && "active:bg-ui-btn-bg-active",
                 /*
                   The focus ring is the input's, drawn on the label — the input
                   itself is `sr-only`, i.e. a 1px clip, so a ring on it would be

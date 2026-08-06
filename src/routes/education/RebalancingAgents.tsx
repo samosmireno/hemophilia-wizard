@@ -305,23 +305,31 @@ export default function RebalancingAgents() {
           it underneath — and left-aligned to the group's left edge rather than
           to the content column's.
 
-          `flex-wrap` rather than an `lg:` switch: the only thing that has to
-          give below the canvas is the button dropping under the caption, and
-          the row does that on its own. It does not, in the event — at 375 the
-          caption shrinks to 311 − 24 − 65 = 222px and the two still share the
-          line, which is well clear of its 150px min-content ("rebalancing" at
-          20px bold). The wrap is the guard, not the shipped behaviour.
+          Below `sm` the row becomes a centred column with the button ON TOP
+          and the caption under it — `flex-col-reverse`, so the DOM keeps
+          caption-then-button (what a screen reader hears, and what `sm:` and
+          up show) while the phone paints the `+` first. From `sm` up the
+          shipped behaviour is unchanged: caption left of the button, sharing
+          a line, with `sm:flex-wrap` as the guard — at 640 the caption gets
+          well over its 150px min-content ("rebalancing" at 20px bold), so the
+          wrap should never fire.
 
           `mt-20` does not ramp. It is one of §11's eight vertical gaps, which
           are deliberately left unramped pending one one-screen rule across all
           four chapters (open item 10) rather than answered per page.
         */}
-        <div className={cn(GROUP, "mt-20 flex flex-wrap items-start gap-x-6 gap-y-4")}>
+        <div
+          className={cn(
+            GROUP,
+            "mt-20 flex flex-col-reverse items-center gap-y-4",
+            "sm:flex-row sm:flex-wrap sm:items-start sm:gap-x-6",
+          )}
+        >
           {/* One step down below `lg`, which lands this on the same
               `text-xl lg:text-2xl` the other three chapters' disclosure
               captions take — so all four now agree on caption size as well as
               on colour (`--color-popup-caption`, open item 15). */}
-          <p className="max-w-135 text-xl font-bold text-popup-caption lg:text-2xl">
+          <p className="max-w-135 text-center text-xl font-bold text-popup-caption sm:text-left lg:text-2xl">
             {MECHANISMS_LABEL}
           </p>
 
@@ -499,7 +507,7 @@ function MechanismsCard({ onViewMechanism }: { onViewMechanism: () => void }) {
  * fourteen-label coagulation cascade at a third of drawn size, which is the
  * densest figure in the app and therefore the least legible there. That is a
  * `PopupFigure` question, not a chapter one: the same cap governs
- * `disease-background`'s two diagrams and all four of `fviiia-mimetics`', and
+ * `disease-background`'s two diagrams and all four of `fviii-mimetics`', and
  * the scroll-region answer the tables took (§11) would have to be taken for all
  * seven at once or not at all. `MECHANISM_FIGURE_ALT` below is the route to what
  * the diagram says either way, which is why it is as long as it is. Raised as

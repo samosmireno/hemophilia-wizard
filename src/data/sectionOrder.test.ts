@@ -9,7 +9,7 @@ describe("sectionOrder", () => {
       "/education/disease-background",
       "/education/treatment-landscape",
       "/education/rebalancing-agents",
-      "/education/fviiia-mimetics",
+      "/education/fviii-mimetics",
       "/education/prophylaxis-guidance",
       "/wizard-intro",
       "/wizard",
@@ -29,7 +29,7 @@ describe("sectionOrder", () => {
 
   it("nextOf steps forward through the spine", () => {
     expect(nextOf("/")).toBe("/education/disease-background");
-    expect(nextOf("/education/fviiia-mimetics")).toBe("/education/prophylaxis-guidance");
+    expect(nextOf("/education/fviii-mimetics")).toBe("/education/prophylaxis-guidance");
     expect(nextOf("/education/prophylaxis-guidance")).toBe("/wizard-intro");
     expect(nextOf("/wizard-intro")).toBe("/wizard");
     // The wizard's own three steps, then out of it.
@@ -45,7 +45,7 @@ describe("sectionOrder", () => {
     expect(prevOf("/wizard/scenario")).toBe("/wizard");
     expect(prevOf("/wizard")).toBe("/wizard-intro");
     expect(prevOf("/wizard-intro")).toBe("/education/prophylaxis-guidance");
-    expect(prevOf("/education/prophylaxis-guidance")).toBe("/education/fviiia-mimetics");
+    expect(prevOf("/education/prophylaxis-guidance")).toBe("/education/fviii-mimetics");
     expect(prevOf("/education/disease-background")).toBe("/");
   });
 

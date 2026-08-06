@@ -21,7 +21,7 @@ file it came from** so it can be re-verified and updated.
   dropped the agent prefix from its bullets — see §7.5); previously 2026-08-03 (the Denecimig
   artboard split `denecimig-moa` off the overview and
   authored a class-level MOA bullet §7.5 files under emicizumab — see §7.5); previously 2026-07-31
-  (the `fviiia-mimetics` artboard refiled §7.6's two investigational
+  (the `fviii-mimetics` artboard refiled §7.6's two investigational
   agents onto §7.5 — see both sections); previously 2026-07-27 (full re-scan of `[PDF-V]` as a diagram, not just text — traced
   branch connections, color-coding, and all 32 pop-up notes, see [§4](#4-treatment-wizard-flow-main-engine);
   plus a `[PPTX]` re-scan that completed the education content in [§7](#7-education-content))
@@ -197,7 +197,7 @@ shown before the reason question) `[PDF-V]`:
 
 ᴮ `[BUILD]` **the artboard sets this one plural where `[PDF-V]` sets it singular** ("Hemostatic
 rebalancing agent"). The app renders the plural, on the standing rule that the artboard is the
-filing authority where the two disagree — the same call recorded for the `fviiia-mimetics` cards'
+filing authority where the two disagree — the same call recorded for the `fviii-mimetics` cards'
 copy. Note the first item in the same list _is_ singular on both, deliberately.
 
 ᶜ `[CLIENT]` 2026-08-05 copy edit — the "a" was dropped from "Factor VIIIa mimetic" on this screen
@@ -537,7 +537,7 @@ chapters:
 | `disease-background`   | §7.2                                                              |
 | `treatment-landscape`  | §7.1, §7.3, §7.4 (first bullet + benefits/challenges)             |
 | `rebalancing-agents`   | §7.6 NFTs + rebalancing agents (wizard cross-link target)         |
-| `fviiia-mimetics`      | §7.5, incl. the investigational agents (wizard cross-link target) |
+| `fviii-mimetics`      | §7.5, incl. the investigational agents (wizard cross-link target) |
 | `prophylaxis-guidance` | §7.4 prophylaxis guidance (last chapter)                          |
 
 The §7.7 "Click here:" figures are **in-chapter local-state pop-ups** — not routes, and not the
@@ -611,13 +611,13 @@ inter-individual variability and uncertain duration.
 
 `[BUILD]` **the chapter says "FVIII mimetic" where this section says "FVIIIa-mimetic"**, on a
 client copy edit of 2026-08-05: the `a` and the hyphen come out of every string the app paints on
-`/education/fviiia-mimetics` — the `<h1>`, all four chapter bullets, both MOA bullets, the panel
+`/education/fviii-mimetics` — the `<h1>`, all four chapter bullets, both MOA bullets, the panel
 heading, and the Inno8 band. This section keeps `[PDF-V]`'s wording below, because that is what
 the source says and this is the transcription of it. Two strings in the app were held back at
 first — `denecimig-moa.title` and the quoted heading in `DENECIMIG_FIGURE_ALT` quote the line
 baked into `denecimig.webp`'s pixels rather than copy the app sets — and the client then supplied
 a re-export painting "FVIII MIMETIC BSAB", so both now quote that and the hold is spent. The route
-slug, the topic ids and the component name are unaffected — `fviiia-mimetics` is contractual
+slug, the topic ids and the component name are unaffected — `fviii-mimetics` is contractual
 (issue 08 cross-links to it). Elsewhere in the app the source's wording still stands: `/explore`'s
 "FVIIIa mimetics" column, the glossary, and the §7.7 wizard notes were outside the edit.
 
@@ -667,7 +667,7 @@ on the same direction; the §7.7 wizard notes and the other six sheets keep the 
   constant: two agents state the same class fact from two sources, and a card reading the _other_
   agent's topic would let an edit to emicizumab's copy silently rewrite this one.
 - **Investigational FVIIIa-mimetic therapies in early-stage development** (moved here from §7.6,
-  2026-07-31): the source lists these under the NFT block, but the `fviiia-mimetics` artboard
+  2026-07-31): the source lists these under the NFT block, but the `fviii-mimetics` artboard
   draws them on this chapter — in its own corner panel, with a separate click-through per agent —
   which is the filing the app follows. `[BUILD]` models them as one topic per agent
   (`nxt007-overview`, `inno8-overview`).

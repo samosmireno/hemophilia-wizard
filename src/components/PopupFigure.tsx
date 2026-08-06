@@ -67,7 +67,7 @@
  * know about: `rebalancing-agents` puts a footnote and a back arrow under the
  * picture, so its card starts scrolling a little sooner than 10rem implies. A
  * footnote losing its last line to a scroll is a nuisance; a caller whose chrome
- * is the *point* — `fviiia-mimetics` sets the MOA sentence under the diagram —
+ * is the *point* — `fviii-mimetics` sets the MOA sentence under the diagram —
  * loses it below the fold entirely. Hence `reserve`: the default stays measured
  * off `Popup` alone, so the callers with no chrome are unaffected, and a caller
  * that has some states its own budget rather than discovering it as a scrollbar.

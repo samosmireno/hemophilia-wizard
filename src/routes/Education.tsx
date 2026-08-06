@@ -1,7 +1,7 @@
 import { Navigate, useParams } from "react-router";
 
 import DiseaseBackground from "./education/DiseaseBackground";
-import FviiiaMimetics from "./education/FviiiaMimetics";
+import FviiiMimetics from "./education/FviiiMimetics";
 import ProphylaxisGuidance from "./education/ProphylaxisGuidance";
 import RebalancingAgents from "./education/RebalancingAgents";
 import TreatmentLandscape from "./education/TreatmentLandscape";
@@ -14,7 +14,7 @@ const EDUCATION_DEFAULT = "/education/disease-background";
  * validity gate for `:section` and the dispatch table — one source of truth, so
  * a chapter cannot be routable without a component or vice versa.
  *
- * `rebalancing-agents` and `fviiia-mimetics` are wizard cross-link targets, so
+ * `rebalancing-agents` and `fviii-mimetics` are wizard cross-link targets, so
  * their slugs are contractual. Walkthrough ORDER is not decided here — that is
  * `SECTION_ORDER` in `src/data/sectionOrder.ts`.
  *
@@ -27,7 +27,7 @@ const CHAPTERS = {
   "disease-background": DiseaseBackground,
   "treatment-landscape": TreatmentLandscape,
   "rebalancing-agents": RebalancingAgents,
-  "fviiia-mimetics": FviiiaMimetics,
+  "fviii-mimetics": FviiiMimetics,
   "prophylaxis-guidance": ProphylaxisGuidance,
 } as const;
 

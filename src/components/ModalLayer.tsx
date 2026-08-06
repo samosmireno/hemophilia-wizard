@@ -36,7 +36,7 @@ export const MODAL_EXIT_MS = 150;
  * `TopRule`'s `z-30` band and the sidebar's z-40/z-50 chrome without owning a
  * z-index of its own.
  *
- * **It nests.** `fviiia-mimetics` opens a figure inside a card, and closing the
+ * **It nests.** `fviii-mimetics` opens a figure inside a card, and closing the
  * inner one leaves the outer standing — see the three reasons in docs/styling.md
  * §13. Two of them live here: the `cancel` handler is attached to the element
  * rather than delegated, and the backdrop guard compares against

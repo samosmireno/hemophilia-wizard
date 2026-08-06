@@ -423,7 +423,7 @@ describe("wizard therapies — the drug sheets", () => {
     await user.click(within(region).getByRole("button", { name: "Expand Denecimig" }));
 
     /*
-      The caption/title split `fviiia-mimetics` records, here spanning two
+      The caption/title split `fviii-mimetics` records, here spanning two
       components: the page knows the agent, the sheet knows what the card is
       called. A reader hears "Expand Denecimig" on the `+` and
       "Denecimig (emerging/investigational)" on the dialog.
@@ -517,7 +517,7 @@ describe("wizard therapies — the responsive pass", () => {
    * looks. The drawn 20/28 shipped as `leading-7`, which is absolute — against a
    * 16px step it renders 1.75, i.e. the step loosening what it was meant to
    * tighten. The ratio is what survives both sizes with one class, which is §2's
-   * own lesson from `fviiia-mimetics`.
+   * own lesson from `fviii-mimetics`.
    */
   it.each(LEAVES)(
     "steps the panel bullets to the floor, on a ratio, %s/%s/%s",

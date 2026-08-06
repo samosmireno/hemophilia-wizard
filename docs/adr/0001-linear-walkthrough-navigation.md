@@ -18,7 +18,7 @@ The Prev/Next spine is a fixed sequence of eleven steps:
 2. `/education/disease-background`
 3. `/education/treatment-landscape`
 4. `/education/rebalancing-agents`
-5. `/education/fviiia-mimetics`
+5. `/education/fviii-mimetics`
 6. `/education/prophylaxis-guidance`
 7. `/wizard-intro` — hands the learner off from education into the wizard
 8. `/wizard`

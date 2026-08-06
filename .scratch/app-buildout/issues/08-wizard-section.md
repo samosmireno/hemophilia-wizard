@@ -179,7 +179,7 @@ Against this issue's acceptance criteria:
 - _Drug names open the drug-sheet overlay by appending `?drug=<id>`_ — **knowingly unmet,
   and the last thing this issue is waiting on.** The `+` buttons are drawn and toggle to
   ✕, but open nothing and carry no `aria-haspopup`, which is the state
-  `education/fviiia-mimetics` records for its own card-less disclosure. `DRUG_SHEETS`
+  `education/fviii-mimetics` records for its own card-less disclosure. `DRUG_SHEETS`
   has all six recommendable agents ready; what is missing is issue 10's routing decision
   about where a sheet lives and what closing one does to history, and pre-empting it here
   would have settled it by accident. `therapies.test.tsx` has a test asserting the absent

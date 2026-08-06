@@ -50,7 +50,7 @@ export interface DrugSheet {
    * is not the agent's name. Falls back to `agent`.
    *
    * This is the caption/title split the education chapters record (see
-   * `fviiia-mimetics`' `CARD_TITLE`): the button announces "Expand Denecimig",
+   * `fviii-mimetics`' `CARD_TITLE`): the button announces "Expand Denecimig",
    * because the agent is what the reader picked, and the card is named for what
    * the source calls the sheet. Stored in sentence case — every band in this app
    * is shouted by CSS, not by copy.

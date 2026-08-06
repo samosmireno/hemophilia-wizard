@@ -9,13 +9,13 @@ import { useLayoutEffect, useRef, useState } from "react";
  * modal caller in this app derives its content from *which* thing is open, so
  * the content goes on the same render the dialog closes — `DisclosureBand`
  * passes `undefined` children and an empty title, `DrugSheetPopup` resolves no
- * sheet, `fviiia-mimetics` unmounts each card body behind `openId === …`. That
+ * sheet, `fviii-mimetics` unmounts each card body behind `openId === …`. That
  * was invisible while closing was instant. With an exit fade it is 150ms of
  * empty card under a blank band, which is worse than no animation at all.
  *
  * **Held for a window, not kept forever.** The obvious fix — snapshot the last
  * value and keep rendering it — is wrong in a way that only shows up later: the
- * held subtree stays *mounted*, so `fviiia-mimetics` would keep four card
+ * held subtree stays *mounted*, so `fviii-mimetics` would keep four card
  * bodies and their nested figure dialogs alive for the life of the page, and
  * the deliberate `openId === …` unmounting at those call sites would silently
  * stop meaning anything. Releasing on a timer puts the tree back exactly as it

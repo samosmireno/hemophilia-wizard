@@ -265,7 +265,7 @@ export const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
     lead: "Therapeutic classes to consider for prophylaxis of HA _with_ inhibitors",
     /**
      * **"agents" is the artboard's; `[PDF-V]` sets it singular.** The artboard is
-     * the filing authority for anything rendered — the call `fviiia-mimetics`
+     * the filing authority for anything rendered — the call `fviii-mimetics`
      * records twice for its own copy — and the singular reads as a source slip
      * rather than a distinction, since the same list's FIRST item is deliberately
      * singular here where `A-without`'s is plural.

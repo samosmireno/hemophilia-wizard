@@ -68,7 +68,7 @@ describe("router", () => {
       "prophylaxis-guidance",
       "Prophylactic treatment is recommended over episodic treatment to control bleeding in patients with moderately severe/severe hemophilia",
     ],
-    ["fviiia-mimetics", "FVIII Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis"],
+    ["fviii-mimetics", "FVIII Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis"],
   ])("renders the %s chapter", (section, title) => {
     renderAt(`/education/${section}`);
     expect(heading()).toHaveTextContent(title);

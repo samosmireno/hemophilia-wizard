@@ -239,7 +239,7 @@ export default function Therapies() {
                 is (17,29,46), which is slate-100 exactly; the education
                 chapters' captions sample (7,70,85), which is what
                 `--color-popup-caption` was derived to hit. The two bands wear
-                different caption colours, and `education/fviiia-mimetics`
+                different caption colours, and `education/fviii-mimetics`
                 already records slate-100 arriving "new and exact" on a fourth
                 artboard. Transcribed, per the §3/§4 rule.
 
@@ -432,14 +432,17 @@ function NoteDisclosure({
               (docs/styling.md §4.4), and press recesses to the open band's own
               inset — so touching a closed header previews the state it is about
               to enter, the move `--color-ui-popup-bg-active` already makes below
-              it.
+              it. The press moves ground and shadow only; the label keeps its
+              hover colour, because releasing lands on the open band's white and
+              a 120ms dip to the dark `fg-active` mix between two light frames
+              reads as a blink on each click.
             */
             open
               ? "cursor-default bg-note-open shadow-note-open"
               : cn(
                   "cursor-pointer bg-note-closed shadow-note-closed",
                   "hover:text-ui-popup-fg-hover hover:shadow-note-closed-hover",
-                  "active:bg-ui-popup-bg-active active:text-ui-popup-fg-active",
+                  "active:bg-ui-popup-bg-active",
                   "active:shadow-note-closed-active",
                 ),
             /*
@@ -584,7 +587,7 @@ function NoteDisclosure({
               render 1.75 against a 16px step — the step loosening what it was
               meant to tighten. 1.4 is the ratio 20/28 already renders at, so one
               class covers both sizes and the 1440 canvas is unchanged. That is
-              §2's own lesson from `fviiia-mimetics`: a `leading-*` on the scale
+              §2's own lesson from `fviii-mimetics`: a `leading-*` on the scale
               does not survive a size ramp, a ratio does. (`ArchBand`'s title is
               the other half of it — a caller's ratio survives a size step there
               for the same reason, because both set `--tw-leading`.)

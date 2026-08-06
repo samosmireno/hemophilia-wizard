@@ -10,7 +10,7 @@ import { type ReactNode } from "react";
  * loses the only thing that distinguishes a zymogen from its activated form,
  * which is precisely what the caption naming it exists to say.
  *
- * Matching by TERM rather than by position: the `fviiia-mimetics` artboard
+ * Matching by TERM rather than by position: the `fviii-mimetics` artboard
  * spends seven hand-placed spans on exactly this and its last letter slips
  * ("BsAbS:", with the trailing s shouted). A named list means a string that
  * stops containing a term simply matches nothing, where a position would
@@ -55,7 +55,7 @@ const PATTERN = new RegExp(`(${CASED_TERMS.join("|")})`);
  * accessible-name algorithm concatenates each element's contribution with a
  * separating space, so a heading built from these fragments announces
  * "FIX/ FIXa " unless it carries an `aria-label` stating the source string. Both
- * callers do — `Popup`'s band and the `fviiia-mimetics` `<h1>` — and a third
+ * callers do — `Popup`'s band and the `fviii-mimetics` `<h1>` — and a third
  * that does not would degrade the name it was reaching for.
  */
 export function preserveCase(text: string): ReactNode[] {

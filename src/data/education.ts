@@ -184,7 +184,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     },
   },
   {
-    id: "fviiia-mimetics",
+    id: "fviii-mimetics",
     title: "FVIII Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
     body: [
       "BsAbs work by simultaneously targeting two antigens",
@@ -472,7 +472,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * §7.6's two investigational agents, **one topic per agent**.
    *
    * They were a single `emerging-mimetics` topic, holding all six bullets and
-   * both figure captions, while nothing rendered them. The `fviiia-mimetics`
+   * both figure captions, while nothing rendered them. The `fviii-mimetics`
    * artboard settles the filing: it draws NXT007 and Inno8 as two separate `+`
    * disclosures inside its own panel, and the designer has drawn a card behind
    * each (Pop ups 12 and 13) — so they are two targets, not one, and they belong

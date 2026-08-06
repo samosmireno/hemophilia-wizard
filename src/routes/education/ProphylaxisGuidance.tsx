@@ -7,7 +7,7 @@ import { topicById } from "../../data/education";
  * the last chapter of the walkthrough's education run.
  *
  * The slug is not a wizard cross-link target, so it is not contractual the way
- * `rebalancing-agents` and `fviiia-mimetics` are — but it is the repo's own
+ * `rebalancing-agents` and `fviii-mimetics` are — but it is the repo's own
  * existing name for this content: `TreatmentLandscape` slices bullets 2–4 off
  * `clotting-factor-replacement` and calls them "§7.4 prophylaxis guidance that
  * belong to a different chapter". This is that chapter, so the two agree.

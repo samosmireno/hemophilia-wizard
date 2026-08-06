@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import { topicById } from "../../data/education";
-import FviiiaMimetics from "./FviiiaMimetics";
+import FviiiMimetics from "./FviiiMimetics";
 
-const CHAPTER = topicById("fviiia-mimetics")!;
+const CHAPTER = topicById("fviii-mimetics")!;
 const EMICIZUMAB = topicById("emicizumab-overview")!;
 const DENECIMIG = topicById("denecimig-overview")!;
 const NXT007 = topicById("nxt007-overview")!;
@@ -61,13 +61,13 @@ const NXT007_CAPTION = "Zemocimig (NXT007)";
  */
 const NXT007_FIGURE_TITLE = "Zemocimig (NXT007) BsAb structure";
 
-describe("fviiia-mimetics chapter", () => {
+describe("fviii-mimetics chapter", () => {
   /**
    * Read by id with non-null assertions in the chapter; a rename in the data
    * module fails here rather than as a render crash.
    */
   it("resolves the topics it reads", () => {
-    expect(topicById("fviiia-mimetics")).toBeDefined();
+    expect(topicById("fviii-mimetics")).toBeDefined();
     expect(topicById("emicizumab-overview")).toBeDefined();
     expect(topicById("denecimig-overview")).toBeDefined();
     expect(topicById("nxt007-overview")).toBeDefined();
@@ -75,7 +75,7 @@ describe("fviiia-mimetics chapter", () => {
   });
 
   it("renders the chapter title in title case, not the uppercase it displays", () => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     // `uppercase` is a CSS transform, so the accessible name is unaffected —
     // this asserts the copy was not shouted in the markup, and that the
     // two-tone split did not lose or duplicate a word on the way through.
@@ -111,7 +111,7 @@ describe("fviiia-mimetics chapter", () => {
    * letter of it is already a capital, so the transform is a no-op.)
    */
   it("keeps BsAbs out of the heading's uppercase transform", () => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     const heading = screen.getByRole("heading", { level: 1 });
 
     const span = within(heading).getByText("BsAbs");
@@ -124,7 +124,7 @@ describe("fviiia-mimetics chapter", () => {
    * drawing being transcribed over the source.
    */
   it("renders the topic's four bullets", () => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     expect(CHAPTER.body).toHaveLength(4);
     for (const bullet of CHAPTER.body) {
       expect(screen.getByText(bullet as string)).toBeInTheDocument();
@@ -137,7 +137,7 @@ describe("fviiia-mimetics chapter", () => {
    * caption (WCAG 2.5.3).
    */
   it("renders a named disclosure for each of the four agents", () => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     for (const name of [EMICIZUMAB.title, DENECIMIG.title, NXT007_CAPTION, "Inno8"]) {
       expect(screen.getByRole("button", { name: `Expand ${name}` })).toBeInTheDocument();
     }
@@ -145,7 +145,7 @@ describe("fviiia-mimetics chapter", () => {
 
   /** The two investigational agents sit inside the panel, under its heading. */
   it("groups NXT007 and Inno8 under the panel heading", () => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     const panel = screen.getByRole("region", { name: PANEL_HEADING });
 
     expect(
@@ -170,7 +170,7 @@ describe("fviiia-mimetics chapter", () => {
    */
   it("shows at most one disclosure open at a time", async () => {
     const user = userEvent.setup();
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     const panel = screen.getByRole("region", { name: PANEL_HEADING });
 
     await user.click(within(panel).getByRole("button", { name: `Expand ${NXT007_CAPTION}` }));
@@ -201,7 +201,7 @@ describe("fviiia-mimetics chapter", () => {
    * added ahead of its card fails here rather than shipping a silent promise.
    */
   it("promises a dialog on every disclosure that opens one", () => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
 
     for (const name of [
       `Expand ${EMICIZUMAB.title}`,
@@ -244,7 +244,7 @@ describe("the Emicizumab card", () => {
   const figure = () => dialogs()[1];
 
   const open = async (user: ReturnType<typeof userEvent.setup>) => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     await user.click(screen.getByRole("button", { name: `Expand ${EMICIZUMAB.title}` }));
   };
 
@@ -407,7 +407,7 @@ describe("the Denecimig card", () => {
   const figure = () => dialogs()[2];
 
   const open = async (user: ReturnType<typeof userEvent.setup>) => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     await user.click(screen.getByRole("button", { name: `Expand ${DENECIMIG.title}` }));
   };
 
@@ -548,7 +548,7 @@ describe("the Denecimig card", () => {
    */
   it("closes the Emicizumab card when Denecimig is opened", async () => {
     const user = userEvent.setup();
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
 
     await user.click(screen.getByRole("button", { name: `Expand ${EMICIZUMAB.title}` }));
     expect(openCards()).toHaveLength(1);
@@ -582,7 +582,7 @@ describe("the NXT007 card", () => {
     within(screen.getByRole("region", { name: PANEL_HEADING })).getByRole("button", { name });
 
   const open = async (user: ReturnType<typeof userEvent.setup>) => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     await user.click(disclosure(`Expand ${NXT007_CAPTION}`));
   };
 
@@ -753,7 +753,7 @@ describe("the NXT007 card", () => {
   /** The three cards cannot be up at once; see the Denecimig block's own pin. */
   it("closes the Denecimig card when NXT007 is opened", async () => {
     const user = userEvent.setup();
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
 
     await user.click(screen.getByRole("button", { name: `Expand ${DENECIMIG.title}` }));
     expect(openCards()).toHaveLength(1);
@@ -785,7 +785,7 @@ describe("the Inno8 card", () => {
     within(screen.getByRole("region", { name: PANEL_HEADING })).getByRole("button", { name });
 
   const open = async (user: ReturnType<typeof userEvent.setup>) => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     await user.click(disclosure("Expand Inno8"));
   };
 
@@ -909,7 +909,7 @@ describe("the Inno8 card", () => {
   /** The four cards cannot be up at once; see the Denecimig block's own pin. */
   it("closes the NXT007 card when Inno8 is opened", async () => {
     const user = userEvent.setup();
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
 
     await user.click(disclosure(`Expand ${NXT007_CAPTION}`));
     expect(openCards()).toHaveLength(1);
@@ -928,7 +928,7 @@ describe("the Inno8 card", () => {
  * that can fail; every pixel behind these values is arithmetic off the tokens
  * and the artboard, and open item 44 records it as unverified.
  */
-describe("fviiia-mimetics — the responsive pass", () => {
+describe("fviii-mimetics — the responsive pass", () => {
   /** The bottom half's three boxes, reached through the one with a name. */
   const bottomHalf = () => {
     const panel = screen.getByRole("region", { name: PANEL_HEADING });
@@ -950,7 +950,7 @@ describe("fviiia-mimetics — the responsive pass", () => {
    * 1280, the drawn 675 from 1397).
    */
   it("turns the bottom half's row on at xl, with the panel as the axis that gives", () => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     const { panel, list, row } = bottomHalf();
 
     expect(row).toHaveClass("flex-col", "xl:flex-row");
@@ -969,7 +969,7 @@ describe("fviiia-mimetics — the responsive pass", () => {
    * than the 675 the drawn 117px corner was measured on.
    */
   it("keeps the panel's radius on its own breakpoint", () => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     expect(bottomHalf().panel).toHaveClass("rounded-tl-[3.75rem]", "lg:rounded-tl-[7.3125rem]");
   });
 
@@ -980,29 +980,37 @@ describe("fviiia-mimetics — the responsive pass", () => {
    * radius.
    */
   it("centres the two left pairs below xl, and left-aligns them above", () => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     expect(bottomHalf().list).toHaveClass("items-center", "xl:items-start");
   });
 
   /**
-   * **Below `sm` every pair is a column, centred** — all four, since they share
-   * one `Disclosure`. Side by side they need 369px (the caption's drawn 288, plus
-   * `gap-4` and the package's 65px button) where a 375px phone gives the content
-   * column 311, so the caption was being squeezed to 230 and losing the line
-   * breaks its `w-72` measure exists to produce.
+   * **Below `sm` every pair is a column, centred, with the `+` on top** — all
+   * four, since they share one `Disclosure`. Side by side they need 369px (the
+   * caption's drawn 288, plus `gap-4` and the package's 65px button) where a
+   * 375px phone gives the content column 311, so the caption was being squeezed
+   * to 230 and losing the line breaks its `w-72` measure exists to produce.
    *
    * `items-center` is asserted with the direction because it is doing two jobs at
    * once: centring the two boxes in the column below `sm`, and centring the
    * caption against the button above it.
+   *
+   * **`flex-col-reverse`, which is the assertion below the class list**: the
+   * button paints above its caption on a phone while the DOM order stays
+   * caption-then-button — what a screen reader hears, and what `sm:flex-row`
+   * paints. A `flex-col` that passed this test by reordering the markup would
+   * fail the query.
    */
-  it("stacks each caption over its + below sm, centred", () => {
-    render(<FviiiaMimetics />);
+  it("stacks each caption under its + below sm, centred", () => {
+    render(<FviiiMimetics />);
     const { panel, list } = bottomHalf();
 
     const pairs = [...list.querySelectorAll("li"), ...panel.querySelectorAll("li")];
     expect(pairs).toHaveLength(4);
     for (const pair of pairs) {
-      expect(pair).toHaveClass("flex-col", "items-center", "sm:flex-row");
+      expect(pair).toHaveClass("flex-col-reverse", "items-center", "sm:flex-row");
+      expect(pair.firstElementChild?.tagName).toBe("P");
+      expect(pair.lastElementChild?.tagName).toBe("BUTTON");
     }
   });
 
@@ -1022,7 +1030,7 @@ describe("fviiia-mimetics — the responsive pass", () => {
    * 1440.
    */
   it("steps every transcribed size on the page down one below lg", () => {
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     const { panel, list } = bottomHalf();
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveClass("text-3xl", "lg:text-5xl");
@@ -1066,7 +1074,7 @@ describe("fviiia-mimetics — the responsive pass", () => {
     [`Expand ${NXT007_CAPTION}`, 2],
   ])("stacks the %s card at xl and steps its body to 16px below lg", async (name, index) => {
     const user = userEvent.setup();
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     await user.click(screen.getByRole("button", { name }));
 
     const card = screen.getAllByRole("dialog", { hidden: true })[index];
@@ -1085,7 +1093,7 @@ describe("fviiia-mimetics — the responsive pass", () => {
    */
   it("leaves the Inno8 card single-column, but ramps its type with the rest", async () => {
     const user = userEvent.setup();
-    render(<FviiiaMimetics />);
+    render(<FviiiMimetics />);
     await user.click(screen.getByRole("button", { name: "Expand Inno8" }));
 
     const bullets = screen.getAllByRole("dialog", { hidden: true })[3].querySelector("ul")!;

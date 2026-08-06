@@ -14,7 +14,7 @@ import { usePreloadImages } from "../../lib/preloadImage";
 import { preserveCase } from "../../lib/preserveCase";
 
 /**
- * `/education/fviiia-mimetics` — CONTEXT.md §7.5. A wizard cross-link target
+ * `/education/fviii-mimetics` — CONTEXT.md §7.5. A wizard cross-link target
  * (issue 08), so this slug is contractual.
  *
  * Non-null for the reason the other chapters record: the ids are literals in
@@ -25,7 +25,7 @@ import { preserveCase } from "../../lib/preserveCase";
  * own corner panel, and the data module was split per-agent to match (see
  * `nxt007-overview`/`inno8-overview` there). CONTEXT.md §7.5 records the move.
  */
-const CHAPTER = topicById("fviiia-mimetics")!;
+const CHAPTER = topicById("fviii-mimetics")!;
 const EMICIZUMAB = topicById("emicizumab-overview")!;
 const EMICIZUMAB_MOA = topicById("emicizumab-moa")!;
 const DENECIMIG = topicById("denecimig-overview")!;
@@ -381,7 +381,7 @@ const [HEADING_LEAD, HEADING_TAIL] = splitTitle(CHAPTER.title);
  */
 type OpenId = "emicizumab" | "denecimig" | "nxt007" | "inno8";
 
-export default function FviiiaMimetics() {
+export default function FviiiMimetics() {
   const [openId, setOpenId] = useState<OpenId | null>(null);
 
   /** Curried so each call site reads as the one disclosure it belongs to. */
@@ -1019,13 +1019,18 @@ function Inno8Card() {
  * four disclosures in two groups of two, so it is a different drawing, not a
  * fourth item.
  *
- * **Below `sm` the pair becomes a column, centred.** Side by side, the widest
- * caption's drawn 288px measure plus `gap-4` and the package's 65px button need
- * 369, where a 375px phone gives the content column 311 — so the caption was
- * being squeezed to 230 and losing the line breaks its measure exists to
- * produce. Stacked it gets the full column, and `items-center` does both jobs
- * without a second class: it centres the two boxes in the column below `sm` and
- * centres the caption against the button above it.
+ * **Below `sm` the pair becomes a column, centred, with the `+` on TOP.** Side
+ * by side, the widest caption's drawn 288px measure plus `gap-4` and the
+ * package's 65px button need 369, where a 375px phone gives the content column
+ * 311 — so the caption was being squeezed to 230 and losing the line breaks its
+ * measure exists to produce. Stacked it gets the full column, and `items-center`
+ * does both jobs without a second class: it centres the two boxes in the column
+ * below `sm` and centres the caption against the button above it.
+ *
+ * `flex-col-reverse` rather than `flex-col` puts the button above its caption on
+ * the phone while the DOM keeps caption-then-button — which is the order a
+ * screen reader hears, and the order `sm:flex-row` paints. The same arrangement
+ * `rebalancing-agents` takes below `sm` for its one disclosure.
  *
  * `caption` is a node rather than a string because the two groups tone
  * themselves differently — slate over lagoon at the left, flat lagoon in the
@@ -1057,7 +1062,7 @@ function Disclosure({
   hasCard?: boolean;
 }) {
   return (
-    <li className="flex flex-col items-center gap-4 sm:flex-row">
+    <li className="flex flex-col-reverse items-center gap-4 sm:flex-row">
       {caption}
       <PopupButton
         label={label}
@@ -1122,10 +1127,16 @@ function AgentCaption({ title }: { title: string }) {
  * is stated once and renders exactly what the absolute `leading-6.5` did at
  * 1440. It is shared with the panel's own `<h2>`, which is the one place it has
  * more than one line to act on.
+ *
+ * `text-center` below `sm` is for the stacked arrangement `Disclosure` takes
+ * there — a wrapped caption hanging left under a centred button reads as a
+ * misalignment. It only bites on the narrow end: "Zemocimig (NXT007)" measures
+ * ~234px at 20px black against the 263 this panel's `px-6` leaves at 375, and
+ * wraps at 320. `AgentCaption` is centred at every width already, as drawn.
  */
 function PanelCaption({ children }: { children: ReactNode }) {
   return (
-    <p className="text-xl leading-[1.08] font-black tracking-wide text-popup-caption lg:text-2xl">
+    <p className="text-center text-xl leading-[1.08] font-black tracking-wide text-popup-caption sm:text-start lg:text-2xl">
       {children}
     </p>
   );

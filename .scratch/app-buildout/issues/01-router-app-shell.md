@@ -42,7 +42,7 @@ semantic landmarks so routes are navigable for testing.
 - `/` renders a standalone **landing page** stub (design/build is issue 17) — **not** a
   redirect to `/education`.
 - **`/education`** is a multi-chapter module with subroutes `/education/:section`, sections
-  `disease-background`, `treatment-landscape`, `rebalancing-agents`, `fviiia-mimetics`
+  `disease-background`, `treatment-landscape`, `rebalancing-agents`, `fviii-mimetics`
   (the last two are wizard cross-link targets, so their URLs must be stable). Bare
   `/education` **redirects to `/education/disease-background`** (no overview page). An
   **unknown `:section`** redirects to `/education/disease-background` (no not-found page).

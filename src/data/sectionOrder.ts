@@ -17,7 +17,7 @@ export const SECTION_ORDER = [
   "/education/disease-background",
   "/education/treatment-landscape",
   "/education/rebalancing-agents",
-  "/education/fviiia-mimetics",
+  "/education/fviii-mimetics",
   "/education/prophylaxis-guidance",
   "/wizard-intro",
   "/wizard",
