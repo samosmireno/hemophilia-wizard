@@ -137,7 +137,7 @@ describe("DrugSheetPopup — clinical trials", () => {
       "FRONTIER2 (NCT05053139)",
       "FRONTIER3 (NCT05306418)",
       "FRONTIER4 (NCT05685238)",
-      "FRONTEIR5 (NCT05878938)",
+      "FRONTIER5 (NCT05878938)",
     ]);
     for (const item of items) expect(item).not.toMatch(/See |: /);
   });
