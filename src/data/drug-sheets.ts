@@ -171,13 +171,11 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
       "No hypersensitivity reactions",
       "No clinically relevant findings in laboratory assessments",
     ],
-    // Source spells "FRONTEIR5"; kept as-authored. The four citation tails this
-    // sheet alone carried are cut by client direction — see the module header.
     trials: [
       { name: "FRONTIER2", id: "NCT05053139" },
       { name: "FRONTIER3", id: "NCT05306418" },
       { name: "FRONTIER4", id: "NCT05685238" },
-      { name: "FRONTEIR5", id: "NCT05878938" },
+      { name: "FRONTIER5", id: "NCT05878938" },
     ],
   },
   {

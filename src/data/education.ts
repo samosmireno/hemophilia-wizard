@@ -373,7 +373,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
         "Increased thrombotic risk",
         "Development of ADA",
         "Complex MOA",
-        "Lack of a standardized lab monitoring",
+        "Lack of standardized lab monitoring",
         "Management of major surgery",
         "Use in older populations",
       ],

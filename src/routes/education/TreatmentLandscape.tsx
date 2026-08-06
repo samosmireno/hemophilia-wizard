@@ -406,7 +406,7 @@ function BenefitsChallengesCard({
  * transformation.
  */
 const MATRIX_COLUMNS = [
-  "Treatment options",
+  "Treatment Options",
   "Mechanism of Action",
   "Population",
   "Indication",

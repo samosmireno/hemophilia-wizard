@@ -339,7 +339,7 @@ describe("treatment-landscape chapter", () => {
         .getAllByRole("columnheader")
         .map((cell) => cell.textContent),
     ).toEqual([
-      "Treatment options",
+      "Treatment Options",
       "Mechanism of Action",
       "Population",
       "Indication",
