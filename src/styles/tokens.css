@@ -144,7 +144,7 @@
   --color-agent-mab: #003d93;
   --color-agent-sirna: var(--color-brand-crimson-50);
 
-  /* The corner panel that closes the `fviiia-mimetics` chapter — the shadowed
+  /* The corner panel that closes the `fviii-mimetics` chapter — the shadowed
      block carrying the two investigational agents. A PAIR: the gradient and the
      shadow are one drawn object, and the shadow is what reads it as lifted off
      the page rather than painted on it.
@@ -534,4 +534,24 @@
   :root {
     font-size: 150%; /* 24px — board 2160 × 1200 */
   }
+}
+
+/* Scrollbars (docs/styling.md §21).
+
+   INVENTED — no artboard draws a scrollbar — so both values are palette
+   references rather than picked colours, which is §12's rule for invented
+   values pointed at colour: nothing here is a fact to transcribe, so nothing
+   here becomes a token. Thumb teal-25, the primary ramp's tint step; track
+   transparent because every route sits on a §6 gradient and an opaque track
+   would paint a solid stripe over it.
+
+   `scrollbar-color` is INHERITED, so this one declaration reaches every scroll
+   container in the app and the package's DOM alike. The `::-webkit-scrollbar`
+   pseudo-elements are deliberately NOT used: Chromium disables all of them the
+   moment `scrollbar-color` applies, so the two mechanisms cannot be mixed, and
+   the standard property is the one all current engines share. The cost is that
+   hover/press stay browser-derived — the ramp's own -50/-75 steps cannot be
+   stated, there is no selector for them. */
+:root {
+  scrollbar-color: var(--color-brand-teal-25) transparent;
 }

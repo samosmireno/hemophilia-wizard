@@ -5009,3 +5009,60 @@ with `animation-name` still applied and `scale: none`, and under
 while the un-dim still eases — caught mid-transition at 0.60. What remains
 arithmetic is the pulse's read on the scaled boards (a ~17px swell on the
 84px-tall pill at 1.5×), which open item 52 records.
+
+## 21. Scrollbars
+
+One declaration, at the end of `tokens.css`, outside `@theme`:
+
+```css
+:root {
+  scrollbar-color: var(--color-brand-teal-25) transparent;
+}
+```
+
+**Both values are INVENTED — no artboard draws a scrollbar** — so they are
+derived from the palette rather than picked fresh, the same rule §20 applies
+to motion. The thumb is teal-25, the primary ramp's tint step: the scrollbar
+is chrome, not content, and the tint reads as part of the page's mint ground
+rather than competing with the crimson/lagoon controls that carry meaning.
+The track is transparent because every route sits on a §6 radial gradient —
+an opaque track would paint a solid stripe over it down the full viewport
+edge.
+
+### Why `scrollbar-color` and not `::-webkit-scrollbar`
+
+The two mechanisms cannot be mixed: the moment `scrollbar-color` applies to an
+element, Chromium disables every `::-webkit-scrollbar` pseudo-element on it.
+So the choice is one or the other, and the standard property wins on three
+counts:
+
+- **Every current engine honours it** (Chromium 121+, Firefox, Safari 18.2+);
+  the pseudo-elements are WebKit-lineage only.
+- **It is inherited**, so one `:root` declaration reaches every scroll
+  container — the page itself, any `overflow-y-auto` panel, and the DOM inside
+  mlg-components, which no app-side class can otherwise touch (the same wall
+  §20 records as mlg-reskin debt 7).
+- **It survives as a runtime `var()`**, so a teal change moves it — the §3/§4
+  rule.
+
+The cost is control: two colours, no radius, no hover/press selector. The
+ramp's own -50/-75 hover/press steps (the §14 grammar) cannot be stated —
+the browser derives its own hover treatment from the base colour. If a design
+review ever wants a drawn thumb (rounded, inset, stateful), that is the
+pseudo-element route, and it must then REPLACE this declaration in Chromium
+rather than sit beside it, with `scrollbar-color` kept only inside
+`@supports not selector(::-webkit-scrollbar)` for Firefox.
+
+Not a token: nothing here is a drawn fact with a rationale to pin, and
+`@theme` would mint `scrollbar-color` into no utility anyway. Plain values in
+a plain rule, next to the other non-`@theme` globals (§5's ring flip, §19's
+scale steps).
+
+`scrollbar-width` is left at `auto`: thinning the bar is a legibility trade
+the design never asked for. `scrollbar-gutter` is likewise untouched — §19's
+height gates were measured against real viewports, and reserving a gutter
+would shift every route's centring for a bar most routes never show.
+
+**Verified in Chromium, 2026-08-06**, by computed style: `scrollbar-color`
+resolves to `rgb(126, 197, 182) rgba(0, 0, 0, 0)` (teal-25 exactly) on the
+root and on a nested scroll container, confirming inheritance.
