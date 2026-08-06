@@ -684,7 +684,8 @@ on the same direction; the §7.7 wizard notes and the other six sheets keep the 
     are modelled as a nested level under the bullet that introduces them, which is how both the
     source and the card subordinate them. Figure: "NXT007 BsAb Structure" (image), shown as a
     thumbnail that enlarges bare over the card; **its heading is baked into the raster**, as
-    denecimig's is, so the caption is image-borne text reachable only through `alt`.
+    denecimig's is, so the caption is image-borne text — reached through `alt`, and since the
+    2026-08-06 note below quoted by the chapter literal that names the control.
     `[BUILD]` **the card drops the "NXT007" prefix** the source puts in front of two of these
     bullets ("NXT007: Next-generation BsAb…", "NXT007 ongoing clinical trials:"). The band above
     already names the agent, and the artboard is the filing authority where it and `[PDF-V]`
@@ -697,8 +698,18 @@ on the same direction; the §7.7 wizard notes and the other six sheets keep the 
     drift. It also opens the sentence under the structure diagram, which is the one place the INN
     reaches the data module ("Zemocimig (NXT007) is derived from emicizumab heavy-chain
     regions…"). Both `title`s still transcribe the bare "NXT007", as does the prose above and the
-    "NXT007-treated plasma" bullet beside the diagram; the heading baked into the figure raster is
-    unreachable in any case. The source and the artboard draw the code name throughout.
+    "NXT007-treated plasma" bullet beside the diagram. The source and the artboard draw the code
+    name throughout.
+    `[BUILD]` **the figure raster carries the INN as well, and the control that opens it follows**
+    (2026-08-06). The re-export in 029caec repainted the baked heading as "ZEMOCIMIG (NXT007) BsAb
+    structure" where it read "NXT007 BsAb STRUCTURE", and rewrote two more lines with it: the
+    subtitle is "Emicizumab-derived heavy chains" for "Further optimized Hch of emicizumab", and
+    both arm labels are "Novel light chain" for "Non-common Lch". All three are image-borne and
+    are transcribed in `alt`. The figure's trigger and its enlargement are named by a **second
+    chapter literal**, "Zemocimig (NXT007) BsAb structure", where they read `nxt007-structure.title`
+    until then — the thumbnail is decorative, so "Expand …" is the button's whole accessible name,
+    and the painted heading is the only text a reader can see to say it by. The topic's `title` is
+    unchanged and stays the source's, which is the split above holding rather than an omission.
     `[BUILD]` **the trials bullet carries the client's phase 3 program, not the source's** (same
     2026-08-05 pass): "Initiated in phase 3 trials:" over **ZEBRHA 1 (NCT07416526)** and **ZEBRHA 2
     (NCT07416604)**, replacing the NXTAGE/WP44714 pair transcribed above. Two children under a

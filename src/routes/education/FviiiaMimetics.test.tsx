@@ -28,6 +28,18 @@ const PANEL_HEADING = "Investigational FVIII mimetic therapies in earlier-stage 
  */
 const NXT007_CAPTION = "Zemocimig (NXT007)";
 
+/**
+ * The structure panel's name — a chapter literal since 2026-08-06, where it was
+ * `nxt007-structure.title`, and mirrored here rather than imported for the reason
+ * every other literal in this file is: a test that reads the value under test
+ * from the code under test asserts nothing.
+ *
+ * It is the heading the re-exported raster paints, which is what the control is
+ * named for; the topic's `title` keeps the source's bare code name, and the test
+ * below pins both halves so a "fix" that collapses them fails here.
+ */
+const NXT007_FIGURE_TITLE = "Zemocimig (NXT007) BsAb structure";
+
 describe("fviiia-mimetics chapter", () => {
   /**
    * Read by id with non-null assertions in the chapter; a rename in the data
@@ -645,8 +657,36 @@ describe("the NXT007 card", () => {
     await open(user);
 
     expect(
-      screen.getByRole("button", { name: `Expand ${NXT007_STRUCTURE.title}` }),
+      screen.getByRole("button", { name: `Expand ${NXT007_FIGURE_TITLE}` }),
     ).toBeInTheDocument();
+  });
+
+  /**
+   * **Named for the heading its raster paints, not for the topic it belongs to**
+   * — the split `NXT007_FIGURE_TITLE` records, and the same shape as the card's
+   * band above: the client's INN reaches the display layer, the data module keeps
+   * the source's bare code name.
+   *
+   * Both halves are asserted, as they are for the caption. The failure this
+   * guards is a tidy-up in either direction — pushing the display name down into
+   * the topic, or "restoring" the trigger to read the topic again — and the
+   * second is the reason for the negative: the button answered to the topic's
+   * title until 2026-08-06, so a revert would look like a passing test if only
+   * the positive were pinned.
+   *
+   * The user-visible stake is label-in-name. This thumbnail is decorative, so
+   * `Expand …` is the button's whole accessible name, and the only text a reader
+   * can see to say it by is the crimson heading inside the picture.
+   */
+  it("names the structure diagram for the heading its raster paints", async () => {
+    const user = userEvent.setup();
+    await open(user);
+
+    expect(NXT007_STRUCTURE.title).toBe("NXT007 BsAb Structure");
+    expect(NXT007_FIGURE_TITLE).toContain(NXT007_CAPTION);
+    expect(
+      screen.queryByRole("button", { name: `Expand ${NXT007_STRUCTURE.title}` }),
+    ).not.toBeInTheDocument();
   });
 
   /**
@@ -658,10 +698,10 @@ describe("the NXT007 card", () => {
   it("enlarges bare, with no caption repeated from the card", async () => {
     const user = userEvent.setup();
     await open(user);
-    await user.click(screen.getByRole("button", { name: `Expand ${NXT007_STRUCTURE.title}` }));
+    await user.click(screen.getByRole("button", { name: `Expand ${NXT007_FIGURE_TITLE}` }));
 
     expect(within(figure()).queryByRole("heading")).not.toBeInTheDocument();
-    expect(figure()).toHaveAccessibleName(NXT007_STRUCTURE.title);
+    expect(figure()).toHaveAccessibleName(NXT007_FIGURE_TITLE);
     expect(
       within(figure()).queryByText(NXT007_STRUCTURE.body[0] as string),
     ).not.toBeInTheDocument();
@@ -675,7 +715,7 @@ describe("the NXT007 card", () => {
     const user = userEvent.setup();
     await open(user);
 
-    await user.click(screen.getByRole("button", { name: `Expand ${NXT007_STRUCTURE.title}` }));
+    await user.click(screen.getByRole("button", { name: `Expand ${NXT007_FIGURE_TITLE}` }));
     expect(figure()).toHaveAttribute("open");
     expect(card()).toHaveAttribute("open");
 

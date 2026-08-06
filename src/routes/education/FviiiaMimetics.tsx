@@ -134,10 +134,36 @@ const DENECIMIG_FIGURE_ALT =
 const DENECIMIG_FIGURE = { width: 1926, height: 1232 } as const;
 
 /**
+ * The NXT007 panel's heading — a **literal** since 2026-08-06, where it used to
+ * be `nxt007-structure.title`.
+ *
+ * The 029caec re-export rewrote the crimson line baked into `nxt007.webp`: it
+ * paints "ZEMOCIMIG (NXT007) BsAb structure" where it painted "NXT007 BsAb
+ * STRUCTURE". The data module's `title` still transcribes the second of those,
+ * and correctly — that module holds the source, and putting the client's INN in
+ * it is the presentation decision `NXT007` records, which CONTEXT.md §7.5 leans
+ * on when it says both `title`s keep the bare code name.
+ *
+ * So the display name is stated here, exactly as `NXT007` and
+ * `INNO8_FIGURE_TITLE` are, and this control is named for **what a reader can
+ * see**. That is the whole of the argument: the thumbnail is decorative, so
+ * `Expand {title}` is this button's entire accessible name, and the only text a
+ * sighted or speech-input user has to say it by is the heading in the picture. A
+ * name of "NXT007 BsAb Structure" against a panel reading ZEMOCIMIG left "click
+ * Expand Zemocimig" landing on the disclosure and never on the figure.
+ *
+ * **Sentence case on "structure", which is transcription rather than a slip.**
+ * The raster's first line is all-caps as styling and its second is not, so the
+ * lowercase is real — and `NXT007_FIGURE_ALT` below quotes the same heading, so
+ * the two agree by construction.
+ */
+const NXT007_FIGURE_TITLE = "Zemocimig (NXT007) BsAb structure";
+
+/**
  * The NXT007 panel's description — and, like Denecimig's, it opens with the
  * panel's **heading**, because `nxt007.webp` carries that crimson line in its own
  * pixels (CONTEXT.md §7.7). Stating it here is what stops the card drawing it
- * twice: `nxt007-structure.title` names the figure for the trigger and the
+ * twice: `NXT007_FIGURE_TITLE` names the figure for the trigger and the
  * enlargement's accessible name, and nothing paints it.
  *
  * **A structure, where the other two describe a mechanism.** This drawing is not
@@ -155,11 +181,9 @@ const DENECIMIG_FIGURE = { width: 1926, height: 1232 } as const;
  * Lch". This is a quote of pixels, as `DENECIMIG_FIGURE_ALT` is, so it moves when
  * the asset does.
  *
- * That re-export leaves `nxt007-structure.title` — "NXT007 BsAb Structure", which
- * names the trigger and the enlargement — as the one place still reading the
- * painted heading as it was. It is deliberately NOT repaired here: the data module
- * transcribes the source, and carrying the INN into it is the presentation
- * decision `NXT007` records. Flagged rather than fixed.
+ * `nxt007-structure.title` still reads the painted heading as it was, and stays
+ * that way on purpose — see `NXT007_FIGURE_TITLE`, which is what the trigger and
+ * the enlargement are named by now that the two have parted company.
  */
 const NXT007_FIGURE_ALT =
   "Diagram titled “Zemocimig (NXT007) BsAb structure”, subtitled “Emicizumab-derived heavy " +
@@ -194,11 +218,13 @@ const NXT007_FIGURE_ALT =
 const NXT007_FIGURE = { width: 1088, height: 750 } as const;
 
 /**
- * The Inno8 panel's heading — a **literal**, and the only one of the four this
- * chapter has to state itself.
+ * The Inno8 panel's heading — a **literal**, and the first of the two this
+ * chapter states itself. (`NXT007_FIGURE_TITLE` is the second, added later and
+ * for a different reason: that raster's painted heading changed under a topic
+ * that could not follow it.)
  *
- * The other three read a topic's `title`, because each of those cards splits a
- * figure topic off its overview to hold the prose drawn under the diagram. This
+ * The other two panels read a topic's `title`, because each of those cards splits
+ * a figure topic off its overview to hold the prose drawn under the diagram. This
  * card draws no such prose (see `inno8-overview`), so there is no second topic
  * and the caption lives in `inno8-overview.figures[0]`. Stated rather than read
  * from that array for the reason `rebalancing-agents` records: a figure's title
@@ -281,9 +307,9 @@ const PANEL_HEADING = "Investigational FVIII mimetic therapies in earlier-stage 
  * that the source and the artboard both predate, since both draw the code name
  * alone. The **raster** no longer does: `nxt007.webp` paints "ZEMOCIMIG (NXT007)"
  * since the 029caec re-export, so the caption and the picture behind it now agree
- * without this const having to reach the asset. See `NXT007_FIGURE_ALT`, which
- * quotes that heading, and which records the one place still holding the bare
- * code name.
+ * without this const having to reach the asset. `NXT007_FIGURE_TITLE` is the
+ * second literal that agreement produced — the figure inside this card is named
+ * for its painted heading, on the same reasoning and from the same layer.
  *
  * It stays the one place in this chapter where the caption and the card's
  * heading agree: the other two agents shed a regulatory status on the way into
@@ -844,7 +870,10 @@ function Nxt007Card() {
         */}
         <ExpandableFigure
           thumbSrc={nxt007Url}
-          title={NXT007_STRUCTURE.title}
+          // The chapter's literal, not `NXT007_STRUCTURE.title`: the raster's own
+          // heading carries the INN and the data module's transcription does not.
+          // See `NXT007_FIGURE_TITLE`.
+          title={NXT007_FIGURE_TITLE}
           // **Bare**, for the reasons both other cards record: the enlargement is
           // the same picture the reader just clicked, and this raster paints its
           // own heading, so a crimson band over it would state the title twice.
