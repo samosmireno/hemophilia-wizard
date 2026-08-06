@@ -181,9 +181,9 @@ export default function RebalancingAgents() {
 
   /**
    * The diagram is two cards deep, so nothing requests it during the chapter's
-   * own load and a cold figure card opens empty then jumps once the picture
-   * lands (see `PopupFigure`). Warmed from here, the nearest scope that stays
-   * mounted — exactly as the other two chapters warm theirs.
+   * own load and a cold figure card paints its picture a beat late — into a box
+   * `PopupFigure` reserves, so late is all it is. Warmed from here, the nearest
+   * scope that stays mounted — exactly as the other two chapters warm theirs.
    */
   usePreloadImage(mechanismUrl);
 

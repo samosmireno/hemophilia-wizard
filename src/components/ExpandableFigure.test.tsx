@@ -9,7 +9,7 @@ const ALT = "Vascular injury exposes tissue factor, which with FVIIa initiates c
 
 const renderFigure = () =>
   render(
-    <ExpandableFigure thumbSrc="/thumb.webp" title={TITLE}>
+    <ExpandableFigure thumbSrc="/thumb.webp" thumbWidth={940} thumbHeight={538} title={TITLE}>
       <img src="/figure.webp" alt={ALT} />
     </ExpandableFigure>,
   );
@@ -36,6 +36,19 @@ describe("ExpandableFigure", () => {
     expect(screen.getByRole("button", { name: `Expand ${TITLE}` })).toHaveAccessibleName(
       `Expand ${TITLE}`,
     );
+  });
+
+  /**
+   * The thumbnail's box must exist before the file has bytes: it is `w-full`,
+   * so the declared ratio is what gives an unloaded image a height — without it
+   * a thumb inside a `Popup` opens the card short and the body shifts when the
+   * picture lands. jsdom does no layout, so the declaration is what is testable.
+   */
+  it("reserves the thumbnail's box with the declared ratio", () => {
+    renderFigure();
+
+    const thumb = screen.getByRole("button", { name: `Expand ${TITLE}` }).querySelector("img");
+    expect(thumb).toHaveStyle({ aspectRatio: "940 / 538" });
   });
 
   it("starts closed", () => {
@@ -65,14 +78,20 @@ describe("ExpandableFigure", () => {
   /** The default is the design's gradient; white is opt-in, per `Popup`. */
   it("passes its surface through to the card", () => {
     const { rerender } = render(
-      <ExpandableFigure thumbSrc="/thumb.webp" title={TITLE}>
+      <ExpandableFigure thumbSrc="/thumb.webp" thumbWidth={940} thumbHeight={538} title={TITLE}>
         <p>body</p>
       </ExpandableFigure>,
     );
     expect(dialog().firstElementChild).toHaveClass("bg-popup");
 
     rerender(
-      <ExpandableFigure thumbSrc="/thumb.webp" title={TITLE} surface="white">
+      <ExpandableFigure
+        thumbSrc="/thumb.webp"
+        thumbWidth={940}
+        thumbHeight={538}
+        title={TITLE}
+        surface="white"
+      >
         <p>body</p>
       </ExpandableFigure>,
     );
@@ -132,7 +151,13 @@ describe("ExpandableFigure", () => {
    */
   it("expands bare on request: no heading, still named, still closable", async () => {
     render(
-      <ExpandableFigure thumbSrc="/thumb.webp" title={TITLE} variant="bare">
+      <ExpandableFigure
+        thumbSrc="/thumb.webp"
+        thumbWidth={940}
+        thumbHeight={538}
+        title={TITLE}
+        variant="bare"
+      >
         <img src="/figure.webp" alt={ALT} />
       </ExpandableFigure>,
     );

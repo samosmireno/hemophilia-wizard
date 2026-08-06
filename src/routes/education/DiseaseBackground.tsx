@@ -83,9 +83,10 @@ const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
  *
  * `DisclosureBand` renders only the *open* disclosure's `content`, so the
  * `PopupFigure`s below do not exist in the DOM until they are clicked — nothing
- * requests these two during the chapter's own load, and a cold card opens empty
- * and then jumps taller once the picture arrives (see `PopupFigure`). This is
- * the nearest scope that is mounted the whole time and already holds the URLs.
+ * requests these two during the chapter's own load, and a cold card paints its
+ * picture a beat after it opens (`PopupFigure` reserves the box, so late is all
+ * a cold picture is; warming is what makes it on time). This is the nearest
+ * scope that is mounted the whole time and already holds the URLs.
  *
  * The cascade is absent deliberately: `ExpandableFigure` mounts its body with
  * the chapter, so `ClottingCascadeFigure` warms itself.
@@ -174,6 +175,8 @@ export default function DiseaseBackground() {
         */}
         <ExpandableFigure
           thumbSrc={cascadeThumbUrl}
+          thumbWidth={940}
+          thumbHeight={538}
           title={CASCADE_TITLE}
           surface="white"
           className="mx-auto mt-8 max-w-120 xl:mx-0 xl:mt-0"

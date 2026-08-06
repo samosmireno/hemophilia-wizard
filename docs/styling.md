@@ -3216,7 +3216,13 @@ and is recorded on `preloadImage`.
 
 Keep the stored size and the `width`/`height` props in step: they are also where
 `aspect-ratio` comes from, so a pair that disagrees with the file reserves a box
-of the wrong shape and the card resettles when the image arrives.
+of the wrong shape. As of 2026-08-06 the element is a definite `width` plus
+`object-contain` rather than a `max-width` — the box exists at its final size
+before the image has bytes, so a cold card no longer opens short and resettles
+when the picture lands, and a mismatched pair shows as letterbox dead space
+rather than a stretch (the NXT007 pair spent a day as exactly that stretch;
+see the chapter). Chapter-level warming stays, demoted from the fix for the
+resettle to what makes a cold picture paint on time.
 
 ### Verified in a browser
 

@@ -208,12 +208,17 @@ const NXT007_FIGURE_ALT =
  * `PopupFigure` writes the pair straight into `aspect-ratio`, and an `<img>`
  * *fills* the box it is given (`object-fit` is `fill` unless something says
  * otherwise), so the enlargement was painted 7.8% too wide rather than
- * letterboxed inside it — the failure `PopupFigure`'s own note predicts for a
- * pair that does not match the file.
+ * letterboxed inside it — the failure `PopupFigure`'s own note predicted for a
+ * pair that does not match the file. That element went `object-contain` later
+ * the same day (the space-reservation fix), so a stale pair now letterboxes:
+ * dead space beside the picture rather than a stretched molecule.
  *
- * Only the enlargement: `ExpandableFigure`'s thumbnail is a bare `w-full` image
- * with no ratio of its own, so the card was unaffected and the stretch appeared
- * on zoom and nowhere else.
+ * Only the enlargement, *then*: `ExpandableFigure`'s thumbnail was a bare
+ * `w-full` image with no ratio of its own, so the card was unaffected and the
+ * stretch appeared on zoom and nowhere else. The thumbnail has since gained a
+ * declared ratio too (`thumbWidth`/`thumbHeight`, the file's own 2176 × 1500 —
+ * the space-reservation fix), so the next re-export that reshapes this raster
+ * has two pairs to move: this one and the thumb's.
  */
 const NXT007_FIGURE = { width: 1088, height: 750 } as const;
 
@@ -386,8 +391,8 @@ export default function FviiiaMimetics() {
    * Both MOA diagrams are **two cards deep** — each lives inside its agent
    * card's `ExpandableFigure`, and those cards' children do not exist until the
    * `+` is clicked — so nothing requests them during the chapter's own load and
-   * a cold figure opens to an empty box that jumps once the picture lands (see
-   * `PopupFigure`). Warmed from here, the nearest scope that stays mounted,
+   * a cold figure paints a beat late, into a box `PopupFigure` reserves (late
+   * is all it is). Warmed from here, the nearest scope that stays mounted,
    * exactly as the other chapters warm theirs.
    *
    * One URL per card, not two: each card's in-card thumbnail and its
@@ -650,6 +655,8 @@ function EmicizumabCard() {
       */}
       <ExpandableFigure
         thumbSrc={emicizumabUrl}
+        thumbWidth={1408}
+        thumbHeight={1468}
         title={EMICIZUMAB_MOA.title}
         // **Bare**, not the §7.7 card. This expansion is the same picture the
         // reader just clicked, larger — a band and a border would announce a new
@@ -774,6 +781,8 @@ function DenecimigCard() {
         */}
         <ExpandableFigure
           thumbSrc={denecimigUrl}
+          thumbWidth={2176}
+          thumbHeight={1392}
           title={DENECIMIG_MOA.title}
           // **Bare**, and for `EmicizumabCard`'s reason plus one of its own: the
           // enlargement is the same picture, and this raster paints its own
@@ -870,6 +879,8 @@ function Nxt007Card() {
         */}
         <ExpandableFigure
           thumbSrc={nxt007Url}
+          thumbWidth={2176}
+          thumbHeight={1500}
           // The chapter's literal, not `NXT007_STRUCTURE.title`: the raster's own
           // heading carries the INN and the data module's transcription does not.
           // See `NXT007_FIGURE_TITLE`.
@@ -967,6 +978,8 @@ function Inno8Card() {
       */}
       <ExpandableFigure
         thumbSrc={inno8Url}
+        thumbWidth={4352}
+        thumbHeight={1676}
         title={INNO8_FIGURE_TITLE}
         // **Bare**, for the reasons all three other cards record: the enlargement
         // is the same picture the reader just clicked, and this raster paints its

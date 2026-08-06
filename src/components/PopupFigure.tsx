@@ -21,8 +21,9 @@
  *   guess.** The files are stored at 2x for retina and nothing wider (see
  *   docs/styling.md §13), so "half the asset" IS the drawn width — and because
  *   the same numbers supply the `aspect-ratio` below, a pair that does not match
- *   the file reserves a box of the wrong shape and the card resettles when the
- *   picture lands.
+ *   the file reserves a box of the wrong shape, which the `contain` below
+ *   letterboxes rather than fills: the mismatch shows as dead space beside the
+ *   picture, in whichever axis the pair overstates.
  *
  *   **The cap is applied in `rem`, so above the canvas it scales with the board**
  *   (docs/styling.md §19). It was `px` until 2026-08-05, which pinned the picture
@@ -71,27 +72,31 @@
  * off `Popup` alone, so the callers with no chrome are unaffected, and a caller
  * that has some states its own budget rather than discovering it as a scrollbar.
  *
- * Two maxima and no fitting mode: given `width`/`height` that are `auto`, the
- * browser scales the image down to satisfy whichever constraint binds first and
- * preserves the aspect ratio itself — the box never needs to letterbox because
- * the image is never stretched to fill one. That is also why the `width`/
- * `height` *attributes* are absent: they are presentational hints that would
- * make the width definite again, and a definite width against a `max-height` is
- * exactly the squash `object-contain` exists to undo. The `aspect-ratio` they
- * would have supplied is set explicitly instead, so the card reserves the right
- * box before the image *decodes*.
+ * **The width is definite, and `object-contain` is what a definite width
+ * costs.** A `max-width` alone left `width: auto`, whose used value is the
+ * image's intrinsic width — and an image that has not loaded has none, leaving
+ * `aspect-ratio` nothing to multiply and collapsing the box. A cold figure
+ * therefore opened to an empty card and jumped taller when the picture landed,
+ * which chapter-level preloading (see `DiseaseBackground`) could only make
+ * *usually* invisible: warming is a fetch racing a click, and a cold cache, a
+ * slow link or a quick click still lost it. With `width` definite the box is at
+ * its final size before the image has any bytes — `aspect-ratio` sets the
+ * height, the height cap clamps it, and neither moves when the picture arrives.
  *
- * **That reservation needs the bytes, though, not just the ratio.** `width` is
- * `auto` here, so its used value comes from the image's intrinsic width — and an
- * image that has not loaded has none, leaving `aspect-ratio` nothing to multiply
- * and collapsing the box. A cold figure therefore opens to an empty card and
- * then jumps taller when the picture lands, which is a *loading* bug and not a
- * layout one: with the asset already fetched, first layout has the intrinsic
- * size and neither the gap nor the jump happens.
+ * The price is the squash the old note warned about: a definite width against a
+ * bound `max-height` would stretch the raster to fill the box, so `contain` is
+ * load-bearing, not belt-and-braces. Where the height cap binds, the picture
+ * paints undistorted and centred and the letterbox is transparent over the
+ * card's own fill — the same pixels the narrower `auto` element painted, in a
+ * wider layout box nothing can see. The `width`/`height` *attributes* stay
+ * absent: with the CSS width definite they would add nothing the style block
+ * does not already state.
  *
- * So this component does not warm its own URL — inside a `DisclosureBand` it
- * mounts on the frame the card opens, far too late to matter. The chapter warms
- * them; see `DiseaseBackground`.
+ * This component still does not warm its own URL — inside a `DisclosureBand` it
+ * mounts on the frame the card opens, far too late to matter. The chapters keep
+ * warming (see `DiseaseBackground`), demoted from the fix to an optimisation:
+ * won, the race paints the picture on the frame the card opens; lost, it paints
+ * a beat late into a box that never moves.
  */
 export default function PopupFigure({
   src,
@@ -132,10 +137,10 @@ export default function PopupFigure({
         /* `rem`, not `px`, so the cap rides the board above the canvas — see the
            note on the width cap above. `/ 16` is the drawn px at the root's own
            16px, so every width at or below 1440 is unmoved. */
-        maxWidth: `min(${width / 16}rem, 100%)`,
+        width: `min(${width / 16}rem, 100%)`,
         maxHeight: `calc(95dvh - ${reserve})`,
       }}
-      className="mx-auto"
+      className="mx-auto object-contain"
     />
   );
 }

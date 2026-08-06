@@ -35,6 +35,8 @@ import Popup from "./Popup";
  */
 export default function ExpandableFigure({
   thumbSrc,
+  thumbWidth,
+  thumbHeight,
   title,
   surface,
   variant = "card",
@@ -43,6 +45,20 @@ export default function ExpandableFigure({
 }: {
   /** The closed state: the same figure with the pop-up's ✕ cropped out. */
   thumbSrc: string;
+  /**
+   * `thumbSrc`'s own pixel dimensions — only their ratio is consumed. The
+   * thumbnail is `w-full`, so with a declared `aspect-ratio` its box exists at
+   * its final size before the file has bytes; without one an unloaded thumbnail
+   * is 0px tall, and a thumb inside a `Popup` opens the card short and shifts
+   * the whole body when the picture lands — the same collapse `PopupFigure`
+   * fixed on 2026-08-06, one level down. Any pair in the right ratio works;
+   * state the file's actual pixels so the next reader can check them against
+   * the asset, and note that a pair in the *wrong* ratio stretches the thumb
+   * (the image fills the box it is given), so a re-export that reshapes the
+   * raster has to move these numbers with it.
+   */
+  thumbWidth: number;
+  thumbHeight: number;
   /** The figure's own heading — the expansion's title, and the trigger's name. */
   title: string;
   /** Passed through to `Popup`; see its own `surface` prop. Ignored when bare. */
@@ -94,7 +110,12 @@ export default function ExpandableFigure({
           className,
         )}
       >
-        <img src={thumbSrc} alt="" className="block w-full" />
+        <img
+          src={thumbSrc}
+          alt=""
+          style={{ aspectRatio: `${thumbWidth} / ${thumbHeight}` }}
+          className="block w-full"
+        />
 
         {/*
           `bg-black/50` is `Popup`'s own `::backdrop`, reused rather than
