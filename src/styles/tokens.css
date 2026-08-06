@@ -275,6 +275,27 @@
   );
   --color-choice-selected-active: var(--color-brand-teal-100);
 
+  /* ─── Wizard gate release (docs/styling.md §20) ───────────────────────────
+     The one-shot emphasis pulse `/wizard`'s Submit button plays when the third
+     answer lands and the gate opens. INVENTED, all three numbers — no artboard
+     draws motion — so each is derived from a value the app already has rather
+     than picked fresh: the amplitude mirrors the press state's `active:scale-95`
+     (the design pushes 5% in, so the release swells 5% out), and 300ms is the
+     app's 150ms fade step out and back. `ease-out` is what every transition in
+     the app and the package already uses.
+
+     A pulse, not a loop: it announces a state change, so it plays once per
+     false→true flip of `complete` and the call site re-arms it (Wizard.tsx).
+     Guarded there with `motion-reduce:animate-none` — scale motion, unlike the
+     120ms colour fades, is exactly what that preference asks to be rid of. */
+  --animate-gate-release: gate-release 300ms ease-out;
+
+  @keyframes gate-release {
+    50% {
+      scale: 1.05;
+    }
+  }
+
   /* ─── Layout geometry (docs/styling.md §12) ───────────────────────────────
      The shell's padding, as the facts it is made of. Each value below comes
      from OUTSIDE `AppShell` — the designer's 1440 canvas, the top rule, or the

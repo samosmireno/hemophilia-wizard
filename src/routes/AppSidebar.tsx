@@ -82,6 +82,13 @@ export default function AppSidebar() {
    * This is the only route-specific fact in the sidebar, and the reason it is
    * here rather than in the pages: the arrow is the sidebar's, and a page cannot
    * disable it. See `docs/adr/0003-session-scoped-wizard-answers.md`.
+   *
+   * When the gate releases, the cue lives on the page's Submit button
+   * (docs/styling.md §20), not here: this arrow un-dims with no transition,
+   * because `Sidebar` renders its arrows internally and exposes no class hook
+   * for them, and reaching in with a CSS selector is the brittleness debt 4
+   * already rejected. Package change — `opacity` joining the arrows' transition
+   * list — tracked as mlg-reskin debt 7.
    */
   const { complete: wizardComplete } = useWizardAnswers();
   const gatedByWizard = pathname === "/wizard" && !wizardComplete;

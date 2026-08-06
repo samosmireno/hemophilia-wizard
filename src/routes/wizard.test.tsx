@@ -157,6 +157,55 @@ describe("wizard — patient characteristics", () => {
     });
 
     /**
+     * The release is announced, not just permitted (docs/styling.md §20): the
+     * moment `complete` flips, Submit eases out of the disabled dimming and
+     * plays a one-shot pulse. The transition class is asserted alongside
+     * because it is the other half of the same cue — the package's own list
+     * restated with `opacity` added, which is what makes the un-dim ease at
+     * all.
+     */
+    it("announces the release with a one-shot pulse", async () => {
+      const user = userEvent.setup();
+      renderAt("/wizard");
+
+      expect(submit()).toHaveClass("transition-[background-color,box-shadow,color,opacity]");
+      expect(submit()).not.toHaveClass("animate-gate-release");
+
+      await answerAll(user);
+
+      // motion-reduce travels with the pulse: the scale motion is dropped for
+      // learners who asked for that, while the opacity ease stays.
+      expect(submit()).toHaveClass("animate-gate-release", "motion-reduce:animate-none");
+    });
+
+    /**
+     * The pulse marks the gate OPENING, not the gate being open: coming back
+     * from the pages beyond, the session is already complete and nothing just
+     * changed, so an armed pulse here would be announcing old news on every
+     * return trip.
+     */
+    it("does not pulse when the page mounts with the gate already open", () => {
+      seedWizardAnswers();
+      renderAt("/wizard");
+
+      expect(submit()).toBeEnabled();
+      expect(submit()).not.toHaveClass("animate-gate-release");
+    });
+
+    /** Clearing disarms the pulse with the gate; re-completing announces again. */
+    it("re-arms the pulse when the gate closes and reopens", async () => {
+      const user = userEvent.setup();
+      renderAt("/wizard");
+      await answerAll(user);
+
+      await user.click(radio("Yes")); // picking the chosen option clears it
+      expect(submit()).not.toHaveClass("animate-gate-release");
+
+      await user.click(radio("No"));
+      expect(submit()).toHaveClass("animate-gate-release");
+    });
+
+    /**
      * Written against `nextOf` rather than the literal `/wizard/scenario`, for
      * the reason `wizardIntro.test.tsx` gives: this is the assertion that the
      * button and the sidebar's Next arrow read one spine, and a hard-coded path

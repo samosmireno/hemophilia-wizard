@@ -1069,6 +1069,7 @@ that item's five cases. | §13, §17, ADR 0007 |
 | 49 | ~~**§19 scaled the pop-up's 5px border but not the app's other visible borders.**~~ **Closed 2026-08-05, and the item under-counted itself while it was open** — it named `ArchBand`'s `border-t-4` and `Scenario`'s `border-4`, but `border-4` had **three** source sites, the other two being `rebalancing-agents`' and `treatment-landscape`' artwork placeholder boxes. All four are now `border-[0.25rem]` / `border-t-[0.25rem]`, which is the same 4px at a 16px root and scales above the canvas with the objects they edge. Verified in Chromium: 4px at 1440, 5px at 2560, and the nine canvas screenshots stay byte-identical. The reason they were missed twice is that they are Tailwind scale utilities rather than arbitrary values, so neither grep that built the §19 conversion list could see them. | §19 |
 | 50 | **`/explore`'s arch row is pinned rather than grown as of 2026-08-05 (§17), and the pin has 7px of vertical clearance at the bottom.** The row now takes its natural height, which is the drawn height to within 9px — but the deepest ink on the page is the three-line `UHL CLOTTING FACTOR REPLACEMENT` label, centred in an `xl:h-20` box whose bottom edge IS the page's, so it bottoms out 7px above it at 1440 and 8/9/10px on the three scaled boards (re-measured at all four when the 1.5× rung landed: 793 of 800, 892 of 900, 991 of 1000, 1190 of 1200 — the clearance scales with the board, so the top rung is the roomiest rather than the tightest). Nothing is clipped at any width measured, and the drawing is no roomier (the artboard's own label row runs to y≈802 on an 800 canvas). Two things would spend it: a **fourth line** on any class label, since `EXPLORE_SEGMENTS` is authored content, and the **20px this page owes the drawing** — §17 records the drawn label row as 100px where the code ships `h-20`, which is the whole of the 9px top-edge discrepancy and would buy 10px of clearance back if the designer confirms it. This is the vertical twin of item 46's 9.4px arc clearance at 320, and the same instruction applies: re-check it if a label grows. | §17, §19, §9 |
 | 51 | **`/wizard`'s Submit button is the last thing in the app still on the package's fixed pixel scale, and above the canvas it now reads smaller than the options it submits.** §14 argues at length for `max-lg:text-lg` — a `max-*` variant precisely so that at `lg` and above the package's drawn `text-[26px]` "stands untouched exactly where the artboard draws it", preserving the +2px the design gives this button over the 24px option pills. That reasoning was written when nothing above 1440 moved. It does now, and 26 is a **px** the root step cannot reach, so the drawn relationship inverts at every rung — measured 2026-08-05: pill/button type **24/26 (+2)** at the canvas, **27/26 (−1)** at 1.125×, **30/26 (−4)** at 1.25× and **36/26 (−10)** at 1.5×, with the pill growing 56 → 84px tall against the button's 56 → 66. This is the fourth instance of §19's "the px that had to move" and the only one a grep _could_ have found, except that the value is not in this repo — it is in mlg-components, reached through a deliberate `max-lg:` hole. It is also what makes `/wizard` the one row of §19's height table that is not proportional (18px short at 1.5×). **The type half was fixed the same day with `lg:text-2xl`**, which rounds the drawn 26 down to 24 and buys proportionality with it: the pill/button delta is now **0 at every board from `lg` up** (24/24, 27/27, 30/30, 36/36) instead of inverting, and 375 keeps its drawn +2 through the untouched `max-lg:text-lg`. The alternative that keeps the 26 was `lg:text-[1.625rem]`, rejected because it re-introduces the arbitrary font size open item 33 spent a day removing. **The box was finished in the same pass** with `lg:px-7.5 lg:py-4.5`, so all three of the package's fixed values are now overridden at `lg` and above and the button scales whole. `py-4.5` is the twin of the type fix — 18px at the canvas, 27 at 1.5×, so the box is 84 where proportion wants 84 instead of the 66 the pinned padding gave. **`px-7.5` is the one to re-read later**: it is not a conversion but a _compensation_, 30px a side chosen to put the narrowed 24px label back at 222.3 against the drawn 223. That makes it an invented number preserving a transcribed one — §12's warning shape — and it means the pill's width no longer follows from its type the way the artboard's does. **What stays open is the premise, not the arithmetic**: this whole repair assumes the drawn 223 × 56 is a shape to hold at every board size rather than a canvas-only transcription. If the designer says the latter, `px-7.5` should go and the pill should simply be narrower above `lg`. **Not verified in a browser** — the type measurements above are real, the 222.3 and the 84 are arithmetic from them at the user's instruction. | §14, §19, §4, §12 |
+| 52 | **`/wizard`'s gate-release cue is half-shipped and wholly invented.** The Submit button now eases its un-dim and plays a one-shot 5%/300ms pulse when the third answer lands (§20); the sidebar's Next arrow, which flips at the same instant, still snaps — `Sidebar` exposes no class hook for its arrows and reaching in via CSS is the brittleness mlg-reskin debt 4 rejected, so the arrow's half is a package change (`opacity` into the transition lists, mlg-reskin debt 7). The pulse's three numbers are derived from existing values (`active:scale-95` mirrored, 2 × the 150ms fade step) but no artboard draws motion, so they are a designer question in the same class as §4.2's derived hovers. **Measured in Chromium at the canvas, 2026-08-06** — pulse peaks at exactly 1.05, un-dim eases 0.35 → 1, reduced-motion drops the animation and keeps the ease (§20) — so what stays open is the designer question, the arrow's half, and the scaled boards: the ~17px swell at 1.5× is still arithmetic only. | §20, mlg-reskin |
 
 ---
 
@@ -4919,3 +4920,92 @@ rather than 13.7, but it is off it (open item 51). Page height is unchanged at
 is worth keeping precisely because breaking it now requires saying so.
 
 Open items 47–49 and 51 record what this pass did not settle.
+
+---
+
+## 20. The wizard gate's release cue
+
+`/wizard` is the walkthrough's one gated step: until all three questions are
+answered, its Submit button and the sidebar's Next arrow are `disabled`, and
+they open together on the third answer (§14, ADR 0003). Until 2026-08-06 that
+opening was silent — both controls flip through `disabled:opacity-ui-disabled`,
+and no component in the package carries `opacity` in its `transition-[…]` list,
+so the most meaningful state change on the page (the learner is now allowed
+forward) rendered as an instant un-dim you only saw if you happened to be
+looking at the button. The gate _closing_ had the same non-treatment, but a
+disabled control you were just told is disabled explains itself; an enabled one
+appearing unannounced does not.
+
+Two classes on the Submit button answer it, both in `Wizard.tsx`:
+
+**The un-dim now eases.** The caller restates the package's transition list
+with one addition — `transition-[background-color,box-shadow,color,opacity]`.
+tailwind-merge puts both lists in one group, so the caller's wins whole, and
+the package's own `duration-120 ease-out` still times it. Both directions of
+the flip ease, which is right: the close is a real state change too, it just
+was not the one that forced the work.
+
+**The release plays a one-shot pulse** — `--animate-gate-release`, the app's
+first `--animate-*` token:
+
+```css
+--animate-gate-release: gate-release 300ms ease-out;
+
+@keyframes gate-release {
+  50% {
+    scale: 1.05;
+  }
+}
+```
+
+**All three numbers are INVENTED — no artboard draws motion — so each is
+derived from a value the app already carries rather than picked fresh.** The
+amplitude mirrors the one scale the design does state: `NavArrowButton`'s press
+is `active:scale-95`, so the press pushes 5% in and the release swells 5% out —
+the same grammar §15's shadows speak, where press and lift are one vocabulary
+pointed two ways. The 300ms is the app's 150ms fade step (ModalLayer's exit,
+`/wizard/therapies`' reason swap) out and back — a pulse is two moves. On the
+224px pill the swell peaks ~11px wide, an announcement rather than a bounce.
+
+Timing note: the pulse and the un-dim run together — the button swells while
+still fading up from the disabled opacity, since both start on the same render.
+At 120 against 300ms the fade is done before the swell peaks, so the peak is at
+full strength; sequencing them (delay the pulse 120ms) was considered and
+dropped as motion nobody would read as two events.
+
+### Why it is state-driven rather than CSS-only
+
+A `:not(:disabled)` animation would fire the pulse without React — and also
+fire it on every mount where the button is born enabled, which is exactly the
+case that must NOT pulse: a learner returning from `/wizard/scenario` finds the
+gate already open, and nothing just changed for them. So `Wizard.tsx` arms the
+class only when `complete` flips false→true on the current mount (a ref seeded
+with the mount-time value, compared in an effect), and disarms it when an
+answer is cleared — re-completing pulses again, because the announcement tracks
+the gate rather than the first time it opened. The class simply stays on after
+its single run; `animation-iteration-count: 1` makes that inert.
+
+`prefers-reduced-motion` drops the pulse (`motion-reduce:animate-none`) and
+keeps the opacity ease: scale motion is what the preference asks to be rid of,
+while a 120ms cross-fade is the same class of change as the package's own
+colour transitions, which it has never guarded.
+
+### The sidebar arrow is the half this does not fix
+
+The Next arrow un-dims at the same instant for the same reason and still snaps:
+`Sidebar` renders its arrows internally, `SidebarProps` forwards no class to
+them, and a CSS rule into the package's DOM is the brittleness mlg-reskin
+debt 4 rejected by name. The clean fix is the package's — `opacity` joining the
+four components' transition lists, one word each — recorded as **mlg-reskin
+debt 7** with this section as its consumer story. The Submit button carrying
+the cue alone is acceptable because it is the primary affordance: the sidebar's
+own gate comment calls it "the way forward", the arrow being the duplicate.
+
+**Verified in Chromium at 1440 × 800, 2026-08-06**, by sampling the button's
+computed style per frame across the third click: opacity eases 0.35 → 1 on the
+120ms transition, the pulse peaks at exactly `scale: 1.05` and returns to rest
+with `animation-name` still applied and `scale: none`, and under
+`prefers-reduced-motion: reduce` the animation is gone (`animation-name: none`)
+while the un-dim still eases — caught mid-transition at 0.60. What remains
+arithmetic is the pulse's read on the scaled boards (a ~17px swell on the
+84px-tall pill at 1.5×), which open item 52 records.

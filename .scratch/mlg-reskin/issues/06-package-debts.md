@@ -230,3 +230,28 @@ as docs/styling.md §9 item 18.
 
 Worth pairing with debt 5 when `Button` gets its `render` — same component, same
 release, and both are "let the consumer in".
+
+## Debt 7 — the `disabled` flip is untransitioned, and `Sidebar`'s arrows can't be reached to fix it
+
+Found 2026-08-06, giving `/wizard`'s gate a release cue (the app-buildout polish
+pass). All four controls carry `disabled:opacity-ui-disabled`, and none of them
+has `opacity` in its `transition-[…]` list — so the most meaningful state change
+a disabled control makes, becoming available, snaps where every hover and press
+eases. The fix is one word per component: `opacity` joining the existing
+transition-property lists (`Button`, `NavArrowButton`, `NavBarButton`,
+`PopupButton`). The 120ms duration and easing are already right.
+
+The app worked around it for `Button` — `/wizard`'s Submit restates the
+package's transition list plus `opacity` via `className`, which tailwind-merge
+resolves in the caller's favour. It could NOT do the same for the sidebar's
+Next arrow, which flips at the same moment for the same reason: `Sidebar`
+renders `NavArrowButton` internally and forwards no class to it, and a CSS rule
+into the package's DOM is the brittleness debt 4 rejected. So the arrow's half
+of this is the 1/2/4/5 family again — the composite decides, the consumer
+cannot say otherwise — while the transition-list half is package polish that
+benefits every consumer and needs no API change.
+
+**Accepted for now**: the Submit button beside the answers carries the cue
+(`docs/styling.md` §20), and the arrow un-dims instantly as it always has. Take
+the transition-list fix in the next package release; give `Sidebar` an arrow
+class hook only if a second consumer need shows up, per debt 4's own rule.

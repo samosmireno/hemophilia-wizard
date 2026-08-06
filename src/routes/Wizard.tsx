@@ -1,7 +1,9 @@
+import { useEffect, useRef, useState } from "react";
 import { Button } from "mlg-components";
 import { useNavigate } from "react-router";
 
 import OptionGroup, { type Option } from "../components/OptionGroup";
+import { cn } from "../lib/cn";
 import { nextOf } from "../data/sectionOrder";
 import {
   HEMOPHILIA_TYPES,
@@ -67,6 +69,26 @@ const REASON_OPTIONS: Option<SwitchReason>[] = REASON_READING_ORDER.map((id) => 
 export default function Wizard() {
   const { answers, setAnswer, complete } = useWizardAnswers();
   const navigate = useNavigate();
+
+  /**
+   * True from the moment `complete` flips false→true *on this mount* — the
+   * trigger for Submit's one-shot release pulse (docs/styling.md §20). The
+   * moment matters, not the value: a learner returning from `/wizard/scenario`
+   * mounts with `complete` already true and gets no pulse, because nothing just
+   * changed for them. Hence the ref seeded with the mount-time value rather
+   * than `false`, and an effect rather than deriving from `complete` alone.
+   *
+   * Clearing an answer disarms it (the class comes off with the gate), so
+   * re-completing pulses again — the announcement tracks the gate, not the
+   * first time it opened.
+   */
+  const prevComplete = useRef(complete);
+  const [released, setReleased] = useState(false);
+  useEffect(() => {
+    if (complete === prevComplete.current) return;
+    prevComplete.current = complete;
+    setReleased(complete);
+  }, [complete]);
 
   /**
    * Submit goes wherever the walkthrough goes, exactly as `/wizard-intro`'s CTA
@@ -235,11 +257,27 @@ export default function Wizard() {
             `disabled` is the real attribute, not `aria-disabled`: the gate is
             visible in the three unanswered groups above it, so a focusable
             button that refuses to act would explain nothing extra.
+
+            The gate RELEASING is the page's most meaningful state change, and
+            the package leaves it silent: `disabled:opacity-ui-disabled` flips
+            instantly because opacity is not in `Button`'s transition list. Two
+            classes fix that here (docs/styling.md §20). The restated
+            `transition-[…]` is the package's own three properties plus
+            `opacity` — same group to tailwind-merge, so this one wins whole and
+            the un-dim eases on the package's own 120ms. The pulse announces the
+            moment for anyone not staring at the button; `released` scopes it to
+            the flip actually happening on this mount, and `motion-reduce`
+            drops the scale motion while keeping the (unguarded, package-style)
+            opacity ease.
           */}
           <Button
             type="submit"
             disabled={!complete}
-            className="bg-brand-lagoon-50 px-6 leading-5 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl"
+            className={cn(
+              "bg-brand-lagoon-50 px-6 leading-5 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl",
+              "transition-[background-color,box-shadow,color,opacity]",
+              released && "animate-gate-release motion-reduce:animate-none",
+            )}
           >
             Submit inputs
           </Button>
