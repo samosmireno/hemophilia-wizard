@@ -301,22 +301,30 @@ describe("rebalancing-agents chapter", () => {
   });
 
   /**
-   * The prose card carries **no** abbreviation footnote (2026-08-05), where it
-   * used to gloss all three terms its copy introduces — the divergence open item
-   * 17 raised, now settled by deleting the row. The figure card behind it keeps
-   * its own gloss, which the assertion below is what distinguishes: a footnote
-   * anywhere on the prose card fails, whichever card it was copied from.
+   * Neither card carries an abbreviation footnote: the prose card lost its gloss
+   * on 2026-08-05 (the divergence open item 17 raised), and the figure card lost
+   * its own "TFPI = tissue factor pathway inhibitor." on 2026-08-06. CONTEXT.md
+   * §7.6 still records the source's gloss, so this is the guard on the deletion
+   * being redone from it — a footnote on *either* card fails.
    *
-   * The CTA is asserted in the same test because the two are the point: the row
-   * lost its text and kept its button.
+   * Each card's action is asserted beside it because that is the point of the
+   * change: the row lost its text and kept its button.
    */
-  it("drops the abbreviation footnote from the prose card but keeps its CTA", async () => {
+  it("drops the abbreviation footnote from both cards but keeps their actions", async () => {
     const user = userEvent.setup();
     render(<RebalancingAgents />);
-    const card = within(await openProseCard(user));
+    const prose = within(await openProseCard(user));
 
-    expect(card.queryByText(/=/)).not.toBeInTheDocument();
-    expect(card.getByRole("button", { name: "View mechanism" })).toBeInTheDocument();
+    expect(prose.queryByText(/=/)).not.toBeInTheDocument();
+    expect(prose.getByRole("button", { name: "View mechanism" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "View mechanism" }));
+    const figure = within(screen.getByRole("dialog"));
+
+    // Scoped to text nodes: the diagram's own `alt` is not a footnote, and it
+    // has no `=` in it either way.
+    expect(figure.queryByText(/=/)).not.toBeInTheDocument();
+    expect(figure.getByRole("button", { name: `Back to ${PROSE_TITLE}` })).toBeInTheDocument();
   });
 
   /**

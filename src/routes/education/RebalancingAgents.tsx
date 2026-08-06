@@ -27,9 +27,6 @@ const MECHANISMS_LABEL =
 const MECHANISM_FIGURE_TITLE =
   "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade";
 
-/** The figure card's footnote, as drawn. */
-const FIGURE_ABBREVIATION = "TFPI = tissue factor pathway inhibitor.";
-
 const MECHANISM_FIGURE_ALT =
   "Coagulation cascade showing where hemostatic rebalancing agents act. FXI activates FIX; " +
   "FIX and FVIIa converge on FX, which with FV generates thrombin, and thrombin converts " +
@@ -180,7 +177,7 @@ function MechanismFigureCard({ onBack }: { onBack: () => void }) {
     <div className="py-6">
       <PopupFigure src={mechanismUrl} width={886} height={430} alt={MECHANISM_FIGURE_ALT} />
 
-      <CardFooter note={FIGURE_ABBREVIATION}>
+      <CardFooter>
         {/* `aria-label` overrides `NavArrowButton`'s hardcoded "Previous", which
             means nothing inside a card. */}
         <NavArrowButton
@@ -194,17 +191,12 @@ function MechanismFigureCard({ onBack }: { onBack: () => void }) {
 }
 
 /**
- * The note's `min-w-0 flex-1 basis-80` are what keep the action on the right —
- * not interchangeable: without them the row wraps and the button drops left.
+ * Neither card carries an abbreviation footnote any more, so the row holds only
+ * its action — `ms-auto` is what still puts that action on the right.
  */
-function CardFooter({ note, children }: { note?: string; children: ReactNode }) {
+function CardFooter({ children }: { children: ReactNode }) {
   return (
     <div className="mt-8 flex flex-wrap items-end gap-x-6 gap-y-4">
-      {note !== undefined && (
-        <p className="min-w-0 flex-1 basis-80 text-sm leading-tight font-light text-black">
-          {note}
-        </p>
-      )}
       <div className="ms-auto">{children}</div>
     </div>
   );

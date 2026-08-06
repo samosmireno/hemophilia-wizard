@@ -754,7 +754,10 @@ on the same direction; the §7.7 wizard notes and the other six sheets keep the 
   - _AT-directed siRNA:_ AT neutralizes thrombin and FXa; **fitusiran** uses RNA interference to
     reduce hepatic AT production, restoring thrombin generation and rebalancing hemostasis.
   - Figure: "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade" (image; APC =
-    activated protein C, AT = antithrombin, TFPI = tissue factor pathway inhibitor).
+    activated protein C, AT = antithrombin, TFPI = tissue factor pathway inhibitor). The gloss is
+    recorded here but **not rendered**: the prose card dropped its footnote row on 2026-08-05 and
+    the figure card dropped its "TFPI = …" on 2026-08-06, so both cards now show only their action.
+    The terms stay reachable through [§8](#8-glossary).
 - **Investigational FVIIIa-mimetic therapies in early-stage development** — the source lists NXT007
   and Inno8 in this block, but they are FVIIIa mimetics, not rebalancing agents, and the design
   files them on the §7.5 chapter. Moved to [§7.5](#75-fviiia-mimetic-bsabs-approved--emerging-agents-for-ha)
