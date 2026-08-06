@@ -1,43 +1,9 @@
 /**
- * Per-drug pop-up information sheets.
- *
- * Source of truth: the RIGHT band of the blueprint (`documents/HM-85L
- * Hemophilia Treatment Wizard_V3_Vector.pdf`, transcribed in
- * `documents/out_raw.txt`); see CONTEXT.md §6.
- *
- * Each sheet is the content the blueprint asks to launch as a pop-up from a
- * drug button ("Note: Please add a button for each drug which will pop up to an
- * information sheet."). Popup vs. page is a Phase-1 presentation choice; this
- * module stays presentation-free.
- *
- * Keyed by the verbatim `agent` string so the sheet joins to `Treatment.agent`
- * (treatments.ts) and to the wizard's `AGENTS` values (wizard.ts) with no
- * separate id scheme — reuse `sheetFor(agent)` / `SHEET_BY_AGENT`.
- *
- * Coverage: the source authored 7 sheets — the 6 novel agents the wizard can
- * recommend (Emicizumab, Denecimig, Concizumab, Marstacimab, Fitusiran,
- * Etranacogene) plus Efanesoctocog alfa. It authored NO per-drug sheet for the
- * generic SHL / EHL rows in treatments.ts (they are class-level, not branded
- * agents); those two comparison-table rows are self-contained and intentionally
- * have no sheet.
- *
- * Text fields are bulleted lists, kept verbatim (PDF soft-hyphen line-wrap
- * artifacts removed). The `points: string[]` shape mirrors `NoteBlock` in
- * wizard.ts.
- *
- * **The trial citations are gone, by client direction (2026-08-04):** "delete the
- * colon and everything after on each bullet (ie, only the clinical trials name
- * (NCT…) would be kept". `ClinicalTrial` therefore has no `citation` field, and
- * the four Denecimig tails it held ("See Mancuso NEJM 2026" and its siblings) are
- * not stored anywhere in this module. They remain recoverable from
- * `documents/out_raw.txt`; CONTEXT.md §6 records the cut.
+ * The trial citations are gone, by client direction (2026-08-04) — only the trial
+ * name and NCT id are kept, so `ClinicalTrial` carries no `citation` field.
  */
-
-/** One clinical-trial reference on a drug sheet. */
 export interface ClinicalTrial {
-  /** Trial name/label, verbatim (e.g. "HAVEN 3", "FRONTIER2", "Study 1"). */
   name: string;
-  /** Registry id — an NCT number, or a jRCT id for NXT007-style trials. */
   id: string;
 }
 
@@ -45,36 +11,14 @@ export interface ClinicalTrial {
 export interface DrugSheet {
   /** Verbatim agent name — the join key to Treatment.agent / AGENTS values. */
   agent: string;
-  /**
-   * The heading the pop-up card wears, where the source gives the sheet one that
-   * is not the agent's name. Falls back to `agent`.
-   *
-   * This is the caption/title split the education chapters record (see
-   * `fviii-mimetics`' `CARD_TITLE`): the button announces "Expand Denecimig",
-   * because the agent is what the reader picked, and the card is named for what
-   * the source calls the sheet. Stored in sentence case — every band in this app
-   * is shouted by CSS, not by copy.
-   */
+  /** The heading the pop-up card wears where it is not the agent's name. */
   title?: string;
-  /**
-   * Label over `classTarget`, **without its trailing colon** — the card appends
-   * that. Defaults to "Class/Target".
-   *
-   * Six sheets pair a class with a molecular target and say so; Efanesoctocog
-   * alfa names a class alone and the source heads it "Class". Transcribed rather
-   * than normalised, because the heading is telling you what the field under it
-   * contains.
-   */
+  /** Label over `classTarget`, without its trailing colon. Defaults to "Class/Target". */
   classHeading?: string;
-  /** "Class" / "Class/Target" — 1–2 source lines. */
   classTarget: string[];
-  /** "Indication(s)" bullets. */
   indication: string[];
-  /** "Dosage and Administration" bullets. */
   dosing: string[];
-  /** "Monitoring" bullets. */
   monitoring: string[];
-  /** "Clinical Trial(s)" entries. */
   trials: ClinicalTrial[];
 }
 
@@ -107,14 +51,8 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   },
   {
     agent: "Emicizumab",
-    /*
-      **"Factor VIII mimetic", not the source's "Factor VIIIa–mimetic"** — client
-      copy edit, 2026-08-05, dropping the activated form's `a` and the dash. It is
-      the same terminology pass that took Denecimig's sibling bullet below and every
-      string the §7.5 chapter paints (see `denecimig-moa` in education.ts); this
-      card was named a step later, so the two sheets agree again. Not a typo to
-      reconcile against the artboard, which still draws the activated form.
-    */
+    /* "Factor VIII mimetic", not the source's "Factor VIIIa–mimetic" — client copy
+       edit, 2026-08-05. Not a typo to reconcile against the artboard. */
     classTarget: ["Factor VIII mimetic", "FIXa x FX BsAb"],
     indication: ["HA +/- inhibitors, newborn + older patients"],
     dosing: [
@@ -138,20 +76,11 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: "Denecimig",
     title: "Denecimig (emerging/investigational)",
-    /**
-     * **"Factor VIII mimetic", not "Factor VIIIa–mimetic" (2026-08-05)** — a client
-     * copy edit: drop the activated form's `a` and the dash. It landed on this
-     * sheet first and on Emicizumab's above a step later, so the two agree; see
-     * that one for the pass they both belong to.
-     */
+    /* "Factor VIII mimetic", not "Factor VIIIa–mimetic" — client copy edit,
+       2026-08-05. Not a typo to reconcile. */
     classTarget: ["Factor VIII mimetic BsAb", "FIXa x FX BsAb"],
-    /*
-      `≥`, not the source's bare `>` — client copy edit, 2026-08-05 ("underline
-      the > sign, ie, greater than or equal to"). It landed here first and on the
-      three rebalancing-agent sheets below a step later, so every age threshold in
-      this module now reads `≥`. It also agrees with what the education chapter
-      has always said about FRONTIER3 ("patients ≥1 year of age").
-    */
+    /* `≥`, not the source's bare `>` — client copy edit, 2026-08-05. Every age
+       threshold in this module reads `≥`. */
     indication: [
       "TBD based on FDA approval; clinical trial populations evaluated HA +/- inhibitors, patients ≥1 year",
     ],
@@ -159,12 +88,6 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
       "SC injection, prefilled pen with attachable syringe",
       "No washout required when switching from emicizumab",
     ],
-    /*
-      The source qualified this whole section at its heading — "Monitoring: TBD;
-      based on phase 3 clinical trial data" — which is why `DrugSheet` used to
-      carry a `monitoringHeading`. Cut by client direction, 2026-08-05, leaving
-      the plain default; the field went with it, since it had no other user.
-    */
     monitoring: [
       "Injection site reactions (mostly mild, transient)",
       "No thromboembolic events or thrombotic microangiopathies",
@@ -204,8 +127,8 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: "Marstacimab",
     classTarget: ["Hemostatic rebalancing agent; TFPI mAB"],
-    // `≥`, not the source's bare `>` — see the Denecimig sheet for the edit. The
-    // dosing bullet's ">50 kg" is a weight, not an age, so it stays as authored.
+    // `≥`, not the source's bare `>` — see Denecimig. The dosing bullet's ">50 kg"
+    // is a weight, not an age, so it stays as authored.
     indication: ["Routine prophylaxis, patients ≥6 years with HA/HB +/- FVIII/FIX inhibitors"],
     dosing: [
       "SC injection (prefilled pen or syringe)",
@@ -227,8 +150,8 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: "Fitusiran",
     classTarget: ["Hemostatic rebalancing agent; AT-directed siRNA"],
-    // `≥`, not the source's bare `>` — see the Denecimig sheet for the edit. The
-    // monitoring bullet's "> 6 months" is a duration, not an age, so it stays.
+    // `≥`, not the source's bare `>` — see Denecimig. The monitoring bullet's
+    // "> 6 months" is a duration, not an age, so it stays.
     indication: ["Routine prophylaxis, patients ≥12 years with HA/HB +/- FVIII/FIX inhibitors"],
     dosing: [
       "SC injection (prefilled pen or syringe and vial for lower dose)",
@@ -253,8 +176,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
     classTarget: ["AAV vector-based gene therapy"],
     indication: ["Adults with HB without FIX inhibitors"],
     // "2 × 10¹³" in Unicode, not "2 x 10^13": the caret renders literally, and a
-    // dose that reads as ten-thousand-and-thirteen is a hazard rather than a
-    // typo. Same notation CONTEXT.md §6 already uses for it.
+    // dose that reads as ten-thousand-and-thirteen is a hazard.
     dosing: ["Single IV infusion", "2 × 10¹³ genome copies/kg body weight"],
     monitoring: [
       "Eligibility: LFTs, hepatic ultrasound and elastography; hepatitis B/C, hepatologist consultation if needed",
@@ -270,7 +192,6 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
 
 const SHEET_BY_AGENT = new Map(DRUG_SHEETS.map((s) => [s.agent, s]));
 
-/** Look up a drug sheet by its verbatim agent name (the Treatment.agent join key). */
 export function sheetFor(agent: string): DrugSheet | undefined {
   return SHEET_BY_AGENT.get(agent);
 }

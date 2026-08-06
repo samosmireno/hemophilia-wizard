@@ -2,26 +2,14 @@
 
 Status: ready-for-agent
 Phase: 0
-Blocked by: —
 
 ## Goal
 
-Build survey submission as a pluggable adapter so the destination decision stays off
-the critical path.
+Build survey submission as a pluggable `submitSurvey(responses): Promise<void>` adapter with a
+no-op stub, so swapping the real target later touches one file.
 
-## Scope
+## Remaining
 
-- Define a thin `submitSurvey(responses): Promise<void>` interface.
-- Ship a **console/no-op stub** implementation now.
-- Swapping the real target later (Firebase / Google Form / client endpoint — Firebase
-  MCP is available) must touch **one file**, no UI rework.
-
-## Acceptance
-
-- Survey UI (issue 13) can submit against the stub end-to-end.
-- Adapter boundary documented; real-target swap is isolated.
-
-## Notes
-
-Destination is **not yet defined** (settled decision). This issue exists precisely so
-that non-decision does not block the survey build.
+Nothing exists — no `submitSurvey` anywhere in `src`. The destination (Firebase / Google Form /
+client endpoint) is **a client decision, still not made**; this issue exists so that
+non-decision does not block issue 13.

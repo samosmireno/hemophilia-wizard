@@ -2,25 +2,14 @@
 
 Status: ready-for-agent
 Phase: 0
-Blocked by: 01
+Blocked by: 01 (done)
 
 ## Goal
 
-Emit per-route GA4 pageviews (and key events) now that the app is routed.
+Emit GA4 pageviews on route change plus named events, no-op when `VITE_GA_MEASUREMENT_ID` is
+unset.
 
-## Scope
+## Remaining
 
-- Build on the existing conditional `react-ga4` init in `src/main.tsx` (only active when
-  `VITE_GA_MEASUREMENT_ID` is set).
-- Fire a pageview on route change; add named events for high-value CME interactions
-  (wizard completion, drug-sheet open, survey submit).
-
-## Acceptance
-
-- Route changes produce pageviews when GA id is set; no-op when unset.
-- No analytics errors in console when the id is absent.
-
-## Notes
-
-Per-route pageviews are a benefit of the sectioned/routed decision — useful for CME
-outcomes reporting.
+All of it. `react-ga4` is **init-only** at `src/main.tsx:23`; nothing fires on navigation.
+Scope: per-route pageviews + events for wizard completion, drug-sheet open, survey submit.

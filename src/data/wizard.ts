@@ -1,66 +1,13 @@
-/**
- * Treatment Wizard — the branching decision model (the MAIN engine).
- *
- * Source of truth: the blueprint in `documents/HM-85L Hemophilia Treatment
- * Wizard_V3_Vector.pdf`. Extracted with text coordinates so each recommendation
- * list is tied to the correct scenario branch.
- *
- * This is distinct from `treatments.ts`:
- *   - `treatments.ts`  = the "Explore therapy options" filterable comparison
- *     table (a COMPUTED attribute filter over all treatments).
- *   - `wizard.ts` (here) = the guided wizard: an AUTHORED lookup keyed by
- *     (hemophilia type, inhibitor status, reason for switching) that returns a
- *     clinically curated set of novel therapies. These lists are hand-picked in
- *     the source material and are intentionally NOT derivable by filtering
- *     (e.g. HA + "reduced monitoring" narrows to the two FVIIIa mimetics only).
- *
- * Flow: "Does the patient have Hemophilia A or B?" → "Does the patient have
- * inhibitors?" → "What is the primary reason for switching therapy?" → a
- * recommended agent list + the scenario-specific Considerations/Strategies note
- * pair for that (scenario, reason). Each recommended agent maps to a pop-up drug
- * information sheet (see drug-sheets.ts / DRUG_SHEETS).
- */
-
 import type { Bullet } from "./education";
 import { TREATMENTS, type Treatment } from "./treatments";
 
-/**
- * The blueprint's entry node — the line the wizard opens on (CONTEXT.md §4),
- * verbatim but for the trailing full stop, which the source sets because it
- * draws the node as a sentence and `/wizard-intro` renders it as a heading.
- *
- * Title case is the source's own; the page uppercases it in CSS, as every
- * education chapter does with its sentence-case heading, so the accessible name
- * stays the copy that was written rather than a shout.
- */
 export const WIZARD_ENTRY_PROMPT = "Explore Novel Prophylactic Therapy Options for Your Patient";
 
-/**
- * The `/wizard` artboard's own title, and the label of the `/wizard-intro`
- * button that leads there — one constant so the button cannot name a
- * destination the destination does not call itself.
- *
- * Sentence case, uppercased in CSS at both call sites, as every heading in the
- * app is. Nowhere in CONTEXT.md: the blueprint has no such screen title, so this
- * is artboard copy, transcribed.
- */
 export const WIZARD_INPUT_TITLE = "Input patient characteristics";
 
 /**
- * The three question prompts as the artboard sets them, which is NOT how the
- * blueprint phrases them (CONTEXT.md §4):
- *
- * | | blueprint | artboard |
- * | --- | --- | --- |
- * | type | "Does the patient have Hemophilia A or Hemophilia B?" | "Disease type" |
- * | inhibitors | "Does the patient have inhibitors?" | "Does the patient have inhibitors" |
- * | reason | "Primary reason for switching therapy?" | "…for considering a treatment option?" |
- *
- * The artboard wins for anything rendered; the blueprint's wording stays the
- * domain vocabulary and is what §4.2's 32 note titles are written against (they
- * still say "…is the primary reason for switching therapies"). Verbatim
- * transcription includes the inconsistent punctuation — the inhibitor prompt
- * carries no question mark on the artboard and the reason prompt does.
+ * Verbatim from the artboard, inconsistent punctuation included — the inhibitor
+ * prompt carries no question mark and the reason prompt does.
  */
 export const WIZARD_QUESTIONS = {
   type: "Disease type",
@@ -70,34 +17,19 @@ export const WIZARD_QUESTIONS = {
 
 export type WizardHemophiliaType = "A" | "B";
 
-/** The two answers to Q1, in the artboard's left-to-right order. */
 export const HEMOPHILIA_TYPES: { id: WizardHemophiliaType; label: string }[] = [
   { id: "A", label: "Hemophilia A" },
   { id: "B", label: "Hemophilia B" },
 ];
 
-/** The wizard's third question — the primary reason for switching therapy. */
 export type SwitchReason = "bleeding-control" | "adherence" | "treatment-burden" | "monitoring";
 
 export interface SwitchReasonOption {
   id: SwitchReason;
-  /** What the wizard screen renders: the artboard's imperative phrasing. */
   label: string;
-  /**
-   * The blueprint's own gerund phrasing (CONTEXT.md §4). Kept beside the label
-   * rather than dropped because it is the wording the source uses everywhere
-   * else — the §4.2 note titles and the leaf's "Novel therapies to consider if
-   * [reason] is the primary reason for switching therapies:" header — so the
-   * pages that render those need this form, not the button's.
-   */
   sourceLabel: string;
 }
 
-/**
- * Order here is the blueprint's (CONTEXT.md §4.1's matrix reads in it). The
- * artboard lays the four out in a 2×2 grid in a *different* reading order; that
- * is a layout fact and lives on the page, not in the data.
- */
 export const SWITCH_REASONS: SwitchReasonOption[] = [
   {
     id: "bleeding-control",
@@ -117,18 +49,13 @@ export const SWITCH_REASONS: SwitchReasonOption[] = [
   },
 ];
 
-/** Scenario = hemophilia type + inhibitor status. Four in total. */
 export type ScenarioKey = "A-without" | "A-with" | "B-without" | "B-with";
 
 export function scenarioKey(type: WizardHemophiliaType, hasInhibitors: boolean): ScenarioKey {
   return `${type}-${hasInhibitors ? "with" : "without"}` as ScenarioKey;
 }
 
-/**
- * Canonical agent identifiers used by the wizard's recommendation lists.
- * Values match `Treatment.agent` in treatments.ts so the two models join.
- * "Gene therapy" in the blueprint = Etranacogene dezaparvovec-drlb.
- */
+/** Values must match `Treatment.agent` in treatments.ts — that is the join key. */
 export const AGENTS = {
   emicizumab: "Emicizumab",
   denecimig: "Denecimig",
@@ -142,11 +69,6 @@ const MIMETICS = [AGENTS.emicizumab, AGENTS.denecimig];
 const REBALANCING = [AGENTS.concizumab, AGENTS.marstacimab, AGENTS.fitusiran];
 const GENE = [AGENTS.etranacogene];
 
-/**
- * scenario → reason → recommended agent names (verbatim from the blueprint).
- * Order within each list follows the source (mimetics first, then rebalancing,
- * then gene therapy).
- */
 export const RECOMMENDATIONS: Record<ScenarioKey, Record<SwitchReason, string[]>> = {
   "A-without": {
     "bleeding-control": [...MIMETICS, ...REBALANCING],
@@ -162,7 +84,7 @@ export const RECOMMENDATIONS: Record<ScenarioKey, Record<SwitchReason, string[]>
   },
   "B-without": {
     "bleeding-control": [...REBALANCING],
-    adherence: [...REBALANCING, ...GENE], // gene therapy offered for HB w/o inhibitors
+    adherence: [...REBALANCING, ...GENE],
     "treatment-burden": [...REBALANCING, ...GENE],
     monitoring: [...REBALANCING],
   },
@@ -174,80 +96,21 @@ export const RECOMMENDATIONS: Record<ScenarioKey, Record<SwitchReason, string[]>
   },
 };
 
-/**
- * The "Therapeutic classes to consider" box each scenario band opens with,
- * shown BEFORE the reason question (CONTEXT.md §4). Labels are the verbatim box
- * wording — deliberately NOT the `TreatmentClass` enum, because the source
- * phrases the same class differently per scenario (e.g. "FIX prophylaxis" and
- * "Recombinant FVIII concentrates" are both clotting factor replacement).
- */
 export interface ClassesToConsider {
-  /**
-   * The `/wizard/scenario` artboard's own `<h1>` — the scenario named in full.
-   *
-   * Sentence case, uppercased in CSS at the one call site, as every heading in
-   * the app is. Not composed from `HEMOPHILIA_TYPES` and the inhibitor answer:
-   * see `lead` below, whose four values prove the screens are transcribed rather
-   * than templated, and this is the same four screens' other half.
-   */
   title: string;
-  /**
-   * The sentence above the class list, as the artboard sets it.
-   *
-   * **Carries inline markup** — the polarity word is italic on all four screens,
-   * written `_with_` / `_without_` and rendered through `formatInline` (ADR
-   * 0004). That emphasis is not decorative: it is the one word distinguishing
-   * two otherwise near-identical sentences, and the branch the screen turns on.
-   *
-   * **Transcribed, not templated, and HB +inhibitors is why.** Three screens
-   * read "Therapeutic classes to consider for prophylaxis of …"; that one reads
-   * "Therapeutic **options** for prophylaxis of …", because its list is a single
-   * class rather than a choice between several. A template would have quietly
-   * normalised that away.
-   */
+  /** Carries inline `_em_` markup, rendered through `formatInline` (ADR 0004). */
   lead: string;
   /** Verbatim class labels listed in the box. */
   classes: string[];
-  /**
-   * The line by the illustration boxes, telling the learner they open.
-   *
-   * Two distinct sentences across the four screens, again not derivable: the
-   * three multi-box screens say "Click on the boxes below to learn more about
-   * each type of therapy", and the one single-box screen abandons that phrasing
-   * for the app's "Click here:" idiom and names the class outright. (The
-   * blueprint hedged with "Click on the box(es) below" — CONTEXT.md §4 — where
-   * the artboard rewrote the sentence instead.)
-   *
-   * WHERE it is drawn is not here: above the boxes on the multi-box screens,
-   * below the single one. That is a layout fact and lives on the page, the same
-   * split `Wizard.tsx` records for `REASON_READING_ORDER`.
-   */
   caption: string;
-  /** Scenario-specific caveat (only HB +inhibitors carries one). */
   caveat?: string;
 }
 
-/**
- * The caption the three multi-box screens share, stated once.
- *
- * A constant rather than three copies of the same sentence, because they ARE the
- * same sentence: the artboards draw one line of copy on three screens, and a
- * reword that reached two of them would be a bug the type system cannot see.
- * `B-with` states its own inline, which is what makes it visible as the
- * exception it is.
- */
 const BOXES_CAPTION = "Click on the boxes below to learn more about each type of therapy";
 
 /**
- * scenario → the class-level guidance box shown before the reason question.
- * `classes` and `caveat` are verbatim from `[PDF-V]` CENTER band
- * (`documents/out_raw.txt`); `title`, `lead` and `caption` are the four
- * `/wizard/scenario` artboards, which the blueprint has no equivalent of.
- *
- * **Double spaces in the exports are not transcribed.** "for  prophylaxis" on
- * the HA +inhibitors lead and "TO LEARN  MORE" in the shared caption are
- * justification artifacts of the drawn text block, not authored spacing — the
- * same call `disease-background` makes for the export's "FACOTOR".
+ * Double spaces in the exports are NOT transcribed — "for  prophylaxis" and
+ * "TO LEARN  MORE" are justification artifacts, not authored spacing.
  */
 export const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
   "A-without": {
@@ -264,15 +127,8 @@ export const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
     title: "Hemophilia A with inhibitors",
     lead: "Therapeutic classes to consider for prophylaxis of HA _with_ inhibitors",
     /**
-     * **"agents" is the artboard's; `[PDF-V]` sets it singular.** The artboard is
-     * the filing authority for anything rendered — the call `fviii-mimetics`
-     * records twice for its own copy — and the singular reads as a source slip
-     * rather than a distinction, since the same list's FIRST item is deliberately
-     * singular here where `A-without`'s is plural.
-     *
-     * **"Factor VIII mimetic", not "Factor VIIIa" (2026-08-05)** — a client copy
-     * edit on this screen only, so `A-without` keeps the activated form the
-     * artboards draw. Deliberate divergence; not a typo to reconcile.
+     * "Factor VIII mimetic", not "Factor VIIIa" — a client copy edit (2026-08-05)
+     * on this screen only; `A-without` keeps the activated form. Not a typo.
      */
     classes: ["Factor VIII mimetic", "Hemostatic rebalancing agents"],
     caption: BOXES_CAPTION,
@@ -297,48 +153,17 @@ export const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
 /** One "Pop-up note" — a title plus its bullet list. Text is verbatim from the source. */
 export interface NoteBlock {
   title: string;
-  /**
-   * `Bullet`, not `string[]`, because four of the 32 notes genuinely carry a
-   * nested level — the `treatment-burden` Considerations in every scenario open
-   * a lead-in with a colon ("Frequent IV therapy is particularly challenging for
-   * children:") and subordinate their age-restriction bullets to it.
-   *
-   * **The nesting is measured, not inferred from the colon.** `documents/out.txt`
-   * is a layout-preserving dump, and in it the top-level bullets of those notes
-   * start at column 1755 while the age bullets start at 1763 — a real indent the
-   * `out_raw.txt` band extraction flattens away, because its `[x=…]` headers are
-   * page regions rather than per-line positions. The same measurement is what
-   * keeps `B-without`'s trailing gene-therapy bullet OUT of the nest: it sits
-   * back at 1755, and on content grounds it is about gene therapy rather than
-   * about children.
-   *
-   * Reusing `education.ts`'s type rather than declaring a second one: a bullet
-   * with one nested level is the same shape wherever the source draws it, and
-   * `BulletList` already renders it as markup rather than as indentation. The
-   * import is `import type`, so it is erased at build and couples nothing.
-   */
   points: Bullet[];
 }
 
-/**
- * The pair of light-blue pop-up notes a leaf shows for one (scenario, reason):
- * a "Considerations for …" list and a "Strategies for …" list.
- */
 export interface ReasonNote {
   considerations: NoteBlock;
   strategies: NoteBlock;
 }
 
 /**
- * scenario → reason → { considerations, strategies } notes, verbatim from
- * `[PDF-V]` (see CONTEXT.md §4.2). The blueprint carries 32 distinct notes
- * (4 scenarios × 4 reasons × {Considerations, Strategies}); the copy is
- * SCENARIO-SPECIFIC, not shared per reason — e.g. the HB notes name hemostatic
- * rebalancing agents / gene therapy while the HA notes name FVIIIa mimetics and
- * a factor washout, and the "+inhibitors" bleeding-control note calls out
- * bypassing agents. Title wording also varies across scenarios (e.g. monitoring:
- * "…Requirements" / "…Requirement" / "…to Reduce Monitoring") and is preserved
- * as-is. Full verbatim source: `documents/out_raw.txt` (CENTER band).
+ * 32 notes, verbatim from `[PDF-V]` (CONTEXT.md §4.2). The copy and the title
+ * wording are SCENARIO-SPECIFIC, not shared per reason — preserved as-is.
  */
 export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote>> = {
   "A-without": {
@@ -392,13 +217,7 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Prefilled dosing pens simplify preparation and administration, reduce dosing complexity, and support at-home treatment",
           {
             text: "Frequent IV therapy is particularly challenging for children:",
-            /* `≥`, not the source's bare `>` — the fourth and last pass of the
-               2026-08-05 client copy edit, which had already reached `B-with`,
-               `B-without`, and `A-with`. Every scenario now carries `≥`; the
-               bare `>` the source set survives only in `treatments.ts` and
-               `drug-sheets.ts`, which the edit did not name. The denecimig
-               bullet keeps its "of age" — the edit changed the sign, not the
-               wording, so it still differs from `A-with`'s "≥1 year". */
+            /* `≥`, not the source's bare `>` — client copy edit, 2026-08-05. */
             children: [
               "Emicizumab is indicated for younger patients, including newborns; denecimig was evaluated in patients ≥1 year of age",
               "Marstacimab is indicated for patients ≥ age 6 years",
@@ -488,16 +307,10 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Simplified dosing approaches, such as fixed or tiered dosing, may reduce the need for frequent dose calculations and ongoing treatment adjustments",
           "Prefilled dosing pens simplify preparation and administration, reduce dosing complexity, and support at-home treatment",
           {
-            /* Same lead-in as `A-without`, and its first child differs by two
-               words — "≥1 year" here, "≥1 year of age" there. Transcribed as the
-               source sets each rather than reconciled. */
+            /* The first child differs from `A-without`'s by two words — "≥1 year"
+               here, "≥1 year of age" there. Transcribed as the source sets each,
+               not reconciled. `≥` is the 2026-08-05 client copy edit. */
             text: "Frequent IV therapy is particularly challenging for children:",
-            /* `≥`, not the source's bare `>` — a third pass of the 2026-08-05
-               client copy edit extended to this scenario what it asked for in
-               `B-with` and then `B-without`, and a fourth pass finished
-               `A-without`. The denecimig bullet moves with the other two:
-               `education.ts`'s FRONTIER3 bullet already writes that age limit
-               as "≥1 year of age". */
             children: [
               "Emicizumab is indicated for younger patients, including newborns; denecimig was evaluated in patients ≥1 year",
               "Marstacimab is indicated for patients ≥ age 6 years",
@@ -586,20 +399,14 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Prefilled dosing pens simplify preparation and administration, reduce dosing complexity, and support at-home treatment",
           {
             text: "Frequent IV therapy is particularly challenging for children:",
-            /* `≥`, not the source's bare `>` — a second pass of the 2026-08-05
-               client copy edit extended to this scenario what it first asked
-               for in `B-with` below. Two further passes carried it to `A-with`
-               and `A-without`. */
+            /* `≥`, not the source's bare `>` — client copy edit, 2026-08-05. */
             children: [
               "Marstacimab is indicated for patients ≥ age 6 years",
               "Concizumab and fitusiran are approved for children ≥12 years",
             ],
           },
-          /* Top level, NOT a third child, and this scenario is the only one where
-             the distinction is live. `out.txt` puts it back at column 1755 with
-             the other top-level bullets where the two age bullets above sit at
-             1763 — and it is about gene therapy rather than about children, so
-             the measurement and the content agree. */
+          /* Top level, NOT a third child — measured at column 1755 in `out.txt`,
+             and it is about gene therapy rather than about children. */
           "Gene therapy may reduce long-term treatment burden by decreasing the need for routine prophylactic FIX infusions, but requires careful patient selection and structured post-treatment monitoring",
         ],
       },
@@ -681,14 +488,8 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Prefilled dosing pens simplify preparation and administration and support at-home treatment",
           {
             text: "Frequent IV therapy is particularly challenging for children:",
-            /* A client copy edit of 2026-08-05 asked for these `>` signs to be
-               underlined — the slide-deck way of drawing "greater than or equal
-               to", and the sense the indications carry. Set as the character for
-               the same reasons as `education.ts`'s FRONTIER bullets: the codebase
-               already writes it that way, and it is what a screen reader
-               announces. The edit named this scenario first, then `B-without`,
-               then `A-with`, then `A-without` — all four scenarios now carry
-               `≥`. */
+            /* `≥`, not the source's bare `>` — client copy edit, 2026-08-05. All
+               four scenarios carry it; set as the character, not an underlined `>`. */
             children: [
               "Marstacimab is indicated for patients ≥ age 6 years",
               "Concizumab and fitusiran are approved for children ≥12 years",
@@ -698,10 +499,8 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
       },
       strategies: {
         title: "Strategies for Reducing Treatment Burden and Improving QoL",
-        /* The same copy edit replaced this set with the three bullets the `A-*`
-           scenarios carry — the client supplied them verbatim, so the HB
-           wording ("convenient SC administration and alternative dosing
-           schedules") is gone rather than merged. */
+        /* The client supplied these three verbatim (2026-08-05); the HB wording is
+           gone rather than merged. */
         points: [
           "Discuss options for less frequent or more convenient SC dosing with appropriate patients",
           "Consider options for less burdensome dosing and administration for younger patients when possible",
@@ -734,17 +533,14 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
 export interface WizardResult {
   scenario: ScenarioKey;
   reason: SwitchReason;
-  /** Recommended treatments, resolved to full Treatment records. */
   recommendations: Treatment[];
   /** Any recommended agent names that had no matching Treatment record. */
   unresolved: string[];
-  /** The scenario-specific Considerations + Strategies pop-up pair for this leaf. */
   note: ReasonNote;
 }
 
 const BY_AGENT = new Map(TREATMENTS.map((t) => [t.agent, t]));
 
-/** Run the wizard: (type, inhibitors, reason) → recommended treatments + note. */
 export function recommend(
   type: WizardHemophiliaType,
   hasInhibitors: boolean,

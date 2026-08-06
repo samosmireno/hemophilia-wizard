@@ -1,17 +1,3 @@
-/**
- * Bibliography and the curated "Resources" panel.
- *
- * Source of truth: `[PDF-V]` (`documents/out_raw.txt`; CONTEXT.md §9).
- * - REFERENCES: the bottom-left teal bibliography block. Kept as formatted
- *   citation display strings (nothing sorts/filters them), URLs inline.
- * - RESOURCES: the far-right categorized panel; each item's URL is split into
- *   `url` so Phase 1 can link it without re-parsing.
- *
- * Trademark glyphs (®/™) are stored verbatim; the V3 "superscript all
- * trademarks" instruction is Phase-3 styling, not encoded here. PDF soft-hyphen
- * line-wrap artifacts removed. "URLs accessed July 14, 2026."
- */
-
 export interface Reference {
   id: string;
   /** Formatted citation, verbatim (URL inline when the source includes one). */

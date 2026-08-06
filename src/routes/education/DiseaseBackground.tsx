@@ -10,40 +10,11 @@ import { cn } from "../../lib/cn";
 import { usePreloadImages } from "../../lib/preloadImage";
 import ClottingCascadeFigure from "./ClottingCascadeFigure";
 
-/**
- * The clotting cascade's own heading, which is not its §7.7 caption ("Disease
- * mechanism for HA/HB") — the same caption-vs-title split `Disclosure` records.
- */
 const CASCADE_TITLE = "Initiation and Amplification of the Clotting Cascade";
 
-/**
- * `/education/disease-background` — CONTEXT.md §7.2, the first chapter of the
- * education module and step 1 of the walkthrough after `/`.
- *
- * Non-null: both ids are literals in this repo's own data module, and the
- * chapter test asserts they resolve. A fallback here would be a second,
- * unverified answer to a question the test already answers.
- */
 const MECHANISM = topicById("disease-mechanism")!;
 const DIAGNOSIS = topicById("diagnosis")!;
 
-/**
- * The three "Click here:" disclosures under the severity heading (§7.7).
- *
- * Labels are literals rather than data reads: only the first has a matching
- * `EDUCATION_TOPICS` title. Second pass reconciles all three with the data
- * model.
- *
- * **Every one of them carries its own `title`.** The caption under the button
- * and the heading on the card are different strings in the design — the caption
- * names the target from the §7.7 index ("Diagnostic algorithm for HA/HB"), the
- * card wears the figure's own title ("Diagnostic approach for Hemophilia A/B").
- * Neither is derivable from the other, so both are stated.
- *
- * A 3-tuple, matching `DisclosureBand`'s prop: the band's grid and arch are
- * drawn around three columns, so a fourth is a design question, and the type is
- * what makes it get asked.
- */
 const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
   {
     label: DIAGNOSIS.title,
@@ -77,75 +48,24 @@ const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
   },
 ];
 
-/**
- * The two figures a `DisclosureBand` opens, warmed from here rather than from
- * inside them.
- *
- * `DisclosureBand` renders only the *open* disclosure's `content`, so the
- * `PopupFigure`s below do not exist in the DOM until they are clicked — nothing
- * requests these two during the chapter's own load, and a cold card paints its
- * picture a beat after it opens (`PopupFigure` reserves the box, so late is all
- * a cold picture is; warming is what makes it on time). This is the nearest
- * scope that is mounted the whole time and already holds the URLs.
- *
- * The cascade is absent deliberately: `ExpandableFigure` mounts its body with
- * the chapter, so `ClottingCascadeFigure` warms itself.
- */
 const DISCLOSURE_FIGURES = [diagnosticUrl, bleedingUrl];
 
 export default function DiseaseBackground() {
   usePreloadImages(DISCLOSURE_FIGURES);
 
-  // A growing flex column so the severity band below can be pinned to the bottom
-  // of it — the shell hands every page a `flex-1` wrapper inside a `min-h-dvh`
-  // `<main>`, so `flex-1` here resolves against the viewport. The leftover height
-  // lands ABOVE the band rather than inside it; see the band's own note.
   return (
     <section aria-labelledby="chapter-heading" className="flex flex-1 flex-col">
       {/* Uppercase is CSS, not copy: the accessible name stays title-case, the
           way `Landing` keeps the activity title readable. */}
       <h1
         id="chapter-heading"
-        // `text-5xl` from `lg` only, app-wide (docs/styling.md §2). `BACKGROUND`
-        // sets 258.5px at 52px, which is the thinnest passing margin in the app
-        // — 2.5px over a 320px column.
         className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
       >
         Hemophilia Disease Background
       </h1>
-      {/*
-        The figure sets the top of this block and the prose is nudged down
-        under it — hence the per-column margins rather than one on the grid:
-        in the comp the pop-up sits nearer the chapter title than the
-        "Disease mechanism" heading does.
-
-        **The split is `xl:`, not `lg:`** — the same argument §8 makes for the
-        landing hero, and for the same reason. The drawn two-column layout needs
-        the 1440 canvas's column, and `lg` is where it can least afford it: the
-        gutter steps 48 → 112 at that exact pixel (§12), so the content column
-        drops 927 → 752 in the same breakpoint that turns the fixed 470px figure
-        track on, leaving the prose 752 − 32 − 470 = **250px**. At `xl` the
-        column is 1008 and the prose 506. Between 1024 and 1279 the chapter is
-        one 752px column instead, which is wider than the prose gets in the
-        two-column layout at that width — the stack is not a fallback here, it
-        is the better composition. 1280 ≤ the 1440 canvas, so **1440 is
-        unaffected**.
-      */}
-      {/* 29.375rem === the drawn 470px at a 16px root, so the canvas is
-          unchanged; as px the figure track held still while the prose track grew
-          above 1440 and the composition drifted (docs/styling.md §19). */}
-      {/* `mb-4` is the band's old `mt-4`, moved here because `mt-auto` displaced
-          it (see the band below). It has to live on this side of the pin: a
-          margin on the band would be the pin, so the 16px floor would vanish on
-          exactly the viewports that have no free space — every width where this
-          chapter scrolls. Measured 0px there before it was restored. */}
+      {/* 29.375rem === the drawn 470px at a 16px root. */}
       <div className="mt-5 mb-4 grid xl:grid-cols-[1fr_29.375rem] xl:gap-x-8">
         <div className="xl:mt-3">
-          {/* `text-3xl` from `lg` only — §2's `<h1>` rule applied one level
-              down. A sub-heading does not overflow the way a display `<h1>`
-              does, so this is comfort rather than correctness: at 30px in a
-              311px phone column the heading hierarchy collapses onto the body
-              size, and one step restores it. */}
           <h2 className="text-2xl font-bold tracking-wide text-black lg:text-3xl">
             {MECHANISM.title}
           </h2>
@@ -155,24 +75,6 @@ export default function DiseaseBackground() {
           </h2>
         </div>
 
-        {/*
-          The one §7.7 target the design draws in the chapter body rather than
-          behind a "Click here:" button, so it is an `ExpandableFigure` and not a
-          fourth `Disclosure` — the band's grid and arch are built for three.
-
-          The thumbnail is the designer's export with only the ✕ cropped out —
-          a control that did nothing while this was a static placeholder — so it
-          keeps the crimson title band and labels itself in a 470px column. What
-          it opens is rebuilt as markup rather than shown as that same raster
-          (docs/styling.md §13), which is why the card is white: the diagram is
-          drawn on white, and the tinted body would frame it as a rectangle.
-
-          `mx-auto` below the split and `xl:mx-0` above it: the 480px cap is
-          narrower than the stacked column at every width the stack exists at
-          (752px at 1024), so left-flush would hang 272px of dead space beside
-          it. Inside its own grid track the track IS the box, and centring there
-          would break the drawn 807–1277 alignment.
-        */}
         <ExpandableFigure
           thumbSrc={cascadeThumbUrl}
           thumbWidth={940}
@@ -187,74 +89,13 @@ export default function DiseaseBackground() {
         <BulletList items={DIAGNOSIS.body} className="mt-4 xl:col-span-2" />
       </div>
 
-      {/*
-        The band closes the page: `ArchBand`'s `mt-auto` pins it to the bottom of
-        the column, which is why the `<section>` above is a flex column. It is
-        inert once the content itself passes the fold (`min-h-dvh` is a floor, so
-        there is no free space to take), and the band then follows the content.
-
-        **It `grow`ed until 2026-08-05**, which made the arch a residual: the
-        leftover height went into the crescent rather than above it, so a tall
-        viewport drew an 861px arch (2560 × 1440) with the three disclosures
-        stranded at its top. Now the arch is its own height at every board and
-        the leftover is page gradient above it — the shape `/wizard/therapies`
-        has always drawn. See `ArchBand` and docs/styling.md §16.
-
-        The 44px above it was the band heading's own top margin collapsing out
-        through the (padding-less) div. A flex item establishes its own
-        formatting context, which stops that; the gap was stated directly as
-        `mt-4` instead, and `mt-auto` now supersedes it — bigger everywhere
-        except on the overflowing column, where it is 0.
-      */}
       <DisclosureBand title="Hemophilia Severity and Bleeding Patterns" disclosures={DISCLOSURES} />
     </section>
   );
 }
 
-/** The banner over the bullet row — a table heading in the design, so a literal here. */
 const MANIFESTATION_HEADING = "Bleeding Manifestation Based on Severity";
 
-/**
- * `SEVERITY_TABLE` as the §7.7 pop-up draws it: severity across the top, the
- * factor level under it, then the bleeding manifestations under a banner of
- * their own.
- *
- * **A real `<table>`**, not the grid the visual suggests. The two pale bars
- * span all three columns and read as single pills, which is a grid's natural
- * shape and a table's awkward one — but the content is a genuine 3×2 matrix
- * (severity × [factor level, manifestations]), and a grid throws away the
- * column association that makes ">5% – <40%" mean something. `border-separate`
- * with zero x-spacing buys the pill back: the header cells touch, share one
- * `bg-white/50`, and only the outer two round, so the row paints as one bar.
- * The banner is one `colspan=3` cell for the same reason — a `colgroup` header
- * over the row beneath it, which is what it is.
- *
- * Type is raw design values under §8's precedent — 26/700 lands on the `text-2xl`
- * step at a heavier weight, and 22px is off the scale entirely. The column rules
- * are inferred: the export draws a hairline the palette has no token for.
- *
- * **It is the one thing on this page that cannot simply reflow.** Three
- * `table-fixed` columns divide whatever they are given, and the manifestation
- * cells carry unbreakable words — `intracranial`, `hemorrhages` — so below a
- * floor the text breaks mid-word rather than wrapping. At 375px the card is
- * `min(1140, 92vw)` = 345px and its body 303px after the border and the ramped
- * padding, which is 101px a column and ~61px of text once `px-2` and `pl-6` are
- * taken off.
- *
- * So it gets both halves of the usual answer: the type steps down below `lg`
- * (24 → 16 in the cells, 20 → 14 in the bullets), which drops the floor to
- * ~140px a column, and `min-w-105` (420px) with an `overflow-x-auto` wrapper
- * holds that floor when the card is narrower still. The table fits outright
- * from ~480px up; below that the card scrolls sideways rather than shredding
- * the words. That is the same call open item 27 already took for the §5
- * comparison table, and it keeps the `<table>` intact — the alternative,
- * restacking into three blocks on a phone, flattens the column association for
- * assistive tech at exactly the width where it matters most, which is the thing
- * the element was chosen for above.
- *
- * The wrapper is a plain `div`: `overflow-x-auto` on the `<table>` itself does
- * nothing, because a table box is not a scroll container.
- */
 function SeverityTable() {
   return (
     <div className="overflow-x-auto">
@@ -305,13 +146,6 @@ function SeverityTable() {
                 key={row.severity}
                 className={cn("px-2 pt-2 pb-6 align-top", index > 0 && "border-l border-black/10")}
               >
-                {/*
-                  One `leading-[1.6]` covers both steps: a Tailwind v4
-                  `leading-*` sets `--tw-leading`, and every `text-<size>`
-                  resolves its line-height through that property, so the ramp
-                  reads it rather than replacing it. A slash modifier would be
-                  the one needing restatement per step. See `Popup`'s title.
-                */}
                 <ul className="list-disc pl-6 text-left text-sm leading-[1.6] font-normal lg:text-xl">
                   {row.manifestations.map((manifestation) => (
                     <li key={manifestation}>{manifestation}</li>

@@ -1,7 +1,3 @@
-/**
- * `/references` — off-line full bibliography page (~40 citations; content is
- * issue 12). Not part of the Prev/Next walkthrough spine.
- */
 export default function References() {
   return (
     <section aria-labelledby="references-heading">

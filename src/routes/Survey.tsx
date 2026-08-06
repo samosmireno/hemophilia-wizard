@@ -1,6 +1,3 @@
-/**
- * `/survey` — post-activity survey, final walkthrough step (build is issue 13).
- */
 export default function Survey() {
   return (
     <section aria-labelledby="survey-heading">

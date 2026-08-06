@@ -1,35 +1,24 @@
-/* Design tokens. Variables declared in @theme become Tailwind utilities
-   (--color-brand-teal-50 → bg-brand-teal-50, text-brand-teal-50, …).
-
-   RATIONALE FOR EVERY VALUE BELOW LIVES IN `docs/styling.md` — where each colour
-   came from, why a mapping beat the obvious one, and what is still open. Change a
-   token, change that doc. */
+/* Change a token, change docs/styling.md. */
 
 @import "tailwindcss";
 @import "mlg-components/tokens.css";
 /* Path is relative to THIS file, and the leading @ form does not work. Getting it
    wrong renders every mlg component unstyled, silently. See docs/styling.md §1. */
 @source "../../node_modules/mlg-components/dist";
+/* Markdown is prose ABOUT classes, not markup using them: without this, every class
+   named in docs/ or .scratch/ ships as a real rule. See docs/styling.md §9 item 40. */
+@source not "../../docs";
+@source not "../../.scratch";
 
 @theme {
-  /* ─── Typography (docs/styling.md §2) ─────────────────────────────────────
-     DM Sans = default, Barlow Condensed = display (font-display). Self-hosted
-     via @fontsource, imported in main.tsx.
-
-     There is NO house type scale. Sizes are Tailwind's own --text-* defaults
-     (text-xs … text-5xl), used unmodified, and line-height comes with them. A
-     step therefore sets size + line-height only, so every call site that wants
-     a weight states it (font-bold, font-semibold, …) — the drawn value → utility
-     mapping is the table in §2. Do not reintroduce --text-* here: overriding
-     one silently changes every utility of that name across the app. */
+  /* ─── Typography (docs/styling.md §2) ─────────────────────────────────────── */
+  /* Do not reintroduce --text-* here: overriding one silently changes every utility
+     of that name across the app (pairs with the merge config in src/lib/cn.ts). */
   --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
 
-  /* ─── Brand palette (docs/styling.md §3) ──────────────────────────────────
-     Raw scales, namespaced so they never collide with Tailwind's built-in
-     teal/slate. Steps run 0→100, lightest→darkest. No semantic aliases yet.
-     NB: -25 is a pastel tint, not a lighter -50 — see the doc before using it
-     as a hover state. */
+  /* ─── Brand palette (docs/styling.md §3) ──────────────────────────────────── */
+  /* -25 is a pastel tint, not a lighter -50 — not a hover state. */
 
   /* TEAL — PRIMARY */
   --color-brand-teal-0: #eef8f6;
@@ -66,43 +55,20 @@
   --color-brand-sand-75: #7a5c38;
   --color-brand-sand-100: #3a2810;
 
-  /* ─── Page backgrounds (docs/styling.md §6) ───────────────────────────────
-     Two radial gradients, from the designer. The `--background-image-*`
-     namespace yields `bg-page` / `bg-page-landing` — the arbitrary-value
-     `bg-[radial-gradient(…)]` form belongs in neither JSX nor here.
-
-     Three of the four stops are exact palette steps, so they are derived with
-     color-mix rather than transcribed as rgba() and a palette change still
-     moves them (verified: Tailwind keeps the var() references live under an
-     @supports color-mix rule, and only the ancient-browser fallback inlines
-     the hex — unlike --shadow-*, which is inlined outright. See §1). */
-
-  /* Landing only. lagoon-25 → teal-75, both at 77%. */
+  /* ─── Page backgrounds (docs/styling.md §6) ───────────────────────────────── */
   --background-image-page-landing: radial-gradient(
     ellipse 123.99% 135.17% at 29.44% -14.63%,
     color-mix(in srgb, var(--color-brand-lagoon-25) 77%, transparent) 0%,
     color-mix(in srgb, var(--color-brand-teal-75) 77%, transparent) 100%
   );
 
-  /* Every other route. White → an off-scale mint, both at 40%. That second
-     stop is `rgba(114.61, 213.07, 191.53)` in the export — fractional channels,
-     i.e. an opacity-flattened Figma layer, not a picked colour. Nearest step is
-     teal-25 at dE .042, twice as close as anything else but still over JND, so
-     it stays literal per the §4 rule. Worth a designer question. */
   --background-image-page: radial-gradient(
     ellipse 58.7% 133.55% at 48.51% 45.06%,
     color-mix(in srgb, #ffffff 40%, transparent) 0%,
     rgba(114.61, 213.07, 191.53, 0.4) 100%
   );
 
-  /* ─── Popups (docs/styling.md §13) ────────────────────────────────────────
-     The §7.7 click-through dialog's body fill. Figma draws a *rotated* ellipse
-     (~13°) with three stops; the middle one is the exact sRGB midpoint of the
-     other two, so it is redundant in an sRGB gradient and dropped. Both end
-     stops are exact palette steps, hence live var() refs rather than hexes —
-     same rule as the page gradients above. CSS cannot rotate a radial-gradient;
-     the outer stop sits past the corners, so the unrotated approximation moves
-     the visible isolines by a few px. */
+  /* ─── Popups (docs/styling.md §13) ────────────────────────────────────────── */
   --background-image-popup: radial-gradient(
     ellipse 99.26% 119.71% at 50.85% 52.95%,
     var(--color-brand-sand-0) 0%,
@@ -112,149 +78,32 @@
   /* In @theme, not :root — Tailwind inlines --shadow-* at build time (§1). */
   --shadow-popup: 0px 22.735px 50.142px 5.052px rgba(0, 0, 0, 0.55);
 
-  /* ─── Education chapters (docs/styling.md §11) ────────────────────────────
-     The caption under each PopupButton disclosure. Sampled #074655 — off every
-     lagoon step, but it is the scale's own midpoint: color-mix(lagoon-75 52%,
-     lagoon-100) lands at dE .0006 OKLab, two orders under JND. Derived rather
-     than transcribed so a lagoon change still moves it (§3/§4 rule).
-     Named outside `brand-` (that namespace is the raw scale) and outside `ui-`
-     (that one belongs to mlg-components). */
+  /* ─── Education chapters (docs/styling.md §11) ────────────────────────────── */
   --color-popup-caption: color-mix(
     in oklab,
     var(--color-brand-lagoon-75) 52%,
     var(--color-brand-lagoon-100)
   );
 
-  /* The two mechanism classes of §7.6's hemostatic rebalancing agents, which
-     the `rebalancing-agents` artboard draws in two colours: the anti-TFPI mABs
-     in blue, the AT-directed siRNA in crimson. A PAIR, named together, because
-     the mapping is one fact — agent class to colour — and half of it stated as
-     a token and half as a bare palette reference would read as a coincidence.
-
-     The blue is the one value in this file that is neither a scale step nor
-     derived from one. Sampled #003d93, and off every ramp by a distance no
-     mapping here comes close to: the nearest steps are lagoon-75 (#076278) and
-     slate-75 (#2e4056), both a different hue rather than a different step. So
-     it is transcribed verbatim, per the §3/§4 rule, and raised as an open item
-     (docs/styling.md §9) rather than rounded into the palette. It is a token
-     anyway so there is one place to change when the designer rules on it.
-
-     Named outside `brand-` (that namespace is the raw scale) and outside `ui-`
-     (that one belongs to mlg-components), as --color-popup-caption is. */
   --color-agent-mab: #003d93;
   --color-agent-sirna: var(--color-brand-crimson-50);
 
-  /* The corner panel that closes the `fviii-mimetics` chapter — the shadowed
-     block carrying the two investigational agents. A PAIR: the gradient and the
-     shadow are one drawn object, and the shadow is what reads it as lifted off
-     the page rather than painted on it.
-
-     The mint is TRANSCRIBED, not derived, and this is the borderline case the
-     §3/§4 rule leaves open rather than a clear one. Sampled #c6eee5. Measured
-     against the ramp: color-mix(teal-25 30%, teal-0) lands at dE .0136 OKLab
-     and --color-figure-note is dE .0157 away — both an order of magnitude above
-     the ~.002 every derived token in this file clears, and well under the .042
-     that sent the page gradient's stop to a literal. It stays literal on the
-     stricter reading, and is raised as an open item (docs/styling.md §9)
-     alongside --color-agent-mab. Reusing --color-figure-note was the third
-     option and was rejected for welding two unrelated elements to one value.
-
-     Shadow cast UP and LEFT (negative x and y) with a -22px spread: the panel
-     sits in the page's bottom-right corner, so the only edges that can throw
-     one are the two facing the content. In @theme, not :root — Tailwind inlines
-     --shadow-* at build time (§1). */
+  /* In @theme, not :root — Tailwind inlines --shadow-* at build time (§1). */
   --background-image-emerging-panel: linear-gradient(117.03deg, #ffffff 21.12%, #d3f1e9 91.03%);
   --shadow-emerging-panel: -20px -1px 47.2px -22px rgba(0, 0, 0, 0.25);
 
-  /* The pale fill behind the annotation notes beside a §7.7 figure — the two
-     callouts the clotting-cascade export draws to the left of the diagram.
-     Sampled #d0eae6, which is not a scale step but sits almost exactly between
-     two: color-mix(teal-25 27%, teal-0) lands at dE .0021 OKLab, two orders
-     under JND (the nearest steps themselves are dE .057 and .152). Derived
-     rather than transcribed so a teal change still moves it — same §3/§4 rule
-     as --color-popup-caption above. */
   --color-figure-note: color-mix(
     in srgb,
     var(--color-brand-teal-25) 27%,
     var(--color-brand-teal-0)
   );
 
-  /* ─── Wizard option buttons (docs/styling.md §14) ─────────────────────────
-     `OptionGroup`'s chosen state — the one colour the `/wizard` artboard adds
-     to the Button skin it otherwise reuses. Sampled #1a5a4c, which is
-     --color-brand-teal-75 exactly, so it is a reference rather than a literal;
-     it is named here anyway because "the chosen answer is teal-75" is a design
-     fact with one place to change, not a coincidence at the call site.
-
-     The hover and press steps are DERIVED, not drawn: the artboard has no such
-     frame, so they follow the model the Button skin already states one ramp over
-     (§4.2) — hover lifts (96% of the resting step with 4% of the -25 tint, the
-     --color-ui-arrow-bg-hover recipe), press pushes to the next darker step.
-     teal-75 → teal-100 is the same one-step move crimson-50 → crimson-75 is on
-     the Button. Named outside `brand-` (the raw scale) and outside `ui-`
-     (mlg-components' namespace), as --color-popup-caption and --color-agent-mab
-     are. */
-  /* ─── Wizard leaf notes (docs/styling.md §15) ─────────────────────────────
-     `/wizard/therapies` draws the leaf's Considerations/Strategies pair as a
-     two-header accordion. Its state is carried TWICE — by the header's ground
-     and by its shadow (below): the open one is crimson and recessed, the closed
-     one lagoon and lifted. Both grounds are exact palette steps — sampled
-     (214,58,82) and (74,191,212) against crimson-50 (214,58,82) and lagoon-25
-     (74,191,212) — so they are references rather than literals. Named here
-     anyway because "open is crimson, closed is lagoon" is one design fact with
-     one place to change, and stated as two bare palette utilities at the call
-     site it would read as a coincidence. The same call --color-choice-selected
-     makes above.
-
-     Hover and press are NOT here: they are `PopupButton`'s own drawn values
-     (--color-ui-popup-fg-hover, --color-ui-popup-bg/fg-active), reused rather
-     than re-derived, because the designer already answered "what does a
-     lagoon-25 ground with white text do when you touch it" for that component.
-     The call site references them directly, as `OptionGroup` does with the
-     Button's press pair. */
+  /* ─── Wizard leaf notes (docs/styling.md §15) ─────────────────────────────── */
   --color-note-open: var(--color-brand-crimson-50);
   --color-note-closed: var(--color-brand-lagoon-25);
 
-  /* The 1px stroke around the open panel, on its left, right and bottom edges —
-     its top is under the header band and carries none.
-
-     TRANSCRIBED, and the one value in this block that is not a palette
-     reference. Sampled (116,116,116) — exactly neutral on all three channels,
-     which rules out both an antialiased tint and black at an opacity (black at
-     45% over the panel's own ground lands at (116,143,137), not grey). It is off
-     every ramp in this file by a hue rather than by a step, so it stays literal
-     per the §3/§4 rule and is raised as an open item (docs/styling.md §9)
-     alongside --color-agent-mab. A token so there is one place to change when
-     the designer rules on it. */
   --color-note-panel-border: #747474;
 
-  /* The header bands' shadows — the accordion's SECOND state carrier, and the
-     reason the block comment above no longer says the ground is the only one.
-     The two exports share a drop shadow and differ in one thing: the inset is
-     BLACK at .36 on the crimson band and WHITE at .36 on the lagoon one. Open
-     reads pressed in, closed reads lifted, which is the same grammar every
-     --shadow-ui-* pair below speaks (white inset = raised, dark inset = pressed).
-
-     **The geometry is rounded, and that is a reading rather than a liberty.**
-     The export gives `0px 1.0641891956329346px 2.128378391265869px` and an inset
-     blur of `4.256756782531738px` — one scale factor on 1, 2 and 4. Three things
-     say so: the ratio is exact, the inset's y came out an unscaled `1px` beside a
-     scaled blur, and the same export carries `outline-offset-[-1.06px]`, which is
-     -1 × the factor and is not a number anyone draws. The rounded drop layer also
-     lands verbatim on one already in --shadow-ui-btn-active.
-
-     Hover and press are BORROWED, not derived — the call --color-note-open makes
-     for the grounds. Hover is the lift `--shadow-ui-btn-hover` and
-     `--shadow-ui-arrow-hover` both make. Press takes the open band's own recessed
-     inset, so touching a closed header previews the state it is about to enter —
-     which is exactly what --color-ui-popup-bg-active is documented to do for the
-     ground below.
-
-     The open band's rim is a third layer inside its shadow rather than an
-     `outline`, because the header spends its outline on the focus ring and an
-     element has only one. rgba(255,255,255,0.2) is --shadow-ui-btn-hover's rim
-     value — the designer's own answer for a rim on a CRIMSON ground, which is
-     what this band is. The export drew the rim but dropped its colour. */
   --shadow-note-open:
     inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2), 0px 1px 2px 0px rgba(0, 0, 0, 0.25),
     inset 0px 1px 4px 0px rgba(0, 0, 0, 0.36);
@@ -262,11 +111,10 @@
     0px 1px 2px 0px rgba(0, 0, 0, 0.25), inset 0px 1px 4px 0px rgba(255, 255, 255, 0.36);
   --shadow-note-closed-hover:
     0px 2px 4px 0px rgba(0, 0, 0, 0.25), inset 0px 2px 4px 2px rgba(255, 255, 255, 0.25);
-  /* The open band's inset without its rim, over the lighter .15 drop the press
-     states of --shadow-ui-navbar-focus and --shadow-ui-popup-open-focus use. */
   --shadow-note-closed-active:
     0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px 1px 4px 0px rgba(0, 0, 0, 0.36);
 
+  /* ─── Wizard option buttons (docs/styling.md §14) ─────────────────────────── */
   --color-choice-selected: var(--color-brand-teal-75);
   --color-choice-selected-hover: color-mix(
     in oklab,
@@ -275,19 +123,9 @@
   );
   --color-choice-selected-active: var(--color-brand-teal-100);
 
-  /* ─── Wizard gate release (docs/styling.md §20) ───────────────────────────
-     The one-shot emphasis pulse `/wizard`'s Submit button plays when the third
-     answer lands and the gate opens. INVENTED, all three numbers — no artboard
-     draws motion — so each is derived from a value the app already has rather
-     than picked fresh: the amplitude mirrors the press state's `active:scale-95`
-     (the design pushes 5% in, so the release swells 5% out), and 300ms is the
-     app's 150ms fade step out and back. `ease-out` is what every transition in
-     the app and the package already uses.
-
-     A pulse, not a loop: it announces a state change, so it plays once per
-     false→true flip of `complete` and the call site re-arms it (Wizard.tsx).
-     Guarded there with `motion-reduce:animate-none` — scale motion, unlike the
-     120ms colour fades, is exactly what that preference asks to be rid of. */
+  /* ─── Wizard gate release (docs/styling.md §20) ───────────────────────────── */
+  /* One-shot pulse, re-armed per false→true flip; motion-reduce:animate-none at the
+     call site. */
   --animate-gate-release: gate-release 300ms ease-out;
 
   @keyframes gate-release {
@@ -296,35 +134,21 @@
     }
   }
 
-  /* ─── Layout geometry (docs/styling.md §12) ───────────────────────────────
-     The shell's padding, as the facts it is made of. Each value below comes
-     from OUTSIDE `AppShell` — the designer's 1440 canvas, the top rule, or the
-     sidebar's own dimensions in mlg-components — which is why it is named here
-     rather than written as a utility. The shell's other padding (the 32/48px
-     small-screen gutters, the 16px bottom) was invented for comfort, is
-     specified by nobody, and stays as plain utilities. */
+  /* ─── Layout geometry (docs/styling.md §12) ───────────────────────────────── */
   --spacing-gutter: 7rem; /* 112px — designer's content inset on the 1440 canvas (§11) */
   --spacing-rule: 0.875rem; /* 14px — TopRule's band height (§10) */
   --spacing-rail: 3rem; /* 48px — clearance past the sidebar rail, >=1024px */
   --spacing-bar: 5rem; /* 80px — clearance past the sidebar bottom bar, <1024px */
 
-  /* Composed. Defined here, from the addends, so the seam stays greppable —
-     pre-summing these into utilities is how `pr-40` and the 163px in the
-     comment beside it drifted apart. */
+  /* Composed from the addends so the seam stays greppable. */
   --spacing-gutter-rail: calc(var(--spacing-gutter) + var(--spacing-rail));
   --spacing-below-rule: calc(var(--spacing-rule) + 1rem);
   --spacing-below-rule-lg: calc(var(--spacing-rule) + 2rem);
 
-  /* The content column at the design width: 1440 - 112 - 160. A cap, not a
-     width — it only bites above the canvas, where the designer said nothing
-     and fixed gutters would otherwise let the measure grow without limit. */
+  /* A cap, not a width: the content column at the design width, 1440 − 112 − 160. */
   --container-content: 73rem; /* 1168px */
 
-  /* ─── mlg-components ──────────────────────────────────────────────────────
-     Component-layer overrides on package v0.4.0; the base ramp is untouched, so
-     re-pointing --color-ui-accent* later cannot disturb these. Shadows MUST be
-     declared here in @theme, never :root — Tailwind inlines --shadow-* at build
-     time and a :root override compiles to nothing. docs/styling.md §1, §4. */
+  /* ─── mlg-components ──────────────────────────────────────────────────────── */
 
   /* NavArrowButton — crimson (docs/styling.md §4.1) */
   --color-ui-arrow-bg: var(--color-brand-crimson-50);
@@ -366,12 +190,9 @@
     0px 1px 2px 0px rgba(0, 0, 0, 0.25), 0px 1px 2px 0px rgba(0, 0, 0, 0.15),
     inset 0px 2px 4px 0px rgba(255, 255, 255, 0.25), inset 0px 1px 2px 1px rgba(57, 27, 32, 1);
 
-  /* NavBarButton — teal, tonally inverted: white ground, coloured glyph
-     (docs/styling.md §4.3). Also drives Sidebar's "More" trigger.
-     -bg-current / -fg-current left UNSET on purpose (v0.5.0 tokens; AppSidebar
-     marks the current item with `disabled` instead — debt 2, issue 06).
-     No --shadow-ui-navbar-hover: the component paints the resting one through
-     hover. */
+  /* NavBarButton — teal (docs/styling.md §4.3).
+     -bg-current / -fg-current left UNSET on purpose — debt 2, issue 06.
+     No --shadow-ui-navbar-hover: the component paints the resting one through hover. */
   --color-ui-navbar-bg: var(--color-ui-white);
   --color-ui-navbar-bg-hover: var(--color-brand-teal-0);
   --color-ui-navbar-bg-active: #d2d5d4; /* off-palette press grey, verbatim */
@@ -420,9 +241,8 @@
   --shadow-ui-popup:
     0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px -1px 2.6px 1px rgba(10, 148, 174, 0.5);
 
-  /* PopupButton, open "×" skin — a tonal inversion, not derived from the closed
-     one. Resting ground/glyph reference the closed press pair so they cannot
-     drift. */
+  /* PopupButton, open "×" skin — resting ground/glyph reference the closed press
+     pair so they cannot drift. */
   --color-ui-popup-open-bg: var(--color-ui-popup-bg-active);
   --color-ui-popup-open-bg-hover: color-mix(
     in oklab,
@@ -448,20 +268,14 @@
     0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px 0px 2.6px 1px rgba(10, 148, 174, 1);
 
   /* Sidebar — teal-100 chrome (docs/styling.md §4.5). Inferred, never exported.
-     Painted only by SidebarBottomBar and its "More" popover; SidebarRail
-     (>=1024px) sets no background at all. */
+     SidebarRail (>=1024px) sets no background at all. */
   --color-ui-sidebar-bg: var(--color-brand-teal-100);
-  /* Package default is 1.25rem; the rail has no background, so this gap is the
-     only thing grouping the column. Bar layout unaffected. */
   --spacing-ui-sidebar-gap: 0.5rem;
 }
 
 /* Sidebar bottom-bar focus ring (docs/styling.md §5).
-   NavBarButton's outline has no offset, so it paints on the ground *behind* the
-   button — the light page in the rail, --color-ui-sidebar-bg in the bar. One
-   token cannot serve both (teal-100 on teal-100 = 1.00:1, a WCAG 2.4.11 failure),
-   so the ring follows the ground. Works only because colour utilities compile to
-   a runtime var(); a shadow token could NOT be flipped this way.
+   The ring follows the ground: one token cannot serve both (teal-100 on teal-100 =
+   1.00:1, a WCAG 2.4.11 failure).
    64rem === Sidebar's `breakpoint` default, which is JS matchMedia the CSS cannot
    see — AppSidebar leaves that prop unset so the two cannot desync. */
 @media (width < 64rem) {
@@ -470,54 +284,12 @@
   }
 }
 
-/* Above the canvas the board SCALES, it does not reflow (docs/styling.md §19).
-
-   Everything the shell is built from is already rem — Tailwind's spacing and type
-   scales, and all five §12 tokens — so stepping the root size moves the whole 1440
-   drawing in proportion and every transcribed ratio survives. It is a step, not a
-   `clamp()`: `ce9e4fb` removed all 13 of those and that decision still holds.
-
-   `%` rather than `px` so a user's own browser font-size stays multiplied in
-   rather than overridden.
-
-   These six numbers are INVENTED — no artboard exists above 1440 — so they are
-   plain values here rather than tokens, which is §12's rule for the below-`sm`
-   gutters pointed the other way: transcribe what the designer gave you, and leave
-   what you made up looking like what it is.
-
-   The rem breakpoints elsewhere in the app are NOT dragged along: inside a media
-   query `rem` resolves against the initial font size (16px), not the root's, so
-   `64rem` above and every `sm:`/`lg:`/`xl:` utility stay where they are. The
-   Sidebar's JS matchMedia is unaffected too — it builds `(min-width: ${px}px)`
-   from a hardcoded 1024.
-
-   WIDTH AND HEIGHT, because a width-only step can take a page that fits and make
-   it scroll purely because the screen got wider — a 2560×1080 ultrawide being the
-   case that proved it.
-
-   Each HEIGHT is the tallest route at that step, rounded up to the next 100:
-   measured 2026-08-05 in Chromium AT EVERY STEP rather than at the canvas and
-   multiplied, the tallest is `/education/disease-background` at 756/850/945/1134,
-   so 900, 1000 and 1200. The rounding is what makes these survive content edits —
-   that page has been 818, then 788, then 756 in two days and the gates never
-   moved.
-
-   Each WIDTH is where that step's board fits the viewport exactly, i.e. 1440 ×
-   the factor: at 1800 the 1.25× board spends 140 + 1460 + 200 and at 2160 the
-   1.5× board spends 168 + 1752 + 240. Nothing overflows below those widths — the
-   layout is fluid and `--container-content` is a cap — so the gate is what stops
-   the column sitting under its cap at the very width the step turned on. 1.125×
-   keeps the 1800 it has always had rather than dropping to its own exact-fit
-   1620, which would reopen §19's deliberate 1441–1799 dead band.
-
-   The three queries OVERLAP and are ordered shortest-to-tallest on purpose: a
-   2560 × 1440 panel matches all three and takes the last. The rungs only ever
-   move together, so keep them in this order.
-
-   Re-measure when issues 12/13 land. `/resources`, `/references`, `/glossary`,
-   `/acronyms` and `/survey` are 94px placeholders today; the bibliography in
-   particular will exceed one screen at every step, and pages that scroll anyway
-   are not what this gate protects. */
+/* Above the canvas the board SCALES, it does not reflow (docs/styling.md §19). A step,
+   not a `clamp()` — `ce9e4fb` removed all 13 of those and that decision still holds. `%`
+   rather than `px`, so a user's own browser font-size stays multiplied in. Gated on WIDTH
+   AND HEIGHT: a width-only step can make a page that fits start to scroll. The three
+   queries OVERLAP and are ordered shortest-to-tallest on purpose — keep the order; the
+   rungs only ever move together. Re-measure when issues 12/13 land. */
 @media (min-width: 1800px) and (min-height: 900px) {
   :root {
     font-size: 112.5%; /* 18px — board 1620 × 900 */
@@ -536,22 +308,10 @@
   }
 }
 
-/* Scrollbars (docs/styling.md §21).
-
-   INVENTED — no artboard draws a scrollbar — so both values are palette
-   references rather than picked colours, which is §12's rule for invented
-   values pointed at colour: nothing here is a fact to transcribe, so nothing
-   here becomes a token. Thumb teal-25, the primary ramp's tint step; track
-   transparent because every route sits on a §6 gradient and an opaque track
-   would paint a solid stripe over it.
-
-   `scrollbar-color` is INHERITED, so this one declaration reaches every scroll
-   container in the app and the package's DOM alike. The `::-webkit-scrollbar`
-   pseudo-elements are deliberately NOT used: Chromium disables all of them the
-   moment `scrollbar-color` applies, so the two mechanisms cannot be mixed, and
-   the standard property is the one all current engines share. The cost is that
-   hover/press stay browser-derived — the ramp's own -50/-75 steps cannot be
-   stated, there is no selector for them. */
+/* Scrollbars (docs/styling.md §21). `scrollbar-color` is INHERITED, so this one
+   declaration reaches every scroll container in the app and the package's DOM alike. The
+   `::-webkit-scrollbar` pseudo-elements are deliberately NOT used: Chromium disables all
+   of them the moment `scrollbar-color` applies. */
 :root {
   scrollbar-color: var(--color-brand-teal-25) transparent;
 }

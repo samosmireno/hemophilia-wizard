@@ -1,13 +1,3 @@
-/**
- * Glossary terms and acronym expansions.
- *
- * Source of truth: the LEFT band of the blueprint (`documents/out_raw.txt`;
- * CONTEXT.md §8). Definitions are verbatim (PDF soft-hyphen artifacts removed).
- *
- * Two separate exports because the source presents them separately and an
- * acronym expansion ("AAV → adeno-associated virus") is not a definition.
- */
-
 export interface GlossaryEntry {
   term: string;
   definition: string;

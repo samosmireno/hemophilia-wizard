@@ -1,19 +1,3 @@
-/**
- * Hemophilia treatment dataset — the wizard's calculation table.
- *
- * Source of truth: "Treatment wizard grid.xlsx", sheet **"All treatments for
- * HA and HB"** (S1), which is the only sheet with every row visible. The other
- * four sheets (FVIII mimetics, Hemostatic Rebalancing Agents, Clotting factor
- * replacement, Gene Therapy) are NOT separate data — each is S1 with the
- * out-of-class rows hidden, i.e. a saved filtered view of one master table.
- * Reproduce any of them with `filterTreatments({ treatmentClass })`.
- *
- * All text fields are kept verbatim from S1 (including original spelling and
- * spacing), with one deliberate exception noted on Fitusiran's `route`.
- * Eligibility is computed from the verbatim strings by the parsers below rather
- * than stored as duplicate fields, so the data stays faithful to the sheet.
- */
-
 export type HemophiliaType = "A" | "B";
 export type YesNo = "Yes" | "No";
 
@@ -26,7 +10,7 @@ export const TREATMENT_CLASSES = [
 export type TreatmentClass = (typeof TREATMENT_CLASSES)[number];
 
 export interface Treatment {
-  /** 1-indexed row in the source sheet (S1), for traceability back to the xlsx. */
+  /** 1-indexed row in the source sheet (S1). */
   row: number;
   /** Column A — treatment class label, verbatim (may carry trailing spaces / notes). */
   treatmentClass: string;
@@ -49,12 +33,8 @@ export interface Treatment {
 }
 
 /**
- * The 9 treatments, exactly as they appear (and are visible) on S1.
- *
- * NOTE on Fitusiran (row 9) `route`: S1 stores "SC (single-use prefilled pen)".
- * We instead use the richer, visible value from the Hemostatic Rebalancing
- * Agents sheet (S3): "SC (single-use prefilled pen or vial/syringe)". This is
- * the only intentional departure from S1. Every other value is S1 verbatim.
+ * The 9 treatments, S1 verbatim — with one intentional departure, on Fitusiran's
+ * `route` (see there).
  */
 export const TREATMENTS: readonly Treatment[] = [
   {
@@ -152,7 +132,7 @@ export const TREATMENTS: readonly Treatment[] = [
     hemophiliaType: "A + B",
     inhibitors: "Yes",
     age: "12+",
-    // Richer value taken from S3 (see note above); S1 had "SC (single-use prefilled pen)".
+    // Richer value taken from S3; S1 had "SC (single-use prefilled pen)".
     route: "SC (single-use prefilled pen or vial/syringe)",
     schedule: "Every 1-2 months",
     monitoring: "Thrombotic events; liver enzymes, gall bladder disease, Anti-thrombin monitoring",
@@ -172,11 +152,6 @@ export const TREATMENTS: readonly Treatment[] = [
   },
 ];
 
-/* ------------------------------------------------------------------ *
- * Derived / calculation layer — parsed from the verbatim strings.
- * ------------------------------------------------------------------ */
-
-/** Expand column D into the concrete types it serves. "A + B" → both. */
 export function typesServed(t: Treatment): ReadonlySet<HemophiliaType> {
   const raw = t.hemophiliaType.toUpperCase();
   const set = new Set<HemophiliaType>();
@@ -185,12 +160,7 @@ export function typesServed(t: Treatment): ReadonlySet<HemophiliaType> {
   return set;
 }
 
-/**
- * Minimum eligible age in whole years, parsed from column F.
- *   "0+" → 0, "6+" → 6, "12+" → 12, "Adults" → 18,
- *   "TBD (studied in pts >1 year of age)" → 1 (see `isAgeProvisional`).
- * Unrecognized labels fall back to 0 (no restriction).
- */
+/** Unrecognized labels fall back to 0 (no restriction). */
 export function minAge(t: Treatment): number {
   const label = t.age;
   const plus = label.match(/(\d+)\s*\+/);
@@ -201,7 +171,6 @@ export function minAge(t: Treatment): number {
   return 0;
 }
 
-/** True when the age label is not a firm threshold (e.g. "TBD …"). */
 export function isAgeProvisional(t: Treatment): boolean {
   return /tbd/i.test(t.age);
 }
@@ -215,14 +184,11 @@ export function classOf(t: Treatment): TreatmentClass {
   return "Clotting factor replacement";
 }
 
+/** An omitted criterion is not applied. */
 export interface PatientCriteria {
-  /** "A" or "B". Omit to not filter by type. */
   hemophiliaType?: HemophiliaType;
-  /** Whether the patient has developed inhibitors. Omit = don't constrain. */
   hasInhibitors?: boolean;
-  /** Patient age in years. Omit = don't constrain by age. */
   age?: number;
-  /** Restrict to one treatment class (reproduces the xlsx per-class tabs). */
   treatmentClass?: TreatmentClass;
 }
 
@@ -233,17 +199,6 @@ export interface EligibilityResult {
   reasons: string[];
 }
 
-/**
- * The wizard's core calculation. Evaluates every treatment against the
- * patient's criteria and returns why each one is in or out.
- *
- * Rules:
- *   type        — patient.hemophiliaType ∈ typesServed(t)   ("A + B" serves both)
- *   inhibitors  — if patient.hasInhibitors, require t.inhibitors === "Yes"
- *   age         — patient.age ≥ minAge(t)
- *   class       — if given, classOf(t) must match
- * An omitted criterion is simply not applied.
- */
 export function evaluateTreatments(criteria: PatientCriteria): EligibilityResult[] {
   return TREATMENTS.map((treatment) => {
     const reasons: string[] = [];
@@ -272,7 +227,6 @@ export function evaluateTreatments(criteria: PatientCriteria): EligibilityResult
   });
 }
 
-/** Convenience: just the eligible treatments for the given criteria. */
 export function filterTreatments(criteria: PatientCriteria): Treatment[] {
   return evaluateTreatments(criteria)
     .filter((r) => r.eligible)

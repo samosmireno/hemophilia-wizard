@@ -1,7 +1,3 @@
-/**
- * `/acronyms` — off-line reference page of abbreviation expansions (content is
- * issue 12). Not part of the Prev/Next walkthrough spine.
- */
 export default function Acronyms() {
   return (
     <section aria-labelledby="acronyms-heading">

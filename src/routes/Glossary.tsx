@@ -1,7 +1,3 @@
-/**
- * `/glossary` — off-line reference page of domain-term definitions (content is
- * issue 12). Not part of the Prev/Next walkthrough spine.
- */
 export default function Glossary() {
   return (
     <section aria-labelledby="glossary-heading">

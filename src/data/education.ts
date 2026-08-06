@@ -1,23 +1,3 @@
-/**
- * Education content — the left-band "Click here:" pop-ups plus two structured
- * tables.
- *
- * Source of truth: `[PDF-V]` LEFT band + `[PPTX]` slides 6–7 (CONTEXT.md §7;
- * `documents/out_raw.txt`). Text verbatim (PDF soft-hyphen artifacts removed).
- *
- * Shape is deliberately lean (issue 00 anti-over-modeling checklist):
- * - EDUCATION_TOPICS is a FLAT list of topics — prose pop-ups keyed to the §7.7
- *   click-through index. Optional `benefitsChallenges` where the source authors
- *   an explicit benefits/challenges pair; optional `figures` holding only the
- *   figure CAPTIONS the PDF names (the 24 images are not yet available as
- *   assets — Phase 1 attaches real files, so there is intentionally no `src`).
- *   A topic's `body` carries at most ONE nested level (`NestedBullet`), which
- *   is as deep as the source goes.
- * - The two genuinely tabular blocks get bespoke row types, like TREATMENTS.
- *
- * No display order/color/grouping fields — that is Phase 1/3 presentation.
- */
-
 import { ACTIVITY_TITLE } from "./activity";
 
 export interface BenefitsChallenges {
@@ -25,82 +5,35 @@ export interface BenefitsChallenges {
   challenges: string[];
 }
 
-/**
- * A bullet that carries a nested level beneath it. The source authors two
- * levels in places — `disease-mechanism`'s lead line ends in a colon and the
- * HA:/HB: pair belongs under it, which is how the design renders them.
- *
- * The nesting is a property of the content, not of a layout: expressing it here
- * rather than by array position means a chapter cannot silently lose its
- * indentation when a bullet is inserted or reordered.
- */
 export interface NestedBullet {
   text: string;
   children: string[];
 }
 
-/** One prose bullet — flat, or with a nested level of its own. */
 export type Bullet = string | NestedBullet;
 
 export interface EducationTopic {
-  /** Stable id (matches the §7.7 click-through index where applicable). */
   id: string;
   title: string;
-  /** Verbatim prose bullets. */
   body: Bullet[];
-  /** Present only where the source authors an explicit benefits/challenges pair. */
   benefitsChallenges?: BenefitsChallenges;
-  /** Figure CAPTIONS the PDF names for this topic. No asset paths yet (Phase 1). */
   figures?: string[];
 }
 
-/**
- * The mechanism class an agent belongs to. A union rather than a string: the
- * `rebalancing-agents` chapter draws the two classes in two different colours,
- * so a typo here would silently fall through to the wrong one — and this is
- * what makes a third class a compile error in the chapter rather than an agent
- * that renders in nobody's colour.
- */
 export type RebalancingMechanism = "anti-TFPI mAB" | "AT-directed siRNA";
 
-/** §7.6's three FDA-approved hemostatic rebalancing agents. */
 export interface RebalancingAgent {
   name: string;
   mechanism: RebalancingMechanism;
 }
 
-/**
- * The three agents, split into name and mechanism rather than kept as the one
- * semicolon-joined string §7.6 transcribes — a bespoke row type beside
- * `SEVERITY_TABLE` and `TREATMENT_OPTIONS_MATRIX`, for the same reason those
- * two have one.
- *
- * **The split is what joins the copy to its colour.** The `rebalancing-agents`
- * artboard sets the two anti-TFPI mABs in blue and the AT-directed siRNA in
- * crimson, so the colour is a function of `mechanism` — a fact about the agent,
- * which is why it is modelled here, while the colours themselves stay in the
- * chapter (this module carries no display fields). Held as one flat string, the
- * chapter could only recover that by matching on the prose, and rewording a
- * bullet would silently drop a colour.
- *
- * Declared above `EDUCATION_TOPICS` rather than beside its two siblings at the
- * foot of the file because the `rebalancing-agents` topic composes its nested
- * bullets from it at module init.
- */
 export const REBALANCING_AGENTS: readonly RebalancingAgent[] = [
   { name: "Concizumab", mechanism: "anti-TFPI mAB" },
   { name: "Marstacimab", mechanism: "anti-TFPI mAB" },
   { name: "Fitusiran", mechanism: "AT-directed siRNA" },
 ];
 
-/**
- * One agent as the source writes it — "Concizumab: anti-TFPI mAB".
- *
- * Exported because it has two callers and they must agree exactly: the topic
- * below builds its nested bullets from it, and the chapter builds the lookup
- * that colours them by the same string. Composed in either place separately,
- * a change to the separator would leave the colours matching nothing.
- */
+/** Shared by the `rebalancing-agents` bullets and the chapter's own render — both must agree. */
 export function rebalancingAgentLabel({ name, mechanism }: RebalancingAgent): string {
   return `${name}: ${mechanism}`;
 }
@@ -110,15 +43,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     id: "evolving-landscape",
     /** Also the `treatment-landscape` chapter's `<h1>`, read from here. */
     title: "The Evolving Treatment Landscape for Hemophilia",
-    body: [
-      // Shared with the landing hero, which renders the same string as its
-      // headline — see `activity.ts`.
-      //
-      // The only bullet left here. The other three moved to `nft` below,
-      // because that is the heading the design files them under — see the note
-      // on that topic.
-      ACTIVITY_TITLE,
-    ],
+    body: [ACTIVITY_TITLE],
   },
   {
     id: "personalized-therapy",
@@ -133,9 +58,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     title: "Disease mechanism for HA and HB",
     body: [
       {
-        // U+2011 NON-BREAKING HYPHEN in "X‑linked", not ASCII "-": a line break
-        // between the X and the term reads as two things. It renders identically
-        // and copies as a hyphen; only the wrap point differs.
+        // U+2011 NON-BREAKING HYPHEN in "X‑linked", not ASCII "-".
         text: "HA and HB are rare but debilitating congenital bleeding disorders, resulting from X‑linked recessive inheritance of clotting factor deficiencies:",
         children: [
           "HA: FVIII deficiency due to F8 gene mutation",
@@ -169,8 +92,6 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "Prophylaxis greatly reduces bleeding risk with minimal toxicity",
       "Recommendations for prophylactic treatment may apply even for FVIII plasma levels ≥2 IU/dL",
     ],
-    // "Benefits and Challenges Associated with Clotting Factor Replacement Therapies
-    //  (Options include SHL, EHL, and UHL FVIII/FIX products)"
     benefitsChallenges: {
       benefits: [
         "Dosing frequency varies by product and patient need",
@@ -193,19 +114,6 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "Emerging FVIII mimetic therapies, including denecimig (Mim8), are being developed to further optimize hemostatic activity while improving dosing convenience",
     ],
   },
-  /**
-   * §7.5's approved agent, as its pop-up card draws it: three bullets beside the
-   * MOA diagram.
-   *
-   * **The MOA sentence used to be a fourth bullet here** and now lives in
-   * `emicizumab-moa` below. That is the `rebalancing-mechanisms` split, for the
-   * same reason: the card does not draw it, and prose an artboard omits gets
-   * moved rather than cut off by an index in the chapter — an inserted or
-   * reordered bullet would otherwise silently change which copy is dropped.
-   *
-   * `figures` still names the diagram, unchanged; that caption is now also the
-   * split topic's `title`, which is what the enlarged figure card wears.
-   */
   {
     id: "emicizumab-overview",
     title: "Emicizumab (FDA-approved)",
@@ -216,18 +124,6 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     ],
     figures: ["Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa"],
   },
-  /**
-   * The diagram beside the bullets above, and the one sentence describing it.
-   *
-   * `title` is `emicizumab-overview.figures[0]` verbatim rather than a reference
-   * to it: a figure's title is *stated* in this codebase, not derived (see
-   * `MECHANISM_FIGURE_TITLE` in the `rebalancing-agents` chapter). The two being
-   * equal is the point — this topic is that figure — but stating it means the
-   * caption list stays a caption list and nothing has to index into it.
-   *
-   * `body` is one bullet because the source authors one. It renders under the
-   * enlarged diagram, which is the only place it is drawn at all.
-   */
   {
     id: "emicizumab-moa",
     title: "Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa",
@@ -236,43 +132,8 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     ],
   },
   /**
-   * §7.5's investigational agent, as its pop-up card draws it: four bullets at
-   * the left, the MOA panel and its two sentences at the right.
-   *
-   * **Two of the source's bullets moved to `denecimig-moa` below**, which is the
-   * `emicizumab-overview` split one topic up, for the same reason and with the
-   * same consequence: the card draws them under the diagram rather than beside
-   * it, and prose that renders somewhere else gets *moved* rather than sliced
-   * off this array by an index. Insert a bullet here and nothing silently
-   * changes column.
-   *
-   * **The first bullet is the artboard's, not `[PDF-V]`'s.** §7.5 authors this
-   * sentence for emicizumab (it is `emicizumab-moa`'s whole body) and gives
-   * denecimig the monovalent-arm sentence instead; the card nonetheless opens
-   * with it, as a class-level statement of what a FVIII mimetic BsAb does.
-   * Transcribed here rather than shared with `emicizumab-moa` as one constant —
-   * two agents state the same class fact, and a card reading the *other* agent's
-   * topic would make an edit to emicizumab's copy silently rewrite this one. The
-   * artboard is the filing authority where it and the source disagree, which is
-   * the call CONTEXT.md §7.5 already records for the investigational panel.
-   *
-   * The FRONTIER trials are a `NestedBullet` because they are subordinate to the
-   * bullet that ends in a colon — the source subordinates them too ("supported
-   * by the phase 3 FRONTIER program: FRONTIER2 …"), so flat siblings were a
-   * modelling miss the artboard made visible rather than a change of content.
-   *
-   * **Their age limits are `≥`, where `[PDF-V]` types a bare `>`.** A client
-   * copy edit of 2026-08-05 asked for the `>` to be underlined — which is the
-   * slide-deck way of drawing "greater than or equal to", and the sense the
-   * source means: FRONTIER2 enrolled from 12 years, FRONTIER3 from 1. It is set
-   * as the character rather than as an underlined `>` because this codebase
-   * already writes the symbol that way (`prophylaxis-guidance`'s "levels ≥2
-   * IU/dL"), and one chapter drawing it two ways is the drift the edit was
-   * asked to remove. It is also the form a screen reader announces.
-   *
-   * The edit reaches this topic only. The same trials are cited in §7.7's
-   * wizard notes and in the drug sheets with the source's bare `>`, and those
-   * were outside it — see CONTEXT.md §7.5.
+   * The FRONTIER age limits are `≥`, where `[PDF-V]` types a bare `>` — client
+   * copy edit, 2026-08-05 (CONTEXT.md §7.5). Not a typo to reconcile.
    */
   {
     id: "denecimig-overview",
@@ -293,31 +154,8 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     figures: ["Mechanism of Action for Denecimig (Mim8): FVIII mimetic BsAb"],
   },
   /**
-   * The MOA panel in the Denecimig card, and the two sentences drawn beneath it.
-   *
-   * `title` is `denecimig-overview.figures[0]` verbatim rather than a reference
-   * to it — a figure's title is *stated* in this codebase, not derived, for the
-   * reason `emicizumab-moa` records.
-   *
-   * **Unlike `emicizumab-moa`, this title is also painted in the asset.** The
-   * heading is baked into `denecimig.webp`'s pixels, so what this string does
-   * here is name the figure for the trigger and the enlargement's accessible
-   * name; the chapter does not draw it a second time.
-   *
-   * **It read "FVIIIa-mimetic" until the raster caught up.** The 2026-08-05
-   * terminology pass dropped the `a` and the hyphen from every string this app
-   * paints, and this one was held back deliberately: a name that disagreed with
-   * the heading in the picture would send a screen-reader user looking for a
-   * line the raster did not carry. `denecimig.webp` was then re-exported
-   * painting "FVIII MIMETIC BSAB", so the hold is spent and this now quotes the
-   * new pixels. `DENECIMIG_FIGURE_ALT` in the chapter quotes the same painted
-   * line and moved with it; both move again if the asset does.
-   *
-   * `body` is two bullets because the card draws two under the panel. Both are
-   * §7.5's own prose, moved off `denecimig-overview` rather than copied — the
-   * second with the agent's name restored ahead of its code name, a client copy
-   * edit of the same date. The source writes "Mim8 potency" flat, which reads as
-   * a different agent from the "Denecimig (Mim8)" the card is titled with.
+   * `title` quotes the heading painted into `denecimig.webp`'s own pixels;
+   * `DENECIMIG_FIGURE_ALT` in the chapter quotes it too — both move if the asset does.
    */
   {
     id: "denecimig-moa",
@@ -327,19 +165,6 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "Pre-clinical studies demonstrated denecimig (Mim8) potency up to 18-fold greater than emicizumab-equivalent analog",
     ],
   },
-  /**
-   * §7.6's benefits/challenges pair, and — since the `treatment-landscape`
-   * design landed — the three §7.1 landscape bullets as well.
-   *
-   * **The prose is §7.1's but the heading over it is this topic's**, which is
-   * the design's own filing, not a transcription slip: the chapter draws these
-   * three bullets under "Non-factor therapies:" and the `+` beside them opens
-   * this topic's `benefitsChallenges`. They were in `evolving-landscape` while
-   * nothing rendered them; `body` was empty here for the same reason.
-   *
-   * `title` is still §7.6's name for the class and is not what the chapter
-   * shows — that heading is a literal there, because the two disagree.
-   */
   {
     id: "nft",
     title: "Non-factor Replacement Therapies",
@@ -347,9 +172,6 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "The hemophilia treatment landscape is rapidly evolving",
       "Novel therapies improve bleed protection, reduce treatment burden, and enable individualized treatment",
       {
-        // One flat semicolon-joined string until the design showed it drawn as
-        // a nested list — the same shape, and the same reasoning, as
-        // `disease-mechanism`'s HA/HB pair above.
         text: "Novel therapeutic classes:",
         children: [
           "FVIII mimetic BsAbs (HA)",
@@ -363,9 +185,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
         "Subcutaneous administration",
         "Stable generation of thrombin",
         "Long half-life",
-        // A real arrow, not the transcription's ASCII `-->`: this string is
-        // rendered copy, the artboard draws "severe → mild", and CONTEXT.md
-        // §7.6 states it the same way.
+        // A real arrow, not the transcription's ASCII `-->`.
         "Shift disease from severe → mild",
         "Effective regardless of inhibitor status",
       ],
@@ -379,31 +199,6 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       ],
     },
   },
-  /**
-   * §7.6's class overview, as the `rebalancing-agents` chapter draws it: two
-   * bullets, the second carrying the three agents.
-   *
-   * **This topic was split when that design landed.** It used to hold all of
-   * §7.6's prose in one flat `body` — the two bullets below, the four
-   * TFPI/AT-pathway sentences now in `rebalancing-mechanisms`, and the three
-   * agents as one semicolon-joined string. The artboard draws the two halves in
-   * two different places (these bullets on the chapter, the mechanism prose
-   * behind the "Mechanisms…" figure), so one topic could only have been
-   * rendered by slicing it at an index — which is a fact about a layout stored
-   * as an offset into an array. The split states it instead.
-   *
-   * **The split put §7.6's block title on the wrong half, and this is the
-   * correction.** It read "Hemostatic Rebalancing Agents in Treatment of HA/HB"
-   * — which is the heading §7.6 sets over the *mechanism* prose, not over these
-   * two bullets — and the chapter had to carry a `HEADING` literal to drop the
-   * scope qualifier the artboard does not draw. Both halves of that are gone:
-   * the qualified title moved to `rebalancing-mechanisms`, whose pop-up wears
-   * it, and this is now the string the chapter's `<h1>` actually shows.
-   *
-   * The children are composed from `REBALANCING_AGENTS` rather than written out
-   * here for the reason recorded on that array: the chapter colours two of them
-   * and not the third, and the two halves of that must not be able to drift.
-   */
   {
     id: "rebalancing-agents",
     title: "Hemostatic Rebalancing Agents",
@@ -415,35 +210,6 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       },
     ],
   },
-  /**
-   * The other half of the split above: how the three agents act, which is what
-   * the §7.7 "Mechanisms of hemostatic rebalancing agents within the coagulation
-   * cascade" click-through is about.
-   *
-   * That target opens **two** cards, and this topic supplies both. This `body`
-   * is the first — the prose card, headed by the `title` below. The second is
-   * the `figures[0]` diagram, which the chapter titles with a literal of its own
-   * because a figure's title is stated rather than derived (the same call
-   * `disease-background` makes for all three of its cards).
-   *
-   * **`title` is §7.6's block heading, which sits over this prose in the
-   * source** — "Hemostatic rebalancing agents in treatment of HA/HB — enhance
-   * thrombin generation by targeting endogenous anticoagulant pathways…". It
-   * arrived here from `rebalancing-agents`, which held it only because that is
-   * where the split left it; see the correction recorded there.
-   *
-   * The id is not in the §7.7 index — that index names click-through targets,
-   * and this is the content behind one of them.
-   *
-   * **The two lead-ins are `NestedBullet`s now, which is what this comment used
-   * to be waiting for.** It read: "flat, though two of the four bullets lead
-   * into the two beneath them — the source punctuates rather than indents, and
-   * no design has drawn this yet… it stayed flat until the artboard showed it
-   * nested." The artboard has shown it, and drawn something stronger than an
-   * indent: each lead-in is a heading over its own list. The trailing colons go
-   * with the flattening — they were the punctuation standing in for the indent,
-   * so keeping them would set a heading that ends in a colon it no longer needs.
-   */
   {
     id: "rebalancing-mechanisms",
     title: "Hemostatic Rebalancing Agents in Treatment of HA/HB",
@@ -469,57 +235,8 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     ],
   },
   /**
-   * §7.6's two investigational agents, **one topic per agent**.
-   *
-   * They were a single `emerging-mimetics` topic, holding all six bullets and
-   * both figure captions, while nothing rendered them. The `fviii-mimetics`
-   * artboard settles the filing: it draws NXT007 and Inno8 as two separate `+`
-   * disclosures inside its own panel, and the designer has drawn a card behind
-   * each (Pop ups 12 and 13) — so they are two targets, not one, and they belong
-   * to §7.5's chapter rather than §7.6's. CONTEXT.md §7.5 records the move.
-   *
-   * The split is clean at the source: the six bullets were already four about
-   * NXT007 followed by two about Inno8, and `figures` already named one diagram
-   * per agent.
-   *
-   * `title` is each card's own heading, not the chapter's caption for it: the
-   * panel labels the buttons "NXT007" and "Inno8" flat, where Pop up 13 heads
-   * its card "Inno8: Oral FVIII Mimetic for HA". The same caption-vs-title
-   * split `Disclosure` documents.
-   *
-   * ---
-   *
-   * This first topic is Pop up 12's **left column**: the three bullets the card
-   * draws beside the structure diagram.
-   *
-   * **A fourth bullet moved to `nxt007-structure` below**, which is the
-   * `emicizumab-overview` and `denecimig-overview` split a third time and for the
-   * same reason: the card draws the "derived from emicizumab" sentence UNDER the
-   * diagram rather than beside it, and prose that renders somewhere else gets
-   * moved rather than sliced off this array by an index.
-   *
-   * **Both "NXT007" prefixes are dropped**, which is the artboard's own doing:
-   * the card's crimson band already names the agent, so it draws
-   * "Next-generation BsAb engineered by…" and the trials bullet flat rather than
-   * naming it three times on one card. `inno8-overview` sheds its two the same
-   * way, for the same reason and on the same authority; see there. (The artboard
-   * sets "Next- generation" — the same PDF soft-hyphen artifact this module's
-   * header says it strips, so it is one word here.)
-   *
-   * The two trials are a `NestedBullet` because the artboard subordinates them
-   * under a bullet ending in a colon — the same shape `denecimig-overview` gives
-   * the FRONTIER program, and the same reading of a source that already wrote
-   * them after a colon.
-   *
-   * **The trials themselves are the client's, not the source's** (2026-08-05,
-   * with the INN — CONTEXT.md §7.5): "Initiated in phase 3 trials:" over ZEBRHA 1
-   * (NCT07416526) and ZEBRHA 2 (NCT07416604), where the PDF lists NXTAGE
-   * (jRCT2080224835) and WP44714 (NCT05987449) as ongoing. Different trials, not
-   * a re-wording of the same two — CONTEXT.md keeps the superseded pair on the
-   * record rather than losing what the PDF said. The colon and
-   * the count are unchanged, so the artboard's shape still holds; the phase is
-   * now stated in the parent bullet, which is why "study" is gone from the two
-   * children.
+   * The ZEBRHA trials are the client's, not the source's (2026-08-05, CONTEXT.md
+   * §7.5) — different trials from the PDF's NXTAGE/WP44714, not a re-wording.
    */
   {
     id: "nxt007-overview",
@@ -535,30 +252,9 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     figures: ["NXT007 BsAb Structure"],
   },
   /**
-   * The structure diagram in the NXT007 card, and the sentence drawn beneath it.
-   *
-   * `title` is `nxt007-overview.figures[0]` verbatim rather than a reference to
-   * it — a figure's title is *stated* in this codebase, not derived, for the
-   * reason `emicizumab-moa` records.
-   *
-   * **A structure, not an MOA**, which is why this id does not end `-moa` like
-   * the other two: the picture is what NXT007 is built out of (heavy chains,
-   * light chains, the charge mutations at their interfaces), not what it does.
-   *
-   * Like `denecimig-moa` and unlike `emicizumab-moa`, **this title is also
-   * painted in the asset** — `nxt007.webp` carries the crimson heading in its
-   * own pixels, so what this string does here is name the figure for the trigger
-   * and the enlargement's accessible name; the card does not draw it twice.
-   *
-   * `body` is one bullet because the card draws one sentence under the panel,
-   * moved off `nxt007-overview` rather than copied.
-   *
-   * **The sentence opens on the agent's display name — "Zemocimig (NXT007)"**,
-   * a client-directed change of 2026-08-05 where the source writes the bare code
-   * name (CONTEXT.md §7.5). It is the one rephrasing in this topic, and the one
-   * place the INN reaches this module: `title` here and on `nxt007-overview`
-   * still transcribe the source, and so does the "NXT007-treated plasma"
-   * sentence next door — that one is a compound the client did not respell.
+   * `title` is also painted into `nxt007.webp`'s own pixels. The body's opening
+   * "Zemocimig (NXT007)" is the client's INN (2026-08-05, CONTEXT.md §7.5) — the
+   * only place it reaches this module; the two `title`s still transcribe the source.
    */
   {
     id: "nxt007-structure",
@@ -568,32 +264,8 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     ],
   },
   /**
-   * The second investigational agent — Pop up 13, and the whole of that card:
-   * two bullets across the top, the MOA panel beneath them.
-   *
-   * **No figure topic split off**, where the other three overviews each gave one
-   * up. That split exists to hold prose the card draws somewhere other than
-   * beside the bullets, and this card draws none: the panel is the last thing in
-   * it. The figure's caption stays in `figures` and the chapter states its own
-   * heading for it, which is how every figure card in this codebase is titled.
-   *
-   * **Both "Inno8" prefixes are dropped**, which is `nxt007-overview`'s call one
-   * card later and on the same authority: the crimson band already reads "Inno8:
-   * Oral FVIII Mimetic for HA", so the artboard draws "Novel VHH-based…" and
-   * "Currently under evaluation…" rather than naming the agent three times on one
-   * card. The comment above used to say this topic kept its prefix *because
-   * nobody had drawn the card yet* — the card is drawn now, and the artboard is
-   * the filing authority where it and `[PDF-V]` disagree.
-   *
-   * **VOYAGER2 is a phase 1/2 trial, not the phase 1 the source states** — a
-   * client copy edit of 2026-08-05, the same pass that took the `a` and the
-   * hyphen out of this card's heading and first bullet (CONTEXT.md §7.5). "1/2"
-   * is the two phase numbers the trial spans, written as the client wrote them;
-   * it is not a fraction and is not to be set as one.
-   *
-   * `title` is the card's own heading and not the panel's caption for it, which
-   * is the caption-vs-title split `Disclosure` documents: the button says "Inno8"
-   * flat.
+   * VOYAGER2 is phase 1/2, not the phase 1 the source states — client copy edit,
+   * 2026-08-05 (CONTEXT.md §7.5). "1/2" is two phase numbers, not a fraction.
    */
   {
     id: "inno8-overview",
@@ -606,45 +278,20 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
   },
 ];
 
-/**
- * Look a topic up by id. Chapters compose from named topics rather than
- * rendering the list in order — `disease-background` pulls `disease-mechanism`
- * and `diagnosis`, and the §7.x → chapter mapping is many-to-one — so this is
- * the join between a chapter component and the content.
- */
 export function topicById(id: string): EducationTopic | undefined {
   return EDUCATION_TOPICS.find((topic) => topic.id === id);
 }
 
-/**
- * The two annotation notes the §7.7 clotting-cascade figure draws beside the
- * diagram, and the conclusion under it.
- *
- * Transcribed off the designer's export, which is the only source: CONTEXT.md
- * §7.7 records this content as image-borne — it appears in no text layer of the
- * `[PDF-V]` blueprint. Here rather than in the component because it IS content,
- * and because a chapter should not be the place a sentence of source copy lives.
- *
- * The conclusion is stored sentence-case; the design shouts it, but uppercase is
- * CSS in this codebase so the accessible name stays readable.
- */
 export const CLOTTING_CASCADE_NOTES: readonly string[] = [
   "The amplification loop is critical for thrombin generation in tissues with limited expression of tissue factor (joints and muscles)",
   "FVIII and FIX play a critical role in amplifying the generation of thrombin and in clot formation",
 ];
 
-/** The crimson line under the §7.7 clotting-cascade figure. */
 export const CLOTTING_CASCADE_CONCLUSION = "Hemophilia reduces thrombin generation";
 
-/** §7.2 severity classification (PPTX slide 6). */
 export interface SeverityRow {
   severity: string;
   factorLevel: string;
-  /**
-   * One entry per bullet, not one semicolon-joined sentence: the §7.7 pop-up
-   * draws these as a list under each severity, so the split is the content's
-   * own shape rather than the renderer's job to guess back out of punctuation.
-   */
   manifestations: readonly string[];
 }
 
@@ -675,46 +322,20 @@ export const SEVERITY_TABLE: readonly SeverityRow[] = [
   },
 ];
 
-/** Footnote marker keying a matrix row to TREATMENT_OPTIONS_FOOTNOTES. */
 export type FootnoteKey = "a" | "b" | "c";
 
-/** §7.3 class-level treatment-options matrix (PPTX slide 7). */
 export interface TreatmentOptionRow {
   option: string;
   moa: string;
   population: string;
-  /**
-   * One entry per indication, not one semicolon-joined sentence — the same call
-   * `SeverityRow.manifestations` makes, for the same reason: the §7.7 pop-up
-   * stacks these as separate lines, so the split is the content's own shape
-   * rather than something the renderer has to guess back out of punctuation.
-   * Only the first row has two.
-   */
   indication: readonly string[];
   route: string;
-  /** Footnote marker keyed into TREATMENT_OPTIONS_FOOTNOTES. */
   footnote?: FootnoteKey;
 }
 
 /**
- * The rows as the §7.7 "Table 1" pop-up draws them.
- *
- * **The shorthand is the copy, on the client's 2026-08-05 instruction.** These
- * strings were expanded out of table shorthand when they stopped being a record
- * of PPTX slide 7 and became on-screen copy, since the artboard spells all of it
- * out. The client has since asked for the shorthand back — `↑` for "increase(s)",
- * `→` for "delivers a", `HA`/`HB` for the spelled-out disease names — so the
- * abbreviations here now override the artboard's longhand. §7.3 keeps the
- * source's own wording.
- *
- * Three drawn strings are **not** reproduced, on the "FACOTOR" precedent — an
- * unambiguous slip is a slip, not copy: the export's "anti–THPI" (the same row's
- * MOA says TFPI), its second "IU/dl", and "inter-individiual" in footnote c.
- *
- * The AAV row's population was the one open divergence — the export drew "A/B"
- * against an MOA cell naming an F9 transgene, and it was held at B for the
- * designer. **Confirmed HB on 2026-08-05**, in the same pass, so the question is
- * closed.
+ * The shorthand is the copy, on the client's 2026-08-05 instruction — `↑`, `→`,
+ * `HA`/`HB` override the artboard's longhand. Do not re-expand.
  */
 export const TREATMENT_OPTIONS_MATRIX: readonly TreatmentOptionRow[] = [
   {
@@ -727,9 +348,8 @@ export const TREATMENT_OPTIONS_MATRIX: readonly TreatmentOptionRow[] = [
   },
   {
     option: "FVIII mimetics",
-    // The client's 2026-08-05 wording, confirmed on a second pass: "FVIII 1st
-    // generation" out, "emicizumab" in, as one span. Left exactly as given —
-    // asked and answered, so a later reader should not re-litigate it.
+    // The client's 2026-08-05 wording, left exactly as given — asked and
+    // answered, so do not re-litigate it.
     moa: "Mimics activity of emicizumab equivalent to FVIII ~10–12 IU/dL",
     population: "HA with/without inhibitors",
     indication: ["Prophylaxis"],
@@ -762,14 +382,6 @@ export const TREATMENT_OPTIONS_MATRIX: readonly TreatmentOptionRow[] = [
   },
 ];
 
-/**
- * The three markers resolved, under the table.
- *
- * `Bullet` rather than a plain string because footnote b genuinely has a nested
- * level — the export draws its two branches as a sub-list under "For
- * breakthrough bleeds:", which is the shape `NestedBullet` exists to hold and
- * the reason it is not a `→`-joined sentence any more.
- */
 export const TREATMENT_OPTIONS_FOOTNOTES: Record<FootnoteKey, Bullet> = {
   a: "EHL recombinant factors use pegylation or fusion to albumin or Fc fragments to extend factor half-life; fusion proteins increase half-life by 1.5- to 6-fold",
   b: {

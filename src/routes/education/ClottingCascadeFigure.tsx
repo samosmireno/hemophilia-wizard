@@ -2,30 +2,8 @@ import cascadeUrl from "../../assets/images/clotting_cascade_diagram.webp";
 import { CLOTTING_CASCADE_CONCLUSION, CLOTTING_CASCADE_NOTES } from "../../data/education";
 import { usePreloadImage } from "../../lib/preloadImage";
 
-/**
- * The §7.7 "Disease mechanism for HA/HB" figure, rebuilt as markup around the
- * diagram instead of being one flat raster.
- *
- * The designer's export composes three things: two annotation notes, the cascade
- * itself, and a conclusion under both. Only the middle one is genuinely a
- * picture — the arrows, the factor labels and the Initiation/Amplification
- * markers have no text equivalent (CONTEXT.md §7.7 records the whole figure as
- * image-borne). The other two are sentences, so they are sentences here: they
- * reflow instead of scaling with the image, they are selectable and
- * translatable, and they do not have to be duplicated into the diagram's `alt`.
- *
- * That is also why the `alt` below is shorter than it looks like it should be —
- * it describes the cascade and nothing else, because everything else on this
- * card is now text a screen reader reads directly.
- *
- * **Two columns at `md`, stacked below it**, mirroring the export's arrangement
- * (notes left, diagram right, conclusion spanning under both). The notes take a
- * third: they are two short paragraphs against a wide diagram, and giving them
- * half would set them at a measure the design does not draw.
- */
 export default function ClottingCascadeFigure() {
-  // The widest §7.7 asset, so the one whose decode is most visible as a flash of
-  // empty card on open. Warmed on mount — see `preloadImage`.
+  // The widest §7.7 asset — warmed on mount, see `preloadImage`.
   usePreloadImage(cascadeUrl);
 
   return (

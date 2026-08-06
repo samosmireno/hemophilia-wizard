@@ -1,17 +1,3 @@
-/**
- * Canonical linear-walkthrough order — the single source of truth for the
- * Prev/Next spine (see `docs/adr/0001-linear-walkthrough-navigation.md`).
- *
- * The array below is the fixed sequence the sidebar (issue 18) steps through.
- * The three off-line reference pages (`/glossary`, `/acronyms`, `/references`)
- * are deliberately absent — they have their own routes and jump buttons but do
- * not participate in Prev/Next.
- *
- * `prevOf` / `nextOf` resolve neighbours by exact path. A path that is not in
- * the sequence (an off-line page, or anything unknown) has no neighbour, so
- * both resolvers return `undefined` for it.
- */
-
 export const SECTION_ORDER = [
   "/",
   "/education/disease-background",
@@ -21,12 +7,6 @@ export const SECTION_ORDER = [
   "/education/prophylaxis-guidance",
   "/wizard-intro",
   "/wizard",
-  // The wizard is three steps of the walkthrough, not one: the questions, the
-  // therapeutic classes for the answered scenario, then the curated leaf. They
-  // are on the spine so Prev/Next walks them like any other step — and because
-  // the two beyond the questions guard themselves, `AppSidebar` disables Next on
-  // `/wizard` until the answers are complete, so the arrow and the page's own
-  // Submit button always agree. See `docs/adr/0003-session-scoped-wizard-answers.md`.
   "/wizard/scenario",
   "/wizard/therapies",
   "/explore",
@@ -36,13 +16,11 @@ export const SECTION_ORDER = [
 
 export type SectionPath = (typeof SECTION_ORDER)[number];
 
-/** The path before `path` in the walkthrough, or `undefined` at the start / off-line. */
 export function prevOf(path: string): SectionPath | undefined {
   const i = SECTION_ORDER.indexOf(path as SectionPath);
   return i > 0 ? SECTION_ORDER[i - 1] : undefined;
 }
 
-/** The path after `path` in the walkthrough, or `undefined` at the end / off-line. */
 export function nextOf(path: string): SectionPath | undefined {
   const i = SECTION_ORDER.indexOf(path as SectionPath);
   return i >= 0 && i < SECTION_ORDER.length - 1 ? SECTION_ORDER[i + 1] : undefined;
