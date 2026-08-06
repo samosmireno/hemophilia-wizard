@@ -286,3 +286,15 @@ is whatever `Popup`'s body is wide.
 - The three figure boxes are still inert; item 16 is untouched by this and stays open.
 - §7.6's NXT007/Inno8 block still renders nowhere, and glossary cross-links (issue 12)
   are still unwired.
+
+**2026-08-06 — touch affordance added to `ExpandableFigure`, needs client eyes.**
+Every figure thumbnail now carries a persistent "⊕ Tap to enlarge" badge in its
+bottom-right corner, visible only where no input can hover (`@media (hover: hover)`
+hides it) — phones/tablets previously got no hint at all that the figures open
+(the hover wash is unreachable by touch; the old "reads as static; accepted" call
+in the component is reversed). Desktop rendering is byte-identical, so no artboard
+is contradicted — but the badge is net-new visible UI no artboard draws, so put it
+in front of the client at the next visual review alongside the mlg-reskin all-five
+check. Rationale in `docs/styling.md` ("The figure that opens itself") and the
+component's own comments; verified in Chromium under emulated `hover: none` on
+both `disease-background` and the `fviiia-mimetics` cards.

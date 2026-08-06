@@ -105,6 +105,22 @@ describe("ExpandableFigure", () => {
   });
 
   /**
+   * Touch devices reach neither `:hover` nor `:focus-visible`, so they get a
+   * persistent tap badge instead; CSS hides it wherever hover exists, which
+   * jsdom cannot see — presence and `aria-hidden` are what is testable here.
+   * Like the wash, it must not leak into the button's accessible name.
+   */
+  it("hides the persistent tap hint from the accessible name", () => {
+    renderFigure();
+
+    const badge = screen.getByText("Tap to enlarge");
+    expect(badge).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("button", { name: `Expand ${TITLE}` })).toHaveAccessibleName(
+      `Expand ${TITLE}`,
+    );
+  });
+
+  /**
    * `variant="bare"` swaps the §7.7 card for `Lightbox` — the picture on the
    * scrim with no band and no border.
    *

@@ -102,14 +102,45 @@ export default function ExpandableFigure({
           cover the page.
 
           On `:focus-visible` as well as `:hover` — a keyboard user never
-          hovers. Touch reaches neither, so on a phone this reads as static;
-          accepted, since a tap costs nothing and the card closes three ways.
+          hovers. Touch reaches neither, so where no input can hover the badge
+          below stands in — reversing the "reads as static; accepted" call
+          recorded here until 2026-08-06.
         */}
         <span
           aria-hidden="true"
           className="absolute inset-0 grid place-items-center bg-black/50 px-4 text-center font-display text-2xl font-semibold tracking-wide text-white uppercase opacity-0 transition-opacity duration-150 ease-out group-hover:opacity-100 group-focus-visible:opacity-100"
         >
           Click to enlarge
+        </span>
+
+        {/*
+          The touch stand-in for the wash above: where no input can hover, a
+          hint is persistent or it does not exist, and a learner on a tablet
+          has no other route to discovering the enlargement. Bottom-right
+          because the open card's ✕ owns top-right; "Tap", not "Click", because
+          the badge only renders where the gesture is a tap. The arbitrary
+          `[@media(hover:hover)]:hidden` rather than a tokens.css variant —
+          one use site, and the desktop rendering stays byte-identical. Hidden
+          from the accessible name for the same reason as the wash.
+        */}
+        <span
+          aria-hidden="true"
+          className="absolute right-0 bottom-0 flex items-center gap-1.5 rounded-tl-xl bg-black/50 px-3 py-1.5 font-display text-base font-semibold tracking-wide text-white uppercase [@media(hover:hover)]:hidden"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            className="size-4"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.3-4.3" />
+            <path d="M11 8v6" />
+            <path d="M8 11h6" />
+          </svg>
+          Tap to enlarge
         </span>
       </button>
 

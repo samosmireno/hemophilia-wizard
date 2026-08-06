@@ -3117,8 +3117,17 @@ single raster (`PopupFigure`) and a composed figure (below).
 **The hover hint reuses `Popup`'s scrim, deliberately.** `bg-black/50` here is
 the same literal as the card's `backdrop:bg-black/50`, so hovering the thumbnail
 previews the wash that is about to cover the page. It fires on `:focus-visible`
-as well as `:hover` — a keyboard user never hovers. Touch reaches neither, so on
-a phone the figure reads as static; accepted, since a tap costs nothing.
+as well as `:hover` — a keyboard user never hovers. Touch reaches neither, so
+touch gets its own affordance: a persistent **"Tap to enlarge" badge** in the
+thumbnail's bottom-right corner (top-right is the ✕'s corner in the open card),
+wearing the wash's own black/50 + white + `font-display` uppercase so the two
+hints read as one voice. The badge is hidden under `@media (hover: hover)` — an
+arbitrary variant on the one use site rather than a `tokens.css` custom variant —
+so mouse users keep the hover reveal and the desktop rendering is untouched.
+This reverses the "reads as static; accepted" call recorded here until
+2026-08-06. No artboard draws the badge, but no artboard can draw the hover
+state either — both are interaction chrome; flag it at the open client visual
+review.
 
 ### The cascade is composed, not photographed
 
