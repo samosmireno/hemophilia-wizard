@@ -262,13 +262,15 @@ unblocks it (designer / browser / code), and where it bites.
 | 51  | `/wizard`'s Submit: type fixed (`lg:text-2xl` — pill/button delta 0 at every board; 375 keeps its drawn +2 via `max-lg:text-lg`) and box (`lg:px-7.5 lg:py-4.5`). **`px-7.5` is a compensation, not a conversion** — an invented number preserving the drawn 223px width. Open premise: is 223 × 56 a shape to hold at every board, or a canvas-only transcription? Designer; arithmetic, not browser-verified.                                                      | §14, §19, §4, §12     |
 | 52  | Gate-release cue half-shipped, wholly invented: the Submit pulse is measured (Chromium 2026-08-06 — peak 1.05, un-dim eases 0.35 → 1, reduced-motion correct); the sidebar arrow still snaps (package change, mlg-reskin debt 7); the pulse's numbers are derived but no artboard draws motion (designer); the scaled boards are arithmetic only.                                                                                                                    | §20, mlg-reskin       |
 
+| 53 | `AppShell`'s `<main>` is `lg:pb-0` — **no page can breathe at the bottom edge at ≥1024**. Never bit, because every route fit one screen; `/acronyms` (§22) is the first that does not, and pads itself. The shell-wide fix is one class, but items 10/32 record every chapter at `scrollHeight` exactly 800 — bottom padding breaks that measurement for nine routes at once. Designer/code, with 10 and 32. | §12, §22, §9 |
+
 **Invention ledger (summary)** — shipped values that are not straight transcriptions:
 
-| Kind                                | Values                                                                                                                                                                                                                                                                                                                                                                         |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Transcribed-literal (off-scale)** | `#939393` press fg (§4.1/4.2); `#f73150`, `#bff5ff` (item 3); `#d2d5d4` (§4.3); §6 gradient stop (7); chapter `text-black` (§11); `--color-agent-mab` (14); emerging-panel mint (19); `#747474` (21)                                                                                                                                                                           |
-| **Inferred (never exported)**       | navbar tooltip (5); sidebar `teal-100` (§4.5); pop-up scrim (12); table hairlines `black/30` (§11)                                                                                                                                                                                                                                                                             |
-| **Invented (no artboard)**          | below-`sm`/`sm` gutters + `lg` bottom padding (§12); every below-`lg` type step (§2); `DisclosureBand` `md` row, `ArchBand` 150px radius, panel 60px radius, `treatment-landscape` `sm` step (§11); `Popup` band floor + ✕ base/`sm` steps (§13); `wide` 1360 (27); hover/press derivations (§4.2, §14, §15); `px-7.5` (51); gate pulse (52); scrollbars (§21); the §19 ladder |
+| Kind                                | Values                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Transcribed-literal (off-scale)** | `#939393` press fg (§4.1/4.2); `#f73150`, `#bff5ff` (item 3); `#d2d5d4` (§4.3); §6 gradient stop (7); chapter `text-black` (§11); `--color-agent-mab` (14); emerging-panel mint (19); `#747474` (21)                                                                                                                                                                                                                                    |
+| **Inferred (never exported)**       | navbar tooltip (5); sidebar `teal-100` (§4.5); pop-up scrim (12); table hairlines `black/30` (§11)                                                                                                                                                                                                                                                                                                                                      |
+| **Invented (no artboard)**          | below-`sm`/`sm` gutters + `lg` bottom padding (§12); every below-`lg` type step (§2); `DisclosureBand` `md` row, `ArchBand` 150px radius, panel 60px radius, `treatment-landscape` `sm` step (§11); `Popup` band floor + ✕ base/`sm` steps (§13); `wide` 1360 (27); hover/press derivations (§4.2, §14, §15); `px-7.5` (51); gate pulse (52); scrollbars (§21); the §19 ladder; `/acronyms`' crimson terms and its own `lg:pb-16` (§22) |
 
 ## 10. Page top rule
 
@@ -718,3 +720,46 @@ and `scrollbar-gutter` stay at their defaults — thinning is a legibility trade
 a reserved gutter would shift the centring §19's gates were measured against. Verified in Chromium
 2026-08-06: resolves to `teal-25` exactly on the root and a nested scroll container, confirming
 inheritance.
+
+## 22. `/acronyms` — the app's one scrolling page
+
+**No artboard exists for this route.** Gate 2 delivered palette and typography only, and issue 12's
+four content pages were never drawn. Every value here is invented within the palette (ledger, §9),
+which is a weaker footing than any other section in this file — a later export overrules all of it.
+
+**Shape.** One column, 41 entries, chosen over the two-column alternative that would have fitted
+800px. At the chapter body ramp (`text-base/[1.6]` → `lg:text-xl/[1.6]`, so 20px on a 32px line at
+`lg`) the rows come to ~1312px, so **the page scrolls — the only route in the app that does**. What
+makes that affordable rather than a defect: the `bg-page` backdrop is `fixed inset-0`
+(`AppShell.tsx`), so the §6 gradient stays put instead of tiling, and §21 already tints scrollbars
+into the teal ramp. What it costs is item 53 — `<main>` is `lg:pb-0`, so the page carries its own
+`lg:pb-16` rather than moving nine other routes off a measured constant. Below `lg`, `pb-bar`
+already clears the bottom bar.
+
+**The list** (`src/components/AcronymList.tsx`, kept out of the route so `/glossary` can take it).
+A `<dl>`, terms on a `max-content` grid track so every expansion aligns on the widest term
+(`VERITAS-Pro`) without a pinned width; `sm:gap-x-8`. Below `sm` the grid is off and the pair stacks
+— that track plus a 41-character expansion does not survive 320px side by side. Terms bold
+`brand-crimson-50` (the drug-sheet section-label idiom, §16: it gives the column a scannable edge,
+which is what earns its keep over 1312px), expansions `text-black` (§11's chapter body).
+
+**No `uppercase`, and this is content rather than taste.** The app's heading idiom is
+`font-display … uppercase` on every `<h1>` and on `/explore`'s class labels; applied to these terms
+it would be a transcription error, not a style — `aPCC` is _activated_ PCC and `APCC` is not the
+same thing, and `mAb`, `aPTT`, `rFVIIa`, `siRNA`, `BsAb`, `QoL`, `Fab` and `VWF:Act` all carry the
+same load. (`preserveCase` in §17 is the same collision solved from the other side.) Terms stay in
+the body face: `font-display` is condensed and this app has never set it at mixed case. The `<h1>`
+is a plain word, so it takes §11's chapter treatment unchanged, left-aligned.
+`src/routes/acronyms.test.tsx` pins the absent class and the mixed-case terms, since jsdom cannot
+compute `text-transform`.
+
+**No ids, no search, no A–Z bar.** Navigation to this page is the sidebar button only — nothing in
+the app links to a term — so issue 12's "anchors must resolve from cross-links" clause is retired
+rather than deferred. Adding fragments later also means adding `scroll-mt` against the fixed 14px
+`TopRule` (§10).
+
+**Confirmed in a browser, not measured** (2026-08-06, by eye). The scroll, the bottom padding and
+the fixed backdrop holding under a scrolling page all behave. The **numbers** above — the ~1312px
+row height, the `max-content` track width, the below-`sm` stack point — are still arithmetic: no
+`scrollHeight` or `getBoundingClientRect` reading was taken, and no width other than the one looked
+at was opened. Enough to say the page is not broken; not enough to close item 30 for this route.

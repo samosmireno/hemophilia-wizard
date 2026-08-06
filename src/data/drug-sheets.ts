@@ -103,7 +103,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   },
   {
     agent: "Concizumab",
-    classTarget: ["Hemostatic rebalancing agent; TFPI mAB"],
+    classTarget: ["Hemostatic rebalancing agent; TFPI mAb"],
     // `≥`, not the source's bare `>` — see the Denecimig sheet for the edit.
     indication: ["Routine prophylaxis, patients ≥12 years with HA/HB +/- FVIII/FIX inhibitors"],
     dosing: [
@@ -126,7 +126,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   },
   {
     agent: "Marstacimab",
-    classTarget: ["Hemostatic rebalancing agent; TFPI mAB"],
+    classTarget: ["Hemostatic rebalancing agent; TFPI mAb"],
     // `≥`, not the source's bare `>` — see Denecimig. Client direction of
     // 2026-08-06 extends that to the dosing bullet's weight threshold too.
     indication: ["Routine prophylaxis, patients ≥6 years with HA/HB +/- FVIII/FIX inhibitors"],

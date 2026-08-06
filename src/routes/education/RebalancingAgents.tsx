@@ -35,9 +35,9 @@ const MECHANISM_FIGURE_ALT =
   "inhibit TFPI; fitusiran inhibits antithrombin — removing those brakes restores thrombin " +
   "generation.";
 
-/** Colour by mechanism class, as drawn: the anti-TFPI mABs in blue, the siRNA in crimson. */
+/** Colour by mechanism class, as drawn: the anti-TFPI mAbs in blue, the siRNA in crimson. */
 const MECHANISM_TONE: Record<RebalancingMechanism, string> = {
-  "anti-TFPI mAB": "text-agent-mab",
+  "anti-TFPI mAb": "text-agent-mab",
   "AT-directed siRNA": "text-agent-sirna",
 };
 

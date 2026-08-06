@@ -99,14 +99,14 @@ describe("rebalancing-agents chapter", () => {
   });
 
   /**
-   * The colour split is the artboard's whole point on this row: anti-TFPI mABs
+   * The colour split is the artboard's whole point on this row: anti-TFPI mAbs
    * in blue, AT-directed siRNA in crimson. The join runs composed-label →
    * mechanism → token, so this asserts an agent lands in its class's colour
    * rather than asserting three hard-coded strings.
    */
   it.each(REBALANCING_AGENTS)("tones $name by its mechanism class", (agent) => {
     render(<RebalancingAgents />);
-    const expected = agent.mechanism === "anti-TFPI mAB" ? "text-agent-mab" : "text-agent-sirna";
+    const expected = agent.mechanism === "anti-TFPI mAb" ? "text-agent-mab" : "text-agent-sirna";
 
     expect(screen.getByText(rebalancingAgentLabel(agent))).toHaveClass(expected);
   });

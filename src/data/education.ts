@@ -20,7 +20,7 @@ export interface EducationTopic {
   figures?: string[];
 }
 
-export type RebalancingMechanism = "anti-TFPI mAB" | "AT-directed siRNA";
+export type RebalancingMechanism = "anti-TFPI mAb" | "AT-directed siRNA";
 
 export interface RebalancingAgent {
   name: string;
@@ -28,8 +28,8 @@ export interface RebalancingAgent {
 }
 
 export const REBALANCING_AGENTS: readonly RebalancingAgent[] = [
-  { name: "Concizumab", mechanism: "anti-TFPI mAB" },
-  { name: "Marstacimab", mechanism: "anti-TFPI mAB" },
+  { name: "Concizumab", mechanism: "anti-TFPI mAb" },
+  { name: "Marstacimab", mechanism: "anti-TFPI mAb" },
   { name: "Fitusiran", mechanism: "AT-directed siRNA" },
 ];
 

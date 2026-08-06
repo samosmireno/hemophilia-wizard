@@ -51,7 +51,7 @@ to `/`.
 | 09  | 1     | Explore comparison table                          | in-progress                |
 | 10  | 1     | Drug info sheets                                  | in-progress                |
 | 11  | 1     | Education blocks                                  | done except residues       |
-| 12  | 1     | Resources / References / Glossary / Acronyms      | ready-for-human            |
+| 12  | 1     | Resources / References / Glossary / Acronyms      | in-progress                |
 | 13  | 1     | Survey UI                                         | ready-for-human            |
 | 17  | 1     | Landing page (`/`)                                | done                       |
 | 18  | 1     | Navigation sidebar                                | done                       |

@@ -9,7 +9,10 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-04 (the `/explore` artboard: the route is §9's SDM conclusion node, not
+- **Last reviewed:** 2026-08-06 (`/acronyms` built — §8 records the list's three shipped-as-is
+  transcription facts and the six app abbreviations it does not gloss; §5.1 records the `mAB` → `mAb`
+  correction, the first place the app departs from `[PDF-V]` on a spelling rather than a layout);
+  previously 2026-08-04 (the `/explore` artboard: the route is §9's SDM conclusion node, not
   the §5 table — see §5, §9 and `docs/adr/0007-explore-is-the-sdm-conclusion.md`; §9's four bullets
   recovered verbatim where they had been abridged, and the seven-agent class index recorded on §5);
   previously 2026-08-04 (the two `/wizard/therapies` artboards: the leaf's one-open
@@ -401,6 +404,17 @@ for detail.
 
 ᴬ Fitusiran route: enriched from S3 / `[PDF-V]` (`…pen or vial/syringe`); S1 had `…pen` only —
 the one deliberate departure from S1 (see [Data quality](#data-quality--conflicts)).
+
+`[BUILD]` **the app writes `mAb` where this table and [§6](#6-drug-information-sheets) write `mAB`**
+(2026-08-06). `[PDF-V]` sets the trailing B capital in both places, against its own
+[§8](#8-glossary) acronym list, which sets `mAb` — one of the two had to be wrong, and monoclonal
+antibody is `mAb`. The correction reaches all 12 app-side occurrences: `treatments.ts` (both MOA
+cells, which also lost a stray double space in `"TFPI  mAB"`), `wizard.ts`'s anti-TFPI washout
+strategy bullet, `drug-sheets.ts`'s two Class/Target lines, and `education.ts`'s
+`RebalancingMechanism` union — a type, so the rename also moves the colour-map key
+`RebalancingAgents.tsx` splits blue from crimson on. **The rows above and §6's sheets keep `mAB` as
+drawn**: their job is to record what the source says so it can be re-verified, which is the one
+thing a silent correction would destroy.
 
 ### 5.2 Filter logic `[BUILD]`
 
@@ -809,6 +823,30 @@ QoL quality of life · rFVIIa recombinant activated factor VII · SC subcutaneou
 interfering RNA · TF tissue factor · TFPI tissue factor pathway inhibitor · VERITAS-Pro
 Validated Hemophilia Regimen Treatment Adherence Scale–Prophylaxis · VWD von Willebrand disease
 · VWF(:Act/:Ag) von Willebrand factor (activity/antigen).
+
+`[BUILD]` **This list ships as `/acronyms`** (2026-08-06) — all 41 entries, expansions and array
+order exactly as above, rendered from `src/data/glossary.ts` → `ACRONYMS`. Three transcription facts
+the page deliberately does not repair:
+
+- **`aPCC` precedes `APC`**, where alphabetical gives `APC` first (`apc` is a prefix of `apcc`); it
+  is not a sort-by-expansion either, which would also put `APC` first. The one inversion in an
+  otherwise case-insensitively alphabetical 41. Source order ships — order is content in a reference
+  list, and the two are adjacent on screen.
+- **Four entries appear nowhere in the app's copy** — `Fab`, `VWD`, `VWF:Act`, `VWF:Ag`. Von
+  Willebrand is diagnostic context the source blueprint carries and the app never reaches. Kept.
+- **`mAb` is the one correction**, and it went the other way — see the note under
+  [§5.1](#51-treatment-roster-9-rows-s1-verbatim).
+
+`[CLIENT]` **Six abbreviations the app paints are not glossed here** — an open content question, not
+a defect in the transcription. The page cannot answer it without authoring CME copy, so it ships
+without them:
+
+| Abbr              | Where it is on screen                                                                                                                |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `SDM`             | `/explore`'s `<h1>`, `SDM_LEAD`, its bullets, and all four scenarios' wizard notes                                                   |
+| `SHL` `EHL` `UHL` | agent names in the [§5.1](#51-treatment-roster-9-rows-s1-verbatim) roster; `/explore`'s "UHL clotting factor replacement" arch label |
+| `VHH`             | the Inno8 card — "VHH-based FVIII mimetic"                                                                                           |
+| `IgG4`            | the emicizumab chapter bullet                                                                                                        |
 
 ---
 

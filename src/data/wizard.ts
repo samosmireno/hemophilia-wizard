@@ -185,7 +185,7 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Monitor for decreased clinical response or loss of bleed control",
           "Anticipate treatment interactions when managing breakthrough bleeding",
           "Plan for treatment with clotting factors or other hemostatic agents for more serious bleeding episodes or major surgery",
-          "Plan for a washout period of 3 to 5 half-lives of factor therapy before starting anti-TFPI treatment; avoid high factor activity when initiating anti-TFPI mABs due to risk of thrombosis",
+          "Plan for a washout period of 3 to 5 half-lives of factor therapy before starting anti-TFPI treatment; avoid high factor activity when initiating anti-TFPI mAbs due to risk of thrombosis",
         ],
       },
     },
