@@ -167,6 +167,14 @@ const MATRIX_PROSE = "text-sm leading-tight lg:text-base";
 /** The hairline between cells — inferred: the export draws a flat #A0A0A0 the palette has no token for. */
 const MATRIX_RULE = "border-black/30";
 
+/**
+ * `↑`/`↓` read as a prefix on the term that follows, so the narrow cells may not
+ * wrap between the two. Glued here rather than in the data: which space is
+ * breakable is typesetting, and the copy stays a plain sentence to transcribe
+ * against.
+ */
+const bindArrows = (text: string) => text.replace(/([↑↓])\s+/g, "$1\u00a0");
+
 function TreatmentOptionsTable() {
   return (
     <div>
@@ -201,8 +209,12 @@ function TreatmentOptionsTable() {
                     {row.option}
                     {row.footnote && <sup>{row.footnote}</sup>}
                   </th>
-                  <td className={cn(MATRIX_CELL, MATRIX_PROSE, column, rule)}>{row.moa}</td>
-                  <td className={cn(MATRIX_CELL, MATRIX_PROSE, column, rule)}>{row.population}</td>
+                  <td className={cn(MATRIX_CELL, MATRIX_PROSE, column, rule)}>
+                    {bindArrows(row.moa)}
+                  </td>
+                  <td className={cn(MATRIX_CELL, MATRIX_PROSE, "italic", column, rule)}>
+                    {row.population}
+                  </td>
                   <td className={cn(MATRIX_CELL, MATRIX_PROSE, column, rule)}>
                     {row.indication.map((line) => (
                       <span key={line} className="block">
@@ -229,7 +241,7 @@ function TreatmentOptionsTable() {
             <li key={key}>
               {key}. {typeof note === "string" ? note : note.text}
               {typeof note !== "string" && (
-                <ul className="list-disc pl-10">
+                <ul className="list-disc pl-10 italic">
                   {note.children.map((child) => (
                     <li key={child}>{child}</li>
                   ))}

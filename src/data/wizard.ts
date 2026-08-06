@@ -276,7 +276,7 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
           "Anticipate treatment interactions when managing breakthrough bleeding",
           "Plan for treatment with clotting factors or other hemostatic agents for more serious bleeding episodes or major surgery",
           "Plan for a washout period when transitioning from prior therapies, as appropriate, based on the selected agent",
-          "For patients requiring bypassing-agent therapy while receiving FVIIIa-mimetic prophylaxis, avoid or minimize aPCC when possible because of thrombotic risk",
+          "For patients requiring bypassing-agent therapy while receiving FVIII mimetic prophylaxis, avoid or minimize aPCC when possible because of thrombotic risk",
         ],
       },
     },

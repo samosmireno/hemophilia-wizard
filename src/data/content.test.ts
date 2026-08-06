@@ -102,18 +102,18 @@ describe("drug sheets", () => {
     expect(JSON.stringify(denecimig)).not.toMatch(/VIIIa|>1 year|TBD;/);
   });
 
-  it("write every age threshold as `≥`", () => {
+  it("write every numeric threshold as `≥`", () => {
     /*
       The same 2026-08-05 edit, extended to the three rebalancing-agent sheets a
-      step later ("underline the > sign, ie, greater than or equal to"). Asserted
-      across every sheet rather than the four named ones, so a sheet transcribed
-      later from the PDF's bare `>` fails here. Only ages are covered — Marstacimab
-      dosing's ">50 kg" and Fitusiran monitoring's "> 6 months" are a weight and a
-      duration, and stay as authored.
+      step later ("underline the > sign, ie, greater than or equal to"), then on
+      2026-08-06 to Marstacimab's ">50 kg" and Fitusiran's "> 6 months" — so no
+      sheet carries a bare `>` threshold any more, whatever the unit. Asserted
+      across every field of every sheet rather than the named ones, so a sheet
+      transcribed later from the PDF's bare `>` fails here.
     */
     for (const sheet of DRUG_SHEETS) {
-      for (const line of sheet.indication) {
-        expect(line, sheet.agent).not.toMatch(/>\s*\d+\s*(year|yr|month)/i);
+      for (const line of [...sheet.indication, ...sheet.dosing, ...sheet.monitoring]) {
+        expect(line, sheet.agent).not.toMatch(/>\s*\d/);
       }
     }
   });

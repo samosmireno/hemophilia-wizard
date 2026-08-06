@@ -127,14 +127,14 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: "Marstacimab",
     classTarget: ["Hemostatic rebalancing agent; TFPI mAB"],
-    // `≥`, not the source's bare `>` — see Denecimig. The dosing bullet's ">50 kg"
-    // is a weight, not an age, so it stays as authored.
+    // `≥`, not the source's bare `>` — see Denecimig. Client direction of
+    // 2026-08-06 extends that to the dosing bullet's weight threshold too.
     indication: ["Routine prophylaxis, patients ≥6 years with HA/HB +/- FVIII/FIX inhibitors"],
     dosing: [
       "SC injection (prefilled pen or syringe)",
       "Loading dose: 300 mg (two 150-mg injections)",
       "Maintenance dose: 150 mg/wk (start 1 week after the loading dose)",
-      "Consider increasing dose to 300 mg/wk in patients weighing >50 kg",
+      "Consider increasing dose to 300 mg/wk in patients weighing ≥50 kg",
     ],
     monitoring: [
       "Hypersensitivity reactions",
@@ -150,8 +150,8 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: "Fitusiran",
     classTarget: ["Hemostatic rebalancing agent; AT-directed siRNA"],
-    // `≥`, not the source's bare `>` — see Denecimig. The monitoring bullet's
-    // "> 6 months" is a duration, not an age, so it stays.
+    // `≥`, not the source's bare `>` — see Denecimig. Client direction of
+    // 2026-08-06 extends that to the monitoring bullet's duration too.
     indication: ["Routine prophylaxis, patients ≥12 years with HA/HB +/- FVIII/FIX inhibitors"],
     dosing: [
       "SC injection (prefilled pen or syringe and vial for lower dose)",
@@ -162,7 +162,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
       "Thrombotic events",
       "AT levels",
       "Acute/recurrent gallbladder disease",
-      "Hepatotoxicity: Measure LFTs at baseline, monthly for > 6 months, after dose increases, periodically thereafter",
+      "Hepatotoxicity: Measure LFTs at baseline, monthly for ≥ 6 months, after dose increases, periodically thereafter",
       "ADAs",
     ],
     trials: [

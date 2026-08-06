@@ -358,7 +358,7 @@ export const TREATMENT_OPTIONS_MATRIX: readonly TreatmentOptionRow[] = [
   },
   {
     option: "Rebalancing: siRNA",
-    moa: "Reduced antithrombin; ↑ thrombin generation",
+    moa: "↓ antithrombin; ↑ thrombin generation",
     population: "HA/HB with/without inhibitors",
     indication: ["Prophylaxis"],
     route: "SC",
