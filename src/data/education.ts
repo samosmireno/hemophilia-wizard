@@ -1,4 +1,5 @@
 import { ACTIVITY_TITLE } from "./activity";
+import { AGENT_NAMES, type AgentName } from "./agents";
 
 export interface BenefitsChallenges {
   benefits: string[];
@@ -12,25 +13,40 @@ export interface NestedBullet {
 
 export type Bullet = string | NestedBullet;
 
+/**
+ * One filing unit of source copy — not one chapter. A chapter composes several
+ * (`treatment-landscape` reads four), and a topic that no chapter reads is an
+ * orphan: keying `EDUCATION_TOPICS` by id is what makes that visible, since every
+ * read is a checked property access rather than a `find()` that can miss.
+ */
 export interface EducationTopic {
-  id: string;
   title: string;
   body: Bullet[];
   benefitsChallenges?: BenefitsChallenges;
+  /**
+   * The caption of the figure this topic owns — the title of the split-off figure
+   * topic where there is one (`emicizumab-moa`, `denecimig-moa`, `nxt007-structure`),
+   * the source's own caption where there is not (`inno8-overview`,
+   * `rebalancing-mechanisms`; CONTEXT.md §7.6).
+   *
+   * Not rendered: every chapter states its own control title, because two of them
+   * name the raster's painted heading rather than the source's. This is the record
+   * of which figure belongs to which topic, so it must still agree with the page.
+   */
   figures?: string[];
 }
 
 export type RebalancingMechanism = "anti-TFPI mAb" | "AT-directed siRNA";
 
 export interface RebalancingAgent {
-  name: string;
+  name: AgentName;
   mechanism: RebalancingMechanism;
 }
 
 export const REBALANCING_AGENTS: readonly RebalancingAgent[] = [
-  { name: "Concizumab", mechanism: "anti-TFPI mAb" },
-  { name: "Marstacimab", mechanism: "anti-TFPI mAb" },
-  { name: "Fitusiran", mechanism: "AT-directed siRNA" },
+  { name: AGENT_NAMES.concizumab, mechanism: "anti-TFPI mAb" },
+  { name: AGENT_NAMES.marstacimab, mechanism: "anti-TFPI mAb" },
+  { name: AGENT_NAMES.fitusiran, mechanism: "AT-directed siRNA" },
 ];
 
 /** Shared by the `rebalancing-agents` bullets and the chapter's own render — both must agree. */
@@ -38,23 +54,20 @@ export function rebalancingAgentLabel({ name, mechanism }: RebalancingAgent): st
   return `${name}: ${mechanism}`;
 }
 
-export const EDUCATION_TOPICS: readonly EducationTopic[] = [
-  {
-    id: "evolving-landscape",
+export const EDUCATION_TOPICS = {
+  "evolving-landscape": {
     /** Also the `treatment-landscape` chapter's `<h1>`, read from here. */
     title: "The Evolving Treatment Landscape for Hemophilia",
     body: [ACTIVITY_TITLE],
   },
-  {
-    id: "personalized-therapy",
+  "personalized-therapy": {
     title: "Personalized therapy for HA/HB",
     body: [
       "The growing treatment landscape provides opportunities to individualize therapy, meeting the changing needs and preferences of each patient",
       "Increased personalization adds complexity to clinical decision-making and optimal treatment selection",
     ],
   },
-  {
-    id: "disease-mechanism",
+  "disease-mechanism": {
     title: "Disease mechanism for HA and HB",
     body: [
       {
@@ -68,29 +81,16 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "Deficiency or absence of FVIII or FIX results in inadequate thrombin generation leading to increased bleeding",
     ],
   },
-  {
-    id: "diagnosis",
+  diagnosis: {
     title: "Diagnostic algorithm for HA/HB",
     body: [
       "Clinical diagnosis is made by laboratory evaluation indicating prolonged aPTT in conjunction with normal PT and fibrinogen levels, confirmed by testing for FVIII or FIX deficiency, and further characterized by F8/F9 genetic testing",
     ],
   },
-  {
-    id: "severity-bleeding",
-    title: "Hemophilia Severity and Bleeding Patterns",
-    body: [
-      "Disease severity is classified by residual FVIII/FIX activity level (see SEVERITY_TABLE)",
-    ],
-    figures: ["Bleeding in males and females with hemophilia"],
-  },
-  {
-    id: "clotting-factor-replacement",
+  "clotting-factor-replacement": {
     title: "Clotting factor replacement",
     body: [
       "Historically, HA and HB were managed with clotting factor replacement, given prophylactically to prevent bleeding or episodically to manage bleeding events",
-      "Prophylactic treatment is recommended over episodic treatment to control bleeding in patients with moderately severe/severe hemophilia",
-      "Prophylaxis greatly reduces bleeding risk with minimal toxicity",
-      "Recommendations for prophylactic treatment may apply even for FVIII plasma levels ≥2 IU/dL",
     ],
     benefitsChallenges: {
       benefits: [
@@ -104,8 +104,24 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       ],
     },
   },
-  {
-    id: "fviii-mimetics",
+  /**
+   * Split off `clotting-factor-replacement` (2026-08-07), which held all four
+   * sentences: `treatment-landscape` read bullet 1 and this chapter read bullets
+   * 2–4 by index, promoting bullet 2 to its `<h1>`. A sentence that is a heading on
+   * one page is not a body bullet on another, and an insertion in the source order
+   * would have silently retitled the chapter. The same split the NXT007 and
+   * Denecimig artboards prompted (CONTEXT.md §7.5).
+   */
+  "prophylaxis-guidance": {
+    /** A full sentence, because that is what the artboard sets as the chapter title. */
+    title:
+      "Prophylactic treatment is recommended over episodic treatment to control bleeding in patients with moderately severe/severe hemophilia",
+    body: [
+      "Prophylaxis greatly reduces bleeding risk with minimal toxicity",
+      "Recommendations for prophylactic treatment may apply even for FVIII plasma levels ≥2 IU/dL",
+    ],
+  },
+  "fviii-mimetics": {
     title: "FVIII Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
     body: [
       "BsAbs work by simultaneously targeting two antigens",
@@ -114,8 +130,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       "Emerging FVIII mimetic therapies, including denecimig (Mim8), are being developed to further optimize hemostatic activity while improving dosing convenience",
     ],
   },
-  {
-    id: "emicizumab-overview",
+  "emicizumab-overview": {
     title: "Emicizumab (FDA-approved)",
     body: [
       "Recombinant, humanized BsAb; IgG4 immunoglobulin combines two binding fragments for FIXa and FX",
@@ -124,8 +139,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     ],
     figures: ["Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa"],
   },
-  {
-    id: "emicizumab-moa",
+  "emicizumab-moa": {
     title: "Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa",
     body: [
       "FVIII mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
@@ -135,8 +149,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * The FRONTIER age limits are `≥`, where `[PDF-V]` types a bare `>` — client
    * copy edit, 2026-08-05 (CONTEXT.md §7.5). Not a typo to reconcile.
    */
-  {
-    id: "denecimig-overview",
+  "denecimig-overview": {
     title: "Denecimig (Mim8): Investigational currently under FDA review",
     body: [
       "FVIII mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
@@ -157,16 +170,14 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * `title` quotes the heading painted into `denecimig.webp`'s own pixels;
    * `DENECIMIG_FIGURE_ALT` in the chapter quotes it too — both move if the asset does.
    */
-  {
-    id: "denecimig-moa",
+  "denecimig-moa": {
     title: "Mechanism of Action for Denecimig (Mim8): FVIII mimetic BsAb",
     body: [
       "A monovalent anti-FIXa arm enhances FIXa proteolytic activity to facilitate FX activation and subsequent thrombin generation and clot formation",
       "Pre-clinical studies demonstrated denecimig (Mim8) potency up to 18-fold greater than emicizumab-equivalent analog",
     ],
   },
-  {
-    id: "nft",
+  nft: {
     title: "Non-factor Replacement Therapies",
     body: [
       "The hemophilia treatment landscape is rapidly evolving",
@@ -199,8 +210,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       ],
     },
   },
-  {
-    id: "rebalancing-agents",
+  "rebalancing-agents": {
     title: "Hemostatic Rebalancing Agents",
     body: [
       "Hemostatic rebalancing agents are NFTs administered by SC injection",
@@ -210,8 +220,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
       },
     ],
   },
-  {
-    id: "rebalancing-mechanisms",
+  "rebalancing-mechanisms": {
     title: "Hemostatic Rebalancing Agents in Treatment of HA/HB",
     body: [
       "Hemostatic rebalancing agents enhance thrombin generation by targeting endogenous anticoagulant pathways, including TFPI, AT, and the APC/protein S system",
@@ -230,16 +239,15 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
         ],
       },
     ],
-    figures: [
-      "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade (APC = activated protein C; AT = antithrombin; TFPI = tissue factor pathway inhibitor)",
-    ],
+    /* The abbreviation footnote the source appended here went with the card that
+       carried it (2026-08-06); what is left is the title the chapter draws. */
+    figures: ["Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade"],
   },
   /**
    * The ZEBRHA trials are the client's, not the source's (2026-08-05, CONTEXT.md
    * §7.5) — different trials from the PDF's NXTAGE/WP44714, not a re-wording.
    */
-  {
-    id: "nxt007-overview",
+  "nxt007-overview": {
     title: "NXT007",
     body: [
       "Next-generation BsAb engineered by modifying emicizumab to enhance hemostasis in HA",
@@ -256,8 +264,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * "Zemocimig (NXT007)" is the client's INN (2026-08-05, CONTEXT.md §7.5) — the
    * only place it reaches this module; the two `title`s still transcribe the source.
    */
-  {
-    id: "nxt007-structure",
+  "nxt007-structure": {
     title: "NXT007 BsAb Structure",
     body: [
       "Zemocimig (NXT007) is derived from emicizumab heavy-chain regions and incorporates two distinct light chains with charged-residue mutations designed to optimize antibody chain pairing and cofactor activity",
@@ -267,8 +274,7 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
    * VOYAGER2 is phase 1/2, not the phase 1 the source states — client copy edit,
    * 2026-08-05 (CONTEXT.md §7.5). "1/2" is two phase numbers, not a fraction.
    */
-  {
-    id: "inno8-overview",
+  "inno8-overview": {
     title: "Inno8: Oral FVIII Mimetic for HA",
     body: [
       "Novel VHH-based FVIII mimetic; once-daily oral treatment of HA",
@@ -276,11 +282,10 @@ export const EDUCATION_TOPICS: readonly EducationTopic[] = [
     ],
     figures: ["Inno8 Mechanism of Action"],
   },
-];
+} satisfies Record<string, EducationTopic>;
 
-export function topicById(id: string): EducationTopic | undefined {
-  return EDUCATION_TOPICS.find((topic) => topic.id === id);
-}
+/** The id of a topic that exists. A chapter reading anything else does not compile. */
+export type TopicId = keyof typeof EDUCATION_TOPICS;
 
 export const CLOTTING_CASCADE_NOTES: readonly string[] = [
   "The amplification loop is critical for thrombin generation in tissues with limited expression of tissue factor (joints and muscles)",

@@ -2,18 +2,18 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-import { topicById } from "../../data/education";
+import { EDUCATION_TOPICS } from "../../data/education";
 import FviiiMimetics from "./FviiiMimetics";
 
-const CHAPTER = topicById("fviii-mimetics")!;
-const EMICIZUMAB = topicById("emicizumab-overview")!;
-const DENECIMIG = topicById("denecimig-overview")!;
-const NXT007 = topicById("nxt007-overview")!;
-const INNO8 = topicById("inno8-overview")!;
+const CHAPTER = EDUCATION_TOPICS["fviii-mimetics"];
+const EMICIZUMAB = EDUCATION_TOPICS["emicizumab-overview"];
+const DENECIMIG = EDUCATION_TOPICS["denecimig-overview"];
+const NXT007 = EDUCATION_TOPICS["nxt007-overview"];
+const INNO8 = EDUCATION_TOPICS["inno8-overview"];
 /** The figure topics split out of the three overviews; see the data module. */
-const MOA = topicById("emicizumab-moa")!;
-const DENECIMIG_MOA = topicById("denecimig-moa")!;
-const NXT007_STRUCTURE = topicById("nxt007-structure")!;
+const MOA = EDUCATION_TOPICS["emicizumab-moa"];
+const DENECIMIG_MOA = EDUCATION_TOPICS["denecimig-moa"];
+const NXT007_STRUCTURE = EDUCATION_TOPICS["nxt007-structure"];
 
 /** The panel's group heading — a chapter literal, no topic holds it. */
 const PANEL_HEADING = "Investigational FVIII mimetic therapies in earlier-stage development:";
@@ -62,18 +62,6 @@ const NXT007_CAPTION = "Zemocimig (NXT007)";
 const NXT007_FIGURE_TITLE = "Zemocimig (NXT007) BsAb structure";
 
 describe("fviii-mimetics chapter", () => {
-  /**
-   * Read by id with non-null assertions in the chapter; a rename in the data
-   * module fails here rather than as a render crash.
-   */
-  it("resolves the topics it reads", () => {
-    expect(topicById("fviii-mimetics")).toBeDefined();
-    expect(topicById("emicizumab-overview")).toBeDefined();
-    expect(topicById("denecimig-overview")).toBeDefined();
-    expect(topicById("nxt007-overview")).toBeDefined();
-    expect(topicById("inno8-overview")).toBeDefined();
-  });
-
   it("renders the chapter title in title case, not the uppercase it displays", () => {
     render(<FviiiMimetics />);
     // `uppercase` is a CSS transform, so the accessible name is unaffected —
@@ -127,7 +115,7 @@ describe("fviii-mimetics chapter", () => {
     render(<FviiiMimetics />);
     expect(CHAPTER.body).toHaveLength(4);
     for (const bullet of CHAPTER.body) {
-      expect(screen.getByText(bullet as string)).toBeInTheDocument();
+      expect(screen.getByText(bullet)).toBeInTheDocument();
     }
   });
 
@@ -248,10 +236,6 @@ describe("the Emicizumab card", () => {
     await user.click(screen.getByRole("button", { name: `Expand ${EMICIZUMAB.title}` }));
   };
 
-  it("resolves the MOA topic split out of the overview", () => {
-    expect(topicById("emicizumab-moa")).toBeDefined();
-  });
-
   /**
    * The card's band drops the regulatory status the `+` beside it states — the
    * caption-vs-title split `rebalancing-agents` records. Pinned because the
@@ -282,9 +266,9 @@ describe("the Emicizumab card", () => {
 
     expect(EMICIZUMAB.body).toHaveLength(3);
     for (const bullet of EMICIZUMAB.body) {
-      expect(screen.getByText(bullet as string)).toBeInTheDocument();
+      expect(screen.getByText(bullet)).toBeInTheDocument();
     }
-    expect(figure()).toContainElement(screen.getByText(MOA.body[0] as string));
+    expect(figure()).toContainElement(screen.getByText(MOA.body[0]));
   });
 
   /** The diagram is a control, named the way every other expandable figure is. */
@@ -411,10 +395,6 @@ describe("the Denecimig card", () => {
     await user.click(screen.getByRole("button", { name: `Expand ${DENECIMIG.title}` }));
   };
 
-  it("resolves the MOA topic split out of the overview", () => {
-    expect(topicById("denecimig-moa")).toBeDefined();
-  });
-
   /** Same caption-vs-title split the Emicizumab card records; same reason. */
   it("opens a dialog named for the agent alone, not its status", async () => {
     const user = userEvent.setup();
@@ -448,7 +428,7 @@ describe("the Denecimig card", () => {
       expect(within(card()).getByText(text)).toBeInTheDocument();
     }
     for (const sentence of DENECIMIG_MOA.body) {
-      expect(within(card()).getByText(sentence as string)).toBeInTheDocument();
+      expect(within(card()).getByText(sentence)).toBeInTheDocument();
     }
   });
 
@@ -488,6 +468,9 @@ describe("the Denecimig card", () => {
     await open(user);
 
     expect(DENECIMIG.body[0]).toBe(MOA.body[0]);
+    // One of two casts left in the chapter tests: `denecimig-overview` mixes strings
+    // with a `NestedBullet`, so its element type is the union even at index 0. The
+    // rest went with the keyed topics, which type the all-string bodies as `string[]`.
     expect(within(card()).getByText(DENECIMIG.body[0] as string)).toBeInTheDocument();
   });
 
@@ -518,7 +501,7 @@ describe("the Denecimig card", () => {
     expect(within(figure()).queryByRole("heading")).not.toBeInTheDocument();
     expect(figure()).toHaveAccessibleName(DENECIMIG_MOA.title);
     for (const sentence of DENECIMIG_MOA.body) {
-      expect(within(figure()).queryByText(sentence as string)).not.toBeInTheDocument();
+      expect(within(figure()).queryByText(sentence)).not.toBeInTheDocument();
     }
   });
 
@@ -586,10 +569,6 @@ describe("the NXT007 card", () => {
     await user.click(disclosure(`Expand ${NXT007_CAPTION}`));
   };
 
-  it("resolves the structure topic split out of the overview", () => {
-    expect(topicById("nxt007-structure")).toBeDefined();
-  });
-
   /**
    * **The one card whose band and whose `+` say the same thing.** The other two
    * agents shed a regulatory status on the way into the dialog; this one has none
@@ -632,7 +611,7 @@ describe("the NXT007 card", () => {
       const text = typeof bullet === "string" ? bullet : bullet.text;
       expect(within(card()).getByText(text)).toBeInTheDocument();
     }
-    expect(within(card()).getByText(NXT007_STRUCTURE.body[0] as string)).toBeInTheDocument();
+    expect(within(card()).getByText(NXT007_STRUCTURE.body[0])).toBeInTheDocument();
   });
 
   /**
@@ -726,9 +705,7 @@ describe("the NXT007 card", () => {
 
     expect(within(figure()).queryByRole("heading")).not.toBeInTheDocument();
     expect(figure()).toHaveAccessibleName(NXT007_FIGURE_TITLE);
-    expect(
-      within(figure()).queryByText(NXT007_STRUCTURE.body[0] as string),
-    ).not.toBeInTheDocument();
+    expect(within(figure()).queryByText(NXT007_STRUCTURE.body[0])).not.toBeInTheDocument();
   });
 
   /**
@@ -796,8 +773,7 @@ describe("the Inno8 card", () => {
    * other three would expect to find repeated here.
    */
   it("reads one topic, with no figure topic split off it", () => {
-    expect(topicById("inno8-overview")).toBeDefined();
-    expect(topicById("inno8-moa")).toBeUndefined();
+    expect(Object.keys(EDUCATION_TOPICS)).not.toContain("inno8-moa");
   });
 
   /**
@@ -849,11 +825,13 @@ describe("the Inno8 card", () => {
     const user = userEvent.setup();
     await open(user);
 
+    // Both bullets are plain strings, and the keyed record now says so in the
+    // type — the `typeof bullet === "string"` narrowing this loop used to carry
+    // narrowed to `never` and is gone.
     expect(INNO8.body).toHaveLength(2);
     for (const bullet of INNO8.body) {
-      const text = typeof bullet === "string" ? bullet : bullet.text;
-      expect(text.startsWith("Inno8")).toBe(false);
-      expect(within(card()).getByText(text)).toBeInTheDocument();
+      expect(bullet.startsWith("Inno8")).toBe(false);
+      expect(within(card()).getByText(bullet)).toBeInTheDocument();
     }
     // The card names the agent exactly once, in its band.
     expect(within(card()).getByRole("heading", { name: INNO8.title })).toBeInTheDocument();
@@ -1034,10 +1012,7 @@ describe("fviii-mimetics — the responsive pass", () => {
     const { panel, list } = bottomHalf();
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveClass("text-3xl", "lg:text-5xl");
-    expect(screen.getByText(CHAPTER.body[0] as string).closest("ul")).toHaveClass(
-      "text-xl",
-      "lg:text-2xl",
-    );
+    expect(screen.getByText(CHAPTER.body[0]).closest("ul")).toHaveClass("text-xl", "lg:text-2xl");
 
     const captions = [...list.querySelectorAll("p")];
     expect(captions).toHaveLength(2);

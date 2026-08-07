@@ -9,7 +9,14 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-07 (`/references` built — §9 records the 29 citations, the 7 `®`
+- **Last reviewed:** 2026-08-07 (content-model rescan against the built pages — the orphaned
+  `severity-bleeding` education topic dropped, the mechanisms `figures` caption reconciled with
+  the card that stopped drawing its gloss, and S1's cell padding stripped from `treatments.ts`
+  (§5.1); then `EDUCATION_TOPICS` keyed by id and §7.4 split into two topics, so neither a chapter's
+  id nor its share of a shared bullet array is positional any more — §7 records both; then the agent
+  roster's names collapsed into one `AGENT_NAMES` / `AgentName` in `src/data/agents.ts`, which §6
+  records, and the two dead fields it made pointless dropped — `WizardResult.unresolved` and
+  `Treatment.row`); previously 2026-08-07 (`/references` built — §9 records the 29 citations, the 7 `®`
   superscripted on client direction, the 11 URLs made clickable, the omitted "URLs accessed" line,
   and **five repaired source defects — the first content array in the app that is not verbatim**,
   under the new `docs/adr/0008-repair-bibliographic-defects.md`); previously 2026-08-06
@@ -410,6 +417,13 @@ for detail.
 ᴬ Fitusiran route: enriched from S3 / `[PDF-V]` (`…pen or vial/syringe`); S1 had `…pen` only —
 the one deliberate departure from S1 (see [Data quality](#data-quality--conflicts)).
 
+`[BUILD]` **S1's cell padding is not transcribed** (2026-08-07). Three `monitoring` cells open with
+a space, the SHL/EHL/Efanesoctocog class labels close with one, and Denecimig's parenthetical is
+aligned with a run of fourteen. Whitespace a spreadsheet uses to lay out a column is not copy, and
+every one of these fields renders as-is in the [§5](#5-explore-therapy-options-table-secondary-engine)
+comparison table — so the padding was a rendering defect waiting on a caller. `classOf()` lowercases
+and substring-matches, so it is unaffected. `content.test.ts` pins the absence.
+
 `[BUILD]` **the app writes `mAb` where this table and [§6](#6-drug-information-sheets) write `mAB`**
 (2026-08-06). `[PDF-V]` sets the trailing B capital in both places, against its own
 [§8](#8-glossary) acronym list, which sets `mAb` — one of the two had to be wrong, and monoclonal
@@ -438,6 +452,16 @@ Monitoring · Clinical Trials). **Built `[BUILD]`** as `src/data/drug-sheets.ts`
 `{ name, id }`). **No SHL/EHL sheet** — the source authored none (they are generic
 class rows in the comparison table, not branded agents), so the acceptance criterion is "every
 agent the wizard can **recommend** has a sheet" (all 6 novel `AGENTS` + Efanesoctocog covered).
+
+`[BUILD]` **The join key is a type, not a convention** (2026-08-07). `src/data/agents.ts` holds
+`AGENT_NAMES` — the nine [§5.1](#51-treatment-roster-9-rows-s1-verbatim) names, written once — and
+`AgentName`, the union of them. `Treatment.agent`, `DrugSheet.agent`, `ExploreColumn.agents`,
+`RECOMMENDATIONS` and `REBALANCING_AGENTS[].name` all take it, where each module previously spelled
+its own literals and the two runtime lookups matched them by string. A typo is now a compile error
+naming the closest match — including a trailing space, which is the failure this could not otherwise
+see. `sheetFor()` deliberately still takes `string` and stays partial: its callers pass component
+state, and SHL/EHL have no sheet. Array _coverage_ is the one thing the type cannot state, so
+`content.test.ts` asserts `TREATMENTS` holds exactly one row per name.
 
 **The card is built `[BUILD]`** as `src/components/DrugSheetPopup.tsx` — `Popup`'s crimson band
 wearing the sheet's name, then the five sections as crimson `<h3>`s over disc lists, in that
@@ -554,10 +578,23 @@ chapters:
 | Chapter subroute       | Source subsections                                                |
 | ---------------------- | ----------------------------------------------------------------- |
 | `disease-background`   | §7.2                                                              |
-| `treatment-landscape`  | §7.1, §7.3, §7.4 (first bullet + benefits/challenges)             |
+| `treatment-landscape`  | §7.1, §7.3, §7.4 (lead bullet + benefits/challenges)              |
 | `rebalancing-agents`   | §7.6 NFTs + rebalancing agents (wizard cross-link target)         |
 | `fviii-mimetics`       | §7.5, incl. the investigational agents (wizard cross-link target) |
 | `prophylaxis-guidance` | §7.4 prophylaxis guidance (last chapter)                          |
+
+`[BUILD]` **§7.4 is two topics, not one** (2026-08-07). `clotting-factor-replacement` keeps its
+lead sentence and its benefits/challenges pair for `treatment-landscape`; `prophylaxis-guidance`
+holds the sentence that chapter sets as its `<h1>` plus the two bullets under it. They were one
+four-bullet array read by index from both pages — `slice(0, 1)` there, `[1]` as a heading and
+`slice(2)` as a list here — so inserting a sentence in source order would have retitled the
+chapter. `[PDF-V]`'s own ordering is unchanged; only the filing is.
+
+`[BUILD]` **`EDUCATION_TOPICS` is keyed by id, not a list** (2026-08-07). Every chapter reads
+`EDUCATION_TOPICS["<id>"]`, so a renamed or misspelled id is a compile error naming the closest
+match, where `topicById(id)!` was a runtime crash at module scope. It is also what surfaces an
+orphan: `severity-bleeding` had sat unread with a code identifier in its body. The per-chapter
+"resolves the topic" tests are gone with it — they asserted what the type system now does.
 
 The §7.7 "Click here:" figures are **in-chapter local-state pop-ups** — not routes, and not the
 `?drug=<id>` overlay (that param is reserved for drug sheets, [§6](#6-drug-information-sheets) /
@@ -776,7 +813,8 @@ on the same direction; the §7.7 wizard notes and the other six sheets keep the 
     activated protein C, AT = antithrombin, TFPI = tissue factor pathway inhibitor). The gloss is
     recorded here but **not rendered**: the prose card dropped its footnote row on 2026-08-05 and
     the figure card dropped its "TFPI = …" on 2026-08-06, so both cards now show only their action.
-    The terms stay reachable through [§8](#8-glossary).
+    The terms stay reachable through [§8](#8-glossary). `education.ts`'s `figures` entry carries
+    the bare title accordingly — it had kept the gloss for a day after the cards stopped drawing it.
 - **Investigational FVIIIa-mimetic therapies in early-stage development** — the source lists NXT007
   and Inno8 in this block, but they are FVIIIa mimetics, not rebalancing agents, and the design
   files them on the §7.5 chapter. Moved to [§7.5](#75-fviiia-mimetic-bsabs-approved--emerging-agents-for-ha)

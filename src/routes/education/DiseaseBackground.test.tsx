@@ -6,7 +6,7 @@ import {
   CLOTTING_CASCADE_CONCLUSION,
   CLOTTING_CASCADE_NOTES,
   SEVERITY_TABLE,
-  topicById,
+  EDUCATION_TOPICS,
 } from "../../data/education";
 import DiseaseBackground from "./DiseaseBackground";
 
@@ -29,16 +29,10 @@ describe("disease-background chapter", () => {
     );
   });
 
-  // The component reads these by id with a non-null assertion; if a rename ever
-  // lands in the data module, this fails here rather than as a render crash.
-  it.each(["disease-mechanism", "diagnosis"])("resolves the %s topic it composes from", (id) => {
-    expect(topicById(id)).toBeDefined();
-  });
-
   it("renders both section headings from the data module's own titles", () => {
     render(<DiseaseBackground />);
     expect(
-      screen.getByRole("heading", { level: 2, name: topicById("disease-mechanism")!.title }),
+      screen.getByRole("heading", { level: 2, name: EDUCATION_TOPICS["disease-mechanism"].title }),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Diagnosis:" })).toBeInTheDocument();
   });
@@ -57,8 +51,8 @@ describe("disease-background chapter", () => {
 
   it("renders the diagnosis prose verbatim from the data module", () => {
     render(<DiseaseBackground />);
-    for (const bullet of topicById("diagnosis")!.body) {
-      expect(screen.getByText(bullet as string)).toBeInTheDocument();
+    for (const bullet of EDUCATION_TOPICS["diagnosis"].body) {
+      expect(screen.getByText(bullet)).toBeInTheDocument();
     }
   });
 

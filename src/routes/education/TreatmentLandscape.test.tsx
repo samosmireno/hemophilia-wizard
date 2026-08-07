@@ -6,7 +6,7 @@ import {
   type FootnoteKey,
   TREATMENT_OPTIONS_FOOTNOTES,
   TREATMENT_OPTIONS_MATRIX,
-  topicById,
+  EDUCATION_TOPICS,
 } from "../../data/education";
 import TreatmentLandscape from "./TreatmentLandscape";
 
@@ -19,15 +19,6 @@ describe("treatment-landscape chapter", () => {
       "The Evolving Treatment Landscape for Hemophilia",
     );
   });
-
-  // The component reads these by id with a non-null assertion; if a rename ever
-  // lands in the data module, this fails here rather than as a render crash.
-  it.each(["evolving-landscape", "clotting-factor-replacement", "nft", "personalized-therapy"])(
-    "resolves the %s topic it composes from",
-    (id) => {
-      expect(topicById(id)).toBeDefined();
-    },
-  );
 
   // All three are literals in the chapter, because the artboard's headings and
   // the topics' titles disagree — two by a colon, and "Non-factor therapies:"
@@ -43,24 +34,28 @@ describe("treatment-landscape chapter", () => {
   });
 
   /**
-   * The clotting block shows the topic's LEAD bullet only — bullets 2–4 are
-   * §7.4 prophylaxis guidance belonging to a different chapter. This asserts
-   * both halves: the one that shows, and the three that must not.
+   * The clotting block shows its own topic and nothing from `prophylaxis-guidance`,
+   * which is §7.4 copy belonging to a different chapter. Both topics held one array
+   * until 2026-08-07, and this page read it by slice — so the absence half is what
+   * the split has to keep true, not just the presence half.
    */
-  it("shows only the lead clotting-factor bullet, not the prophylaxis guidance", () => {
+  it("shows the clotting-factor topic, not the prophylaxis guidance", () => {
     render(<TreatmentLandscape />);
-    const [lead, ...elsewhere] = topicById("clotting-factor-replacement")!.body;
 
-    expect(screen.getByText(lead as string)).toBeInTheDocument();
-    for (const bullet of elsewhere) {
-      expect(screen.queryByText(bullet as string)).not.toBeInTheDocument();
+    for (const bullet of EDUCATION_TOPICS["clotting-factor-replacement"].body) {
+      expect(screen.getByText(bullet)).toBeInTheDocument();
+    }
+
+    const guidance = EDUCATION_TOPICS["prophylaxis-guidance"];
+    for (const bullet of [guidance.title, ...guidance.body]) {
+      expect(screen.queryByText(bullet)).not.toBeInTheDocument();
     }
   });
 
   it("renders the personalized-therapy prose verbatim from the data module", () => {
     render(<TreatmentLandscape />);
-    for (const bullet of topicById("personalized-therapy")!.body) {
-      expect(screen.getByText(bullet as string)).toBeInTheDocument();
+    for (const bullet of EDUCATION_TOPICS["personalized-therapy"].body) {
+      expect(screen.getByText(bullet)).toBeInTheDocument();
     }
   });
 
@@ -234,7 +229,8 @@ describe("treatment-landscape chapter", () => {
     );
 
     const dialog = within(screen.getByRole("dialog"));
-    const { benefits, challenges } = topicById("clotting-factor-replacement")!.benefitsChallenges!;
+    const { benefits, challenges } =
+      EDUCATION_TOPICS["clotting-factor-replacement"].benefitsChallenges;
 
     expect(benefits).toHaveLength(2);
     for (const bullet of [...benefits, ...challenges]) {
@@ -272,7 +268,7 @@ describe("treatment-landscape chapter", () => {
     );
 
     const dialog = within(screen.getByRole("dialog"));
-    const { benefits, challenges } = topicById("nft")!.benefitsChallenges!;
+    const { benefits, challenges } = EDUCATION_TOPICS["nft"].benefitsChallenges;
 
     for (const bullet of [...benefits, ...challenges]) {
       expect(dialog.getByText(bullet)).toBeInTheDocument();

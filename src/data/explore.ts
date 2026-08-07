@@ -1,3 +1,5 @@
+import { AGENT_NAMES, type AgentName } from "./agents";
+
 /** Shortened to its opening clause at the client's direction (2026-08-05). */
 export const SDM_CONCLUSION = "Leverage multidisciplinary care and SDM with patients";
 
@@ -15,8 +17,8 @@ export const SDM_POINTS: readonly string[] = [
 export interface ExploreColumn {
   /** Verbatim from the artboard — not a `TreatmentClass`; three of the four differ. */
   label: string;
-  /** Verbatim names: the name is the join key `sheetFor()` looks a sheet up by. */
-  agents: readonly string[];
+  /** The join key `sheetFor()` looks a sheet up by. */
+  agents: readonly AgentName[];
 }
 
 export interface ExploreSegment {
@@ -28,27 +30,27 @@ export interface ExploreSegment {
 export const EXPLORE_SEGMENTS: readonly ExploreSegment[] = [
   {
     width: 339,
-    columns: [{ label: "FVIII mimetics", agents: ["Emicizumab", "Denecimig"] }],
+    columns: [{ label: "FVIII mimetics", agents: [AGENT_NAMES.emicizumab, AGENT_NAMES.denecimig] }],
   },
   {
     width: 524,
     columns: [
       {
         label: "Hemostatic rebalancing agents",
-        agents: ["Concizumab", "Marstacimab", "Fitusiran"],
+        agents: [AGENT_NAMES.concizumab, AGENT_NAMES.marstacimab, AGENT_NAMES.fitusiran],
       },
     ],
   },
   {
     width: 353,
     columns: [
-      { label: "UHL clotting factor replacement", agents: ["Efanesoctocog alfa"] },
-      { label: "Gene therapy", agents: ["Etranacogene dezaparvovec-drlb"] },
+      { label: "UHL clotting factor replacement", agents: [AGENT_NAMES.efanesoctocog] },
+      { label: "Gene therapy", agents: [AGENT_NAMES.etranacogene] },
     ],
   },
 ];
 
-export const EXPLORE_AGENTS: readonly string[] = EXPLORE_SEGMENTS.flatMap((segment) =>
+export const EXPLORE_AGENTS: readonly AgentName[] = EXPLORE_SEGMENTS.flatMap((segment) =>
   segment.columns.flatMap((column) => column.agents),
 );
 

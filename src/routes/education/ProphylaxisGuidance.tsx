@@ -1,12 +1,8 @@
 import backdropUrl from "../../assets/images/bg_image.webp";
 import BulletList from "../../components/BulletList";
-import { topicById } from "../../data/education";
+import { EDUCATION_TOPICS } from "../../data/education";
 
-const CLOTTING = topicById("clotting-factor-replacement")!;
-
-const [, HEADING_BULLET, ...BODY] = CLOTTING.body;
-
-const HEADING = typeof HEADING_BULLET === "string" ? HEADING_BULLET : HEADING_BULLET.text;
+const CHAPTER = EDUCATION_TOPICS["prophylaxis-guidance"];
 
 export default function ProphylaxisGuidance() {
   return (
@@ -19,10 +15,10 @@ export default function ProphylaxisGuidance() {
           id="chapter-heading"
           className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
         >
-          {HEADING}
+          {CHAPTER.title}
         </h1>
 
-        <BulletList items={BODY} className="mt-8 text-xl leading-tight lg:text-2xl" />
+        <BulletList items={CHAPTER.body} className="mt-8 text-xl leading-tight lg:text-2xl" />
       </section>
     </>
   );

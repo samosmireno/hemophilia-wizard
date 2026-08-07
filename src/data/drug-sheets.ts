@@ -1,3 +1,5 @@
+import { AGENT_NAMES, type AgentName } from "./agents";
+
 /**
  * The trial citations are gone, by client direction (2026-08-04) — only the trial
  * name and NCT id are kept, so `ClinicalTrial` carries no `citation` field.
@@ -9,8 +11,8 @@ export interface ClinicalTrial {
 
 /** A per-drug information sheet. Fields are verbatim bullet lists from the PDF. */
 export interface DrugSheet {
-  /** Verbatim agent name — the join key to Treatment.agent / AGENTS values. */
-  agent: string;
+  /** The roster name — the key `sheetFor()` resolves and `Treatment.agent` shares. */
+  agent: AgentName;
   /** The heading the pop-up card wears where it is not the agent's name. */
   title?: string;
   /** Label over `classTarget`, without its trailing colon. Defaults to "Class/Target". */
@@ -24,7 +26,7 @@ export interface DrugSheet {
 
 export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
-    agent: "Efanesoctocog alfa",
+    agent: AGENT_NAMES.efanesoctocog,
     // The one sheet whose heading is "Class" alone — see `classHeading`.
     classHeading: "Class",
     classTarget: ["Clotting factor replacement; ultralong half-life"],
@@ -50,7 +52,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
     ],
   },
   {
-    agent: "Emicizumab",
+    agent: AGENT_NAMES.emicizumab,
     /* "Factor VIII mimetic", not the source's "Factor VIIIa–mimetic" — client copy
        edit, 2026-08-05. Not a typo to reconcile against the artboard. */
     classTarget: ["Factor VIII mimetic", "FIXa x FX BsAb"],
@@ -74,7 +76,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
     ],
   },
   {
-    agent: "Denecimig",
+    agent: AGENT_NAMES.denecimig,
     title: "Denecimig (emerging/investigational)",
     /* "Factor VIII mimetic", not "Factor VIIIa–mimetic" — client copy edit,
        2026-08-05. Not a typo to reconcile. */
@@ -102,7 +104,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
     ],
   },
   {
-    agent: "Concizumab",
+    agent: AGENT_NAMES.concizumab,
     classTarget: ["Hemostatic rebalancing agent; TFPI mAb"],
     // `≥`, not the source's bare `>` — see the Denecimig sheet for the edit.
     indication: ["Routine prophylaxis, patients ≥12 years with HA/HB +/- FVIII/FIX inhibitors"],
@@ -125,7 +127,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
     ],
   },
   {
-    agent: "Marstacimab",
+    agent: AGENT_NAMES.marstacimab,
     classTarget: ["Hemostatic rebalancing agent; TFPI mAb"],
     // `≥`, not the source's bare `>` — see Denecimig. Client direction of
     // 2026-08-06 extends that to the dosing bullet's weight threshold too.
@@ -148,7 +150,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
     ],
   },
   {
-    agent: "Fitusiran",
+    agent: AGENT_NAMES.fitusiran,
     classTarget: ["Hemostatic rebalancing agent; AT-directed siRNA"],
     // `≥`, not the source's bare `>` — see Denecimig. Client direction of
     // 2026-08-06 extends that to the monitoring bullet's duration too.
@@ -172,7 +174,7 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
     ],
   },
   {
-    agent: "Etranacogene dezaparvovec-drlb",
+    agent: AGENT_NAMES.etranacogene,
     classTarget: ["AAV vector-based gene therapy"],
     indication: ["Adults with HB without FIX inhibitors"],
     // "2 × 10¹³" in Unicode, not "2 x 10^13": the caret renders literally, and a
@@ -190,8 +192,16 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   },
 ];
 
-const SHEET_BY_AGENT = new Map(DRUG_SHEETS.map((s) => [s.agent, s]));
+const SHEET_BY_AGENT: ReadonlyMap<string, DrugSheet> = new Map(
+  DRUG_SHEETS.map((s) => [s.agent, s]),
+);
 
+/**
+ * Takes `string`, not `AgentName`, and stays partial on purpose: the callers pass
+ * component state (`openAgent: string | null`), and two roster agents — SHL and EHL —
+ * have no sheet of their own. `content.test.ts` pins that every agent a page draws a
+ * button for does have one.
+ */
 export function sheetFor(agent: string): DrugSheet | undefined {
   return SHEET_BY_AGENT.get(agent);
 }

@@ -9,13 +9,13 @@ import {
   type RebalancingMechanism,
   REBALANCING_AGENTS,
   rebalancingAgentLabel,
-  topicById,
+  EDUCATION_TOPICS,
 } from "../../data/education";
 import { cn } from "../../lib/cn";
 import { usePreloadImage } from "../../lib/preloadImage";
 
-const AGENTS = topicById("rebalancing-agents")!;
-const MECHANISMS = topicById("rebalancing-mechanisms")!;
+const AGENTS = EDUCATION_TOPICS["rebalancing-agents"];
+const MECHANISMS = EDUCATION_TOPICS["rebalancing-mechanisms"];
 
 const BOXES_CAPTION = "Click on the boxes to learn more about hemostatic rebalancing agents";
 

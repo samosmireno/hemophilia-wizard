@@ -9,18 +9,18 @@ import BulletList from "../../components/BulletList";
 import ExpandableFigure from "../../components/ExpandableFigure";
 import Popup from "../../components/Popup";
 import PopupFigure from "../../components/PopupFigure";
-import { topicById } from "../../data/education";
+import { EDUCATION_TOPICS } from "../../data/education";
 import { usePreloadImages } from "../../lib/preloadImage";
 import { preserveCase } from "../../lib/preserveCase";
 
-const CHAPTER = topicById("fviii-mimetics")!;
-const EMICIZUMAB = topicById("emicizumab-overview")!;
-const EMICIZUMAB_MOA = topicById("emicizumab-moa")!;
-const DENECIMIG = topicById("denecimig-overview")!;
-const DENECIMIG_MOA = topicById("denecimig-moa")!;
-const NXT007_OVERVIEW = topicById("nxt007-overview")!;
-const NXT007_STRUCTURE = topicById("nxt007-structure")!;
-const INNO8_OVERVIEW = topicById("inno8-overview")!;
+const CHAPTER = EDUCATION_TOPICS["fviii-mimetics"];
+const EMICIZUMAB = EDUCATION_TOPICS["emicizumab-overview"];
+const EMICIZUMAB_MOA = EDUCATION_TOPICS["emicizumab-moa"];
+const DENECIMIG = EDUCATION_TOPICS["denecimig-overview"];
+const DENECIMIG_MOA = EDUCATION_TOPICS["denecimig-moa"];
+const NXT007_OVERVIEW = EDUCATION_TOPICS["nxt007-overview"];
+const NXT007_STRUCTURE = EDUCATION_TOPICS["nxt007-structure"];
+const INNO8_OVERVIEW = EDUCATION_TOPICS["inno8-overview"];
 
 /** The card band's heading, where the topic's title carries "(FDA-approved)" too. */
 const CARD_TITLE = "Emicizumab";
@@ -242,7 +242,7 @@ function EmicizumabCard() {
             width, then fill what the picture settled on, so the caption stays
             centred on the picture rather than stretching the column. */}
         <p className="mt-4 w-0 min-w-full text-center text-base leading-[1.6] text-white drop-shadow-md lg:text-xl">
-          {EMICIZUMAB_MOA.body[0] as string}
+          {EMICIZUMAB_MOA.body[0]}
         </p>
       </ExpandableFigure>
     </div>
@@ -328,7 +328,7 @@ function Nxt007Card() {
         {/* A centred paragraph, where the Denecimig card sets a `BulletList` — the
             artboard draws no marker here. */}
         <p className="text-center text-base leading-[1.6] text-black lg:text-xl">
-          {NXT007_STRUCTURE.body[0] as string}
+          {NXT007_STRUCTURE.body[0]}
         </p>
       </div>
     </div>

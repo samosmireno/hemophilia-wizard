@@ -6,7 +6,7 @@ import {
   type Bullet,
   REBALANCING_AGENTS,
   rebalancingAgentLabel,
-  topicById,
+  EDUCATION_TOPICS,
 } from "../../data/education";
 import RebalancingAgents from "./RebalancingAgents";
 
@@ -22,7 +22,7 @@ const PROSE_TITLE = "Hemostatic Rebalancing Agents in Treatment of HA/HB";
 /** The second card's heading — the diagram's own name. */
 const FIGURE_TITLE = "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade";
 
-const MECHANISMS = topicById("rebalancing-mechanisms")!;
+const MECHANISMS = EDUCATION_TOPICS["rebalancing-mechanisms"];
 
 /**
  * Every string the prose card renders, headings included — the two lead-ins are
@@ -59,14 +59,8 @@ describe("rebalancing-agents chapter", () => {
    * stay on the topic whose card wears it.
    */
   it("keeps §7.6's scope qualifier on the mechanism prose, not on the chapter", () => {
-    expect(topicById("rebalancing-agents")!.title).toBe("Hemostatic Rebalancing Agents");
+    expect(EDUCATION_TOPICS["rebalancing-agents"].title).toBe("Hemostatic Rebalancing Agents");
     expect(MECHANISMS.title).toBe(PROSE_TITLE);
-  });
-
-  // Both are read by id with a non-null assertion; a rename in the data module
-  // fails here rather than as a render crash.
-  it.each(["rebalancing-agents", "rebalancing-mechanisms"])("resolves the %s topic", (id) => {
-    expect(topicById(id)).toBeDefined();
   });
 
   it("renders the chapter prose verbatim from the data module", () => {
@@ -220,6 +214,8 @@ describe("rebalancing-agents chapter", () => {
     expect(screen.getByText(CAPTION)).toHaveClass("text-xl", "lg:text-2xl");
 
     const card = within(await openProseCard(user));
+    // `rebalancing-mechanisms` mixes strings with `NestedBullet`s, so the cast
+    // stands where the all-string topics' ones went with the keying.
     const [lead] = MECHANISMS.body;
     expect(card.getByText(lead as string)).toHaveClass("text-xl", "lg:text-2xl");
 

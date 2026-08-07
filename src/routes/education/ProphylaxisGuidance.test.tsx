@@ -1,34 +1,28 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { topicById } from "../../data/education";
+import { EDUCATION_TOPICS } from "../../data/education";
 import ProphylaxisGuidance from "./ProphylaxisGuidance";
 
-const CLOTTING = topicById("clotting-factor-replacement")!;
+const CHAPTER = EDUCATION_TOPICS["prophylaxis-guidance"];
 
-/**
- * The chapter's heading and its two bullets — bullets 2–4 of
- * `clotting-factor-replacement`, read here the way the chapter reads them so
- * the copy is asserted from one source rather than transcribed twice.
- */
-const HEADING = CLOTTING.body[1] as string;
-const BODY = CLOTTING.body.slice(2) as string[];
+/** Read the way the chapter reads them, so the copy is asserted from one source. */
+const HEADING = CHAPTER.title;
+const BODY = CHAPTER.body;
 
 describe("prophylaxis-guidance chapter", () => {
-  // Read by id with a non-null assertion in the chapter; a rename in the data
-  // module fails here rather than as a render crash.
-  it("resolves the clotting-factor-replacement topic", () => {
-    expect(topicById("clotting-factor-replacement")).toBeDefined();
-  });
-
   /**
-   * The split with `treatment-landscape` is the whole filing decision behind
-   * this chapter: that page renders `body.slice(0, 1)` and these three bullets
-   * are left for this one. Pinning the positions is what stops an insertion in
-   * the data module silently promoting the wrong sentence to a chapter title.
+   * The split with `treatment-landscape` is the whole filing decision behind this
+   * chapter. It used to be positional — one `clotting-factor-replacement` topic
+   * held all four sentences, that page took `body.slice(0, 1)`, and this one took
+   * bullet 2 as its `<h1>` and bullets 3–4 as its list. The topic split (2026-08-07)
+   * makes the boundary a name instead of an index, so an insertion in the source
+   * order can no longer promote the wrong sentence to a chapter title.
+   *
+   * Still asserted as copy: the split moved these strings between topics, and
+   * nothing else would notice them coming back.
    */
-  it("takes its heading and body from bullets 2–4 of the topic", () => {
-    expect(CLOTTING.body).toHaveLength(4);
+  it("owns its heading and both bullets as a topic of its own", () => {
     expect(HEADING).toBe(
       "Prophylactic treatment is recommended over episodic treatment to control bleeding in patients with moderately severe/severe hemophilia",
     );
@@ -36,6 +30,8 @@ describe("prophylaxis-guidance chapter", () => {
       "Prophylaxis greatly reduces bleeding risk with minimal toxicity",
       "Recommendations for prophylactic treatment may apply even for FVIII plasma levels ≥2 IU/dL",
     ]);
+    // The sentences that stayed behind, so the two halves cannot both drift.
+    expect(EDUCATION_TOPICS["clotting-factor-replacement"].body).toHaveLength(1);
   });
 
   /**
@@ -56,9 +52,8 @@ describe("prophylaxis-guidance chapter", () => {
   });
 
   /**
-   * The heading is a bullet on the topic, but it is the chapter's title here —
-   * it must not also appear in the list under itself, which is what a
-   * `body.map()` that forgot the slice would produce.
+   * The heading must not also appear in the list under itself — what the old
+   * positional read produced whenever the slice was off by one.
    */
   it("does not repeat the heading as a bullet", () => {
     render(<ProphylaxisGuidance />);

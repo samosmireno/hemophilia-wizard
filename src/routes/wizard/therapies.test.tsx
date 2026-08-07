@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Bullet } from "../../data/education";
 import {
+  RECOMMENDATIONS,
   SWITCH_REASONS,
   recommend,
   scenarioKey,
@@ -89,10 +90,13 @@ describe("wizard therapies — the sixteen leaves", () => {
   });
 
   it.each(LEAVES)("resolves every recommended agent for %s/%s/%s", (type, inh, why) => {
-    /* A recommendation naming an agent with no `Treatment` record would render as
-       a missing button rather than as an error, so it is asserted rather than
-       looked at. */
-    expect(recommend(type, inh, why).unresolved).toEqual([]);
+    /* A recommendation naming an agent with no `Treatment` row used to render as a
+       missing button — `recommend()` reported it through an `unresolved` array that
+       nothing read. It throws now, so this asserts the stronger thing the throw
+       makes available: the leaf resolves the scenario's roster, in order. */
+    expect(recommend(type, inh, why).recommendations.map((t) => t.agent)).toEqual(
+      RECOMMENDATIONS[scenarioKey(type, inh)][why],
+    );
   });
 
   it("keeps the resolved scenario in step with scenarioKey()", () => {

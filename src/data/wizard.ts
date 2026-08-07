@@ -1,3 +1,4 @@
+import { AGENT_NAMES, type AgentName } from "./agents";
 import type { Bullet } from "./education";
 import { TREATMENTS, type Treatment } from "./treatments";
 
@@ -55,21 +56,25 @@ export function scenarioKey(type: WizardHemophiliaType, hasInhibitors: boolean):
   return `${type}-${hasInhibitors ? "with" : "without"}` as ScenarioKey;
 }
 
-/** Values must match `Treatment.agent` in treatments.ts — that is the join key. */
+/**
+ * The six the wizard can recommend — the roster's novel agents, so SHL, EHL and
+ * Efanesoctocog alfa are absent by design. The names come from `AGENT_NAMES`, which
+ * is what keeps them equal to `Treatment.agent`; this record only picks.
+ */
 export const AGENTS = {
-  emicizumab: "Emicizumab",
-  denecimig: "Denecimig",
-  concizumab: "Concizumab",
-  marstacimab: "Marstacimab",
-  fitusiran: "Fitusiran",
-  etranacogene: "Etranacogene dezaparvovec-drlb",
+  emicizumab: AGENT_NAMES.emicizumab,
+  denecimig: AGENT_NAMES.denecimig,
+  concizumab: AGENT_NAMES.concizumab,
+  marstacimab: AGENT_NAMES.marstacimab,
+  fitusiran: AGENT_NAMES.fitusiran,
+  etranacogene: AGENT_NAMES.etranacogene,
 } as const;
 
 const MIMETICS = [AGENTS.emicizumab, AGENTS.denecimig];
 const REBALANCING = [AGENTS.concizumab, AGENTS.marstacimab, AGENTS.fitusiran];
 const GENE = [AGENTS.etranacogene];
 
-export const RECOMMENDATIONS: Record<ScenarioKey, Record<SwitchReason, string[]>> = {
+export const RECOMMENDATIONS: Record<ScenarioKey, Record<SwitchReason, AgentName[]>> = {
   "A-without": {
     "bleeding-control": [...MIMETICS, ...REBALANCING],
     adherence: [...MIMETICS, ...REBALANCING],
@@ -534,12 +539,23 @@ export interface WizardResult {
   scenario: ScenarioKey;
   reason: SwitchReason;
   recommendations: Treatment[];
-  /** Any recommended agent names that had no matching Treatment record. */
-  unresolved: string[];
   note: ReasonNote;
 }
 
 const BY_AGENT = new Map(TREATMENTS.map((t) => [t.agent, t]));
+
+/**
+ * Throws rather than skips. `WizardResult` used to carry an `unresolved: string[]`
+ * of names that found no row — a channel nothing read, so a mistyped name dropped an
+ * agent off the leaf silently. `AgentName` makes the typo a compile error and
+ * `content.test.ts` pins the roster's coverage, which leaves only "someone deleted a
+ * row" — and that should be loud.
+ */
+function treatmentFor(name: AgentName): Treatment {
+  const treatment = BY_AGENT.get(name);
+  if (!treatment) throw new Error(`No treatment row for ${name}`);
+  return treatment;
+}
 
 export function recommend(
   type: WizardHemophiliaType,
@@ -547,13 +563,10 @@ export function recommend(
   reason: SwitchReason,
 ): WizardResult {
   const scenario = scenarioKey(type, hasInhibitors);
-  const names = RECOMMENDATIONS[scenario][reason];
-  const recommendations: Treatment[] = [];
-  const unresolved: string[] = [];
-  for (const name of names) {
-    const t = BY_AGENT.get(name);
-    if (t) recommendations.push(t);
-    else unresolved.push(name);
-  }
-  return { scenario, reason, recommendations, unresolved, note: SCENARIO_NOTES[scenario][reason] };
+  return {
+    scenario,
+    reason,
+    recommendations: RECOMMENDATIONS[scenario][reason].map(treatmentFor),
+    note: SCENARIO_NOTES[scenario][reason],
+  };
 }

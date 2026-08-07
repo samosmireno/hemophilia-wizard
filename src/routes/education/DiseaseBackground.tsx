@@ -5,15 +5,15 @@ import BulletList from "../../components/BulletList";
 import DisclosureBand, { type Disclosure } from "../../components/DisclosureBand";
 import ExpandableFigure from "../../components/ExpandableFigure";
 import PopupFigure from "../../components/PopupFigure";
-import { SEVERITY_TABLE, topicById } from "../../data/education";
+import { SEVERITY_TABLE, EDUCATION_TOPICS } from "../../data/education";
 import { cn } from "../../lib/cn";
 import { usePreloadImages } from "../../lib/preloadImage";
 import ClottingCascadeFigure from "./ClottingCascadeFigure";
 
 const CASCADE_TITLE = "Initiation and Amplification of the Clotting Cascade";
 
-const MECHANISM = topicById("disease-mechanism")!;
-const DIAGNOSIS = topicById("diagnosis")!;
+const MECHANISM = EDUCATION_TOPICS["disease-mechanism"];
+const DIAGNOSIS = EDUCATION_TOPICS["diagnosis"];
 
 const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
   {

@@ -1,3 +1,5 @@
+import { AGENT_NAMES, type AgentName } from "./agents";
+
 export type HemophiliaType = "A" | "B";
 export type YesNo = "Yes" | "No";
 
@@ -10,12 +12,10 @@ export const TREATMENT_CLASSES = [
 export type TreatmentClass = (typeof TREATMENT_CLASSES)[number];
 
 export interface Treatment {
-  /** 1-indexed row in the source sheet (S1). */
-  row: number;
-  /** Column A — treatment class label, verbatim (may carry trailing spaces / notes). */
+  /** Column A — treatment class label, verbatim (may carry a parenthetical note). */
   treatmentClass: string;
-  /** Column B — agent / product name, verbatim. */
-  agent: string;
+  /** Column B — the roster name, and the join key every other module resolves by. */
+  agent: AgentName;
   /** Column C — mechanism of action, verbatim (original newline preserved). */
   moa: string;
   /** Column D — hemophilia type served: "A", "B", or "A + B". Verbatim. */
@@ -35,36 +35,42 @@ export interface Treatment {
 /**
  * The 9 treatments, S1 verbatim — with one intentional departure, on Fitusiran's
  * `route` (see there).
+ *
+ * **In S1 row order**, which is the only record of it now: each row carried its own
+ * 1-indexed `row` number and nothing ever read it, so the array position is the
+ * provenance (row = index + 2). CONTEXT.md §5.1 holds the roster in the same order.
+ *
+ * Cell padding is NOT transcribed: S1 pads three `monitoring` cells with a leading
+ * space, two class labels with a trailing one, and aligns Denecimig's parenthetical
+ * with a run of them. Whitespace a spreadsheet uses to lay out a column is not copy,
+ * and every one of these fields renders as-is in the §5 comparison table.
  */
 export const TREATMENTS: readonly Treatment[] = [
   {
-    row: 2,
     treatmentClass: "Clotting factor replacement",
-    agent: "SHL",
+    agent: AGENT_NAMES.shl,
     moa: "Standard half-life",
     hemophiliaType: "A + B",
     inhibitors: "No",
     age: "0+",
     route: "IV",
     schedule: "3X/week",
-    monitoring: " FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed",
+    monitoring: "FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed",
   },
   {
-    row: 3,
-    treatmentClass: "Clotting factor replacement ",
-    agent: "EHL",
+    treatmentClass: "Clotting factor replacement",
+    agent: AGENT_NAMES.ehl,
     moa: "Extended half-life",
     hemophiliaType: "A + B",
     inhibitors: "No",
     age: "0+",
     route: "IV",
     schedule: "~2X/week",
-    monitoring: " FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed",
+    monitoring: "FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed",
   },
   {
-    row: 4,
-    treatmentClass: "Clotting factor replacement ",
-    agent: "Efanesoctocog alfa",
+    treatmentClass: "Clotting factor replacement",
+    agent: AGENT_NAMES.efanesoctocog,
     moa: "Ultralong half-life",
     hemophiliaType: "A",
     inhibitors: "No",
@@ -72,12 +78,11 @@ export const TREATMENTS: readonly Treatment[] = [
     route: "IV",
     schedule: "Weekly",
     monitoring:
-      " FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed; hypersensitivity reactions,FVIII inhibitor development",
+      "FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed; hypersensitivity reactions,FVIII inhibitor development",
   },
   {
-    row: 5,
     treatmentClass: "Factor VIIIa mimetic",
-    agent: "Emicizumab",
+    agent: AGENT_NAMES.emicizumab,
     moa: "Factor VIIIa–mimetic\nBsAb",
     hemophiliaType: "A",
     inhibitors: "Yes",
@@ -87,9 +92,8 @@ export const TREATMENTS: readonly Treatment[] = [
     monitoring: "Thrombotic events in pts on aPCC at high doses",
   },
   {
-    row: 6,
-    treatmentClass: "Factor VIIIa mimetic              (emerging / investigational)",
-    agent: "Denecimig",
+    treatmentClass: "Factor VIIIa mimetic (emerging / investigational)",
+    agent: AGENT_NAMES.denecimig,
     moa: "Factor VIIIa–mimetic\nBsAb",
     hemophiliaType: "A",
     inhibitors: "Yes",
@@ -99,9 +103,8 @@ export const TREATMENTS: readonly Treatment[] = [
     monitoring: "TBD",
   },
   {
-    row: 7,
     treatmentClass: "Hemostatic rebalancing agent",
-    agent: "Concizumab",
+    agent: AGENT_NAMES.concizumab,
     moa: "TFPI mAb",
     hemophiliaType: "A + B",
     inhibitors: "Yes",
@@ -112,9 +115,8 @@ export const TREATMENTS: readonly Treatment[] = [
       "Thrombotic events, hypersensitivity reactions, increased laboratory values for fibrin D-dimer and prothrombin fragment",
   },
   {
-    row: 8,
     treatmentClass: "Hemostatic rebalancing agent",
-    agent: "Marstacimab",
+    agent: AGENT_NAMES.marstacimab,
     moa: "TFPI mAb",
     hemophiliaType: "A + B",
     inhibitors: "Yes",
@@ -125,9 +127,8 @@ export const TREATMENTS: readonly Treatment[] = [
       "Thrombotic events, hypersensitivity reactions, increased laboratory values for fibrin D-dimer and prothrombin fragment",
   },
   {
-    row: 9,
     treatmentClass: "Hemostatic rebalancing agent",
-    agent: "Fitusiran",
+    agent: AGENT_NAMES.fitusiran,
     moa: "AT-directed siRNA",
     hemophiliaType: "A + B",
     inhibitors: "Yes",
@@ -138,9 +139,8 @@ export const TREATMENTS: readonly Treatment[] = [
     monitoring: "Thrombotic events; liver enzymes, gall bladder disease, Anti-thrombin monitoring",
   },
   {
-    row: 10,
     treatmentClass: "Gene therapy",
-    agent: "Etranacogene dezaparvovec-drlb",
+    agent: AGENT_NAMES.etranacogene,
     moa: "AAV vector",
     hemophiliaType: "B",
     inhibitors: "No",

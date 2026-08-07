@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import { ALL_AGENT_NAMES } from "./agents";
 import { DRUG_SHEETS, sheetFor } from "./drug-sheets";
-import { EDUCATION_TOPICS, SEVERITY_TABLE, TREATMENT_OPTIONS_MATRIX } from "./education";
+import {
+  EDUCATION_TOPICS,
+  SEVERITY_TABLE,
+  TREATMENT_OPTIONS_MATRIX,
+  type EducationTopic,
+} from "./education";
 import { EXPLORE_AGENTS, EXPLORE_SEGMENTS } from "./explore";
 import { ACRONYMS, GLOSSARY } from "./glossary";
 import { REFERENCES, RESOURCES } from "./references";
@@ -213,10 +219,55 @@ describe("explore segments", () => {
   });
 });
 
+describe("treatment roster", () => {
+  /*
+    `AgentName` makes a misspelled agent a compile error, but it cannot make
+    `TREATMENTS` cover the roster — an array proves nothing about which of the nine
+    names it contains. That gap is what `recommend()`'s `treatmentFor()` throws on
+    and what `sheetFor()` returns `undefined` for, so it is asserted here instead.
+  */
+  it("hold exactly one row per name in AGENT_NAMES", () => {
+    expect(TREATMENTS.map((t) => t.agent).sort()).toEqual([...ALL_AGENT_NAMES].sort());
+  });
+
+  /*
+    S1 pads cells to lay out its columns — three `monitoring` values opened with a
+    space, two class labels closed with one, and Denecimig's parenthetical was
+    aligned with a run of fourteen. Every one of these fields renders as-is in the
+    §5 comparison table, so the padding is a rendering defect waiting on a caller
+    rather than copy to transcribe. Asserted across all fields of all rows, so a
+    row re-transcribed from the XLSX fails here.
+  */
+  it("carry no spreadsheet cell padding", () => {
+    for (const t of TREATMENTS) {
+      for (const [field, value] of Object.entries(t)) {
+        if (typeof value !== "string") continue;
+        expect(value, `${t.agent}.${field}`).toBe(value.trim());
+        // `moa` sets a deliberate newline; only runs of spaces are the artifact.
+        expect(value, `${t.agent}.${field}`).not.toMatch(/ {2}/);
+      }
+    }
+  });
+});
+
+/*
+  Id uniqueness is no longer a test — `EDUCATION_TOPICS` is keyed, so a repeated id
+  is a duplicate object-literal key and does not compile.
+*/
 describe("education", () => {
-  it("has unique topic ids", () => {
-    const ids = EDUCATION_TOPICS.map((t) => t.id);
-    expect(new Set(ids).size).toBe(ids.length);
+  /*
+    `severity-bleeding` shipped with the body "Disease severity is classified by
+    residual FVIII/FIX activity level (see SEVERITY_TABLE)" — a code identifier
+    standing in for copy, in a topic no chapter read. It was invisible precisely
+    because nothing rendered it; this is what would have said so.
+  */
+  it("carry no code identifiers standing in for copy", () => {
+    const lines = Object.values(EDUCATION_TOPICS).flatMap((topic: EducationTopic) =>
+      topic.body.flatMap((b) => (typeof b === "string" ? [b] : [b.text, ...b.children])),
+    );
+    for (const line of lines) {
+      expect(line).not.toMatch(/\b[A-Z][A-Z0-9]*(_[A-Z0-9]+)+\b/);
+    }
   });
 
   it("has fully populated tables", () => {

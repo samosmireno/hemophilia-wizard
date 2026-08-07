@@ -10,15 +10,15 @@ import {
   type FootnoteKey,
   TREATMENT_OPTIONS_FOOTNOTES,
   TREATMENT_OPTIONS_MATRIX,
-  topicById,
+  EDUCATION_TOPICS,
 } from "../../data/education";
 import { cn } from "../../lib/cn";
 import { usePreloadImage } from "../../lib/preloadImage";
 
-const LANDSCAPE = topicById("evolving-landscape")!;
-const CLOTTING = topicById("clotting-factor-replacement")!;
-const NFT = topicById("nft")!;
-const PERSONALIZED = topicById("personalized-therapy")!;
+const LANDSCAPE = EDUCATION_TOPICS["evolving-landscape"];
+const CLOTTING = EDUCATION_TOPICS["clotting-factor-replacement"];
+const NFT = EDUCATION_TOPICS["nft"];
+const PERSONALIZED = EDUCATION_TOPICS["personalized-therapy"];
 
 interface Row {
   heading: string;
@@ -34,12 +34,12 @@ interface Row {
 const ROWS: readonly [Row, Row, Row] = [
   {
     heading: "Clotting factor replacement:",
-    bullets: CLOTTING.body.slice(0, 1),
+    bullets: CLOTTING.body,
     // Ships as drawn: the design drops "factor" from the class name.
     label: "Benefits and challenges of clotting replacement therapies",
     title: "Benefits and Challenges Associated with Clotting Factor Replacement Therapies",
     subtitle: "(Options include SHL, EHL, and UHL FVIII/FIX products)",
-    content: <BenefitsChallengesCard data={CLOTTING.benefitsChallenges!} image={bloodDropUrl} />,
+    content: <BenefitsChallengesCard data={CLOTTING.benefitsChallenges} image={bloodDropUrl} />,
   },
   {
     heading: "Non-factor therapies:",
@@ -47,7 +47,7 @@ const ROWS: readonly [Row, Row, Row] = [
     label: "Benefits and challenges of NFTs",
     title: NFT.title,
     width: "narrow",
-    content: <BenefitsChallengesCard data={NFT.benefitsChallenges!} image={bloodDropUrl} />,
+    content: <BenefitsChallengesCard data={NFT.benefitsChallenges} image={bloodDropUrl} />,
   },
   {
     heading: "Personalized therapy for HA/HB:",
