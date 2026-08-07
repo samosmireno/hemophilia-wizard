@@ -47,13 +47,26 @@ describe("router", () => {
     expect(heading()).toHaveAccessibleName(SDM_CONCLUSION);
   });
 
+  it("renders the bibliography at /references", () => {
+    renderAt("/references");
+    expect(heading()).toHaveTextContent(/References/);
+    expect(document.querySelectorAll("li")).toHaveLength(29);
+  });
+
+  it("renders the curated panel at /resources", () => {
+    renderAt("/resources");
+    expect(heading()).toHaveTextContent(/Resources/);
+    expect(document.querySelectorAll("li")).toHaveLength(18);
+  });
+
+  // `/survey` is still a stub; `/glossary` and `/acronyms` are built and keep
+  // their place here because the assertion — this path reaches this heading —
+  // is a routing fact either way.
   it.each([
-    ["/resources", /Resources/],
     ["/survey", /Survey/],
     ["/glossary", /Glossary/],
     ["/acronyms", /Acronyms/],
-    ["/references", /References/],
-  ])("renders a stub at %s", (path, expected) => {
+  ])("renders %s under its own heading", (path, expected) => {
     renderAt(path);
     expect(heading()).toHaveTextContent(expected);
   });

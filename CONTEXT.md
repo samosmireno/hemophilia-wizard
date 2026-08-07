@@ -9,7 +9,11 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-06 (`/glossary` built — §8 records the twelve definitions shipping
+- **Last reviewed:** 2026-08-07 (`/references` built — §9 records the 29 citations, the 7 `®`
+  superscripted on client direction, the 11 URLs made clickable, the omitted "URLs accessed" line,
+  and **five repaired source defects — the first content array in the app that is not verbatim**,
+  under the new `docs/adr/0008-repair-bibliographic-defects.md`); previously 2026-08-06
+  (`/glossary` built — §8 records the twelve definitions shipping
   verbatim, including the source's one "sic"); previously 2026-08-06 (`/acronyms` built — §8 records the list's three shipped-as-is
   transcription facts and the six app abbreviations it does not gloss; §5.1 records the `mAB` → `mAb`
   correction, the first place the app departs from `[PDF-V]` on a spelling rather than a layout);
@@ -865,9 +869,80 @@ without them:
 
 ## 9. References & resources `[PDF-V]`
 
-- **References** — a full bibliography (~40 citations: prescribing information, FDA labels,
-  guidelines, clinical-trial publications) sits in the bottom-left teal block of the blueprint.
-  Transcribe from `[PDF-V]` when a specific citation is needed.
+- **References** — a full bibliography sits in the bottom-left teal block of the blueprint:
+  **29 citations** (prescribing information, FDA labels, guidelines, clinical-trial publications
+  and congress abstracts), unnumbered, alphabetical by first author or title, closing with the
+  line _"URLs accessed July 14, 2026."_ (The "~40" recorded here before the 2026-08-07 count was
+  an estimate; `documents/out_raw.txt:490–536` is the block.)
+
+  `[BUILD]` **This list ships as `/references`** (2026-08-07) — all 29 entries in source order,
+  rendered from `src/data/references.ts` → `REFERENCES`. Five facts about how:
+
+  - **Unnumbered but bulleted.** Nothing in the app cites a reference — there is no superscript
+    marker anywhere in the activity — so numbers would be markers pointing at nothing. The `id`
+    field stays a React key. If a later pass adds in-text citations, the numbering comes back
+    with them. **The page first shipped with no marker at all**, on a reading of
+    `documents/out_raw.txt`; the board draws a **disc** on every entry, and a text extraction has
+    no bullets to show. Corrected the same day — `docs/adr/0009-bibliographies-reproduce-source-list-structure.md`.
+  - **The journal abbreviation is italic** on **15 of the 29** entries — exactly the 15 that name a
+    journal; PIs, websites and congress abstracts are upright. Same discovery as the bullets and
+    the same cause: `out_raw.txt` carries no font information. Marked `_like this_` in the data per
+    ADR 0004. `r15` alone stops its run short of the sentence period, as drawn.
+  - **The client's one direction on this block is honoured**: _"Updated the entire reference list
+    — please superscript all trademarks (ie, ®)."_ All **7 `®`** render in `<sup>`. There is no
+    `™` in the list despite issue 12 naming it, and `®` appears **nowhere else in `src/`** — so
+    unlike the §5.1 `mAb` correction this one needed no app-wide propagation.
+  - **The 11 inline URLs are clickable**, each anchored to itself with the sentence period left
+    outside the `href` (`…/download.` links to `…/download`). The painted characters are
+    unchanged — the same class of move as `formatInline` rendering `_with_` as `<em>`. These are
+    the app's first external links; every other link is a router `<Link>`.
+  - **The closing "URLs accessed July 14, 2026." line is deliberately not shipped.** It is
+    recorded here rather than dropped silently, and is the one piece of the source block the page
+    omits. `[PDF-V]` draws the same line under the resources panel too (`out_raw.txt:536` and
+    `:2705`); **`/resources` omits it on the same decision** (2026-08-07, user), so neither page
+    carries it and this note covers both.
+
+  `[BUILD]` **Eight source defects are repaired across the two lists** — five in `REFERENCES`,
+  three in `RESOURCES`, and between them the first content arrays in the app that are not verbatim.
+  The rule and its limits are `docs/adr/0008-repair-bibliographic-defects.md`: a defect in a
+  **citation** is repaired because a citation is a checkable pointer to an external artifact; a
+  defect in **authored copy** is transcribed, which is why §8's `homeostatic` (sic), §6's
+  `FRONTEIR5` and §5.1's `mAB` all still ship as drawn.
+
+  | list         | id / entry   | `[PDF-V]` draws                | the app ships                  |
+  | ------------ | ------------ | ------------------------------ | ------------------------------ |
+  | `REFERENCES` | `r2`         | `…/media/165594/download..`    | `…/media/165594/download.`     |
+  | `REFERENCES` | `r12`        | `healthy male participant`     | `healthy male participants`    |
+  | `REFERENCES` | `r14`        | `J Thromb Haemost. 2017:117:…` | `J Thromb Haemost. 2017;117:…` |
+  | `REFERENCES` | `r16`        | `et al.··J Thromb …2341-2354`  | `et al. J Thromb …2341-2354.`  |
+  | `REFERENCES` | `r21`        | `Oldenberg J, et al.`          | `Oldenburg J, et al.`          |
+  | `RESOURCES`  | Duncan       | `Haemophilia. 2020;16:247-255` | `Haemophilia. 2010;16:247-255` |
+  | `RESOURCES`  | Duncan       | `adherence to prophylaxis reg` | `adherence to prophylactic re` |
+  | `RESOURCES`  | WFH Workbook | `…March 2025 3 Last reviewed…` | `…March 2025. Last reviewed…`  |
+
+  `r21` is what forced the rule: [§6](#6-drug-information-sheets) records the **same author on the
+  same FRONTIER5 study** as _Oldenburg_ in the Denecimig sheet's cut citation tails, so the source
+  contradicts itself and a single list cannot carry both. `src/routes/references.test.tsx` and
+  `src/routes/resources.test.tsx` pin each repair against the string it replaced — the lists are
+  otherwise verbatim, which is exactly the condition under which a well-meaning re-transcription
+  would revert all eight and look right.
+
+  **On the three `RESOURCES` repairs.** The Duncan pair is one entry with two defects: _VERITAS-Pro_
+  is `Haemophilia. 2010;16:247-255` — volume 16 of that journal is 2010, not 2020 — and the paper is
+  titled "…adherence to **prophylactic** regimens…". Both were confirmed against the PubMed record
+  rather than asserted. The WFH Workbook's stray `3` is the `r2` class (a stray character inside a
+  citation), and the period that replaces it is what the line needs to parse as two sentences; the
+  glyph was verified as really drawn by rendering the board at 2400 dpi, not inferred from the text
+  dump. **This repair predates ADR 0008** — it was already in the typed array, silently, which is
+  the failure mode the ADR exists to prevent. It is recorded here now rather than reverted.
+
+  `[CLIENT]` **One defect the ADR does not license, raised instead of fixed.** `r14` cites
+  _Kitazawa T, et al. **J** Thromb Haemost. 2017;117:1348-1357_ — volume 117 belongs to
+  _Thromb Haemost_, not _J Thromb Haemost_. A journal name is checkable, but changing one rewrites
+  **which artifact** the citation points at rather than fixing **how** it points there. Same class
+  as §8's six unglossed abbreviations: an open client content question, not a defect in the
+  transcription.
+
 - **Curated "Resources" panel** (far right), categorized:
   - _Clinical guidelines & recommendations:_ NBDF MASAC Document 267; WFH AAV Gene Therapy
     Guidelines (Haemophilia 2026;32:20-54); ISTH treatment guideline (J Thromb Haemost
@@ -881,6 +956,30 @@ without them:
     Duncan et al. VERITAS-Pro adherence measure; Molinari et al. Delphi monitoring tool; WFH SDM
     Tool & Workbook (https://sdm.wfh.org/).
   - **URLs accessed July 14, 2026.**
+
+  `[BUILD]` **This panel ships as `/resources`** (2026-08-07) — all **18 items in source order
+  across the 3 categories** (5 / 8 / 5), rendered from `src/data/references.ts` → `RESOURCES`. It
+  is the only one of issue 12's four pages **on the walkthrough spine** (`SECTION_ORDER` index 11),
+  so it carries Prev/Next from `AppSidebar` and needs no navigation of its own. Four facts about
+  how:
+
+  - **The URL is painted inline**, as the panel draws it, although the data model splits `url` out
+    of `text`. The route composes `${text} ${url}.` and `formatCitation` lifts the sentence period
+    back out of the `href` — same idiom as `/references`, which is one sidebar click away and holds
+    five of the same citations. **5 of the 18** carry a URL.
+  - **Bulleted, with the journal in italic** on **14 of the 18** — again exactly those that name a
+    journal (ADR 0009). Mehta's italic run is the odd one: it is the StatPearls **chapter title**,
+    not a journal, which is also why a term-list derivation was not available (the word is
+    "Hemophilia", which appears as ordinary prose throughout `src/data/`).
+  - **The category headings drop the source's run-in colon.** `[PDF-V]` writes
+    `Clinical guidelines and recommendations:` because the label shares a line with the list; the
+    page gives it vertical space instead (`docs/styling.md` §25).
+  - **Five items duplicate `REFERENCES` entries in different forms** — the panel writes `AJMC.`
+    where the bibliography writes `American Journal of Managed Care.`, and abbreviates author lists
+    where the bibliography spells them out (Rezende, Lim, Coffin, Makris). Both are as drawn, so
+    the transcription rule settles it and neither list is reconciled against the other. Recorded so
+    it is not re-found as drift.
+
 - **Shared decision-making (SDM) conclusion node** — "Leverage multidisciplinary care and SDM
   with patient, emphasizing consideration of risks, benefits, alternative treatment options, and
   patient goals/preferences."

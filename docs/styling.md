@@ -262,15 +262,17 @@ unblocks it (designer / browser / code), and where it bites.
 | 51  | `/wizard`'s Submit: type fixed (`lg:text-2xl` — pill/button delta 0 at every board; 375 keeps its drawn +2 via `max-lg:text-lg`) and box (`lg:px-7.5 lg:py-4.5`). **`px-7.5` is a compensation, not a conversion** — an invented number preserving the drawn 223px width. Open premise: is 223 × 56 a shape to hold at every board, or a canvas-only transcription? Designer; arithmetic, not browser-verified.                                                      | §14, §19, §4, §12     |
 | 52  | Gate-release cue half-shipped, wholly invented: the Submit pulse is measured (Chromium 2026-08-06 — peak 1.05, un-dim eases 0.35 → 1, reduced-motion correct); the sidebar arrow still snaps (package change, mlg-reskin debt 7); the pulse's numbers are derived but no artboard draws motion (designer); the scaled boards are arithmetic only.                                                                                                                    | §20, mlg-reskin       |
 
-| 53 | `AppShell`'s `<main>` is `lg:pb-0` — **no page can breathe at the bottom edge at ≥1024**. Never bit, because every route fit one screen; `/acronyms` (§22) is the first that does not and `/glossary` (§23) the second, and both pad themselves. **Two routes repeating the same class is the point at which the shell-wide fix starts costing less than the workaround** — but items 10/32 record every chapter at `scrollHeight` exactly 800, and bottom padding breaks that measurement for nine routes at once. Designer/code, with 10 and 32. | §12, §22, §23, §9 |
+| 53 | `AppShell`'s `<main>` is `lg:pb-0` — **no page can breathe at the bottom edge at ≥1024**. Never bit, because every route fit one screen; `/acronyms` (§22) is the first that does not, `/glossary` (§23) the second, `/references` (§24) the third and `/resources` (§25) the fourth, and all four pad themselves. **Four routes repeating the same class is past the point at which the shell-wide fix costs less than the workaround** — but items 10/32 record every chapter at `scrollHeight` exactly 800, and bottom padding breaks that measurement for nine routes at once. Designer/code, with 10 and 32. | §12, §22, §23, §24, §9, §25 |
+| 54 | **`src/data/` was transcribed from a text extraction, which carries no font style.** ADR 0009 found the two bibliographies shipping without the italic journal runs the board draws — 29 runs across 47 entries, missed because `out_raw.txt` cannot show them. The same dump is the source for the education chapters, the drug sheets, the glossary and the acronyms, and ADR 0004 already records `F8`/`F9` shipping upright where §7.2/§7.3 set them italic. **The bibliographies are fixed; nothing else has been checked.** `pdftohtml -xml` exposes the font subset per run (`BAAAAA+` = NotoSans-Italic), so this is a sweep, not an investigation. Code. | §24, §25, ADR 0009 |
+| 55 | ~~**`/resources` and the reworked `/references` have never been opened in a browser.**~~ **Closed 2026-08-07** — both were opened and checked after the ADR 0009 rework, including §24's `break-words` claim on `r8`'s URL. No widths recorded, so the residue is item 30's, not its own. | §24, §25 |
 
 **Invention ledger (summary)** — shipped values that are not straight transcriptions:
 
-| Kind                                | Values                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Transcribed-literal (off-scale)** | `#939393` press fg (§4.1/4.2); `#f73150`, `#bff5ff` (item 3); `#d2d5d4` (§4.3); §6 gradient stop (7); chapter `text-black` (§11); `--color-agent-mab` (14); emerging-panel mint (19); `#747474` (21)                                                                                                                                                                                                                                    |
-| **Inferred (never exported)**       | navbar tooltip (5); sidebar `teal-100` (§4.5); pop-up scrim (12); table hairlines `black/30` (§11)                                                                                                                                                                                                                                                                                                                                      |
-| **Invented (no artboard)**          | below-`sm`/`sm` gutters + `lg` bottom padding (§12); every below-`lg` type step (§2); `DisclosureBand` `md` row, `ArchBand` 150px radius, panel 60px radius, `treatment-landscape` `sm` step (§11); `Popup` band floor + ✕ base/`sm` steps (§13); `wide` 1360 (27); hover/press derivations (§4.2, §14, §15); `px-7.5` (51); gate pulse (52); scrollbars (§21); the §19 ladder; `/acronyms`' crimson terms and its own `lg:pb-16` (§22) |
+| Kind                                | Values                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Transcribed-literal (off-scale)** | `#939393` press fg (§4.1/4.2); `#f73150`, `#bff5ff` (item 3); `#d2d5d4` (§4.3); §6 gradient stop (7); chapter `text-black` (§11); `--color-agent-mab` (14); emerging-panel mint (19); `#747474` (21)                                                                                                                                                                                                                                                                                                |
+| **Inferred (never exported)**       | navbar tooltip (5); sidebar `teal-100` (§4.5); pop-up scrim (12); table hairlines `black/30` (§11)                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Invented (no artboard)**          | below-`sm`/`sm` gutters + `lg` bottom padding (§12); every below-`lg` type step (§2); `DisclosureBand` `md` row, `ArchBand` 150px radius, panel 60px radius, `treatment-landscape` `sm` step (§11); `Popup` band floor + ✕ base/`sm` steps (§13); `wide` 1360 (27); hover/press derivations (§4.2, §14, §15); `px-7.5` (51); gate pulse (52); scrollbars (§21); the §19 ladder; `/acronyms`' crimson terms and its own `lg:pb-16` (§22); `/references`' lagoon link colour and hanging indent (§24) |
 
 ## 10. Page top rule
 
@@ -802,3 +804,129 @@ like §22 and for the same reasons, with no horizontal overflow at any of the fi
 uppercased reads `VIIIA`, which names nothing. `src/routes/glossary.test.tsx` pins it the same way.
 
 **No ids, no search.** Same as §22 — the sidebar button is the only way in, nothing links a term.
+
+---
+
+## 24. `/references` — the bibliography, and the app's first links
+
+Built 2026-08-07 as the third of the undrawn content pages, and §22's footing note applies here
+word for word: **no artboard exists**, gate 2 delivered palette and typography only, every value
+below is invented within the palette (ledger, §9), and a later export overrules all of it.
+
+Same `<h1>` as §22/§23 — §11's chapter treatment, `font-display … uppercase text-brand-crimson-50`,
+left-aligned — and the same `lg:pb-16` against item 53.
+
+**Shape.** One column, 29 entries, `space-y-4`, at the chapter body ramp
+(`text-base/[1.6]` → `lg:text-xl/[1.6]`). Two columns at `xl` were considered and rejected: they
+would halve the scroll to roughly one screen, but each column drops to ~560px, the `r8` HEMLIBRA
+URL alone eats several lines of that, and alphabetical order read down-then-across is the harder
+order to follow. §22 made the same call on weaker grounds.
+
+**~~Hanging indent — `-indent-8 pl-8` on the `<li>`.~~ Withdrawn the same day, see ADR 0009.** The
+argument was: the list is **unnumbered** (CONTEXT.md §9: nothing in the app cites a reference, so
+numbers would be markers pointing at nothing), which removes the device that normally separates one
+entry from the next, and with neither a marker nor an indent a wrapped second line and a new
+citation are the same glyph at the same x. The reasoning was sound and its premise was false —
+**`[PDF-V]` draws a disc on every entry**, which `out_raw.txt` flattens away. The indent was
+invented to replace a marker the source has. Both bibliographies now render through `BulletList`,
+and the marker does the job the indent was standing in for.
+
+**Italic journal runs.** Also from ADR 0009: the board sets the journal abbreviation in
+NotoSans-Italic on **15 of the 29** entries here — exactly those that name a journal — and this page
+first shipped them flat. They are marked `_like this_` in `src/data/references.ts` per ADR 0004 and
+rendered by `formatCitation`. `r15` is the one entry whose terminal period sits outside the run, as
+drawn.
+
+**`break-words` on the `<ul>` is correctness, not taste.** `r8`'s citation carries roughly 300
+characters of unbreakable HEMLIBRA tracking URL — one token with no space, no hyphen and no
+opportunity to wrap. Without it the page scrolls sideways at every board, and at 375 the URL is
+several times the viewport. This is the only place in the app where a single string can do that.
+
+**Links: `brand-lagoon-50` underlined** (`[&_a]:text-brand-lagoon-50 [&_a]:underline` on the list).
+**These are the app's first external links** — everything else is a router `<Link>` in the sidebar,
+which the package styles. Lagoon is the palette's bright-blue family and already the app's
+interactive colour on `PopupButton` (§4.4), and `DrugSheetPopup.test.tsx:147` records that the
+source drew its trial citations as "blue underlined links" — so the derivation has both a palette
+role and a source precedent behind it, which is more than most of §22's values have. Crimson was
+the alternative (it is what both sibling pages use for emphasis) and was rejected because crimson
+is this app's heading colour: a crimson URL reads as a highlight, not as something to click.
+
+**The markup split.** `src/lib/formatCitation.tsx` is presentation-free like `formatInline` — it
+emits a bare `<a>` and `<sup>`, and the route colours them through a descendant selector. That
+keeps the one link idiom described in one place here, and keeps the lib file about _what the
+source draws_ rather than about this page. Its two non-obvious jobs: superscripting the 7 `®` on
+the client's direction, and splitting the sentence period back out of each URL so the `href`
+resolves (`…/download.` → `…/download`, `…-emicizumab/.` → `…-emicizumab/`).
+
+**Confirmed by eye, not measured.** Verified in `src/routes/references.test.tsx` and
+`src/lib/formatCitation.test.tsx`, and **opened and checked after the ADR 0009 rework** (2026-08-07,
+user) — same footing as §22. jsdom computes no layout, so the bullet indent, the URL wrap and the
+horizontal-overflow claim above were all arithmetic until that point; this route is the app's
+longest scroll (~1900px at `lg`) and holds its only unbreakable strings, which is precisely where
+arithmetic stops being trustworthy.
+
+**What that settles, and what it does not.** The `break-words` claim §24 named as the one to check
+first has now had eyes on it: `r8`'s ~300-character HEMLIBRA URL does not push the page sideways.
+**No widths were recorded**, so this is a sighting rather than a sweep — item 30 stays open for
+this route on the same terms as every other, and 320 in particular is still unvisited.
+
+---
+
+## 25. `/resources` — the curated panel, and the only content page on the spine
+
+Built 2026-08-07 as the last of issue 12's four content pages. **Unlike §22–§24 this one is not
+wholly invented**: no app artboard exists, but `[PDF-V]` draws the panel itself with real
+typographic structure — bold sentence-case category labels, bulleted items, italic journal runs and
+blue underlined URLs — and that structure is read off the board rather than guessed (ADR 0009).
+Everything _below_ that (the ramps, the spacing, the breakpoints) is still invented within the
+palette, and a later export overrules it.
+
+**On the spine.** `SECTION_ORDER` index 11, between `/explore` and `/survey`, so Prev/Next come
+from `AppSidebar` and the route carries no navigation of its own. It is the only one of issue 12's
+four pages in the walkthrough; the other three are sidebar jumps.
+
+**Same `<h1>` as §22–§24** — §11's chapter treatment, `font-display … uppercase
+text-brand-crimson-50`, left-aligned — and the same `lg:pb-16` against item 53. The source draws
+`Resources:` with a colon, in the board's own small blue label style; that is panel-label
+typography, not the page's title, and the `<h1>` follows its three siblings instead.
+
+**Categories are `<h2>` on the chapter ramp** — `text-2xl font-bold tracking-wide text-black
+lg:text-3xl`, which is both the app's existing answer for a bold black sentence-case heading inside
+a chapter (§11) _and_ what the panel draws. Nothing is invented here, which is worth stating on a
+route with no artboard. Crimson uppercase was the alternative and was rejected: that is the page
+title's voice, and three of them under one `<h1>` flattens the hierarchy the scroll depends on.
+
+**The run-in colon is not carried.** The board writes `Clinical guidelines and recommendations:`
+because the label shares its line's visual space with the list beneath it. Vertical space does that
+binding here, so the colon would be transcribing a typographic mechanism rather than the copy.
+
+**Three lists, not one.** Each category owns its `<ul>`, so the heading is the list's label rather
+than a paragraph floating above a longer list. `mt-10 first:mt-8` between blocks — the first sits
+closer to the `<h1>` than the categories sit to each other.
+
+**Shape.** One column, 18 entries, `space-y-4`, at the chapter body ramp (`text-base/[1.6]` →
+`lg:text-xl/[1.6]`), bulleted through `BulletList` with `format={formatCitation}`. §22 and §24 both
+rejected two columns and the reasoning holds harder here: at `xl` each column drops to ~560px and
+these citations run three and four lines at full width. Categories side by side at `xl` was the
+other option — rejected because 5 / 8 / 5 items bottom out at three different heights and the eye
+has to hunt for where each column restarts.
+
+**The URL is put back inline.** `ResourceItem` splits `url` out of `text`; `[PDF-V]` draws it at the
+tail of the citation, so the route composes `${text} ${url}.` and paints what the panel paints.
+`formatCitation` then lifts the sentence period back out of the `href`, exactly as on §24. The
+alternative — anchoring the citation text and never showing the URL — was rejected twice over: it
+invents an affordance the source does not draw, and it would make 5 of 18 entries look
+categorically unlike the other 13.
+
+**Links reuse §24's derivation**, `[&_a]:text-brand-lagoon-50 [&_a]:underline`. Worth recording
+that §24 _invented_ that pairing from the palette and this panel then corroborated it: the board
+draws these URLs blue and underlined.
+
+**`break-words` is inherited caution, not a need.** No URL on this page is unbreakable — the
+longest, MASAC's, is ~180 characters and hyphenated throughout. It stays for consistency with §24
+and because the cost of being wrong is a sideways page.
+
+**Verified in `src/routes/resources.test.tsx`, then confirmed by eye** (2026-08-07, user) — same
+footing as §22 and §24. jsdom computes no layout, so the column, the wrap and the bullet indent
+were arithmetic until the page was opened. **No widths were recorded**, so item 30 covers this
+route too: it has been seen, not swept.
