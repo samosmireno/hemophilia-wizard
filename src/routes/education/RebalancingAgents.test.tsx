@@ -39,6 +39,16 @@ async function openProseCard(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe("rebalancing-agents chapter", () => {
+  /**
+   * `figures` is the record of which figure belongs to which topic, and it says
+   * it "must still agree with the page" — but this chapter states the caption as
+   * its own literal, because the record is content and the control title is
+   * markup. So the agreement is a test rather than a shared const.
+   */
+  it("captions the mechanism figure as the topic's record says", () => {
+    expect(EDUCATION_TOPICS["rebalancing-mechanisms"].figures?.[0]).toBe(FIGURE_TITLE);
+  });
+
   it("renders the chapter title in title case, not the uppercase it displays", () => {
     render(<RebalancingAgents />);
     // `uppercase` is a CSS transform, so the accessible name is unaffected —

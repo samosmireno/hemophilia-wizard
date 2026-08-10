@@ -222,6 +222,44 @@ describe("education", () => {
     expect(SEVERITY_TABLE).toHaveLength(3);
     expect(TREATMENT_OPTIONS_MATRIX).toHaveLength(5);
   });
+
+  /*
+    `figures` says it names "the topic where there is one", and three of the five
+    entries do — but nothing held them to it, so a renamed topic title would have
+    left the record pointing at a caption no topic carries. The two page-side
+    entries are pinned where their page is (`RebalancingAgents.test.tsx`,
+    `FviiiMimetics.test.tsx`), because only the page holds the literal.
+
+    `nxt007-overview` is the deliberate exception and is asserted as one: the
+    record keeps the source's "NXT007 BsAb Structure" while the chapter paints the
+    raster's own "Zemocimig (NXT007) BsAb structure". Asserted rather than skipped
+    so the divergence stays a decision rather than becoming drift.
+  */
+  it.each([
+    ["emicizumab-overview", "emicizumab-moa"],
+    ["denecimig-overview", "denecimig-moa"],
+    ["nxt007-overview", "nxt007-structure"],
+  ] as const)("names %s's figure by the title of the topic it belongs to", (owner, figure) => {
+    expect(EDUCATION_TOPICS[owner].figures?.[0]).toBe(EDUCATION_TOPICS[figure].title);
+  });
+});
+
+/*
+  Neither list is keyed, so neither gets `EDUCATION_TOPICS`' duplicate-key compile
+  error — and both use their term as the React key in `DefinitionList`, where a
+  repeat is a console warning rather than a failure. Asserted here because a
+  duplicate is the kind of thing a re-transcription introduces silently.
+*/
+describe("the definition lists", () => {
+  it("define each glossary term once", () => {
+    const terms = GLOSSARY.map((entry) => entry.term);
+    expect(new Set(terms).size).toBe(terms.length);
+  });
+
+  it("expand each acronym once", () => {
+    const abbrs = ACRONYMS.map((entry) => entry.abbr);
+    expect(new Set(abbrs).size).toBe(abbrs.length);
+  });
 });
 
 describe("glossary, references, survey", () => {

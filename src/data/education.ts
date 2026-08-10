@@ -31,7 +31,11 @@ export interface EducationTopic {
    *
    * Not rendered: every chapter states its own control title, because two of them
    * name the raster's painted heading rather than the source's. This is the record
-   * of which figure belongs to which topic, so it must still agree with the page.
+   * of which figure belongs to which topic, so it must still agree with the page —
+   * **except `nxt007-overview`**, which keeps the source's "NXT007 BsAb Structure"
+   * against the chapter's "Zemocimig (NXT007) BsAb structure". All five are pinned:
+   * the three that name a topic in `content.test.ts`, and the two page-side
+   * captions in their own chapter's suite, since only the page holds the literal.
    */
   figures?: string[];
 }

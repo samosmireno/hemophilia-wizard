@@ -1,4 +1,15 @@
 export interface Reference {
+  /**
+   * `r1`–`r29`, in source order. **Nothing in the app cites a reference** — the
+   * page renders `text` alone — so this is not a join key and never becomes one
+   * unless in-text citations arrive.
+   *
+   * It is the stable address the tests use. `references.test.tsx` pins the five
+   * ADR 0008 repairs by id, against the source forms they replaced, so a
+   * re-transcription from `[PDF-V]` cannot quietly undo them; the doubled-space
+   * sweep names the offender by id too. Addressing those by their text would mean
+   * matching on the very strings under test.
+   */
   id: string;
   /**
    * Formatted citation (URL inline when the source includes one), with the
