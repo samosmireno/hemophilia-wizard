@@ -10,7 +10,7 @@ import {
 } from "mlg-components";
 import { Link, useLocation, useNavigate } from "react-router";
 
-import { SECTION_ORDER, nextOf, prevOf, type SectionPath } from "../data/sectionOrder";
+import { isSpinePath, nextOf, prevOf, type SectionPath } from "../data/sectionOrder";
 import { useWizardAnswers } from "../state/wizardAnswers";
 
 const JUMP_TARGETS = [
@@ -20,10 +20,6 @@ const JUMP_TARGETS = [
   { path: "/references", label: "References", Icon: DocumentIcon },
   { path: "/glossary", label: "Glossary", Icon: InfoIcon },
 ] as const;
-
-function isSpinePath(path: string): path is SectionPath {
-  return (SECTION_ORDER as readonly string[]).includes(path);
-}
 
 export default function AppSidebar() {
   const { pathname } = useLocation();

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { SECTION_ORDER, nextOf, prevOf } from "./sectionOrder";
+import { SECTION_ORDER, isSpinePath, nextOf, prevOf } from "./sectionOrder";
 
 describe("sectionOrder", () => {
   it("is the thirteen-step walkthrough spine in blueprint order", () => {
@@ -54,10 +54,18 @@ describe("sectionOrder", () => {
     expect(nextOf("/survey")).toBeUndefined();
   });
 
-  it("returns undefined for off-line and unknown paths", () => {
+  /*
+    `nextOf`/`prevOf` no longer take these — a plain string is a type error, so
+    "what does stepping from an off-line path do" is not a question the interface
+    can be asked. `isSpinePath` is where a runtime path earns the narrowed type,
+    and rejecting these is the half of its contract the spine test above can't pin.
+  */
+  it("isSpinePath rejects off-line and unknown paths", () => {
     for (const path of ["/glossary", "/acronyms", "/references", "/nope"]) {
-      expect(prevOf(path)).toBeUndefined();
-      expect(nextOf(path)).toBeUndefined();
+      expect(isSpinePath(path)).toBe(false);
+    }
+    for (const path of SECTION_ORDER) {
+      expect(isSpinePath(path)).toBe(true);
     }
   });
 });
