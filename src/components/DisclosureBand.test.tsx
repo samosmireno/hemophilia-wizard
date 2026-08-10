@@ -2,11 +2,17 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-import DisclosureBand, { type Disclosure } from "./DisclosureBand";
+import DisclosureBand from "./DisclosureBand";
+import { type Disclosure } from "./disclosures";
 
 const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
   { label: "First figure", content: <p>first panel</p> },
-  { label: "Second figure", content: <p>second panel</p> },
+  {
+    label: "Second figure",
+    subtitle: "(both corners)",
+    width: "narrow",
+    content: <p>second panel</p>,
+  },
   // No content — the §7.7 assets that do not exist yet.
   { label: "Third figure" },
 ];
@@ -94,6 +100,23 @@ describe("DisclosureBand", () => {
     expect(dialog()).toHaveAttribute("open");
     expect(dialog()).toHaveAccessibleName("First figure");
     expect(dialog()).toHaveTextContent("first panel");
+  });
+
+  /**
+   * The disclosure's card fields reach the dialog as one record — the
+   * `disclosureCard` join, pinned here for every caller that maps a disclosure
+   * to a `Popup` rather than restated where each of them does. The subtitle
+   * joins the accessible name (a card announced without its parenthetical
+   * claims a broader scope than it has), and `width` picks the card's box.
+   */
+  it("carries a disclosure's subtitle and width onto the card", async () => {
+    renderBand();
+
+    await userEvent.click(trigger("Second figure"));
+
+    expect(dialog()).toHaveAccessibleName("Second figure (both corners)");
+    // `narrow`'s box — the card is the dialog's one child.
+    expect(dialog().firstElementChild).toHaveClass("w-[min(53.75rem,92vw)]");
   });
 
   // Closing from inside the dialog has to move the band's state, or the trigger

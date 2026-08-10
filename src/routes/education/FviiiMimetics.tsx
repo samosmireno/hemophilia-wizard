@@ -8,7 +8,7 @@ import nxt007Url from "../../assets/images/nxt007.webp";
 import BulletList from "../../components/BulletList";
 import ExpandableFigure from "../../components/ExpandableFigure";
 import PageSection from "../../components/PageSection";
-import Popup from "../../components/Popup";
+import Popup, { type PopupCard } from "../../components/Popup";
 import PopupFigure from "../../components/PopupFigure";
 import { EDUCATION_TOPICS } from "../../data/education";
 import { usePreloadImages } from "../../lib/preloadImage";
@@ -128,6 +128,23 @@ export default function FviiiMimetics() {
   /** Curried so each call site reads as the one disclosure it belongs to. */
   const toggle = (id: OpenId) => (next: boolean) => setOpenId(next ? id : null);
 
+  /**
+   * The four cards, one record per disclosure, painted by the chapter's one
+   * `Popup`. Switching agents swaps the card in place — the same move every
+   * other chapter's single `Popup` makes. Until 2026-08-10 these were four
+   * `Popup`s mounted side by side, and the chapter's tests had to address
+   * dialogs by position, counting past the empty mounts.
+   */
+  const CARDS: Record<OpenId, PopupCard> = {
+    emicizumab: { title: CARD_TITLE, content: <EmicizumabCard /> },
+    // The chapter's one card off `default`: the densest of the four, and `wide`
+    // spends the extra width entirely on its left column.
+    denecimig: { title: DENECIMIG_CARD_TITLE, width: "wide", content: <DenecimigCard /> },
+    // The caption const, not `nxt007-overview.title` — see `NXT007`.
+    nxt007: { title: NXT007, content: <Nxt007Card /> },
+    inno8: { title: INNO8_OVERVIEW.title, content: <Inno8Card /> },
+  };
+
   usePreloadImages([emicizumabUrl, denecimigUrl, nxt007Url, inno8Url]);
 
   return (
@@ -186,37 +203,7 @@ export default function FviiiMimetics() {
         </EmergingPanel>
       </div>
 
-      {/* Four `Popup`s rather than one keyed off `openId`, which is what the
-          payload would now allow: `FviiiMimetics.test.tsx` addresses dialogs by
-          position (`dialogs()[2]`, `[3]`) and its helpers spell out how many
-          empty ones precede each open card. Collapsing these is its own change,
-          with that test rewrite as its own diff. */}
-      <Popup
-        card={openId === "emicizumab" ? { title: CARD_TITLE, content: <EmicizumabCard /> } : null}
-        onClose={() => setOpenId(null)}
-      />
-
-      {/* The one card in this chapter off `default`: the densest of the four, and
-          `wide` spends the extra width entirely on its left column. */}
-      <Popup
-        card={
-          openId === "denecimig"
-            ? { title: DENECIMIG_CARD_TITLE, width: "wide", content: <DenecimigCard /> }
-            : null
-        }
-        onClose={() => setOpenId(null)}
-      />
-
-      {/* The caption const, not `nxt007-overview.title` — see `NXT007`. */}
-      <Popup
-        card={openId === "nxt007" ? { title: NXT007, content: <Nxt007Card /> } : null}
-        onClose={() => setOpenId(null)}
-      />
-
-      <Popup
-        card={openId === "inno8" ? { title: INNO8_OVERVIEW.title, content: <Inno8Card /> } : null}
-        onClose={() => setOpenId(null)}
-      />
+      <Popup card={openId === null ? null : CARDS[openId]} onClose={() => setOpenId(null)} />
     </PageSection>
   );
 }

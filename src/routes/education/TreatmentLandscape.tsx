@@ -1,10 +1,11 @@
-import { Fragment, type ReactNode, useState } from "react";
+import { Fragment, useState } from "react";
 import { PopupButton } from "mlg-components";
 
 import bloodDropUrl from "../../assets/images/blood_drop.webp";
 import BulletList from "../../components/BulletList";
+import { type Disclosure, disclosureCard } from "../../components/disclosures";
 import PageSection from "../../components/PageSection";
-import Popup, { type PopupWidth } from "../../components/Popup";
+import Popup from "../../components/Popup";
 import {
   type BenefitsChallenges,
   type Bullet,
@@ -21,15 +22,10 @@ const CLOTTING = EDUCATION_TOPICS["clotting-factor-replacement"];
 const NFT = EDUCATION_TOPICS["nft"];
 const PERSONALIZED = EDUCATION_TOPICS["personalized-therapy"];
 
-interface Row {
+/** A drawn row: its prose and reserved figure box, then the disclosure beside them. */
+interface Row extends Disclosure {
   heading: string;
   bullets: readonly Bullet[];
-  /** Caption under the `+`, and the button's accessible name. */
-  label: string;
-  title?: string;
-  subtitle?: string;
-  width?: PopupWidth;
-  content?: ReactNode;
 }
 
 const ROWS: readonly [Row, Row, Row] = [
@@ -99,22 +95,7 @@ export default function TreatmentLandscape() {
         ))}
       </div>
 
-      {/* `width` travels with the card rather than beside it: it is held through
-          the exit fade with the rest, where it used to revert on close and snap
-          the `narrow` NFT card 280px wider for the length of its own fade. */}
-      <Popup
-        card={
-          open?.content
-            ? {
-                title: open.title ?? open.label,
-                subtitle: open.subtitle,
-                width: open.width,
-                content: open.content,
-              }
-            : null
-        }
-        onClose={() => setOpenIndex(null)}
-      />
+      <Popup card={disclosureCard(open)} onClose={() => setOpenIndex(null)} />
     </PageSection>
   );
 }

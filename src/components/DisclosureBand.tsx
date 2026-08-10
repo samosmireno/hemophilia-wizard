@@ -1,15 +1,9 @@
-import { type ReactNode, useState } from "react";
+import { useState } from "react";
 import { PopupButton } from "mlg-components";
 
 import ArchBand from "./ArchBand";
+import { type Disclosure, disclosureCard } from "./disclosures";
 import Popup from "./Popup";
-
-/** One "Click here:" disclosure — the caption under the button, and what it opens. */
-export interface Disclosure {
-  label: string;
-  title?: string;
-  content?: ReactNode;
-}
 
 /** Three, enforced by the type — the prop is a 3-tuple, not an array. */
 export default function DisclosureBand({
@@ -42,12 +36,7 @@ export default function DisclosureBand({
         ))}
       </ul>
 
-      {/* A disclosure with no content opens nothing — which is now the same
-          statement as "there is no card", rather than a boolean beside a title. */}
-      <Popup
-        card={open?.content ? { title: open.title ?? open.label, content: open.content } : null}
-        onClose={() => setOpenIndex(null)}
-      />
+      <Popup card={disclosureCard(open)} onClose={() => setOpenIndex(null)} />
     </ArchBand>
   );
 }

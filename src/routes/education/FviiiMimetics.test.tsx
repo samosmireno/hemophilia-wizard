@@ -21,23 +21,36 @@ const PANEL_HEADING = "Investigational FVIII mimetic therapies in earlier-stage 
 /**
  * Every card that is currently up — which for this chapter should never be more
  * than one, and is what the three mutual-exclusion tests below actually mean.
- *
- * **Stated as "which are open" rather than by position**, unlike the per-block
- * `dialogs()[n]` helpers. `Popup` holds its last open content rendered for the
- * length of `MODAL_EXIT_MS` so the exit fade has a card to paint, so for that
- * window a just-closed card still carries its body — and, for the three that
- * hold a figure, that body's nested `<dialog>`. Indices between two cards are
- * therefore transient, and the mutual-exclusion tests are the only ones that
- * span a close and an open closely enough to see it.
- *
- * **Not by accessible name either**, which is the obvious alternative and does
- * not work: a closed dialog is `display: none`, and the name algorithm ignores
- * hidden content, so every shut card computes to `""` no matter what its band
- * still says. Only an open dialog can be found by name — which is exactly what
- * the assertions pair this with.
+ * One `Popup` serves the whole chapter, so "up" is that one dialog being
+ * `open`; found by filtering rather than by accessible name because a closed
+ * dialog is `display: none` and the name algorithm ignores hidden content, so
+ * only an open dialog can be found by name — which is exactly what the
+ * assertions pair this with.
  */
 const openCards = () =>
   screen.getAllByRole("dialog", { hidden: true }).filter((d) => d.hasAttribute("open"));
+
+/**
+ * The chapter's one card `<dialog>`, then the enlarged figure nested inside
+ * it. DOM order, because the figure's `<dialog>` is a descendant of the card's
+ * — which is also the whole reason the card survives the figure closing. One
+ * `Popup` serves all four cards, so these two addresses hold in every block
+ * below; until 2026-08-10 the chapter mounted four `Popup`s side by side, and
+ * each block had to count past the empty mounts that preceded its card.
+ *
+ * `hidden: true` because jsdom implements `showModal()` but not the top layer:
+ * a closed `<dialog>` is `display: none`, and the closed figure still has to
+ * be addressable for the "not open" halves of the nesting assertions.
+ *
+ * **`open` is what "showing" means here**, not presence in the document.
+ * `ExpandableFigure` mounts its `Popup` with children unconditionally, so the
+ * figure's markup exists from the moment its card opens; the UA hides it with
+ * `display: none` until `showModal()` runs. Asserting on text being in the
+ * document would therefore pass in both states.
+ */
+const dialogs = () => screen.getAllByRole("dialog", { hidden: true });
+const card = () => dialogs()[0];
+const figure = () => dialogs()[1];
 
 /**
  * NXT007's display name — a chapter literal too, and since 2026-08-05 the INN
@@ -202,35 +215,8 @@ describe("fviii-mimetics chapter", () => {
   });
 });
 
-/**
- * Pop up 10 — the first of the two cards the designer has delivered.
- *
- * `hidden: true` on every dialog query: jsdom implements `showModal()` but not
- * the top layer, so a closed `<dialog>` is `display: none` and an open one is
- * still not exposed the way a real UA exposes it. The chapter's other tests use
- * accessible names, which is what actually distinguishes the two cards here.
- */
+/** Pop up 10 — the first of the two cards the designer has delivered. */
 describe("the Emicizumab card", () => {
-  const dialogs = () => screen.getAllByRole("dialog", { hidden: true });
-
-  /**
-   * The card, then the enlarged figure nested inside it. DOM order, because the
-   * figure's `<dialog>` is a descendant of the card's — which is also the whole
-   * reason the card survives the figure closing.
-   *
-   * The Denecimig card is mounted too, but its children are `undefined` while it
-   * is shut, so it contributes exactly one empty dialog *after* these two. The
-   * indices are therefore unaffected by a sibling card existing.
-   *
-   * **`open` is what "showing" means here**, not presence in the document.
-   * `ExpandableFigure` mounts its `Popup` with children unconditionally, so the
-   * figure card's markup exists from the moment the Emicizumab card opens; the
-   * UA hides it with `display: none` until `showModal()` runs. Asserting on text
-   * being in the document would therefore pass in both states.
-   */
-  const card = () => dialogs()[0];
-  const figure = () => dialogs()[1];
-
   const open = async (user: ReturnType<typeof userEvent.setup>) => {
     render(<FviiiMimetics />);
     await user.click(screen.getByRole("button", { name: `Expand ${EMICIZUMAB.title}` }));
@@ -375,21 +361,8 @@ describe("the Emicizumab card", () => {
   });
 });
 
-/**
- * Pop up 11 — the second delivered card, and the second `Popup` mounted by the
- * chapter.
- *
- * The indices shift by one against the Emicizumab block above, and that shift is
- * the structure rather than an accident: the Emicizumab card mounts first and
- * stands empty while this one is open, so the dialogs are [emicizumab (empty),
- * denecimig, denecimig's figure, nxt007 (empty)] in DOM order. The empty mounts
- * that come *after* cannot move these two.
- */
+/** Pop up 11 — the second delivered card. */
 describe("the Denecimig card", () => {
-  const dialogs = () => screen.getAllByRole("dialog", { hidden: true });
-  const card = () => dialogs()[1];
-  const figure = () => dialogs()[2];
-
   const open = async (user: ReturnType<typeof userEvent.setup>) => {
     render(<FviiiMimetics />);
     await user.click(screen.getByRole("button", { name: `Expand ${DENECIMIG.title}` }));
@@ -545,17 +518,8 @@ describe("the Denecimig card", () => {
   });
 });
 
-/**
- * Pop up 12 — the third delivered card, and the chapter's third `Popup`.
- *
- * Two empty mounts precede it while it is open, so the dialogs are [emicizumab
- * (empty), denecimig (empty), nxt007, nxt007's figure] in DOM order.
- */
+/** Pop up 12 — the third delivered card. */
 describe("the NXT007 card", () => {
-  const dialogs = () => screen.getAllByRole("dialog", { hidden: true });
-  const card = () => dialogs()[2];
-  const figure = () => dialogs()[3];
-
   /**
    * The panel's disclosure, not the card's ✕ — the two share the name "Close
    * Zemocimig (NXT007)" once the card is up, which is the collision the
@@ -742,18 +706,8 @@ describe("the NXT007 card", () => {
   });
 });
 
-/**
- * Pop up 13 — the last of the four, and the chapter's fourth `Popup`.
- *
- * Three empty mounts precede it while it is open, so the dialogs are [emicizumab
- * (empty), denecimig (empty), nxt007 (empty), inno8, inno8's figure] in DOM
- * order.
- */
+/** Pop up 13 — the last of the four. */
 describe("the Inno8 card", () => {
-  const dialogs = () => screen.getAllByRole("dialog", { hidden: true });
-  const card = () => dialogs()[3];
-  const figure = () => dialogs()[4];
-
   /** The source's caption for the diagram, stated in the chapter; see there. */
   const FIGURE_TITLE = "Inno8 Mechanism of Action";
 
@@ -1042,22 +996,20 @@ describe("fviii-mimetics — the responsive pass", () => {
    * column, and a card may not set larger body type than the page that opened it
    * in a narrower measure.
    */
-  it.each([
-    [`Expand ${EMICIZUMAB.title}`, 0],
-    [`Expand ${DENECIMIG.title}`, 1],
-    [`Expand ${NXT007_CAPTION}`, 2],
-  ])("stacks the %s card at xl and steps its body to 16px below lg", async (name, index) => {
-    const user = userEvent.setup();
-    render(<FviiiMimetics />);
-    await user.click(screen.getByRole("button", { name }));
+  it.each([`Expand ${EMICIZUMAB.title}`, `Expand ${DENECIMIG.title}`, `Expand ${NXT007_CAPTION}`])(
+    "stacks the %s card at xl and steps its body to 16px below lg",
+    async (name) => {
+      const user = userEvent.setup();
+      render(<FviiiMimetics />);
+      await user.click(screen.getByRole("button", { name }));
 
-    const card = screen.getAllByRole("dialog", { hidden: true })[index];
-    const bullets = card.querySelector("ul")!;
+      const bullets = card().querySelector("ul")!;
 
-    expect(bullets).toHaveClass("text-base", "lg:text-xl");
-    expect(bullets.parentElement).toHaveClass("flex-col", "xl:flex-row");
-    expect(bullets.parentElement).not.toHaveClass("lg:flex-row");
-  });
+      expect(bullets).toHaveClass("text-base", "lg:text-xl");
+      expect(bullets.parentElement).toHaveClass("flex-col", "xl:flex-row");
+      expect(bullets.parentElement).not.toHaveClass("lg:flex-row");
+    },
+  );
 
   /**
    * Inno8 is the exception and stays one, at both breakpoints: its panel is
@@ -1070,7 +1022,7 @@ describe("fviii-mimetics — the responsive pass", () => {
     render(<FviiiMimetics />);
     await user.click(screen.getByRole("button", { name: "Expand Inno8" }));
 
-    const bullets = screen.getAllByRole("dialog", { hidden: true })[3].querySelector("ul")!;
+    const bullets = card().querySelector("ul")!;
 
     expect(bullets).toHaveClass("text-base", "lg:text-xl");
     expect(bullets.parentElement).toHaveClass("flex-col");

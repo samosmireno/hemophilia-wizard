@@ -2,7 +2,8 @@ import bleedingUrl from "../../assets/images/bleeding_manifestations_diagram.web
 import cascadeThumbUrl from "../../assets/images/clotting-cascade-thumb.webp";
 import diagnosticUrl from "../../assets/images/diagnostic_approach_diagram.webp";
 import BulletList from "../../components/BulletList";
-import DisclosureBand, { type Disclosure } from "../../components/DisclosureBand";
+import DisclosureBand from "../../components/DisclosureBand";
+import { type Disclosure } from "../../components/disclosures";
 import ExpandableFigure from "../../components/ExpandableFigure";
 import PageSection from "../../components/PageSection";
 import PopupFigure from "../../components/PopupFigure";
