@@ -79,14 +79,30 @@
   --shadow-popup: 0px 22.735px 50.142px 5.052px rgba(0, 0, 0, 0.55);
 
   /* ─── Education chapters (docs/styling.md §11) ────────────────────────────── */
-  --color-popup-caption: color-mix(
-    in oklab,
-    var(--color-brand-lagoon-75) 52%,
-    var(--color-brand-lagoon-100)
-  );
+  --color-popup-caption: var(--color-brand-lagoon-75);
 
   --color-agent-mab: #003d93;
   --color-agent-sirna: var(--color-brand-crimson-50);
+
+  /* The wash behind rebalancing-agents' thumbnail row — applied at 10% (`/10`)
+     at the call site. Off every ramp (nearest is lagoon, a hue away) — a
+     transcribed literal per §3/§4, like the agent colours above. */
+  --color-agents-panel: #00d8ff;
+
+  /* In @theme, not :root — Tailwind inlines --shadow-* at build time (§1).
+     The thumbnail boxes' drawn shadow is TWO layers; the export writes them as
+     two shadow-[] classes, which cascade to one rule (the Figma-codegen trap).
+     One token carries the pair. */
+  --shadow-agent-box: 0px 2px 6px 0px rgba(0, 0, 0, 0.3), 0px 1px 4px 0px rgba(0, 0, 0, 0.08);
+
+  /* The box-button's hover/press — §4.2-style derivations, no artboard: hover
+     pushes both rest layers one step out (same opacities, doubled geometry);
+     press is the app's shared "outer drops, inner shades" pair (§4, §15). The
+     focus state swaps the white ring to crimson at the call site instead. */
+  --shadow-agent-box-hover:
+    0px 4px 10px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 0px rgba(0, 0, 0, 0.12);
+  --shadow-agent-box-active:
+    0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px 1px 4px 0px rgba(0, 0, 0, 0.36);
 
   /* In @theme, not :root — Tailwind inlines --shadow-* at build time (§1). */
   --background-image-emerging-panel: linear-gradient(117.03deg, #ffffff 21.12%, #d3f1e9 91.03%);

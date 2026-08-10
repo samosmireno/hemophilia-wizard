@@ -13,7 +13,7 @@ import RebalancingAgents from "./RebalancingAgents";
 /** The caption beside the `+`, which is also its accessible name. */
 const CAPTION = "Mechanisms of hemostatic rebalancing agents within the coagulation cascade";
 
-/** The line under the three reserved boxes. */
+/** The line under the three figure boxes. */
 const BOXES_CAPTION = "Click on the boxes to learn more about hemostatic rebalancing agents";
 
 /** The first card's heading — §7.6's block title, which now lives on its prose. */
@@ -149,23 +149,69 @@ describe("rebalancing-agents chapter", () => {
   });
 
   /**
-   * The three reserved figure boxes have no asset yet (CONTEXT.md §7.7). They
-   * must not be `<img>`s standing empty, and they must not be focusable — a box
-   * that takes a tab stop and opens nothing is worse than a gap. The caption
-   * above them says "click on the boxes", so this is the guard that the
-   * instruction has not been half-honoured with a control that does nothing.
+   * The boxes are buttons now — the caption's "click on the boxes" finally has
+   * a target (each agent's §6 sheet; item 16 answered in code). Named
+   * "Expand {agent}" in roster order per the app-wide trigger convention, with
+   * the images decorative — the bullets above already announce each agent's
+   * composed label, and `AgentBoxButton.test.tsx` pins the skin and states.
    *
    * Queried by role rather than by selector, as `treatment-landscape` records:
-   * `Popup` is mounted unconditionally, so its ✕ is a second `<button>` in the
+   * `Popup` is mounted unconditionally, so its ✕ is another `<button>` in the
    * container. Role queries honour the closed dialog's `display: none` and see
    * only what a user can reach.
    */
-  it("reserves the figure boxes without announcing or focusing them", () => {
+  it("renders each figure box as an Expand button in roster order, images decorative", () => {
     render(<RebalancingAgents />);
 
+    // The three boxes, then the mechanisms `+` — and nothing else.
+    const buttons = screen.getAllByRole("button");
+    expect(buttons).toHaveLength(REBALANCING_AGENTS.length + 1);
+    REBALANCING_AGENTS.forEach((agent, index) => {
+      expect(buttons[index]).toHaveAccessibleName(`Expand ${agent.name}`);
+    });
+
     expect(screen.queryAllByRole("img")).toHaveLength(0);
-    // The mechanisms `+`, and nothing else.
-    expect(screen.queryAllByRole("button")).toHaveLength(1);
+  });
+
+  /**
+   * Clicking a box opens that agent's §6 drug sheet — ADR 0006's wiring, the
+   * same dialog `/wizard/therapies` and `/explore` open, named by its agent.
+   * The ✕ closes back to the page; the sheet and the mechanisms cards are
+   * separate dialogs that never stack, because both are modal.
+   */
+  it.each(REBALANCING_AGENTS)(
+    "opens $name's drug sheet from its box, and closes it",
+    async ({ name }) => {
+      const user = userEvent.setup();
+      render(<RebalancingAgents />);
+
+      await user.click(screen.getByRole("button", { name: `Expand ${name}` }));
+      expect(screen.getByRole("dialog")).toHaveAccessibleName(name);
+
+      await user.click(screen.getByRole("button", { name: `Close ${name}` }));
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    },
+  );
+
+  /**
+   * The tinted panel wraps exactly the three thumbnails and the caption under
+   * them — the mechanisms row below stays on the page ground. Both halves of
+   * the skin are pinned: the wash is `--color-agents-panel` at 10%, and the
+   * drawn 56px radius ships in rem (`rounded-[3.5rem]`) so it scales with the
+   * §19 board rather than staying pinned in px.
+   */
+  it("washes the thumbnails and their caption — and only those — in the agents panel", () => {
+    const { container } = render(<RebalancingAgents />);
+    const panel = container.querySelector<HTMLElement>("div.bg-agents-panel\\/10")!;
+
+    expect(panel).toHaveClass("rounded-[3.5rem]");
+    for (const agent of REBALANCING_AGENTS) {
+      expect(
+        within(panel).getByRole("button", { name: `Expand ${agent.name}` }),
+      ).toBeInTheDocument();
+    }
+    expect(within(panel).getByText(BOXES_CAPTION)).toBeInTheDocument();
+    expect(within(panel).queryByText(CAPTION)).not.toBeInTheDocument();
   });
 
   /**
@@ -187,7 +233,7 @@ describe("rebalancing-agents chapter", () => {
    */
   it("ramps the box row's gap rather than the boxes, which stay drawn-size at every width", () => {
     const { container } = render(<RebalancingAgents />);
-    const boxes = [...container.querySelectorAll("div.border-\\[0\\.25rem\\]")];
+    const boxes = [...container.querySelectorAll("button.shadow-agent-box")];
 
     expect(boxes).toHaveLength(REBALANCING_AGENTS.length);
     for (const box of boxes) {
@@ -243,11 +289,14 @@ describe("rebalancing-agents chapter", () => {
     }
   });
 
-  // The `+` opens a card now, so it advertises one. This is what has to stay in
-  // step with the target actually having content behind it.
-  it("advertises a dialog on the trigger that opens one", () => {
+  // Every trigger on the page opens a dialog now — the three boxes and the
+  // `+` alike — so every one advertises it. This is what has to stay in step
+  // with each target actually having content behind it.
+  it("advertises a dialog on every trigger, each of which opens one", () => {
     render(<RebalancingAgents />);
-    expect(screen.getByRole("button")).toHaveAttribute("aria-haspopup", "dialog");
+    for (const button of screen.getAllByRole("button")) {
+      expect(button).toHaveAttribute("aria-haspopup", "dialog");
+    }
   });
 
   /**

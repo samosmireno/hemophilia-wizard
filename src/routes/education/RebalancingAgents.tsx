@@ -1,11 +1,17 @@
 import { type ReactNode, useState } from "react";
 import { Button, NavArrowButton, PopupButton } from "mlg-components";
 
+import concizumabUrl from "../../assets/images/concizumab.webp";
+import fitusiranUrl from "../../assets/images/fitusiran.webp";
 import mechanismUrl from "../../assets/images/hemostatic_mechanisms_diagram.webp";
+import marstacimabUrl from "../../assets/images/marstacimab.webp";
+import AgentBoxButton from "../../components/AgentBoxButton";
 import BulletList from "../../components/BulletList";
+import DrugSheetPopup from "../../components/DrugSheetPopup";
 import PageSection from "../../components/PageSection";
 import Popup, { type PopupCard } from "../../components/Popup";
 import PopupFigure from "../../components/PopupFigure";
+import { AGENT_NAMES, type AgentName } from "../../data/agents";
 import {
   type RebalancingMechanism,
   REBALANCING_AGENTS,
@@ -50,6 +56,13 @@ const AGENT_TONE: ReadonlyMap<string, string> = new Map(
   ]),
 );
 
+/** §7.7's three thumbnails, one asset per agent — keyed by the S1 name, like `AGENT_TONE`. */
+const AGENT_IMAGE: ReadonlyMap<AgentName, string> = new Map([
+  [AGENT_NAMES.concizumab, concizumabUrl],
+  [AGENT_NAMES.marstacimab, marstacimabUrl],
+  [AGENT_NAMES.fitusiran, fitusiranUrl],
+]);
+
 /** The width of the three-box group — 3 × 227 + 2 × 141, off the artboard. */
 const GROUP = "mx-auto w-full max-w-240.5";
 
@@ -57,6 +70,11 @@ type Step = "prose" | "figure";
 
 export default function RebalancingAgents() {
   const [step, setStep] = useState<Step | null>(null);
+
+  // A sheet is opened by holding its agent name — ADR 0006, the same wiring
+  // as /explore and /wizard/therapies. Item 16's unnamed click target,
+  // answered in code (docs/styling.md §9).
+  const [openAgent, setOpenAgent] = useState<string | null>(null);
 
   const CARDS: Record<Step, PopupCard> = {
     prose: {
@@ -81,27 +99,34 @@ export default function RebalancingAgents() {
       />
 
       <div className="mt-14">
-        {/* Reserved boxes at the drawn 227×185 — the three §7.7 thumbnails have no asset yet. */}
-        <div
-          className={cn(
-            GROUP,
-            "flex flex-col items-center gap-8 lg:flex-row lg:gap-x-10 xl:gap-x-35.25",
-          )}
-        >
-          {REBALANCING_AGENTS.map((agent) => (
-            <div
-              key={agent.name}
-              // `border-[0.25rem]` not `border-4`: the numeric utility is px and
-              // would pin the outline while the box scales (§19). Editors will
-              // offer to "canonicalise" it — decline.
-              className="h-48 w-full max-w-56 shrink-0 border-[0.25rem] border-black lg:shrink"
-            />
-          ))}
-        </div>
+        {/* The tinted panel holds exactly the thumbnails and their caption — the
+            mechanisms row below stays on the page ground. `rounded-[3.5rem]` not
+            `rounded-[56px]`: rem, so the corner scales with the board (§19). */}
+        <div className="rounded-[3.5rem] bg-agents-panel/10 py-3">
+          {/* The drawn 227×185 boxes, each holding its agent's §7.7 thumbnail. */}
+          <div
+            className={cn(
+              GROUP,
+              "flex flex-col items-center gap-8 lg:flex-row lg:gap-x-10 xl:gap-x-35.25",
+            )}
+          >
+            {REBALANCING_AGENTS.map((agent) => (
+              <AgentBoxButton
+                key={agent.name}
+                // `!`: the map is keyed from the same roster this iterates,
+                // and the box tests render all three.
+                src={AGENT_IMAGE.get(agent.name)!}
+                agent={agent.name}
+                onClick={() => setOpenAgent(agent.name)}
+                className="shrink-0 lg:shrink"
+              />
+            ))}
+          </div>
 
-        <p className="mt-4 text-center text-xl font-bold text-popup-caption uppercase lg:text-2xl">
-          {BOXES_CAPTION}
-        </p>
+          <p className="mt-4 text-center text-xl font-bold text-popup-caption uppercase lg:text-2xl">
+            {BOXES_CAPTION}
+          </p>
+        </div>
 
         {/* `flex-col-reverse` on the phone: the DOM keeps caption-then-button
             while the narrow layout paints the `+` first. */}
@@ -128,6 +153,8 @@ export default function RebalancingAgents() {
       </div>
 
       <Popup card={card ?? null} onClose={() => setStep(null)} />
+
+      <DrugSheetPopup agent={openAgent} onClose={() => setOpenAgent(null)} />
     </PageSection>
   );
 }

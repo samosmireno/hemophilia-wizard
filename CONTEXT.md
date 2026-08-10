@@ -885,6 +885,10 @@ clotting-factor replacement therapies_ · _Benefits and challenges of NFTs_ · _
 for HA/HB_ · _Mechanisms of hemostatic rebalancing agents within the coagulation cascade_ ·
 _Emicizumab Overview_ · _Denecimig/Mim8 Overview_.
 
+`[BUILD]` The `rebalancing-agents` chapter's three thumbnail boxes — whose click targets the
+blueprint never names — open each agent's §6 drug information sheet as in-chapter pop-ups (ADR
+0006), decided 2026-08-10 (docs/styling.md §9 item 16; a code answer the designer can veto).
+
 > **Image-borne content (not in any text layer):** the PDF embeds **24 figures** — MOA/coagulation-
 > cascade diagrams, the NXT007 BsAb structure, Inno8 MOA, the severity/bleeding schematics, and the
 > per-scenario therapeutic-class illustration panels. These are assets, not extractable text; a
