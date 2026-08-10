@@ -1,8 +1,8 @@
 import BulletList from "../../components/BulletList";
-import { CLASSES_TO_CONSIDER, scenarioKey } from "../../data/wizard";
+import { classesFor } from "../../data/wizard";
 import { cn } from "../../lib/cn";
 import { formatInline } from "../../lib/formatInline";
-import { isComplete, useWizardAnswers } from "../../state/wizardAnswers";
+import { useCompleteWizardAnswers } from "../../state/wizardAnswers";
 
 /* Every length here is rem so the placeholder scales with the board above the
    canvas. `border-[0.25rem]` is deliberately NOT `border-4` — Tailwind's numeric
@@ -10,11 +10,7 @@ import { isComplete, useWizardAnswers } from "../../state/wizardAnswers";
 const BOX = "h-46.25 w-full max-w-56.75 shrink-0 border-[0.25rem] border-black lg:shrink";
 
 export default function Scenario() {
-  const { answers } = useWizardAnswers();
-
-  if (!isComplete(answers)) return null;
-
-  const screen = CLASSES_TO_CONSIDER[scenarioKey(answers.type, answers.hasInhibitors)];
+  const screen = classesFor(useCompleteWizardAnswers());
 
   const captionBelow = screen.classes.length === 1;
 

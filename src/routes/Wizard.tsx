@@ -7,7 +7,7 @@ import { cn } from "../lib/cn";
 import { nextOf } from "../data/sectionOrder";
 import {
   HEMOPHILIA_TYPES,
-  SWITCH_REASONS,
+  REASON_CHOICES,
   WIZARD_INPUT_TITLE,
   WIZARD_QUESTIONS,
   type SwitchReason,
@@ -19,18 +19,6 @@ const INHIBITOR_OPTIONS: Option<"yes" | "no">[] = [
   { id: "yes", label: "Yes" },
   { id: "no", label: "No" },
 ];
-
-const REASON_READING_ORDER: SwitchReason[] = [
-  "bleeding-control",
-  "monitoring",
-  "adherence",
-  "treatment-burden",
-];
-
-const REASON_OPTIONS: Option<SwitchReason>[] = REASON_READING_ORDER.map((id) => {
-  const reason = SWITCH_REASONS.find((r) => r.id === id)!;
-  return { id: reason.id, label: reason.label };
-});
 
 export default function Wizard() {
   const { answers, setAnswer, complete } = useWizardAnswers();
@@ -84,7 +72,7 @@ export default function Wizard() {
           className="mt-6"
           legend={WIZARD_QUESTIONS.reason}
           name="switch-reason"
-          options={REASON_OPTIONS}
+          options={REASON_CHOICES}
           value={answers.reason}
           onChange={(reason: SwitchReason | null) => setAnswer("reason", reason)}
         />

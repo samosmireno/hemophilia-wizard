@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-import type { SwitchReason, WizardHemophiliaType } from "../data/wizard";
+import { ALL_REASONS, type SwitchReason, type WizardHemophiliaType } from "../data/wizard";
 
 export interface WizardAnswers {
   type: WizardHemophiliaType | null;
@@ -20,8 +20,6 @@ export function isComplete(answers: WizardAnswers): answers is CompleteWizardAns
   return answers.type !== null && answers.hasInhibitors !== null && answers.reason !== null;
 }
 
-const REASONS: SwitchReason[] = ["bleeding-control", "adherence", "treatment-burden", "monitoring"];
-
 export function readStoredAnswers(): WizardAnswers {
   try {
     const raw = sessionStorage.getItem(ANSWERS_STORAGE_KEY);
@@ -32,7 +30,7 @@ export function readStoredAnswers(): WizardAnswers {
     return {
       type: type === "A" || type === "B" ? type : null,
       hasInhibitors: typeof hasInhibitors === "boolean" ? hasInhibitors : null,
-      reason: REASONS.includes(reason as SwitchReason) ? (reason as SwitchReason) : null,
+      reason: ALL_REASONS.includes(reason as SwitchReason) ? (reason as SwitchReason) : null,
     };
   } catch {
     return EMPTY;
@@ -64,4 +62,19 @@ export function useWizardAnswers(): WizardAnswersValue {
   const value = useContext(WizardAnswersContext);
   if (!value) throw new Error("useWizardAnswers must be used within a WizardAnswersProvider");
   return value;
+}
+
+/**
+ * The answers, narrowed, for the pages behind `WizardGate`. Throws rather than
+ * rendering nothing: ADR 0003 states the gate twice on purpose — the sidebar
+ * disables Next, and the gate redirects the URL — and neither of those is this.
+ * A page reaching here without answers means both went wrong, which is a defect
+ * and should read as one instead of as a blank screen.
+ */
+export function useCompleteWizardAnswers(): CompleteWizardAnswers {
+  const { answers } = useWizardAnswers();
+  if (!isComplete(answers)) {
+    throw new Error("A wizard leaf rendered without answers — WizardGate should have redirected");
+  }
+  return answers;
 }

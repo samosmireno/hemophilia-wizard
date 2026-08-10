@@ -2,12 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
-import {
-  CLASSES_TO_CONSIDER,
-  scenarioKey,
-  type ScenarioKey,
-  type WizardHemophiliaType,
-} from "../../data/wizard";
+import { ALL_SCENARIOS, classesFor, type WizardHemophiliaType } from "../../data/wizard";
 import { seedWizardAnswers } from "../../test/setup";
 import { routes } from "../router";
 
@@ -21,21 +16,23 @@ import { routes } from "../router";
  * a sidebar full of list items and buttons that would otherwise be indexed
  * alongside the page's.
  */
-function renderScenario(type: WizardHemophiliaType, hasInhibitors: boolean, key: ScenarioKey) {
+function renderScenario(type: WizardHemophiliaType, hasInhibitors: boolean) {
   seedWizardAnswers({ type, hasInhibitors, reason: "bleeding-control" });
   const router = createMemoryRouter(routes, { initialEntries: ["/wizard/scenario"] });
   render(<RouterProvider router={router} />);
 
-  return screen.getByRole("region", { name: CLASSES_TO_CONSIDER[key].title });
+  return screen.getByRole("region", { name: classesFor({ type, hasInhibitors }).title });
 }
 
-/** The four branches, and the key each is expected to resolve to. */
-const BRANCHES: [WizardHemophiliaType, boolean, ScenarioKey][] = [
-  ["A", false, "A-without"],
-  ["A", true, "A-with"],
-  ["B", false, "B-without"],
-  ["B", true, "B-with"],
-];
+/**
+ * The four branches, taken from `ALL_SCENARIOS` rather than written out — the set
+ * is the data module's to state. Flattened to tuples only so `it.each` can name
+ * each case in its title.
+ */
+const BRANCHES: [WizardHemophiliaType, boolean][] = ALL_SCENARIOS.map(({ type, hasInhibitors }) => [
+  type,
+  hasInhibitors,
+]);
 
 /** The lead as a reader sees it: the delimiters are markup, not text. */
 function stripMarkup(text: string) {
@@ -43,9 +40,9 @@ function stripMarkup(text: string) {
 }
 
 describe("wizard scenario — the four screens", () => {
-  it.each(BRANCHES)("renders hemophilia %s, inhibitors=%s as its own screen", (type, inh, key) => {
-    const data = CLASSES_TO_CONSIDER[key];
-    const region = renderScenario(type, inh, key);
+  it.each(BRANCHES)("renders hemophilia %s, inhibitors=%s as its own screen", (type, inh) => {
+    const data = classesFor({ type, hasInhibitors: inh });
+    const region = renderScenario(type, inh);
 
     /*
       Sentence case in the accessible name, shouted in CSS — the app-wide rule,
@@ -70,8 +67,8 @@ describe("wizard scenario — the four screens", () => {
     ).toEqual(data.classes);
   });
 
-  it.each(BRANCHES)("emphasises the polarity word for %s/%s", (type, inh, key) => {
-    const region = renderScenario(type, inh, key);
+  it.each(BRANCHES)("emphasises the polarity word for %s/%s", (type, inh) => {
+    const region = renderScenario(type, inh);
 
     /*
       The one thing the four leads exist to say. `with` / `without` is the only
@@ -81,23 +78,19 @@ describe("wizard scenario — the four screens", () => {
     */
     expect(within(region).getByText(inh ? "with" : "without").tagName).toBe("EM");
   });
-
-  it("keeps the resolved key in step with scenarioKey()", () => {
-    for (const [type, inh, key] of BRANCHES) expect(scenarioKey(type, inh)).toBe(key);
-  });
 });
 
 describe("wizard scenario — the caveat", () => {
   it("shows the bypassing-agents note on hemophilia B with inhibitors", () => {
-    const region = renderScenario("B", true, "B-with");
+    const region = renderScenario("B", true);
 
-    expect(region).toHaveTextContent(CLASSES_TO_CONSIDER["B-with"].caveat!);
+    expect(region).toHaveTextContent(classesFor({ type: "B", hasInhibitors: true }).caveat!);
   });
 
-  it.each(BRANCHES.filter(([, , key]) => key !== "B-with"))(
+  it.each(BRANCHES.filter(([type, inh]) => !(type === "B" && inh)))(
     "shows no caveat on %s/%s",
-    (type, inh, key) => {
-      const region = renderScenario(type, inh, key);
+    (type, inh) => {
+      const region = renderScenario(type, inh);
 
       expect(region).not.toHaveTextContent(/^Note: Bypassing agents/);
     },
@@ -105,8 +98,8 @@ describe("wizard scenario — the caveat", () => {
 });
 
 describe("wizard scenario — the illustration boxes", () => {
-  it.each(BRANCHES)("reserves one box per class for %s/%s", (type, inh, key) => {
-    const region = renderScenario(type, inh, key);
+  it.each(BRANCHES)("reserves one box per class for %s/%s", (type, inh) => {
+    const region = renderScenario(type, inh);
 
     /*
       The boxes are inert reserved divs with no accessible role — no asset exists
@@ -115,14 +108,16 @@ describe("wizard scenario — the illustration boxes", () => {
       way to assert something deliberately invisible to assistive tech.
     */
     expect(region.querySelectorAll("div.border-\\[0\\.25rem\\]")).toHaveLength(
-      CLASSES_TO_CONSIDER[key].classes.length,
+      classesFor({ type, hasInhibitors: inh }).classes.length,
     );
   });
 
-  it.each(BRANCHES)("captions the boxes for %s/%s", (type, inh, key) => {
-    const region = renderScenario(type, inh, key);
+  it.each(BRANCHES)("captions the boxes for %s/%s", (type, inh) => {
+    const region = renderScenario(type, inh);
 
-    expect(within(region).getByText(CLASSES_TO_CONSIDER[key].caption)).toBeInTheDocument();
+    expect(
+      within(region).getByText(classesFor({ type, hasInhibitors: inh }).caption),
+    ).toBeInTheDocument();
   });
 
   /**
@@ -133,9 +128,9 @@ describe("wizard scenario — the illustration boxes", () => {
    */
   it.each(BRANCHES)(
     "paints the caption below the boxes only when there is one, %s/%s",
-    (type, inh, key) => {
-      const region = renderScenario(type, inh, key);
-      const single = CLASSES_TO_CONSIDER[key].classes.length === 1;
+    (type, inh) => {
+      const region = renderScenario(type, inh);
+      const single = classesFor({ type, hasInhibitors: inh }).classes.length === 1;
 
       expect(region.querySelector(".flex-col-reverse") !== null).toBe(single);
     },
@@ -161,8 +156,8 @@ describe("wizard scenario — the illustration boxes", () => {
    */
   it.each(BRANCHES)(
     "ramps the row's gap rather than the boxes, which stay drawn-size at every width, %s/%s",
-    (type, inh, key) => {
-      const region = renderScenario(type, inh, key);
+    (type, inh) => {
+      const region = renderScenario(type, inh);
       const boxes = [...region.querySelectorAll("div.border-\\[0\\.25rem\\]")];
 
       for (const box of boxes) {
@@ -192,9 +187,9 @@ describe("wizard scenario — the responsive pass", () => {
    * at 24 would read at 0.8× the heading on a phone where the artboard draws
    * 0.5×.
    */
-  it.each(BRANCHES)("steps every transcribed size down one below lg, %s/%s", (type, inh, key) => {
-    const data = CLASSES_TO_CONSIDER[key];
-    const region = renderScenario(type, inh, key);
+  it.each(BRANCHES)("steps every transcribed size down one below lg, %s/%s", (type, inh) => {
+    const data = classesFor({ type, hasInhibitors: inh });
+    const region = renderScenario(type, inh);
 
     expect(within(region).getByRole("heading", { level: 1 })).toHaveClass(
       "text-3xl",

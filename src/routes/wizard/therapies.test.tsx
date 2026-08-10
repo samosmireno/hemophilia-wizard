@@ -5,10 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Bullet } from "../../data/education";
 import {
-  RECOMMENDATIONS,
-  SWITCH_REASONS,
-  recommend,
-  scenarioKey,
+  ALL_REASONS,
+  ALL_SCENARIOS,
+  leafFor,
   type SwitchReason,
   type WizardHemophiliaType,
 } from "../../data/wizard";
@@ -30,17 +29,19 @@ function renderTherapies(type: WizardHemophiliaType, hasInhibitors: boolean, rea
   const router = createMemoryRouter(routes, { initialEntries: ["/wizard/therapies"] });
   render(<RouterProvider router={router} />);
 
-  const label = SWITCH_REASONS.find((r) => r.id === reason)!.label;
-  return screen.getByRole("region", { name: label });
+  return screen.getByRole("region", { name: leafFor({ type, hasInhibitors, reason }).heading });
 }
 
-/** All sixteen leaves: 4 scenarios × 4 reasons. */
-const LEAVES: [WizardHemophiliaType, boolean, SwitchReason][] = (
-  ["A", "B"] as WizardHemophiliaType[]
-).flatMap((type) =>
-  [false, true].flatMap((inh) =>
-    SWITCH_REASONS.map((r) => [type, inh, r.id] as [WizardHemophiliaType, boolean, SwitchReason]),
-  ),
+/**
+ * All sixteen leaves: 4 scenarios × 4 reasons, both sets taken from the data
+ * module rather than written out. Flattened to tuples only so `it.each` can name
+ * each case in its title.
+ */
+const LEAVES: [WizardHemophiliaType, boolean, SwitchReason][] = ALL_SCENARIOS.flatMap(
+  ({ type, hasInhibitors }) =>
+    ALL_REASONS.map(
+      (reason) => [type, hasInhibitors, reason] as [WizardHemophiliaType, boolean, SwitchReason],
+    ),
 );
 
 /** A note's bullets as a reader meets them, nested level flattened in source order. */
@@ -56,19 +57,19 @@ function headers(region: HTMLElement) {
 }
 
 describe("wizard therapies — the sixteen leaves", () => {
-  it.each(LEAVES)("renders hemophilia %s, inhibitors=%s, %s from recommend()", (type, inh, why) => {
-    const { note, recommendations } = recommend(type, inh, why);
+  it.each(LEAVES)("renders hemophilia %s, inhibitors=%s, %s from leafFor()", (type, inh, why) => {
+    const leaf = leafFor({ type, hasInhibitors: inh, reason: why });
     const region = renderTherapies(type, inh, why);
 
     /*
       Sentence case in the accessible name, shouted in CSS — the app-wide rule.
-      The `<h1>` is the artboard's imperative `label`, not the blueprint's gerund
-      `sourceLabel`; the arch below is what uses the other one, and the two
-      assertions together are what keep the pair from being collapsed into one
-      string.
+      The `<h1>` is `heading`, the artboard's imperative; the arch below is
+      `archTitle`, built on the blueprint's gerund. That the two differ is pinned
+      in `data/wizard.test.ts`; what is pinned here is that the page puts each in
+      the right place.
     */
     const heading = within(region).getByRole("heading", { level: 1 });
-    expect(heading).toHaveAccessibleName(SWITCH_REASONS.find((r) => r.id === why)!.label);
+    expect(heading).toHaveAccessibleName(leaf.heading);
     expect(heading).toHaveClass("uppercase");
 
     /*
@@ -78,32 +79,25 @@ describe("wizard therapies — the sixteen leaves", () => {
       twelve would not.
     */
     const [considerations, strategies] = headers(region);
-    expect(considerations).toHaveTextContent(note.considerations.title);
-    expect(strategies).toHaveTextContent(note.strategies.title);
+    expect(considerations).toHaveTextContent(leaf.considerations.title);
+    expect(strategies).toHaveTextContent(leaf.strategies.title);
 
     /* The curated agent list — issue 08's "all 4 scenarios reach the correct
        curated leaf, verified against wizard.ts". */
-    expect(recommendations).not.toHaveLength(0);
-    for (const treatment of recommendations) {
+    expect(leaf.recommendations).not.toHaveLength(0);
+    for (const treatment of leaf.recommendations) {
       expect(within(region).getByText(treatment.agent)).toBeInTheDocument();
     }
   });
 
-  it.each(LEAVES)("resolves every recommended agent for %s/%s/%s", (type, inh, why) => {
-    /* A recommendation naming an agent with no `Treatment` row used to render as a
-       missing button — `recommend()` reported it through an `unresolved` array that
-       nothing read. It throws now, so this asserts the stronger thing the throw
-       makes available: the leaf resolves the scenario's roster, in order. */
-    expect(recommend(type, inh, why).recommendations.map((t) => t.agent)).toEqual(
-      RECOMMENDATIONS[scenarioKey(type, inh)][why],
-    );
-  });
-
-  it("keeps the resolved scenario in step with scenarioKey()", () => {
-    for (const [type, inh, why] of LEAVES) {
-      expect(recommend(type, inh, why).scenario).toBe(scenarioKey(type, inh));
-    }
-  });
+  /*
+    Two tests stood here and are gone. Both compared `recommend()`'s output to the
+    tables it reads — which was tautological even against `recommend`, and is
+    unwritable now the tables are private. What they were reaching for lives in
+    `data/wizard.test.ts`: that every recommendation resolves to a roster row, and
+    the matrix facts worth naming (mimetics alone for HA + reduced monitoring, gene
+    therapy only for HB without inhibitors, no mimetic on any HB leaf).
+  */
 });
 
 describe("wizard therapies — the one-open accordion", () => {
@@ -169,7 +163,7 @@ describe("wizard therapies — the one-open accordion", () => {
   it("hides the closed panel from assistive tech", async () => {
     const user = userEvent.setup();
     const region = renderTherapies("B", true, "bleeding-control");
-    const { note } = recommend("B", true, "bleeding-control");
+    const leaf = leafFor({ type: "B", hasInhibitors: true, reason: "bleeding-control" });
 
     /*
       Both panels are always in the DOM — that is what lets one collapse while the
@@ -182,19 +176,19 @@ describe("wizard therapies — the one-open accordion", () => {
     */
     const named = (title: string) => within(region).queryByRole("region", { name: title });
 
-    expect(named(note.considerations.title)).toBeInTheDocument();
-    expect(named(note.strategies.title)).toBeNull();
+    expect(named(leaf.considerations.title)).toBeInTheDocument();
+    expect(named(leaf.strategies.title)).toBeNull();
 
     await user.click(headers(region)[1]);
 
-    expect(named(note.considerations.title)).toBeNull();
-    expect(named(note.strategies.title)).toBeInTheDocument();
+    expect(named(leaf.considerations.title)).toBeNull();
+    expect(named(leaf.strategies.title)).toBeInTheDocument();
   });
 
   it.each(LEAVES)("renders the open block's bullets for %s/%s/%s", (type, inh, why) => {
-    const { note } = recommend(type, inh, why);
+    const leaf = leafFor({ type, hasInhibitors: inh, reason: why });
     const region = renderTherapies(type, inh, why);
-    const panel = within(region).getByRole("region", { name: note.considerations.title });
+    const panel = within(region).getByRole("region", { name: leaf.considerations.title });
 
     /*
       Nested bullets are markup, not indentation: the `treatment-burden` notes
@@ -212,7 +206,7 @@ describe("wizard therapies — the one-open accordion", () => {
           .join(""),
       );
 
-    expect(items).toEqual(flatten(note.considerations.points));
+    expect(items).toEqual(flatten(leaf.considerations.points));
   });
 });
 
@@ -244,7 +238,7 @@ describe("wizard therapies — the accordion payoff scroll", () => {
 
   it("scrolls the opened panel into view when its expansion lands", async () => {
     const user = userEvent.setup();
-    const { note } = recommend("B", true, "bleeding-control");
+    const leaf = leafFor({ type: "B", hasInhibitors: true, reason: "bleeding-control" });
     const region = renderTherapies("B", true, "bleeding-control");
 
     await user.click(headers(region)[1]);
@@ -253,7 +247,7 @@ describe("wizard therapies — the accordion payoff scroll", () => {
        header. The transition's end is what carries the real geometry. */
     expect(scrollIntoView).not.toHaveBeenCalled();
 
-    const panel = within(region).getByRole("region", { name: note.strategies.title });
+    const panel = within(region).getByRole("region", { name: leaf.strategies.title });
     const wrapper = panel.parentElement!.parentElement!;
 
     /* The panel's own opacity transition bubbles through the wrapper 70ms
@@ -309,9 +303,9 @@ describe("wizard therapies — the nested treatment-burden bullets", () => {
   ] as [WizardHemophiliaType, boolean, number][])(
     "nests the age bullets under the lead-in for %s/%s",
     (type, inh, childCount) => {
-      const { note } = recommend(type, inh, "treatment-burden");
+      const leaf = leafFor({ type, hasInhibitors: inh, reason: "treatment-burden" });
       const region = renderTherapies(type, inh, "treatment-burden");
-      const panel = within(region).getByRole("region", { name: note.considerations.title });
+      const panel = within(region).getByRole("region", { name: leaf.considerations.title });
 
       const leadIn = within(panel)
         .getAllByRole("listitem")
@@ -323,9 +317,9 @@ describe("wizard therapies — the nested treatment-burden bullets", () => {
   );
 
   it("keeps B-without's gene-therapy bullet at the top level", () => {
-    const { note } = recommend("B", false, "treatment-burden");
+    const leaf = leafFor({ type: "B", hasInhibitors: false, reason: "treatment-burden" });
     const region = renderTherapies("B", false, "treatment-burden");
-    const panel = within(region).getByRole("region", { name: note.considerations.title });
+    const panel = within(region).getByRole("region", { name: leaf.considerations.title });
 
     /*
       The one bullet the source's own indentation separates from the nest —
@@ -362,7 +356,7 @@ describe("wizard therapies — the arch", () => {
   });
 
   it.each(LEAVES)("gives every agent a button and a caption for %s/%s/%s", (type, inh, why) => {
-    const { recommendations } = recommend(type, inh, why);
+    const { recommendations } = leafFor({ type, hasInhibitors: inh, reason: why });
     const region = renderTherapies(type, inh, why);
 
     /*
@@ -378,7 +372,7 @@ describe("wizard therapies — the arch", () => {
   });
 
   it.each(LEAVES)("promises a dialog on every agent for %s/%s/%s", (type, inh, why) => {
-    const { recommendations } = recommend(type, inh, why);
+    const { recommendations } = leafFor({ type, hasInhibitors: inh, reason: why });
     const region = renderTherapies(type, inh, why);
 
     /*
@@ -526,10 +520,10 @@ describe("wizard therapies — the responsive pass", () => {
   it.each(LEAVES)(
     "steps the panel bullets to the floor, on a ratio, %s/%s/%s",
     (type, inh, why) => {
-      const { note } = recommend(type, inh, why);
+      const leaf = leafFor({ type, hasInhibitors: inh, reason: why });
       const region = renderTherapies(type, inh, why);
       const list = within(region)
-        .getByRole("region", { name: note.considerations.title })
+        .getByRole("region", { name: leaf.considerations.title })
         .querySelector("ul")!;
 
       expect(list).toHaveClass("text-base", "leading-[1.4]", "lg:text-xl");
@@ -549,9 +543,9 @@ describe("wizard therapies — the responsive pass", () => {
   it.each(LEAVES)(
     "ramps the panel's padding and not its 12px inset, %s/%s/%s",
     (type, inh, why) => {
-      const { note } = recommend(type, inh, why);
+      const leaf = leafFor({ type, hasInhibitors: inh, reason: why });
       const region = renderTherapies(type, inh, why);
-      const panel = within(region).getByRole("region", { name: note.considerations.title });
+      const panel = within(region).getByRole("region", { name: leaf.considerations.title });
 
       expect(panel).toHaveClass("px-4", "sm:px-6", "lg:px-9");
       expect(panel).toHaveClass("mx-3");
@@ -569,7 +563,7 @@ describe("wizard therapies — the responsive pass", () => {
    * are single words that never wrap and never touch a measure.
    */
   it.each(LEAVES)("holds the agent captions at one size, %s/%s/%s", (type, inh, why) => {
-    const { recommendations } = recommend(type, inh, why);
+    const { recommendations } = leafFor({ type, hasInhibitors: inh, reason: why });
     const region = renderTherapies(type, inh, why);
 
     for (const treatment of recommendations) {

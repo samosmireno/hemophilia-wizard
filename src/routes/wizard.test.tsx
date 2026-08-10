@@ -5,10 +5,11 @@ import { describe, expect, it } from "vitest";
 
 import { nextOf } from "../data/sectionOrder";
 import {
-  CLASSES_TO_CONSIDER,
-  SWITCH_REASONS,
+  REASON_CHOICES,
   WIZARD_INPUT_TITLE,
   WIZARD_QUESTIONS,
+  classesFor,
+  leafFor,
 } from "../data/wizard";
 import { seedWizardAnswers } from "../test/setup";
 import { routes } from "./router";
@@ -74,13 +75,26 @@ describe("wizard — patient characteristics", () => {
     ]);
   });
 
-  /** The screen renders the artboard's imperative labels, not the source's gerunds. */
+  /**
+   * The screen renders the artboard's imperative labels, not the source's gerunds.
+   * The gerunds are literals here rather than a field read: they belong to the
+   * blueprint's arch sentence, which is `wizard.ts`'s to compose and `wizard.test.ts`'s
+   * to assert. What this pins is that none of the four reaches a radio.
+   */
   it("labels the reasons with the artboard's wording", () => {
     renderAt("/wizard");
 
-    for (const reason of SWITCH_REASONS) {
-      expect(radio(reason.label)).toBeInTheDocument();
-      expect(screen.queryByRole("radio", { name: reason.sourceLabel })).not.toBeInTheDocument();
+    for (const choice of REASON_CHOICES) {
+      expect(radio(choice.label)).toBeInTheDocument();
+    }
+
+    for (const gerund of [
+      "Improving bleeding control",
+      "Increased adherence",
+      "Reduced treatment burden",
+      "Reduced monitoring requirement",
+    ]) {
+      expect(screen.queryByRole("radio", { name: gerund })).not.toBeInTheDocument();
     }
   });
 
@@ -276,8 +290,11 @@ describe("wizard — the pages past the questions", () => {
    * the gate lets an answered session through.
    */
   it.each([
-    ["/wizard/scenario", CLASSES_TO_CONSIDER["A-without"].title],
-    ["/wizard/therapies", SWITCH_REASONS.find((r) => r.id === "bleeding-control")!.label],
+    ["/wizard/scenario", classesFor({ type: "A", hasInhibitors: false }).title],
+    [
+      "/wizard/therapies",
+      leafFor({ type: "A", hasInhibitors: false, reason: "bleeding-control" }).heading,
+    ],
   ])("renders %s for an answered session", (path, title) => {
     seedWizardAnswers();
     const router = renderAt(path);

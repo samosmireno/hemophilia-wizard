@@ -4,24 +4,18 @@ import { PopupButton } from "mlg-components";
 import ArchBand from "../../components/ArchBand";
 import BulletList from "../../components/BulletList";
 import DrugSheetPopup from "../../components/DrugSheetPopup";
-import { SWITCH_REASONS, recommend, type NoteBlock } from "../../data/wizard";
+import { leafFor, type NoteBlock } from "../../data/wizard";
 import { cn } from "../../lib/cn";
-import { isComplete, useWizardAnswers } from "../../state/wizardAnswers";
+import { useCompleteWizardAnswers } from "../../state/wizardAnswers";
 
 type BlockId = "considerations" | "strategies";
 
 export default function Therapies() {
-  const { answers } = useWizardAnswers();
+  const leaf = leafFor(useCompleteWizardAnswers());
 
   const [open, setOpen] = useState<BlockId>("considerations");
 
   const [openAgent, setOpenAgent] = useState<string | null>(null);
-
-  if (!isComplete(answers)) return null;
-
-  const { note, recommendations } = recommend(answers.type, answers.hasInhibitors, answers.reason);
-
-  const reason = SWITCH_REASONS.find((r) => r.id === answers.reason)!;
 
   return (
     <section aria-labelledby="wizard-therapies-heading" className="flex flex-1 flex-col lg:-mr-16">
@@ -29,34 +23,31 @@ export default function Therapies() {
         id="wizard-therapies-heading"
         className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
       >
-        {reason.label}
+        {leaf.heading}
       </h1>
 
       <div className="mt-3 mb-4 lg:mb-0">
         <NoteDisclosure
-          block={note.considerations}
+          block={leaf.considerations}
           open={open === "considerations"}
           onOpen={() => setOpen("considerations")}
         />
         <NoteDisclosure
-          block={note.strategies}
+          block={leaf.strategies}
           open={open === "strategies"}
           onOpen={() => setOpen("strategies")}
           last
         />
       </div>
 
-      <ArchBand
-        title={`Novel therapies to consider if ${reason.sourceLabel} is the primary reason for switching therapies:`}
-        titleClassName="mx-auto max-w-215 leading-none"
-      >
+      <ArchBand title={leaf.archTitle} titleClassName="mx-auto max-w-215 leading-none">
         <ul
           className={cn(
             "mt-5 flex flex-wrap justify-center gap-y-10 px-4 pb-6 xl:flex-nowrap",
-            recommendations.length > 3 ? "gap-x-20" : "gap-x-30",
+            leaf.recommendations.length > 3 ? "gap-x-20" : "gap-x-30",
           )}
         >
-          {recommendations.map((treatment) => (
+          {leaf.recommendations.map((treatment) => (
             <li
               key={treatment.agent}
               className="flex w-40 shrink-0 flex-col items-center xl:shrink"

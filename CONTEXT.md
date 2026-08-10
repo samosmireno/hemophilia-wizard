@@ -9,7 +9,14 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-07 (content-model rescan against the built pages — the orphaned
+- **Last reviewed:** 2026-08-07 (the wizard's two leaves resolved behind one interface each —
+  `classesFor()` and `leafFor()` — so `CLASSES_TO_CONSIDER`, `RECOMMENDATIONS`, `SCENARIO_NOTES`,
+  `scenarioKey`, `ScenarioKey` and the reason options are private and §4 records the resolvers
+  instead; the blueprint's arch sentence moved out of `Therapies.tsx` into `Leaf.archTitle`, which
+  is why `sourceLabel` no longer leaves the module, and `SWITCH_REASONS` split into
+  `REASON_CHOICES` (artboard order, painted) and `ALL_REASONS` (blueprint order, the canonical
+  set) so the four reasons are spelled once rather than three times); previously 2026-08-07
+  (content-model rescan against the built pages — the orphaned
   `severity-bleeding` education topic dropped, the mechanisms `figures` caption reconciled with
   the card that stopped drawing its gloss, and S1's cell padding stripped from `treatments.ts`
   (§5.1); then `EDUCATION_TOPICS` keyed by id and §7.4 split into two topics, so neither a chapter's
@@ -171,7 +178,9 @@ Entry node (purple diamond): **"Explore Novel Prophylactic Therapy Options for Y
 > · burden. The blueprint wording above stays the domain vocabulary and is what
 > [§4.2](#42-scenario-specific-considerations--strategies-notes)'s 32 note titles are written
 > against ("…is the primary reason for **switching therapies**"); both forms are carried in
-> `wizard.ts` → `SWITCH_REASONS[].label` (artboard, rendered) and `.sourceLabel` (blueprint).
+> `wizard.ts`, which carries both: the artboard's imperative reaches the screen as
+> `REASON_CHOICES[].label`, and the blueprint's gerund never leaves the module — it is read
+> into `Leaf.archTitle` by `leafFor()` and is not otherwise exported.
 > This is a copy decision on one screen, not a change to the source content.
 >
 > **The flow is three app routes `[BUILD]`.** `/wizard` collects the three answers behind a
@@ -221,8 +230,9 @@ diverge on purpose.
 
 Each box carries the annotation _"Click on the box(es) below to learn more about each type of
 therapy"_ and links to the class-level education pop-ups. Encoded in `[BUILD]` `src/data/wizard.ts`
-→ `CLASSES_TO_CONSIDER[scenario]` (verbatim labels — not the `TreatmentClass` enum, since the
-source phrases the same class differently per scenario).
+→ the private `CLASSES_TO_CONSIDER[scenario]`, reached through `classesFor({ type, hasInhibitors })`
+(verbatim labels — not the `TreatmentClass` enum, since the source phrases the same class
+differently per scenario).
 
 > **The four scenario screens carry copy the blueprint has no equivalent of `[BUILD]`.** Each
 > `/wizard/scenario` artboard states its scenario as the page title ("Hemophilia B with
@@ -280,8 +290,8 @@ Fitu = Fitusiran, Gene = Etranacogene dezaparvovec-drlb (gene therapy).
   treatment burden (Etranacogene is HB, no-inhibitor, adults only).
 - FVIIIa mimetics (Emi, Dene) never appear in Hemophilia B branches (they are HA-only).
 
-Encoded in `[BUILD]` `src/data/wizard.ts` → `RECOMMENDATIONS[scenario][reason]`, resolver
-`recommend(type, hasInhibitors, reason)`.
+Encoded in `[BUILD]` `src/data/wizard.ts` → the private `RECOMMENDATIONS[scenario][reason]`,
+reached through `leafFor({ type, hasInhibitors, reason })`.
 
 ### 4.2 Scenario-specific Considerations & Strategies notes `[PDF-V]`
 
@@ -313,8 +323,8 @@ four scenario bands top→bottom.
 
 **Data-model status `[BUILD]`.** Implemented 2026-07-27: `src/data/wizard.ts` → `SCENARIO_NOTES`
 is `Record<ScenarioKey, Record<SwitchReason, { considerations, strategies }>>` (32 notes,
-verbatim), `recommend()` returns the scenario's note pair, and `treatment-wizard-demo.html` mirrors
-it. The old shared per-reason `REASON_NOTES` is gone.
+verbatim), `leafFor()` returns the scenario's note pair as `Leaf.considerations` / `.strategies`,
+and `treatment-wizard-demo.html` mirrors it. The old shared per-reason `REASON_NOTES` is gone.
 
 **Nesting correction, 2026-08-04 `[PDF-V]` `[BUILD]`.** Four of the 32 notes carry a **second
 bullet level**, which the earlier transcription flattened. In all four scenarios the

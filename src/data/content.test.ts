@@ -13,9 +13,7 @@ import { ACRONYMS, GLOSSARY } from "./glossary";
 import { REFERENCES, RESOURCES } from "./references";
 import { SURVEY_QUESTIONS } from "./survey";
 import { TREATMENTS } from "./treatments";
-import { AGENTS, CLASSES_TO_CONSIDER, RECOMMENDATIONS, type ScenarioKey } from "./wizard";
-
-const ALL_SCENARIOS: ScenarioKey[] = ["A-without", "A-with", "B-without", "B-with"];
+import { AGENTS, ALL_REASONS, ALL_SCENARIOS, leafFor } from "./wizard";
 
 describe("drug sheets", () => {
   it("cover every novel agent the wizard can recommend, plus Efanesoctocog alfa", () => {
@@ -25,13 +23,20 @@ describe("drug sheets", () => {
     }
   });
 
-  it("cover every agent name referenced in RECOMMENDATIONS", () => {
-    const names = new Set(ALL_SCENARIOS.flatMap((s) => Object.values(RECOMMENDATIONS[s]).flat()));
+  // Through `leafFor`, so what is covered is the set a leaf actually paints a
+  // button for — not a table that might name an agent no scenario reaches.
+  it("cover every agent any wizard leaf recommends", () => {
+    const names = new Set(
+      ALL_SCENARIOS.flatMap((scenario) =>
+        ALL_REASONS.flatMap((reason) =>
+          leafFor({ ...scenario, reason }).recommendations.map((t) => t.agent),
+        ),
+      ),
+    );
+
+    expect(names.size).toBeGreaterThan(0);
     for (const name of names) {
-      expect(
-        sheetFor(name),
-        `RECOMMENDATIONS names ${name} but it has no drug sheet`,
-      ).toBeDefined();
+      expect(sheetFor(name), `a leaf recommends ${name} but it has no drug sheet`).toBeDefined();
     }
   });
 
@@ -140,55 +145,13 @@ describe("drug sheets", () => {
   });
 });
 
-describe("wizard class boxes", () => {
-  it("cover all four scenarios with a non-empty class list", () => {
-    for (const scenario of ALL_SCENARIOS) {
-      expect(CLASSES_TO_CONSIDER[scenario].classes.length).toBeGreaterThan(0);
-    }
-  });
-
-  it("carry a caveat only for HB with inhibitors", () => {
-    expect(CLASSES_TO_CONSIDER["B-with"].caveat).toBeDefined();
-    for (const scenario of ["A-without", "A-with", "B-without"] as ScenarioKey[]) {
-      expect(CLASSES_TO_CONSIDER[scenario].caveat).toBeUndefined();
-    }
-  });
-
-  /**
-   * The three fields the `/wizard/scenario` artboards added. The type already
-   * makes them required, so this asserts what a type cannot: that they are not
-   * blank, and that the emphasis the four leads exist to carry is actually in
-   * them.
-   */
-  it("name their scenario and lead with the polarity word emphasised", () => {
-    for (const scenario of ALL_SCENARIOS) {
-      const box = CLASSES_TO_CONSIDER[scenario];
-
-      expect(box.title, scenario).not.toHaveLength(0);
-      expect(box.caption, scenario).not.toHaveLength(0);
-
-      // `_with_` on the two +inhibitor screens, `_without_` on the two others —
-      // matched with the delimiters, so a lead that lost its markup fails here
-      // rather than rendering an un-emphasised sentence nobody notices.
-      const polarity = scenario.endsWith("-with") ? "_with_" : "_without_";
-      expect(box.lead, scenario).toContain(polarity);
-    }
-  });
-
-  /**
-   * Transcribed, not templated — the reason the artboard copy is four literals
-   * rather than a format string. If a future edit collapses these onto one
-   * pattern, this is the test that objects.
-   */
-  it("keep HB-with-inhibitors' 'Therapeutic options' wording", () => {
-    expect(CLASSES_TO_CONSIDER["B-with"].lead).toMatch(/^Therapeutic options for/);
-    for (const scenario of ["A-without", "A-with", "B-without"] as ScenarioKey[]) {
-      expect(CLASSES_TO_CONSIDER[scenario].lead, scenario).toMatch(
-        /^Therapeutic classes to consider for/,
-      );
-    }
-  });
-});
+/*
+  The class boxes' own invariants — coverage, the caveat, the emphasised polarity
+  word, the "Therapeutic options" wording — moved to `wizard.test.ts` when
+  `CLASSES_TO_CONSIDER` went private. They are facts about one module's data, not
+  joins between modules, so they belong at that module's own seam. What stays here
+  is the wizard's joins outward: to `DRUG_SHEETS`, above, and to `TREATMENTS`.
+*/
 
 describe("explore segments", () => {
   // The three arches tile the band 112→1328 with no gaps, and the widths are
@@ -274,6 +237,7 @@ describe("education", () => {
     expect(SEVERITY_TABLE).toHaveLength(3);
     expect(TREATMENT_OPTIONS_MATRIX).toHaveLength(5);
   });
+
 });
 
 describe("glossary, references, survey", () => {

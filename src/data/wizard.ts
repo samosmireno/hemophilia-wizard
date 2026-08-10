@@ -25,35 +25,80 @@ export const HEMOPHILIA_TYPES: { id: WizardHemophiliaType; label: string }[] = [
 
 export type SwitchReason = "bleeding-control" | "adherence" | "treatment-burden" | "monitoring";
 
-export interface SwitchReasonOption {
+/**
+ * The blueprint's order, and the canonical set — `ALL_REASONS` is what proves a
+ * record covers all four, and what the answer store validates against.
+ */
+export const ALL_REASONS: readonly SwitchReason[] = [
+  "bleeding-control",
+  "adherence",
+  "treatment-burden",
+  "monitoring",
+];
+
+/**
+ * Both wordings of one reason. `label` is the artboard's imperative and is the
+ * only one painted on its own; `sourceLabel` is the blueprint's gerund and exists
+ * solely to be read into `Leaf.archTitle`, which is why neither this shape nor the
+ * record below leaves the module (CONTEXT.md §4).
+ */
+interface SwitchReasonOption {
   id: SwitchReason;
   label: string;
   sourceLabel: string;
 }
 
-export const SWITCH_REASONS: SwitchReasonOption[] = [
-  {
+const REASON_OPTIONS: Record<SwitchReason, SwitchReasonOption> = {
+  "bleeding-control": {
     id: "bleeding-control",
     label: "Improve bleeding control",
     sourceLabel: "Improving bleeding control",
   },
-  { id: "adherence", label: "Increase adherence", sourceLabel: "Increased adherence" },
-  {
+  adherence: { id: "adherence", label: "Increase adherence", sourceLabel: "Increased adherence" },
+  "treatment-burden": {
     id: "treatment-burden",
     label: "Reduce treatment burden",
     sourceLabel: "Reduced treatment burden",
   },
-  {
+  monitoring: {
     id: "monitoring",
     label: "Reduce monitoring requirement",
     sourceLabel: "Reduced monitoring requirement",
   },
+};
+
+/**
+ * The four reason radios in the artboard's reading order — 2×2, bleeding ·
+ * monitoring · adherence · burden — which is NOT `ALL_REASONS`' (the blueprint's).
+ * Shaped for `OptionGroup` without importing its `Option`, the way
+ * `HEMOPHILIA_TYPES` above is.
+ */
+export const REASON_CHOICES: { id: SwitchReason; label: string }[] = (
+  ["bleeding-control", "monitoring", "adherence", "treatment-burden"] as const
+).map((id) => ({ id, label: REASON_OPTIONS[id].label }));
+
+/** One of the four branches the wizard's first two questions resolve to. */
+export interface Scenario {
+  type: WizardHemophiliaType;
+  hasInhibitors: boolean;
+}
+
+/** All four, in the order the `[PPTX]` slides run. */
+export const ALL_SCENARIOS: readonly Scenario[] = [
+  { type: "A", hasInhibitors: false },
+  { type: "A", hasInhibitors: true },
+  { type: "B", hasInhibitors: false },
+  { type: "B", hasInhibitors: true },
 ];
 
-export type ScenarioKey = "A-without" | "A-with" | "B-without" | "B-with";
+/**
+ * The string the three scenario-keyed records are indexed by. Private, and the
+ * records with it: a caller names a scenario with a `Scenario`, not a key.
+ */
+type ScenarioKey = "A-without" | "A-with" | "B-without" | "B-with";
 
-export function scenarioKey(type: WizardHemophiliaType, hasInhibitors: boolean): ScenarioKey {
-  return `${type}-${hasInhibitors ? "with" : "without"}` as ScenarioKey;
+function scenarioKey({ type, hasInhibitors }: Scenario): ScenarioKey {
+  return `${type}-${hasInhibitors ? "with" : "without"}`;
 }
 
 /**
@@ -74,7 +119,7 @@ const MIMETICS = [AGENTS.emicizumab, AGENTS.denecimig];
 const REBALANCING = [AGENTS.concizumab, AGENTS.marstacimab, AGENTS.fitusiran];
 const GENE = [AGENTS.etranacogene];
 
-export const RECOMMENDATIONS: Record<ScenarioKey, Record<SwitchReason, AgentName[]>> = {
+const RECOMMENDATIONS: Record<ScenarioKey, Record<SwitchReason, AgentName[]>> = {
   "A-without": {
     "bleeding-control": [...MIMETICS, ...REBALANCING],
     adherence: [...MIMETICS, ...REBALANCING],
@@ -117,7 +162,7 @@ const BOXES_CAPTION = "Click on the boxes below to learn more about each type of
  * Double spaces in the exports are NOT transcribed — "for  prophylaxis" and
  * "TO LEARN  MORE" are justification artifacts, not authored spacing.
  */
-export const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
+const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
   "A-without": {
     title: "Hemophilia A without inhibitors",
     lead: "Therapeutic classes to consider for prophylaxis of HA _without_ inhibitors",
@@ -161,7 +206,7 @@ export interface NoteBlock {
   points: Bullet[];
 }
 
-export interface ReasonNote {
+interface ReasonNote {
   considerations: NoteBlock;
   strategies: NoteBlock;
 }
@@ -170,7 +215,7 @@ export interface ReasonNote {
  * 32 notes, verbatim from `[PDF-V]` (CONTEXT.md §4.2). The copy and the title
  * wording are SCENARIO-SPECIFIC, not shared per reason — preserved as-is.
  */
-export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote>> = {
+const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote>> = {
   "A-without": {
     "bleeding-control": {
       considerations: {
@@ -535,11 +580,19 @@ export const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote
   },
 };
 
-export interface WizardResult {
-  scenario: ScenarioKey;
-  reason: SwitchReason;
+/**
+ * What `/wizard/therapies` paints, resolved: CONTEXT.md §4's leaf — "a curated set
+ * of novel therapies + the scenario-specific Considerations & Strategies note pair".
+ * Both strings arrive composed, so the route holds no copy of its own.
+ */
+export interface Leaf {
+  /** The artboard's imperative, the `<h1>`. */
+  heading: string;
+  /** The blueprint's sentence with the blueprint's gerund read into it. */
+  archTitle: string;
+  considerations: NoteBlock;
+  strategies: NoteBlock;
   recommendations: Treatment[];
-  note: ReasonNote;
 }
 
 const BY_AGENT = new Map(TREATMENTS.map((t) => [t.agent, t]));
@@ -557,16 +610,30 @@ function treatmentFor(name: AgentName): Treatment {
   return treatment;
 }
 
-export function recommend(
-  type: WizardHemophiliaType,
-  hasInhibitors: boolean,
-  reason: SwitchReason,
-): WizardResult {
-  const scenario = scenarioKey(type, hasInhibitors);
+/** The therapeutic-class screen for a scenario. Reads no reason — all four share one. */
+export function classesFor(scenario: Scenario): ClassesToConsider {
+  return CLASSES_TO_CONSIDER[scenarioKey(scenario)];
+}
+
+/**
+ * The blueprint's arch sentence (CONTEXT.md §4.2), which is why it takes
+ * `sourceLabel` and not the `label` the `<h1>` above it wears — rendering the
+ * artboard's imperative here would read "…if Improve bleeding control is the
+ * primary reason…".
+ */
+function archTitleFor(reason: SwitchReason): string {
+  return `Novel therapies to consider if ${REASON_OPTIONS[reason].sourceLabel} is the primary reason for switching therapies:`;
+}
+
+export function leafFor(query: Scenario & { reason: SwitchReason }): Leaf {
+  const key = scenarioKey(query);
+  const note = SCENARIO_NOTES[key][query.reason];
+
   return {
-    scenario,
-    reason,
-    recommendations: RECOMMENDATIONS[scenario][reason].map(treatmentFor),
-    note: SCENARIO_NOTES[scenario][reason],
+    heading: REASON_OPTIONS[query.reason].label,
+    archTitle: archTitleFor(query.reason),
+    considerations: note.considerations,
+    strategies: note.strategies,
+    recommendations: RECOMMENDATIONS[key][query.reason].map(treatmentFor),
   };
 }
