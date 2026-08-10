@@ -20,6 +20,14 @@ function Probe() {
       <button onClick={() => setAnswer("hasInhibitors", true)}>set inhibitors</button>
       <button onClick={() => setAnswer("reason", "monitoring")}>set reason</button>
       <button onClick={() => setAnswer("type", null)}>clear type</button>
+      <button
+        onClick={() => {
+          setAnswer("type", "B");
+          setAnswer("hasInhibitors", true);
+        }}
+      >
+        set two at once
+      </button>
       <button onClick={reset}>reset</button>
     </>
   );
@@ -65,6 +73,20 @@ describe("wizard answers", () => {
     await press("clear type");
 
     expect(shown()).toEqual({ ...EMPTY, reason: "monitoring" });
+  });
+
+  /**
+   * Two `setAnswer` calls in one handler must both land. A `setAnswer` built
+   * over the render's `answers` drops the first — each call spreads the same
+   * stale snapshot, so the last write wins alone.
+   */
+  it("keeps both answers when one handler sets two", async () => {
+    renderProbe();
+
+    await press("set two at once");
+
+    expect(shown()).toEqual({ ...EMPTY, type: "B", hasInhibitors: true });
+    expect(stored()).toEqual({ ...EMPTY, type: "B", hasInhibitors: true });
   });
 
   it("is complete only once all three are answered", async () => {
