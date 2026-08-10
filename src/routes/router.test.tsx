@@ -89,8 +89,10 @@ describe("router", () => {
 
   // All five chapters are designed; the placeholder list this sat beside is gone.
 
-  // `CHAPTERS` is looked up with `Object.hasOwn`, so an inherited Object key is
-  // not a section — `in` would resolve it and then try to render it.
+  // The chapters are static routes, so an unknown section is simply unmatched
+  // and falls to `*`. The prototype keys stay as cases: they were hazardous
+  // when a `CHAPTERS` map dispatched the `:section` param, and they pin that no
+  // future return to a map lookup lets `in`-style resolution render one.
   it.each(["not-a-real-section", "toString", "constructor"])(
     "redirects the unknown education section %s to the first chapter",
     async (section) => {

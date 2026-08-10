@@ -2,7 +2,11 @@ import { Navigate, createBrowserRouter, type RouteObject } from "react-router";
 
 import Acronyms from "./Acronyms";
 import AppShell from "./AppShell";
-import Education from "./Education";
+import DiseaseBackground from "./education/DiseaseBackground";
+import FviiiMimetics from "./education/FviiiMimetics";
+import ProphylaxisGuidance from "./education/ProphylaxisGuidance";
+import RebalancingAgents from "./education/RebalancingAgents";
+import TreatmentLandscape from "./education/TreatmentLandscape";
 import Explore from "./Explore";
 import Glossary from "./Glossary";
 import Landing from "./Landing";
@@ -16,6 +20,9 @@ import WizardGate from "./wizard/Gate";
 import Scenario from "./wizard/Scenario";
 import Therapies from "./wizard/Therapies";
 
+/** Where bare `/education` and its unmatched sections land: the first chapter. */
+const EDUCATION_DEFAULT = "/education/disease-background";
+
 export const routes: RouteObject[] = [
   {
     element: <AppShell />,
@@ -26,10 +33,22 @@ export const routes: RouteObject[] = [
         children: [
           {
             path: "education",
+            /*
+              Static routes, not a `:section` param: the chapters are a closed
+              set, so which slug renders which chapter is the router's own
+              matching, and anything unmatched — unknown sections, prototype
+              keys, deeper paths — falls to `*` without a hand-rolled guard.
+              `rebalancing-agents` and `fviii-mimetics` are wizard cross-link
+              targets, so their slugs are contractual.
+            */
             children: [
-              { index: true, element: <Navigate to="/education/disease-background" replace /> },
-              { path: ":section", element: <Education /> },
-              { path: "*", element: <Navigate to="/education/disease-background" replace /> },
+              { index: true, element: <Navigate to={EDUCATION_DEFAULT} replace /> },
+              { path: "disease-background", element: <DiseaseBackground /> },
+              { path: "treatment-landscape", element: <TreatmentLandscape /> },
+              { path: "rebalancing-agents", element: <RebalancingAgents /> },
+              { path: "fviii-mimetics", element: <FviiiMimetics /> },
+              { path: "prophylaxis-guidance", element: <ProphylaxisGuidance /> },
+              { path: "*", element: <Navigate to={EDUCATION_DEFAULT} replace /> },
             ],
           },
           { path: "wizard-intro", element: <WizardIntro /> },
