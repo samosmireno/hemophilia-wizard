@@ -1,4 +1,5 @@
 import BulletList from "../../components/BulletList";
+import PageSection from "../../components/PageSection";
 import { classesFor } from "../../data/wizard";
 import { cn } from "../../lib/cn";
 import { formatInline } from "../../lib/formatInline";
@@ -29,16 +30,9 @@ export default function Scenario() {
   );
 
   return (
-    <section aria-labelledby="wizard-scenario-heading">
-      {/* Raw, NOT through `formatInline`: this is the section's accessible name,
-          and a name assembled from fragments gains separating spaces. */}
-      <h1
-        id="wizard-scenario-heading"
-        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-      >
-        {screen.title}
-      </h1>
-
+    // Raw, NOT through `formatInline`: the title is the section's accessible
+    // name, and a name assembled from fragments gains separating spaces.
+    <PageSection title={screen.title}>
       <p className="mt-8 text-xl text-black lg:text-2xl">{formatInline(screen.lead)}</p>
 
       <BulletList items={screen.classes} className="text-xl lg:text-2xl" format={formatInline} />
@@ -51,6 +45,6 @@ export default function Scenario() {
         {caption}
         {boxes}
       </div>
-    </section>
+    </PageSection>
   );
 }

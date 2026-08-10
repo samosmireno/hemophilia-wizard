@@ -108,18 +108,12 @@ describe("explore — the SDM conclusion", () => {
  * themselves are in docs/styling.md §17's browser table.
  */
 describe("explore — the responsive pass", () => {
-  /**
-   * Three steps rather than §2's one — the heading is 190 characters, and 30px
-   * would spend ~315px of a 320px viewport on it. `/none` rather than
-   * `leading-9`: 36px against `text-4xl` is the same 1.0 ratio at the canvas,
-   * but as an absolute it would render 1.5 at the 24px step.
-   */
-  it("ramps the heading in three steps, on a ratio", () => {
-    const heading = within(renderExplore()).getByRole("heading", { level: 1 });
-
-    expect(heading).toHaveClass("text-2xl/none", "sm:text-3xl/none", "lg:text-4xl/none");
-    expect(heading.className).not.toMatch(/(^|\s)leading-/);
-  });
+  /*
+    A heading test stood here: the page's bespoke three-step ramp
+    (24/30/36, centred, `max-w-content`-capped). It went on 2026-08-10 when the
+    heading joined `PageSection`'s app-wide §2 ramp (user direction, styling.md
+    §17 item 31) — the ramp is pinned once, in `PageSection.test.tsx`.
+  */
 
   /** This page's one body step, and it lands on the 16px floor. */
   it("steps the bullets to the floor below lg, on a ratio", () => {

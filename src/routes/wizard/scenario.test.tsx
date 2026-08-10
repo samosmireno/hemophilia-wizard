@@ -182,19 +182,14 @@ describe("wizard scenario — the responsive pass", () => {
    * at the artboards' 26 and so have exactly one step to give. 20 is a step on
    * the scale, not a collapse onto the other chapters' value.
    *
-   * The `<h1>` is asserted alongside them because it is the reason the rest
-   * ramp: it drops 48 → 30 below `lg` under §2's app-wide rule, and prose left
-   * at 24 would read at 0.8× the heading on a phone where the artboard draws
-   * 0.5×.
+   * The `<h1>` these ramp against drops 48 → 30 below `lg` under §2's app-wide
+   * rule — that ramp is `PageSection`'s and is pinned once in
+   * `PageSection.test.tsx`.
    */
   it.each(BRANCHES)("steps every transcribed size down one below lg, %s/%s", (type, inh) => {
     const data = classesFor({ type, hasInhibitors: inh });
     const region = renderScenario(type, inh);
 
-    expect(within(region).getByRole("heading", { level: 1 })).toHaveClass(
-      "text-3xl",
-      "lg:text-5xl",
-    );
     expect(region.querySelector("ul")).toHaveClass("text-xl", "lg:text-2xl");
     expect(within(region).getByText(data.caption)).toHaveClass("text-xl", "lg:text-2xl");
 

@@ -481,30 +481,21 @@ describe("wizard therapies — the responsive pass", () => {
    * The pixel arithmetic behind them was measured in a browser instead
    * (docs/styling.md §15).
    *
-   * The `<h1>` rides along in the first test because it is the reason the rest
-   * ramp: it drops 48 → 30 below `lg` under §2's app-wide rule, so a body left
-   * at its drawn 20 would read 0.67× the heading on a phone where the artboard
-   * draws 0.42×.
+   * The `<h1>` these ramp against drops 48 → 30 below `lg` under §2's app-wide
+   * rule — that ramp is `PageSection`'s and is pinned once in
+   * `PageSection.test.tsx`.
    */
-  it.each(LEAVES)(
-    "steps the heading, the bands and the body below lg, %s/%s/%s",
-    (type, inh, why) => {
-      const region = renderTherapies(type, inh, why);
+  it.each(LEAVES)("steps the bands and the body below lg, %s/%s/%s", (type, inh, why) => {
+    const region = renderTherapies(type, inh, why);
 
-      expect(within(region).getByRole("heading", { level: 1 })).toHaveClass(
-        "text-3xl",
-        "lg:text-5xl",
-      );
-
-      for (const header of headers(region)) {
-        expect(header).toHaveClass("text-xl", "lg:text-2xl");
-        /* A bare `text-2xl` would be the pre-pass value surviving the merge. */
-        expect(header.className.split(/\s+/)).not.toContain("text-2xl");
-        /* The 44px band is a floor at every width, not a thing that ramps. */
-        expect(header).toHaveClass("min-h-11");
-      }
-    },
-  );
+    for (const header of headers(region)) {
+      expect(header).toHaveClass("text-xl", "lg:text-2xl");
+      /* A bare `text-2xl` would be the pre-pass value surviving the merge. */
+      expect(header.className.split(/\s+/)).not.toContain("text-2xl");
+      /* The 44px band is a floor at every width, not a thing that ramps. */
+      expect(header).toHaveClass("min-h-11");
+    }
+  });
 
   /**
    * **§2's body-copy exception reaches a fifth page here, and this is the first

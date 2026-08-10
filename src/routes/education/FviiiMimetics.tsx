@@ -7,6 +7,7 @@ import inno8Url from "../../assets/images/inno8.webp";
 import nxt007Url from "../../assets/images/nxt007.webp";
 import BulletList from "../../components/BulletList";
 import ExpandableFigure from "../../components/ExpandableFigure";
+import PageSection from "../../components/PageSection";
 import Popup from "../../components/Popup";
 import PopupFigure from "../../components/PopupFigure";
 import { EDUCATION_TOPICS } from "../../data/education";
@@ -130,20 +131,19 @@ export default function FviiiMimetics() {
   usePreloadImages([emicizumabUrl, denecimigUrl, nxt007Url, inno8Url]);
 
   return (
-    <section aria-labelledby="chapter-heading" className="flex flex-1 flex-col">
-      {/* Uppercase is CSS, not copy — the accessible name stays title case.
-          `aria-label` is required, not belt-and-braces: the two-tone split makes
-          the name algorithm announce "FVIII Mimetic BsAbs : Approved…". The `{" "}`
-          keeps `textContent` equal to the source title. */}
-      <h1
-        id="chapter-heading"
-        aria-label={CHAPTER.title}
-        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-      >
-        <span className="block">{preserveCase(HEADING_LEAD)}</span>{" "}
-        <span className="block text-brand-slate-100">{preserveCase(HEADING_TAIL)}</span>
-      </h1>
-
+    <PageSection
+      // `titleLabel` is required, not belt-and-braces: the two-tone split makes
+      // the name algorithm announce "FVIII Mimetic BsAbs : Approved…". The `{" "}`
+      // keeps `textContent` equal to the source title.
+      title={
+        <>
+          <span className="block">{preserveCase(HEADING_LEAD)}</span>{" "}
+          <span className="block text-brand-slate-100">{preserveCase(HEADING_TAIL)}</span>
+        </>
+      }
+      titleLabel={CHAPTER.title}
+      className="flex flex-1 flex-col"
+    >
       {/* Four bullets, not the export's five: its last two are one sentence Figma
           broke across lines, which is why this reads the topic's `body`. */}
       <BulletList items={CHAPTER.body} className="mt-8 text-xl leading-normal lg:text-2xl" />
@@ -217,7 +217,7 @@ export default function FviiiMimetics() {
         card={openId === "inno8" ? { title: INNO8_OVERVIEW.title, content: <Inno8Card /> } : null}
         onClose={() => setOpenId(null)}
       />
-    </section>
+    </PageSection>
   );
 }
 

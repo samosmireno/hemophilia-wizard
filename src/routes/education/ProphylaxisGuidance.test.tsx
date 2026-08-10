@@ -83,7 +83,6 @@ describe("prophylaxis-guidance chapter", () => {
     const { container } = render(<ProphylaxisGuidance />);
 
     expect(container.querySelector("ul")).toHaveClass("text-xl", "lg:text-2xl", "leading-tight");
-    expect(screen.getByRole("heading", { level: 1 })).toHaveClass("text-3xl", "lg:text-5xl");
   });
 
   /**

@@ -1,8 +1,9 @@
+import PageSection from "../components/PageSection";
+
 export default function Survey() {
   return (
-    <section aria-labelledby="survey-heading">
-      <h1 id="survey-heading">Survey</h1>
+    <PageSection title="Survey">
       <p>Survey placeholder.</p>
-    </section>
+    </PageSection>
   );
 }

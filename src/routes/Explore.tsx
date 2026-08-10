@@ -3,6 +3,7 @@ import { Button, PopupButton } from "mlg-components";
 
 import BulletList from "../components/BulletList";
 import DrugSheetPopup from "../components/DrugSheetPopup";
+import PageSection from "../components/PageSection";
 import Popup from "../components/Popup";
 import {
   EXPLORE_SEGMENTS,
@@ -21,17 +22,9 @@ export default function Explore() {
   const [tableOpen, setTableOpen] = useState(false);
 
   return (
-    <section aria-labelledby="explore-heading" className="flex flex-1 flex-col lg:-mr-rail">
-      {/* Uppercase is CSS, not copy — the accessible name stays the sentence case
-          `SDM_CONCLUSION` is written in. `max-w-content` is a line-break cap, not
-          styling: it is what reproduces the drawn wrap. */}
-      <h1
-        id="explore-heading"
-        className="mx-auto max-w-content text-center font-display text-2xl/none font-bold tracking-wide text-brand-crimson-50 uppercase sm:text-3xl/none lg:text-4xl/none"
-      >
-        {SDM_CONCLUSION}
-      </h1>
-
+    // On the app-wide §2 ramp since 2026-08-10 (user direction), replacing the
+    // page's bespoke centred three-step fit — docs/styling.md §17, item 31.
+    <PageSection title={SDM_CONCLUSION} className="flex flex-1 flex-col lg:-mr-rail">
       {/* `ps-6` is the list's own `pl-6`, so this sentence's left edge sits on the
           bullets' text rather than on their discs. */}
       <p className="mt-6 ps-6 text-base/[1.6] text-black lg:text-xl/[1.6]">{SDM_LEAD}</p>
@@ -81,7 +74,7 @@ export default function Explore() {
         }
         onClose={() => setTableOpen(false)}
       />
-    </section>
+    </PageSection>
   );
 }
 

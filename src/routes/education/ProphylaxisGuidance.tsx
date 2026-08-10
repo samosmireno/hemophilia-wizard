@@ -1,5 +1,6 @@
 import backdropUrl from "../../assets/images/bg_image.webp";
 import BulletList from "../../components/BulletList";
+import PageSection from "../../components/PageSection";
 import { EDUCATION_TOPICS } from "../../data/education";
 
 const CHAPTER = EDUCATION_TOPICS["prophylaxis-guidance"];
@@ -9,17 +10,9 @@ export default function ProphylaxisGuidance() {
     <>
       <ChapterBackdrop />
 
-      <section aria-labelledby="chapter-heading" className="flex flex-1 flex-col justify-center">
-        {/* Uppercase is CSS, not copy — the accessible name stays sentence case. */}
-        <h1
-          id="chapter-heading"
-          className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-        >
-          {CHAPTER.title}
-        </h1>
-
+      <PageSection title={CHAPTER.title} className="flex flex-1 flex-col justify-center">
         <BulletList items={CHAPTER.body} className="mt-8 text-xl leading-tight lg:text-2xl" />
-      </section>
+      </PageSection>
     </>
   );
 }

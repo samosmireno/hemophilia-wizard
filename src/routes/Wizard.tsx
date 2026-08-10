@@ -3,6 +3,7 @@ import { Button } from "mlg-components";
 import { useNavigate } from "react-router";
 
 import OptionGroup, { type Option } from "../components/OptionGroup";
+import PageSection from "../components/PageSection";
 import { cn } from "../lib/cn";
 import { nextOf } from "../data/sectionOrder";
 import {
@@ -35,14 +36,7 @@ export default function Wizard() {
   const next = nextOf("/wizard")!;
 
   return (
-    <section aria-labelledby="wizard-heading">
-      <h1
-        id="wizard-heading"
-        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-      >
-        {WIZARD_INPUT_TITLE}
-      </h1>
-
+    <PageSection title={WIZARD_INPUT_TITLE}>
       <form
         className="mt-20"
         onSubmit={(event) => {
@@ -92,6 +86,6 @@ export default function Wizard() {
           </Button>
         </div>
       </form>
-    </section>
+    </PageSection>
   );
 }

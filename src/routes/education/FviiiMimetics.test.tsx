@@ -1011,7 +1011,6 @@ describe("fviii-mimetics — the responsive pass", () => {
     render(<FviiiMimetics />);
     const { panel, list } = bottomHalf();
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveClass("text-3xl", "lg:text-5xl");
     expect(screen.getByText(CHAPTER.body[0]).closest("ul")).toHaveClass("text-xl", "lg:text-2xl");
 
     const captions = [...list.querySelectorAll("p")];

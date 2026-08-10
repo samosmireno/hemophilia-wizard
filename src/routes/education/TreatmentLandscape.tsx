@@ -3,6 +3,7 @@ import { PopupButton } from "mlg-components";
 
 import bloodDropUrl from "../../assets/images/blood_drop.webp";
 import BulletList from "../../components/BulletList";
+import PageSection from "../../components/PageSection";
 import Popup, { type PopupWidth } from "../../components/Popup";
 import {
   type BenefitsChallenges,
@@ -64,15 +65,7 @@ export default function TreatmentLandscape() {
   usePreloadImage(bloodDropUrl);
 
   return (
-    <section aria-labelledby="chapter-heading">
-      {/* Uppercase is CSS, not copy — the accessible name stays title-case. */}
-      <h1
-        id="chapter-heading"
-        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-      >
-        {LANDSCAPE.title}
-      </h1>
-
+    <PageSection title={LANDSCAPE.title}>
       {/* 12.5rem / 18.75rem === the drawn 200px / 300px at a 16px root. */}
       <div className="mt-8 grid gap-y-10 sm:grid-cols-[12.5rem_1fr] sm:gap-x-6 xl:grid-cols-[1fr_12.5rem_18.75rem] xl:items-center xl:gap-y-5">
         {ROWS.map((row, index) => (
@@ -122,7 +115,7 @@ export default function TreatmentLandscape() {
         }
         onClose={() => setOpenIndex(null)}
       />
-    </section>
+    </PageSection>
   );
 }
 

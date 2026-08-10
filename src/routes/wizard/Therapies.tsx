@@ -4,6 +4,7 @@ import { PopupButton } from "mlg-components";
 import ArchBand from "../../components/ArchBand";
 import BulletList from "../../components/BulletList";
 import DrugSheetPopup from "../../components/DrugSheetPopup";
+import PageSection from "../../components/PageSection";
 import { leafFor, type NoteBlock } from "../../data/wizard";
 import { cn } from "../../lib/cn";
 import { useCompleteWizardAnswers } from "../../state/wizardAnswers";
@@ -18,14 +19,7 @@ export default function Therapies() {
   const [openAgent, setOpenAgent] = useState<string | null>(null);
 
   return (
-    <section aria-labelledby="wizard-therapies-heading" className="flex flex-1 flex-col lg:-mr-16">
-      <h1
-        id="wizard-therapies-heading"
-        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-      >
-        {leaf.heading}
-      </h1>
-
+    <PageSection title={leaf.heading} className="flex flex-1 flex-col lg:-mr-16">
       <div className="mt-3 mb-4 lg:mb-0">
         <NoteDisclosure
           block={leaf.considerations}
@@ -69,7 +63,7 @@ export default function Therapies() {
       </ArchBand>
 
       <DrugSheetPopup agent={openAgent} onClose={() => setOpenAgent(null)} />
-    </section>
+    </PageSection>
   );
 }
 

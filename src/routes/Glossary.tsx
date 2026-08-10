@@ -1,19 +1,11 @@
 import DefinitionList from "../components/DefinitionList";
+import PageSection from "../components/PageSection";
 import { GLOSSARY } from "../data/glossary";
 
 export default function Glossary() {
   return (
-    // Twelve sentence-length definitions overrun the viewport at some heights,
-    // so this page pads its own bottom too — `AppShell` is `lg:pb-0`
-    // (docs/styling.md §9 item 53).
-    <section aria-labelledby="glossary-heading" className="flex flex-1 flex-col lg:pb-16">
-      <h1
-        id="glossary-heading"
-        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-      >
-        Glossary
-      </h1>
-
+    // Twelve sentence-length definitions overrun the viewport at some heights.
+    <PageSection title="Glossary" padsOwnBottom className="flex flex-1 flex-col">
       <DefinitionList
         items={GLOSSARY}
         // A fixed 20rem track, not `/acronyms`' `max-content`: the widest term
@@ -24,6 +16,6 @@ export default function Glossary() {
         className="mt-5 xl:grid xl:grid-cols-[20rem_1fr] xl:gap-x-8 xl:gap-y-6"
         termClassName="mt-6 first:mt-0 xl:mt-0"
       />
-    </section>
+    </PageSection>
   );
 }

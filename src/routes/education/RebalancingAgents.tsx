@@ -3,6 +3,7 @@ import { Button, NavArrowButton, PopupButton } from "mlg-components";
 
 import mechanismUrl from "../../assets/images/hemostatic_mechanisms_diagram.webp";
 import BulletList from "../../components/BulletList";
+import PageSection from "../../components/PageSection";
 import Popup, { type PopupCard } from "../../components/Popup";
 import PopupFigure from "../../components/PopupFigure";
 import {
@@ -72,15 +73,7 @@ export default function RebalancingAgents() {
   usePreloadImage(mechanismUrl);
 
   return (
-    <section aria-labelledby="chapter-heading">
-      {/* Uppercase is CSS, not copy — the accessible name stays title-case. */}
-      <h1
-        id="chapter-heading"
-        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-      >
-        {AGENTS.title}
-      </h1>
-
+    <PageSection title={AGENTS.title}>
       <BulletList
         items={AGENTS.body}
         className="mt-8 text-xl lg:text-2xl"
@@ -135,7 +128,7 @@ export default function RebalancingAgents() {
       </div>
 
       <Popup card={card ?? null} onClose={() => setStep(null)} />
-    </section>
+    </PageSection>
   );
 }
 

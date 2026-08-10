@@ -1,19 +1,12 @@
 import BulletList from "../components/BulletList";
+import PageSection from "../components/PageSection";
 import { REFERENCES } from "../data/references";
 import { formatCitation } from "../lib/formatCitation";
 
 export default function References() {
   return (
-    // The app's longest scroll, so it pads its own bottom like `/acronyms` and
-    // `/glossary` — `AppShell` is `lg:pb-0` (docs/styling.md §9 item 53).
-    <section aria-labelledby="references-heading" className="flex flex-1 flex-col lg:pb-16">
-      <h1
-        id="references-heading"
-        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-      >
-        References
-      </h1>
-
+    // The app's longest scroll.
+    <PageSection title="References" padsOwnBottom className="flex flex-1 flex-col">
       {/*
         Unnumbered but bulleted, as the source draws it: nothing in the app cites
         a reference, so numbers would be markers pointing at nothing (CONTEXT.md
@@ -29,6 +22,6 @@ export default function References() {
         format={formatCitation}
         className="mt-5 space-y-4 text-base/[1.6] break-words text-black lg:text-xl/[1.6] [&_a]:text-brand-lagoon-50 [&_a]:underline"
       />
-    </section>
+    </PageSection>
   );
 }

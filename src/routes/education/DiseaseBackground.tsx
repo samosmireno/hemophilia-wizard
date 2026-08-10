@@ -4,6 +4,7 @@ import diagnosticUrl from "../../assets/images/diagnostic_approach_diagram.webp"
 import BulletList from "../../components/BulletList";
 import DisclosureBand, { type Disclosure } from "../../components/DisclosureBand";
 import ExpandableFigure from "../../components/ExpandableFigure";
+import PageSection from "../../components/PageSection";
 import PopupFigure from "../../components/PopupFigure";
 import { SEVERITY_TABLE, EDUCATION_TOPICS } from "../../data/education";
 import { cn } from "../../lib/cn";
@@ -54,15 +55,7 @@ export default function DiseaseBackground() {
   usePreloadImages(DISCLOSURE_FIGURES);
 
   return (
-    <section aria-labelledby="chapter-heading" className="flex flex-1 flex-col">
-      {/* Uppercase is CSS, not copy: the accessible name stays title-case, the
-          way `Landing` keeps the activity title readable. */}
-      <h1
-        id="chapter-heading"
-        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-      >
-        Hemophilia Disease Background
-      </h1>
+    <PageSection title="Hemophilia Disease Background" className="flex flex-1 flex-col">
       {/* 29.375rem === the drawn 470px at a 16px root. */}
       <div className="mt-5 mb-4 grid xl:grid-cols-[1fr_29.375rem] xl:gap-x-8">
         <div className="xl:mt-3">
@@ -90,7 +83,7 @@ export default function DiseaseBackground() {
       </div>
 
       <DisclosureBand title="Hemophilia Severity and Bleeding Patterns" disclosures={DISCLOSURES} />
-    </section>
+    </PageSection>
   );
 }
 

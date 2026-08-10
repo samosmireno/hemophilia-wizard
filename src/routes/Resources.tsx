@@ -1,4 +1,5 @@
 import BulletList from "../components/BulletList";
+import PageSection from "../components/PageSection";
 import { RESOURCES, type ResourceItem } from "../data/references";
 import { formatCitation } from "../lib/formatCitation";
 
@@ -15,16 +16,8 @@ function compose({ text, url }: ResourceItem): string {
 export default function Resources() {
   return (
     // On the walkthrough spine, so Prev/Next come from `AppSidebar` — nothing to
-    // do here. Pads its own bottom like the three off-line pages: `AppShell` is
-    // `lg:pb-0` (docs/styling.md §9 item 53).
-    <section aria-labelledby="resources-heading" className="flex flex-1 flex-col lg:pb-16">
-      <h1
-        id="resources-heading"
-        className="font-display text-3xl font-bold tracking-wide text-brand-crimson-50 uppercase lg:text-5xl"
-      >
-        Resources
-      </h1>
-
+    // do here. Pads its own bottom like the three off-line pages.
+    <PageSection title="Resources" padsOwnBottom className="flex flex-1 flex-col">
       {RESOURCES.map(({ category, items }) => (
         <div key={category} className="mt-10 first:mt-8">
           {/* The chapter `<h2>` ramp, which is also what the panel draws: bold,
@@ -44,6 +37,6 @@ export default function Resources() {
           />
         </div>
       ))}
-    </section>
+    </PageSection>
   );
 }
