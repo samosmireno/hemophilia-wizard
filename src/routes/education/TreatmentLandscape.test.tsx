@@ -93,45 +93,28 @@ describe("treatment-landscape chapter", () => {
   });
 
   /**
-   * The three reserved figure boxes have no asset yet (CONTEXT.md §7.7). They
-   * must not be `<img>` elements standing empty, and they must not be
-   * focusable — a box that traps a tab stop and opens nothing is worse than a
-   * gap. This is the guard on that until the assets land.
+   * The first two rows' figures landed (the third row has none in the design).
+   * Both assets draw their captions as part of the image, so unlike the cards'
+   * ornamental drop they carry text a reader must still get — the alts are the
+   * captions, not `""`. Exactly two: the imageless third row must not grow an
+   * empty `<img>` standing in for an asset that does not exist.
    *
    * Queried by role rather than by selector: `Popup` is mounted unconditionally
    * (its `showModal()` effect needs the element in the DOM), so the card's own ✕
    * is a fourth `<button>` in the container. Role queries honour the closed
-   * dialog's `display: none` and see only what a user can reach, which is what
-   * this was ever asserting.
+   * dialog's `display: none` and see only what a user can reach.
    */
-  it("reserves the figure boxes without announcing or focusing them", () => {
+  it("announces the two row figures by their drawn captions", () => {
     render(<TreatmentLandscape />);
 
-    expect(screen.queryAllByRole("img")).toHaveLength(0);
+    const figures = screen.queryAllByRole("img");
+    expect(figures.map((img) => img.getAttribute("alt"))).toEqual([
+      "Factor FVIII concentrates",
+      "Factor FVIII mimetic bispecific antibody, hemostatic rebalancing agents " +
+        "(anti-TFPI mAB, AT siRNA), and gene therapy",
+    ]);
     // The three `+` triggers, and nothing else.
     expect(screen.queryAllByRole("button")).toHaveLength(3);
-  });
-
-  /**
-   * **The box's outline is `border-[0.25rem]`, not `border-4`** — §19's rule
-   * that a drawn edge is shape and has to scale with the object it edges, which
-   * the numeric utility does not, being px.
-   *
-   * This test exists because the class reverted. The Tailwind language server
-   * offers `suggestCanonicalClasses` on it, the two utilities compute the same
-   * 4px at a 16px root, and accepting the suggestion silently unpins the edge
-   * above the canvas. `rebalancing-agents` pinned its own box in the same pass
-   * and that is what caught this one; this box had nothing asserting it.
-   */
-  it("outlines the figure box in rem, so it scales with the board", () => {
-    const { container } = render(<TreatmentLandscape />);
-    const boxes = [...container.querySelectorAll("div.border-\\[0\\.25rem\\]")];
-
-    // The same three the test above counts by what they are not.
-    expect(boxes).toHaveLength(3);
-    for (const box of boxes) {
-      expect(box).toHaveClass("h-41.5", "max-w-50", "border-black");
-    }
   });
 
   /**
@@ -152,11 +135,11 @@ describe("treatment-landscape chapter", () => {
 
     expect(container.querySelector("section > div.grid")).toHaveClass(
       "gap-y-10",
-      "sm:grid-cols-[12.5rem_1fr]",
-      "sm:gap-x-6",
-      "xl:grid-cols-[1fr_12.5rem_18.75rem]",
+      "sm:grid-cols-[1fr_1fr]",
+      "sm:gap-x-4",
+      "xl:grid-cols-[1fr_20rem_18.75rem]",
       "xl:items-center",
-      "xl:gap-y-5",
+      "xl:gap-y-4",
     );
 
     // The prose spanning both tracks is what puts the other two cells on the
@@ -428,9 +411,10 @@ describe("treatment-landscape chapter", () => {
   });
 
   /**
-   * The drop is ornament, unlike every other §7 figure — so it must stay out of
-   * the accessibility tree even once a card that holds it is open. Both cards
-   * draw the same asset, so both are asserted.
+   * The drop is ornament, unlike the row figures with their drawn captions — so
+   * it must stay out of the accessibility tree even once a card that holds it
+   * is open. Scoped to the dialog, because the two row figures behind it are
+   * announced on purpose. Both cards draw the same asset, so both are asserted.
    */
   it.each([
     "Benefits and challenges of clotting replacement therapies",
@@ -441,6 +425,6 @@ describe("treatment-landscape chapter", () => {
 
     await user.click(screen.getByRole("button", { name: `Expand ${caption}` }));
 
-    expect(screen.queryAllByRole("img")).toHaveLength(0);
+    expect(within(screen.getByRole("dialog")).queryAllByRole("img")).toHaveLength(0);
   });
 });
