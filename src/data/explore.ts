@@ -15,7 +15,12 @@ export const SDM_POINTS: readonly string[] = [
 ];
 
 export interface ExploreColumn {
-  /** Verbatim from the artboard — not a `TreatmentClass`; three of the four differ. */
+  /**
+   * Verbatim from the artboard, and the app's only class vocabulary. `treatments.ts`
+   * once carried a canonical four-class enum that three of these four disagreed
+   * with; it went with the unbuilt filter engine (ADR 0007). Transcribed, never
+   * derived — `content.test.ts` pins the four.
+   */
   label: string;
   /** The join key `sheetFor()` looks a sheet up by. */
   agents: readonly AgentName[];

@@ -3,7 +3,7 @@
  *
  * Five modules used to spell these independently — `TREATMENTS`, `DRUG_SHEETS`,
  * `EXPLORE_SEGMENTS`, the wizard's `AGENTS`, and `REBALANCING_AGENTS` — and all of
- * them are joined at runtime by exact string match: `recommend()` looks a
+ * them are joined at runtime by exact string match: `treatmentFor()` looks a
  * `Treatment` up by name, `sheetFor()` looks a sheet up by name. A typo in any one
  * of them dropped an agent from a recommendation or opened an empty card, silently.
  * `content.test.ts` pinned three of those joins; `AgentName` makes all of them the

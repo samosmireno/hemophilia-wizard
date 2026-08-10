@@ -166,12 +166,14 @@ describe("explore segments", () => {
   });
 
   /**
-   * The labels are the artboard's, and three of the four deliberately disagree
-   * with `TREATMENT_CLASSES` — plural where the enum is singular, and "UHL
-   * clotting factor replacement" naming a half-life the enum has no term for.
-   * This is the test that objects if someone "fixes" them into the enum.
+   * The labels are the artboard's, and they are the app's only class vocabulary:
+   * `treatments.ts` once carried a canonical four-class enum, and three of these
+   * four disagreed with it — plural where it was singular, and "UHL clotting factor
+   * replacement" naming a half-life it had no term for. The enum went with the
+   * unbuilt filter engine (ADR 0007); these stayed, because they are drawn. This is
+   * the test that objects if someone canonicalises them.
    */
-  it("label columns in the artboard's wording, not the TreatmentClass enum", () => {
+  it("label columns in the artboard's wording", () => {
     const labels = EXPLORE_SEGMENTS.flatMap((s) => s.columns.map((c) => c.label));
     expect(labels).toEqual([
       "FVIII mimetics",
@@ -186,30 +188,13 @@ describe("treatment roster", () => {
   /*
     `AgentName` makes a misspelled agent a compile error, but it cannot make
     `TREATMENTS` cover the roster — an array proves nothing about which of the nine
-    names it contains. That gap is what `recommend()`'s `treatmentFor()` throws on
-    and what `sheetFor()` returns `undefined` for, so it is asserted here instead.
+    names it contains. That gap is what `treatmentFor()` throws on and what
+    `sheetFor()` returns `undefined` for, so it is asserted here instead: the join
+    between `treatments.ts` and `agents.ts` is what makes the former's throw
+    unreachable. The rows' own transcription rules live in `treatments.test.ts`.
   */
   it("hold exactly one row per name in AGENT_NAMES", () => {
     expect(TREATMENTS.map((t) => t.agent).sort()).toEqual([...ALL_AGENT_NAMES].sort());
-  });
-
-  /*
-    S1 pads cells to lay out its columns — three `monitoring` values opened with a
-    space, two class labels closed with one, and Denecimig's parenthetical was
-    aligned with a run of fourteen. Every one of these fields renders as-is in the
-    §5 comparison table, so the padding is a rendering defect waiting on a caller
-    rather than copy to transcribe. Asserted across all fields of all rows, so a
-    row re-transcribed from the XLSX fails here.
-  */
-  it("carry no spreadsheet cell padding", () => {
-    for (const t of TREATMENTS) {
-      for (const [field, value] of Object.entries(t)) {
-        if (typeof value !== "string") continue;
-        expect(value, `${t.agent}.${field}`).toBe(value.trim());
-        // `moa` sets a deliberate newline; only runs of spaces are the artifact.
-        expect(value, `${t.agent}.${field}`).not.toMatch(/ {2}/);
-      }
-    }
   });
 });
 
@@ -237,7 +222,6 @@ describe("education", () => {
     expect(SEVERITY_TABLE).toHaveLength(3);
     expect(TREATMENT_OPTIONS_MATRIX).toHaveLength(5);
   });
-
 });
 
 describe("glossary, references, survey", () => {

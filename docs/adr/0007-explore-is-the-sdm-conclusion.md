@@ -87,11 +87,36 @@ would cost real edits to buy a name no more accurate than the one it replaced.
   assets may never arrive, where an empty card is a dead end. This table is specified, its
   data and filter engine are built and tested, and the card is the container they drop
   into — so the placeholder is a state, not a stub, and it says so in words.
+  <br>**Corrected 2026-08-10 — see the amendment below.**
 - **CONTEXT.md §9 gains the four bullets verbatim**, and §5 gains a note that the table is
   a pop-up on this page rather than the page itself.
 - **Efanesoctocog alfa's sheet is reachable at last**, closing the loose end §6 recorded.
 - `router.test.tsx` graduates `/explore` out of its "renders a stub" list, the same move
   each education chapter made as its design landed.
+
+### "Built and tested" was wrong (amended 2026-08-10)
+
+The decision above stands unchanged. One supporting claim in its Consequences does not: the
+filter engine was **never tested**, and as of 2026-08-10 it is deleted.
+
+`evaluateTreatments` / `filterTreatments` and their four helpers had zero callers and zero tests
+from the day they were written. Worse for this ADR's purposes, they answered a different question
+than the artboard asks — patient eligibility rather than column filtering. The three drawn
+dropdowns do not map onto them: no age dropdown exists, `hasInhibitors: false` applied no filter
+at all, and the type dropdown's three values (A / B / A + B) do not fit a two-member union whose
+resolver reads "A + B" as _both_. Rather than have issue 09 bend the table to fit an untested
+engine, the engine went and issue 09 gained the specification instead. Details in CONTEXT.md §5.2.
+
+**What this costs the reasoning above.** "The placeholder is a state, not a stub" rested on three
+supports — the table is specified, its data exist, and its engine is built. Two of the three hold:
+`TREATMENTS` is transcribed and tested, and §5 specifies the columns and the filters. The third is
+gone. That is enough — the card is still a container waiting on a body someone has drawn, not a
+promise of a feature nobody has designed — but it is now one support lighter, and the honest
+statement is that the placeholder is a state because the **design** is settled, not because the
+code was.
+
+Nothing else in this ADR is affected: the table is still a `Popup` on `/explore`, the route still
+sits on the spine, and the seven-agent class index is untouched.
 
 ## Alternatives considered
 

@@ -1,15 +1,6 @@
 import { AGENT_NAMES, type AgentName } from "./agents";
 
-export type HemophiliaType = "A" | "B";
 export type YesNo = "Yes" | "No";
-
-export const TREATMENT_CLASSES = [
-  "Clotting factor replacement",
-  "Factor VIII mimetic",
-  "Hemostatic rebalancing agent",
-  "Gene therapy",
-] as const;
-export type TreatmentClass = (typeof TREATMENT_CLASSES)[number];
 
 export interface Treatment {
   /** Column A — treatment class label, verbatim (may carry a parenthetical note). */
@@ -152,83 +143,26 @@ export const TREATMENTS: readonly Treatment[] = [
   },
 ];
 
-export function typesServed(t: Treatment): ReadonlySet<HemophiliaType> {
-  const raw = t.hemophiliaType.toUpperCase();
-  const set = new Set<HemophiliaType>();
-  if (raw.includes("A")) set.add("A");
-  if (raw.includes("B")) set.add("B");
-  return set;
-}
+const BY_AGENT: ReadonlyMap<string, Treatment> = new Map(TREATMENTS.map((t) => [t.agent, t]));
 
-/** Unrecognized labels fall back to 0 (no restriction). */
-export function minAge(t: Treatment): number {
-  const label = t.age;
-  const plus = label.match(/(\d+)\s*\+/);
-  if (plus) return Number(plus[1]);
-  if (/adult/i.test(label)) return 18;
-  const gt = label.match(/>\s*(\d+)\s*(year|yr)/i);
-  if (gt) return Number(gt[1]);
-  return 0;
-}
-
-export function isAgeProvisional(t: Treatment): boolean {
-  return /tbd/i.test(t.age);
-}
-
-/** Normalize the verbatim column-A label into one of the four canonical classes. */
-export function classOf(t: Treatment): TreatmentClass {
-  const c = t.treatmentClass.toLowerCase();
-  if (c.includes("mimetic")) return "Factor VIII mimetic";
-  if (c.includes("rebalancing")) return "Hemostatic rebalancing agent";
-  if (c.includes("gene")) return "Gene therapy";
-  return "Clotting factor replacement";
-}
-
-/** An omitted criterion is not applied. */
-export interface PatientCriteria {
-  hemophiliaType?: HemophiliaType;
-  hasInhibitors?: boolean;
-  age?: number;
-  treatmentClass?: TreatmentClass;
-}
-
-export interface EligibilityResult {
-  treatment: Treatment;
-  eligible: boolean;
-  /** Human-readable reasons a treatment was excluded (empty when eligible). */
-  reasons: string[];
-}
-
-export function evaluateTreatments(criteria: PatientCriteria): EligibilityResult[] {
-  return TREATMENTS.map((treatment) => {
-    const reasons: string[] = [];
-
-    if (criteria.hemophiliaType && !typesServed(treatment).has(criteria.hemophiliaType)) {
-      reasons.push(
-        `Not indicated for hemophilia ${criteria.hemophiliaType} (serves ${treatment.hemophiliaType}).`,
-      );
-    }
-    if (criteria.hasInhibitors && treatment.inhibitors !== "Yes") {
-      reasons.push("Not indicated for use with inhibitors.");
-    }
-    if (criteria.age !== undefined) {
-      const min = minAge(treatment);
-      if (criteria.age < min) {
-        reasons.push(
-          `Below minimum age (${treatment.age}${isAgeProvisional(treatment) ? ", provisional" : ""}).`,
-        );
-      }
-    }
-    if (criteria.treatmentClass && classOf(treatment) !== criteria.treatmentClass) {
-      reasons.push(`Outside selected class (${classOf(treatment)}).`);
-    }
-
-    return { treatment, eligible: reasons.length === 0, reasons };
-  });
-}
-
-export function filterTreatments(criteria: PatientCriteria): Treatment[] {
-  return evaluateTreatments(criteria)
-    .filter((r) => r.eligible)
-    .map((r) => r.treatment);
+/**
+ * The roster row for an agent. **Total**, and throws rather than skips when it
+ * cannot be — the opposite policy to `sheetFor()`, deliberately.
+ *
+ * The two differ because their key sets do. `AgentName` is the closed union of the
+ * nine, every one of which has a row, so a miss means someone deleted one and that
+ * should be loud. `sheetFor()` takes `string` and returns `undefined` because its
+ * callers pass component state and because SHL and EHL genuinely have no sheet —
+ * absence there is a real state, not corruption.
+ *
+ * `WizardResult` used to carry an `unresolved: string[]` of names that found no
+ * row — a channel nothing read, so a mistyped name dropped an agent off the leaf
+ * silently. `AgentName` makes the typo a compile error; array *coverage* is the one
+ * thing the type cannot state, so `content.test.ts` pins that `TREATMENTS` holds
+ * exactly one row per name, which is what makes the throw below unreachable.
+ */
+export function treatmentFor(name: AgentName): Treatment {
+  const treatment = BY_AGENT.get(name);
+  if (!treatment) throw new Error(`No treatment row for ${name}`);
+  return treatment;
 }

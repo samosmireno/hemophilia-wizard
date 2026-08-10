@@ -1,6 +1,6 @@
 import { AGENT_NAMES, type AgentName } from "./agents";
 import type { Bullet } from "./education";
-import { TREATMENTS, type Treatment } from "./treatments";
+import { treatmentFor, type Treatment } from "./treatments";
 
 export const WIZARD_ENTRY_PROMPT = "Explore Novel Prophylactic Therapy Options for Your Patient";
 
@@ -593,21 +593,6 @@ export interface Leaf {
   considerations: NoteBlock;
   strategies: NoteBlock;
   recommendations: Treatment[];
-}
-
-const BY_AGENT = new Map(TREATMENTS.map((t) => [t.agent, t]));
-
-/**
- * Throws rather than skips. `WizardResult` used to carry an `unresolved: string[]`
- * of names that found no row — a channel nothing read, so a mistyped name dropped an
- * agent off the leaf silently. `AgentName` makes the typo a compile error and
- * `content.test.ts` pins the roster's coverage, which leaves only "someone deleted a
- * row" — and that should be loud.
- */
-function treatmentFor(name: AgentName): Treatment {
-  const treatment = BY_AGENT.get(name);
-  if (!treatment) throw new Error(`No treatment row for ${name}`);
-  return treatment;
 }
 
 /** The therapeutic-class screen for a scenario. Reads no reason — all four share one. */

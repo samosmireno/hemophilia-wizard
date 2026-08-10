@@ -91,9 +91,9 @@ describe("wizard therapies — the sixteen leaves", () => {
   });
 
   /*
-    Two tests stood here and are gone. Both compared `recommend()`'s output to the
-    tables it reads — which was tautological even against `recommend`, and is
-    unwritable now the tables are private. What they were reaching for lives in
+    Two tests stood here and are gone. Both compared the old `recommend()`'s output
+    to the tables it read — which was tautological even then, and is unwritable now
+    the tables are private and the function is `leafFor()`. What they reached for is
     `data/wizard.test.ts`: that every recommendation resolves to a roster row, and
     the matrix facts worth naming (mimetics alone for HA + reduced monitoring, gene
     therapy only for HB without inhibitors, no mimetic on any HB leaf).
@@ -377,7 +377,7 @@ describe("wizard therapies — the arch", () => {
 
     /*
       `aria-haspopup="dialog"`, unconditionally, where the education chapters
-      make it conditional on a card existing. Every agent `recommend()` can name
+      make it conditional on a card existing. Every agent `leafFor()` can name
       has a sheet — `content.test.ts` asserts that against `DRUG_SHEETS` — so
       there is no leaf on which a `+` promises something it cannot deliver.
 

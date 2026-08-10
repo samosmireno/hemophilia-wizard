@@ -9,7 +9,13 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-07 (the wizard's two leaves resolved behind one interface each —
+- **Last reviewed:** 2026-08-10 (the unbuilt eligibility engine deleted from `treatments.ts` — it had
+  zero callers and zero tests since the first data pass and modelled patient eligibility where the
+  artboard specifies column filters, so §5.2 becomes the record of a specified-but-unbuilt design
+  and keeps the age-parse rule; the canonical `TREATMENT_CLASSES` enum went with it, leaving
+  `EXPLORE_SEGMENTS`' drawn labels as the app's only class vocabulary; and `treatmentFor()` moved
+  out of `wizard.ts` to sit beside `TREATMENTS` opposite `sheetFor()`, with §6 recording why one is
+  total and the other partial); previously 2026-08-07 (the wizard's two leaves resolved behind one interface each —
   `classesFor()` and `leafFor()` — so `CLASSES_TO_CONSIDER`, `RECOMMENDATIONS`, `SCENARIO_NOTES`,
   `scenarioKey`, `ScenarioKey` and the reason options are private and §4 records the resolvers
   instead; the blueprint's arch sentence moved out of `Therapies.tsx` into `Leaf.archTitle`, which
@@ -231,8 +237,10 @@ diverge on purpose.
 Each box carries the annotation _"Click on the box(es) below to learn more about each type of
 therapy"_ and links to the class-level education pop-ups. Encoded in `[BUILD]` `src/data/wizard.ts`
 → the private `CLASSES_TO_CONSIDER[scenario]`, reached through `classesFor({ type, hasInhibitors })`
-(verbatim labels — not the `TreatmentClass` enum, since the source phrases the same class
-differently per scenario).
+(verbatim labels — transcribed rather than derived, since the source phrases the same class
+differently per scenario; `treatments.ts` carried a canonical `TreatmentClass` enum until
+2026-08-10 and these labels never matched it, which is [§5.2](#52-filter-logic--specified-not-built-build)'s
+account of why it went).
 
 > **The four scenario screens carry copy the blueprint has no equivalent of `[BUILD]`.** Each
 > `/wizard/scenario` artboard states its scenario as the page title ("Hemophilia B with
@@ -392,10 +400,13 @@ Indicated with inhibitors (Yes / No). "A + B" means eligible for both.
 > the SDM copy the artboard draws three arched segments holding all seven agents that have a
 > sheet, under four verbatim class labels — "FVIII mimetics" (drawn "FVIIIa mimetics"; the `a`
 > was dropped 2026-08-05) · "Hemostatic rebalancing agents" ·
-> "UHL clotting factor replacement" · "Gene therapy". Three of the four disagree with the
-> `TreatmentClass` enum in `treatments.ts` (plural where it is singular; "UHL" is a half-life the
-> enum has no term for), so they are transcribed rather than derived — the same call
-> `CLASSES_TO_CONSIDER` records. Encoded as `src/data/explore.ts` → `EXPLORE_SEGMENTS`. The two
+> "UHL clotting factor replacement" · "Gene therapy". Three of the four disagreed with the
+> canonical `TreatmentClass` enum `treatments.ts` carried until 2026-08-10 (plural where it was
+> singular; "UHL" is a half-life it had no term for), so they are transcribed rather than derived —
+> the same call `CLASSES_TO_CONSIDER` records. **They are now the app's only class vocabulary**,
+> which is why the enum went with the unbuilt filter engine
+> ([§5.2](#52-filter-logic--specified-not-built-build)) and why they are the natural source for the
+> comparison table's class dropdown. Encoded as `src/data/explore.ts` → `EXPLORE_SEGMENTS`. The two
 > generic SHL/EHL rows are **not** drawn, consistent with their having no sheet by design.
 
 The `[PDF-V]` embedded copy of the table fills in the **"Toxicity & Monitoring"** column per row
@@ -431,8 +442,10 @@ the one deliberate departure from S1 (see [Data quality](#data-quality--conflict
 a space, the SHL/EHL/Efanesoctocog class labels close with one, and Denecimig's parenthetical is
 aligned with a run of fourteen. Whitespace a spreadsheet uses to lay out a column is not copy, and
 every one of these fields renders as-is in the [§5](#5-explore-therapy-options-table-secondary-engine)
-comparison table — so the padding was a rendering defect waiting on a caller. `classOf()` lowercases
-and substring-matches, so it is unaffected. `content.test.ts` pins the absence.
+comparison table — so the padding was a rendering defect waiting on a caller. `treatments.test.ts`
+pins the absence. (The one reader that would have been indifferent to it, `classOf()`, lowercased
+and substring-matched; it went with the filter engine on 2026-08-10 —
+[§5.2](#52-filter-logic--specified-not-built-build).)
 
 `[BUILD]` **the app writes `mAb` where this table and [§6](#6-drug-information-sheets) write `mAB`**
 (2026-08-06). `[PDF-V]` sets the trailing B capital in both places, against its own
@@ -445,12 +458,36 @@ strategy bullet, `drug-sheets.ts`'s two Class/Target lines, and `education.ts`'s
 drawn**: their job is to record what the source says so it can be re-verified, which is the one
 thing a silent correction would destroy.
 
-### 5.2 Filter logic `[BUILD]`
+### 5.2 Filter logic — specified, not built `[BUILD]`
 
-`src/data/treatments.ts` — computed eligibility filter: `evaluateTreatments(criteria)` /
-`filterTreatments(criteria)`. Rules: type ∈ typesServed · (hasInhibitors ⇒ inhibitors=="Yes")
-· age ≥ minAge · optional class. Age parse: `0+→0, 6+→6, 12+→12, Adults→18, "TBD >1yr"→1
-(provisional)`. `filterTreatments({treatmentClass})` reproduces the S2–S5 per-class tabs.
+**The eligibility engine was deleted 2026-08-10.** `src/data/treatments.ts` carried
+`evaluateTreatments(criteria)` / `filterTreatments(criteria)` plus `typesServed`, `minAge`,
+`isAgeProvisional` and `classOf` from the first data pass. They had **zero callers and zero
+tests** for their whole life, and they answered a different question than the artboard asks:
+they modelled **patient eligibility** ("is this treatment right for a 6-year-old with
+inhibitors"), where the three drawn dropdowns are **column filters** ("show the rows whose
+cell says B"). Three concrete mismatches:
+
+- **No age dropdown is drawn**, so `age`, `minAge` and `isAgeProvisional` served no filter.
+- **`hasInhibitors: false` applied no filter at all** — picking "No" would have shown all nine
+  rows, where the drawn dropdown is a Yes/No column filter.
+- **The type dropdown has three values** (A / B / A + B) against a two-member `HemophiliaType`
+  union, and `typesServed` read "A + B" as _both_, so picking "A" returned eight rows rather
+  than the three whose cell says `A`.
+
+The canonical `TREATMENT_CLASSES` enum went with them: `/explore` transcribes its four class
+labels from the artboard (§5, `EXPLORE_SEGMENTS`) and three of the four disagreed with the
+enum, so the app's only class vocabulary is the drawn one. What survives in `treatments.ts` is
+the roster, its shape, and `treatmentFor()` (§6).
+
+**The rules are recorded here rather than in code**, since issue 09 still has to decide them:
+
+- Age parse, as it was implemented: `0+→0, 6+→6, 12+→12, Adults→18, "TBD (…>1 year…)"→1
+(provisional)`. Read off the verbatim `age` column.
+- Per-class filtering reproduces the S2–S5 per-class tabs, which is what those sheets are.
+- **Open question for issue 09:** does picking "A" mean the three rows whose cell reads `A`, or
+  the eight that serve A? §5 above glosses "A + B" as _"eligible for both"_, which leans to the
+  second reading and makes the three options overlap rather than partition. Undecided.
 
 ---
 
@@ -469,9 +506,18 @@ agent the wizard can **recommend** has a sheet" (all 6 novel `AGENTS` + Efanesoc
 `RECOMMENDATIONS` and `REBALANCING_AGENTS[].name` all take it, where each module previously spelled
 its own literals and the two runtime lookups matched them by string. A typo is now a compile error
 naming the closest match — including a trailing space, which is the failure this could not otherwise
-see. `sheetFor()` deliberately still takes `string` and stays partial: its callers pass component
-state, and SHL/EHL have no sheet. Array _coverage_ is the one thing the type cannot state, so
-`content.test.ts` asserts `TREATMENTS` holds exactly one row per name.
+see. Array _coverage_ is the one thing the type cannot state, so `content.test.ts` asserts
+`TREATMENTS` holds exactly one row per name.
+
+`[BUILD]` **The two agent lookups fail differently, and the rule is the key set** (2026-08-10).
+`treatmentFor(name: AgentName): Treatment` (`treatments.ts`, beside the roster it indexes) is
+**total** and throws: the key is the closed union, every member has a row, so a miss means a row was
+deleted and that should be loud — the coverage test above is what keeps the throw unreachable.
+`sheetFor(agent: string): DrugSheet | undefined` (`drug-sheets.ts`) is **partial** and returns
+`undefined`: its callers pass component state, and SHL/EHL genuinely have no sheet, so absence is a
+state the domain really has rather than corruption. **Total where the key is a union and the domain
+is complete; partial where the domain has real gaps.** `treatmentFor` was a private function inside
+`wizard.ts` until 2026-08-10, 600 lines from the roster it indexed and under no stated rule.
 
 **The card is built `[BUILD]`** as `src/components/DrugSheetPopup.tsx` — `Popup`'s crimson band
 wearing the sheet's name, then the five sections as crimson `<h3>`s over disc lists, in that

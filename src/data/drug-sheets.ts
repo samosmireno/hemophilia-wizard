@@ -201,6 +201,11 @@ const SHEET_BY_AGENT: ReadonlyMap<string, DrugSheet> = new Map(
  * component state (`openAgent: string | null`), and two roster agents — SHL and EHL —
  * have no sheet of their own. `content.test.ts` pins that every agent a page draws a
  * button for does have one.
+ *
+ * The mirror lookup, `treatmentFor()` in `treatments.ts`, is **total** and throws.
+ * The policies differ because the key sets do: there, the key is the closed
+ * `AgentName` union and every member has a row, so a miss is corruption. Here,
+ * absence is a state the domain really has.
  */
 export function sheetFor(agent: string): DrugSheet | undefined {
   return SHEET_BY_AGENT.get(agent);
