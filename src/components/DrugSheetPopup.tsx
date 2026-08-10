@@ -14,13 +14,14 @@ export default function DrugSheetPopup({
 
   return (
     <Popup
-      open={sheet !== undefined}
-      // `?? sheet.agent` is the usual case: only Denecimig carries a `title`.
-      title={sheet ? (sheet.title ?? sheet.agent) : ""}
+      card={
+        sheet
+          ? // `?? sheet.agent` is the usual case: only Denecimig carries a `title`.
+            { title: sheet.title ?? sheet.agent, content: <DrugSheetBody sheet={sheet} /> }
+          : null
+      }
       onClose={onClose}
-    >
-      {sheet && <DrugSheetBody sheet={sheet} />}
-    </Popup>
+    />
   );
 }
 

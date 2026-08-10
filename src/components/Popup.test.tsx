@@ -12,27 +12,28 @@ const SUBTITLE = "(Options include SHL, EHL, and UHL FVIII/FIX products)";
 const dialog = () => screen.getByRole("dialog", { hidden: true });
 
 describe("Popup", () => {
-  it("opens and closes as `open` changes", () => {
-    const { rerender } = render(
-      <Popup open={false} title={TITLE} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
-    );
+  /** `null` is closed: the card and the openness are one value, not two props. */
+  it("opens and closes as `card` appears and goes", () => {
+    const { rerender } = render(<Popup card={null} onClose={vi.fn()} />);
     expect(dialog()).not.toHaveAttribute("open");
 
-    rerender(
-      <Popup open title={TITLE} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
-    );
+    rerender(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={vi.fn()} />);
     expect(dialog()).toHaveAttribute("open");
 
-    rerender(
-      <Popup open={false} title={TITLE} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
-    );
+    rerender(<Popup card={null} onClose={vi.fn()} />);
     expect(dialog()).not.toHaveAttribute("open");
+  });
+
+  /**
+   * Before anything has opened there is no card at all, where the layer used to
+   * wrap a full card shell around an empty `<h2>` — blank crimson band and all.
+   * The `<dialog>` itself still mounts either way (`ModalLayer` renders it
+   * unconditionally), so nothing that counts or indexes dialogs moves.
+   */
+  it("renders an empty layer before it has ever opened", () => {
+    render(<Popup card={null} onClose={vi.fn()} />);
+
+    expect(dialog()).toBeEmptyDOMElement();
   });
 
   /**
@@ -55,11 +56,7 @@ describe("Popup", () => {
    * `ExpandableFigure`), and this is the modal's copy of that rule.
    */
   it("carries the enter and exit transition classes, including the silent two", () => {
-    render(
-      <Popup open title={TITLE} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={vi.fn()} />);
 
     expect(dialog()).toHaveClass(
       "starting:open:opacity-0",
@@ -77,37 +74,42 @@ describe("Popup", () => {
   /**
    * The exit's other half, and the reason it needed a follow-up rather than
    * coming free with the CSS: the card has to still be *rendered* while it
-   * fades, but every caller drops its content on the same render that closes.
-   * `DisclosureBand` is the worst case and the one modelled here — it passes
-   * `undefined` children *and* an empty title, so without the hold the fade
-   * would paint an empty card under a blank band.
+   * fades, but every caller drops its card on the same render that closes.
+   *
+   * **The whole card is asserted, not just the title and body.** The hold used
+   * to be a hand-assembled `{ title, subtitle, children }` while `width` was
+   * read off the live prop — so closing the `narrow` NFT card on
+   * `/education/treatment-landscape` snapped it to the default 71.25rem and
+   * faded it out 280px too wide. `PopupCard` puts every field in the hold by
+   * construction, and this is what pins that the render reads them from the held
+   * card rather than the live one — which is the substitution that shipped the bug.
    *
    * jsdom runs no transitions, so what a test can hold is the DOM half: the old
-   * title and body are still there after a close that dropped both, and the
-   * closed dialog hides them. The timer that ends the window is not asserted —
+   * card is still there after a close that dropped it, and the closed dialog
+   * hides it. The timer that ends the window is not asserted —
    * `useExitContent`'s own suite owns that.
    */
-  it("keeps the last open title and body rendered after close, for the exit fade", () => {
+  it("keeps the whole last-open card rendered after close, for the exit fade", () => {
     const { rerender } = render(
-      <Popup open title={TITLE} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
+      <Popup
+        card={{ title: TITLE, subtitle: SUBTITLE, width: "narrow", content: <p>body</p> }}
+        onClose={vi.fn()}
+      />,
     );
+    const shell = dialog().firstElementChild!;
 
-    // Exactly what `DisclosureBand` passes once nothing is selected.
-    rerender(<Popup open={false} title="" onClose={vi.fn()} />);
+    // Exactly what every caller passes once nothing is selected.
+    rerender(<Popup card={null} onClose={vi.fn()} />);
 
     expect(dialog()).not.toHaveAttribute("open");
     expect(screen.getByRole("heading", { hidden: true })).toHaveTextContent(TITLE);
+    expect(screen.getByText(SUBTITLE)).toBeInTheDocument();
     expect(screen.getByText("body")).not.toBeVisible();
+    expect(shell).toHaveClass("w-[min(53.75rem,92vw)]");
   });
 
   it("names the dialog with its title", () => {
-    render(
-      <Popup open title={TITLE} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={vi.fn()} />);
 
     expect(dialog()).toHaveAccessibleName(TITLE);
   });
@@ -119,20 +121,14 @@ describe("Popup", () => {
    */
   it("names the dialog with its title AND subtitle when it has one", () => {
     render(
-      <Popup open title={TITLE} subtitle={SUBTITLE} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
+      <Popup card={{ title: TITLE, subtitle: SUBTITLE, content: <p>body</p> }} onClose={vi.fn()} />,
     );
 
     expect(dialog()).toHaveAccessibleName(`${TITLE} ${SUBTITLE}`);
   });
 
   it("renders no subtitle element when none is given", () => {
-    render(
-      <Popup open title={TITLE} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={vi.fn()} />);
 
     expect(screen.queryByText(SUBTITLE)).not.toBeInTheDocument();
     expect(dialog()).toHaveAccessibleName(TITLE);
@@ -153,9 +149,7 @@ describe("Popup", () => {
    */
   it("keeps the subtitle's font-size utility intact", () => {
     render(
-      <Popup open title={TITLE} subtitle={SUBTITLE} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
+      <Popup card={{ title: TITLE, subtitle: SUBTITLE, content: <p>body</p> }} onClose={vi.fn()} />,
     );
 
     expect(screen.getByText(SUBTITLE)).toHaveClass("text-xl", "font-medium");
@@ -176,11 +170,7 @@ describe("Popup", () => {
    */
   it("keeps cased abbreviations out of the band's uppercase, and out of its name", () => {
     const cased = "Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa";
-    render(
-      <Popup open title={cased} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: cased, content: <p>body</p> }} onClose={vi.fn()} />);
 
     const heading = screen.getByRole("heading", { name: cased });
     for (const term of ["FIXa", "FXa"]) {
@@ -191,11 +181,7 @@ describe("Popup", () => {
 
   /** A title with nothing to protect is one text node, and names the card. */
   it("leaves a title with no cased term whole", () => {
-    render(
-      <Popup open title={TITLE} onClose={vi.fn()}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={vi.fn()} />);
 
     expect(screen.getByRole("heading", { name: TITLE })).toHaveTextContent(TITLE);
     expect(dialog()).toHaveAccessibleName(TITLE);
@@ -210,21 +196,21 @@ describe("Popup", () => {
    * beside the base string is exactly the shape that silently ate the old `text-h4`.
    */
   describe("width", () => {
-    /** The card is the layer's only child; the layer itself is always full-size. */
-    const card = () => dialog().firstElementChild!;
+    /**
+     * The card's own element — the layer's only child, the layer itself always
+     * being full-size. Named `shell` rather than `card` since that is now the
+     * prop.
+     */
+    const shell = () => dialog().firstElementChild!;
 
     it.each([
       ["narrow", "w-[min(53.75rem,92vw)]"],
       ["default", "w-[min(71.25rem,92vw)]"],
       ["wide", "w-[min(85rem,96vw)]"],
     ] as const)("draws the %s card", (width, expected) => {
-      render(
-        <Popup open title={TITLE} width={width} onClose={vi.fn()}>
-          <p>body</p>
-        </Popup>,
-      );
+      render(<Popup card={{ title: TITLE, width, content: <p>body</p> }} onClose={vi.fn()} />);
 
-      expect(card()).toHaveClass(expected);
+      expect(shell()).toHaveClass(expected);
     });
 
     /**
@@ -236,13 +222,9 @@ describe("Popup", () => {
      * styling open item 29.
      */
     it("is the default width when the caller says nothing", () => {
-      render(
-        <Popup open title={TITLE} onClose={vi.fn()}>
-          <p>body</p>
-        </Popup>,
-      );
+      render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={vi.fn()} />);
 
-      expect(card()).toHaveClass("w-[min(71.25rem,92vw)]");
+      expect(shell()).toHaveClass("w-[min(71.25rem,92vw)]");
     });
 
     /**
@@ -262,13 +244,9 @@ describe("Popup", () => {
      * dropped from one and not the other is exactly the regression this guards.
      */
     it("floors the band at the ✕'s own height at every step, title centred in it", () => {
-      render(
-        <Popup open title={TITLE} onClose={vi.fn()}>
-          <p>body</p>
-        </Popup>,
-      );
+      render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={vi.fn()} />);
 
-      expect(card().firstElementChild).toHaveClass(
+      expect(shell().firstElementChild).toHaveClass(
         "min-h-11",
         "sm:min-h-14",
         "lg:min-h-16.25",
@@ -283,11 +261,7 @@ describe("Popup", () => {
      * from here would silently ship a 56px button on the 1440 canvas.
      */
     it("ramps the ✕ in step with the band it is centred on", () => {
-      render(
-        <Popup open title={TITLE} onClose={vi.fn()}>
-          <p>body</p>
-        </Popup>,
-      );
+      render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={vi.fn()} />);
 
       expect(screen.getByRole("button", { name: `Close ${TITLE}` })).toHaveClass(
         "size-11",
@@ -299,11 +273,7 @@ describe("Popup", () => {
 
   it("closes on the ✕", async () => {
     const onClose = vi.fn();
-    render(
-      <Popup open title={TITLE} onClose={onClose}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={onClose} />);
 
     // `PopupButton` builds its name as "Close <label>" when open.
     await userEvent.click(screen.getByRole("button", { name: `Close ${TITLE}` }));
@@ -322,11 +292,7 @@ describe("Popup", () => {
    */
   it("routes ESC through onClose and cancels the platform's own close", () => {
     const onClose = vi.fn();
-    render(
-      <Popup open title={TITLE} onClose={onClose}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={onClose} />);
 
     const escaped = fireEvent.keyDown(dialog(), { key: "Escape" });
 
@@ -338,11 +304,7 @@ describe("Popup", () => {
   /** Any other key is none of this component's business. */
   it("ignores keys that are not ESC", () => {
     const onClose = vi.fn();
-    render(
-      <Popup open title={TITLE} onClose={onClose}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={onClose} />);
 
     fireEvent.keyDown(dialog(), { key: "Enter" });
 
@@ -358,11 +320,7 @@ describe("Popup", () => {
    */
   it("routes the platform's cancel (ESC) through onClose without self-closing", () => {
     const onClose = vi.fn();
-    render(
-      <Popup open title={TITLE} onClose={onClose}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={onClose} />);
 
     const cancel = new Event("cancel", { cancelable: true, bubbles: true });
     fireEvent(dialog(), cancel);
@@ -374,11 +332,7 @@ describe("Popup", () => {
 
   it("closes on a backdrop click", async () => {
     const onClose = vi.fn();
-    render(
-      <Popup open title={TITLE} onClose={onClose}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={onClose} />);
 
     await userEvent.click(dialog());
 
@@ -387,11 +341,7 @@ describe("Popup", () => {
 
   it("ignores a click inside the card", async () => {
     const onClose = vi.fn();
-    render(
-      <Popup open title={TITLE} onClose={onClose}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={onClose} />);
 
     await userEvent.click(screen.getByText("body"));
 
@@ -405,11 +355,7 @@ describe("Popup", () => {
    */
   it("ignores a drag that starts inside the card and ends on the backdrop", () => {
     const onClose = vi.fn();
-    render(
-      <Popup open title={TITLE} onClose={onClose}>
-        <p>body</p>
-      </Popup>,
-    );
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={onClose} />);
 
     fireEvent.mouseDown(screen.getByText("body"));
     fireEvent.mouseUp(dialog());
@@ -424,9 +370,10 @@ describe("Popup", () => {
       return (
         <>
           <button onClick={() => setOpen((previous) => !previous)}>toggle</button>
-          <Popup open={open} title={TITLE} onClose={() => setOpen(false)}>
-            <p>body</p>
-          </Popup>
+          <Popup
+            card={open ? { title: TITLE, content: <p>body</p> } : null}
+            onClose={() => setOpen(false)}
+          />
         </>
       );
     }

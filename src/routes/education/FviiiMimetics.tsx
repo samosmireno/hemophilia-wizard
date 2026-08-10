@@ -186,29 +186,37 @@ export default function FviiiMimetics() {
         </EmergingPanel>
       </div>
 
-      <Popup open={openId === "emicizumab"} title={CARD_TITLE} onClose={() => setOpenId(null)}>
-        {openId === "emicizumab" && <EmicizumabCard />}
-      </Popup>
+      {/* Four `Popup`s rather than one keyed off `openId`, which is what the
+          payload would now allow: `FviiiMimetics.test.tsx` addresses dialogs by
+          position (`dialogs()[2]`, `[3]`) and its helpers spell out how many
+          empty ones precede each open card. Collapsing these is its own change,
+          with that test rewrite as its own diff. */}
+      <Popup
+        card={openId === "emicizumab" ? { title: CARD_TITLE, content: <EmicizumabCard /> } : null}
+        onClose={() => setOpenId(null)}
+      />
 
       {/* The one card in this chapter off `default`: the densest of the four, and
           `wide` spends the extra width entirely on its left column. */}
       <Popup
-        open={openId === "denecimig"}
-        title={DENECIMIG_CARD_TITLE}
-        width="wide"
+        card={
+          openId === "denecimig"
+            ? { title: DENECIMIG_CARD_TITLE, width: "wide", content: <DenecimigCard /> }
+            : null
+        }
         onClose={() => setOpenId(null)}
-      >
-        {openId === "denecimig" && <DenecimigCard />}
-      </Popup>
+      />
 
       {/* The caption const, not `nxt007-overview.title` — see `NXT007`. */}
-      <Popup open={openId === "nxt007"} title={NXT007} onClose={() => setOpenId(null)}>
-        {openId === "nxt007" && <Nxt007Card />}
-      </Popup>
+      <Popup
+        card={openId === "nxt007" ? { title: NXT007, content: <Nxt007Card /> } : null}
+        onClose={() => setOpenId(null)}
+      />
 
-      <Popup open={openId === "inno8"} title={INNO8_OVERVIEW.title} onClose={() => setOpenId(null)}>
-        {openId === "inno8" && <Inno8Card />}
-      </Popup>
+      <Popup
+        card={openId === "inno8" ? { title: INNO8_OVERVIEW.title, content: <Inno8Card /> } : null}
+        onClose={() => setOpenId(null)}
+      />
     </section>
   );
 }

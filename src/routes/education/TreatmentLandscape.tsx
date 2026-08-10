@@ -106,15 +106,22 @@ export default function TreatmentLandscape() {
         ))}
       </div>
 
+      {/* `width` travels with the card rather than beside it: it is held through
+          the exit fade with the rest, where it used to revert on close and snap
+          the `narrow` NFT card 280px wider for the length of its own fade. */}
       <Popup
-        open={open?.content !== undefined}
-        title={open?.title ?? open?.label ?? ""}
-        subtitle={open?.subtitle}
-        width={open?.width}
+        card={
+          open?.content
+            ? {
+                title: open.title ?? open.label,
+                subtitle: open.subtitle,
+                width: open.width,
+                content: open.content,
+              }
+            : null
+        }
         onClose={() => setOpenIndex(null)}
-      >
-        {open?.content}
-      </Popup>
+      />
     </section>
   );
 }

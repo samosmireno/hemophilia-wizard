@@ -3,7 +3,7 @@ import { Button, NavArrowButton, PopupButton } from "mlg-components";
 
 import mechanismUrl from "../../assets/images/hemostatic_mechanisms_diagram.webp";
 import BulletList from "../../components/BulletList";
-import Popup from "../../components/Popup";
+import Popup, { type PopupCard } from "../../components/Popup";
 import PopupFigure from "../../components/PopupFigure";
 import {
   type RebalancingMechanism,
@@ -57,7 +57,7 @@ type Step = "prose" | "figure";
 export default function RebalancingAgents() {
   const [step, setStep] = useState<Step | null>(null);
 
-  const CARDS: Record<Step, { title: string; content: ReactNode }> = {
+  const CARDS: Record<Step, PopupCard> = {
     prose: {
       title: MECHANISMS.title,
       content: <MechanismsCard onViewMechanism={() => setStep("figure")} />,
@@ -134,9 +134,7 @@ export default function RebalancingAgents() {
         </div>
       </div>
 
-      <Popup open={card !== undefined} title={card?.title ?? ""} onClose={() => setStep(null)}>
-        {card?.content}
-      </Popup>
+      <Popup card={card ?? null} onClose={() => setStep(null)} />
     </section>
   );
 }

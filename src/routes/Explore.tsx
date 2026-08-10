@@ -65,16 +65,22 @@ export default function Explore() {
       <DrugSheetPopup agent={openAgent} onClose={() => setOpenAgent(null)} />
 
       <Popup
-        open={tableOpen}
-        title={EXPLORE_TABLE_TITLE}
-        width="wide"
+        card={
+          tableOpen
+            ? {
+                title: EXPLORE_TABLE_TITLE,
+                width: "wide",
+                // The filters and the nine-column grid are issue 09's remaining scope.
+                content: (
+                  <p className="py-6 text-center text-xl leading-[1.6] text-black">
+                    The filterable comparison table is not built yet.
+                  </p>
+                ),
+              }
+            : null
+        }
         onClose={() => setTableOpen(false)}
-      >
-        {/* The filters and the nine-column grid are issue 09's remaining scope. */}
-        <p className="py-6 text-center text-xl leading-[1.6] text-black">
-          The filterable comparison table is not built yet.
-        </p>
-      </Popup>
+      />
     </section>
   );
 }

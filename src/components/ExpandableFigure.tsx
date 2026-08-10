@@ -83,9 +83,11 @@ export default function ExpandableFigure({
           {children}
         </Lightbox>
       ) : (
-        <Popup open={open} title={title} surface={surface} onClose={() => setOpen(false)}>
-          {children}
-        </Popup>
+        <Popup
+          card={open ? { title, content: children } : null}
+          surface={surface}
+          onClose={() => setOpen(false)}
+        />
       )}
     </>
   );

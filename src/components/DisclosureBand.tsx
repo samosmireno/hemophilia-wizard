@@ -42,13 +42,12 @@ export default function DisclosureBand({
         ))}
       </ul>
 
+      {/* A disclosure with no content opens nothing — which is now the same
+          statement as "there is no card", rather than a boolean beside a title. */}
       <Popup
-        open={open?.content !== undefined}
-        title={open?.title ?? open?.label ?? ""}
+        card={open?.content ? { title: open.title ?? open.label, content: open.content } : null}
         onClose={() => setOpenIndex(null)}
-      >
-        {open?.content}
-      </Popup>
+      />
     </ArchBand>
   );
 }

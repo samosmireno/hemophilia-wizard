@@ -75,13 +75,20 @@ describe("ExpandableFigure", () => {
     expect(screen.getByRole("img")).toHaveAttribute("src", "/figure.webp");
   });
 
-  /** The default is the design's gradient; white is opt-in, per `Popup`. */
-  it("passes its surface through to the card", () => {
+  /**
+   * The default is the design's gradient; white is opt-in, per `Popup`.
+   *
+   * Opened first, then re-rendered: `Popup` draws no card at all while it is
+   * shut, so there is no shell to read a surface off until something is in it.
+   * The `open` state lives in this component, so it survives the re-render.
+   */
+  it("passes its surface through to the card", async () => {
     const { rerender } = render(
       <ExpandableFigure thumbSrc="/thumb.webp" thumbWidth={940} thumbHeight={538} title={TITLE}>
         <p>body</p>
       </ExpandableFigure>,
     );
+    await userEvent.click(screen.getByRole("button", { name: `Expand ${TITLE}` }));
     expect(dialog().firstElementChild).toHaveClass("bg-popup");
 
     rerender(

@@ -23,86 +23,107 @@ const CARD_WIDTH: Record<PopupWidth, string> = {
   wide: "w-[min(85rem,96vw)]",
 };
 
-export default function Popup({
-  open,
-  title,
-  subtitle,
-  onClose,
-  surface = "gradient",
-  width = "default",
-  children,
-}: {
-  open: boolean;
+/**
+ * Everything the card *is*. One nullable payload rather than an `open` flag
+ * beside the fields it governs: `null` is closed, and there is no title to
+ * invent for a card that is not showing.
+ *
+ * The reason it is one object is the exit fade. `Popup` holds its last open card
+ * rendered for `MODAL_EXIT_MS` after it closes, and that hold used to be a
+ * hand-assembled `{ title, subtitle, children }` — so `width` sat outside it and
+ * a `narrow` card snapped 280px wider for the length of its own fade. A field
+ * added to this record is inside the hold by construction.
+ *
+ * `surface` is **not** here, and is the one thing outside the hold: it is caller
+ * configuration rather than a property of the card, and no caller varies it per
+ * card. A caller that needs to would have to move it in.
+ */
+export interface PopupCard {
   title: string;
   subtitle?: string;
+  width?: PopupWidth;
+  /** Required: a card with nothing in it is `null`, not an empty card. */
+  content: ReactNode;
+}
+
+export default function Popup({
+  card,
+  onClose,
+  surface = "gradient",
+}: {
+  card: PopupCard | null;
   onClose: () => void;
   surface?: "gradient" | "white";
-  width?: PopupWidth;
-  children?: ReactNode;
 }) {
   const titleId = useId();
   const subtitleId = useId();
 
-  const shown = useExitContent(open, { title, subtitle, children }, MODAL_EXIT_MS);
+  const shown = useExitContent(card, MODAL_EXIT_MS);
 
   return (
     <ModalLayer
-      open={open}
+      open={card !== null}
       onClose={onClose}
-      aria-labelledby={shown.subtitle ? `${titleId} ${subtitleId}` : titleId}
+      /* Before the first open there is no heading to point at, so the layer is
+         named directly. It is empty and shut; the name is never announced. */
+      {...(shown
+        ? { "aria-labelledby": shown.subtitle ? `${titleId} ${subtitleId}` : titleId }
+        : { "aria-label": "" })}
     >
-      <div
-        className={cn(
-          "flex max-h-[95dvh] flex-col overflow-hidden rounded-[2.5rem] border-[0.3125rem] border-brand-crimson-50 shadow-popup",
-          CARD_WIDTH[width],
-          surface === "white" ? "bg-white" : "bg-popup",
-        )}
-      >
-        <header className="relative flex min-h-11 shrink-0 flex-col justify-center bg-brand-crimson-50 py-3 sm:min-h-14 lg:min-h-16.25">
-          {/* `aria-label` is required, not belt-and-braces: `preserveCase` splits the
-              title into fragments the accessible-name algorithm would join with spaces. */}
-          <h2
-            id={titleId}
-            aria-label={shown.title}
-            className={cn(
-              BAND_INSET,
-              "text-center font-display text-2xl leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase sm:text-3xl lg:text-5xl",
-            )}
-          >
-            {preserveCase(shown.title)}
-          </h2>
-
-          {shown.subtitle && (
-            <p
-              id={subtitleId}
-              // Same treatment and the same reason as the title above: this line
-              // is `uppercase` too, and it joins the accessible name.
-              aria-label={shown.subtitle}
+      {shown && (
+        <div
+          className={cn(
+            "flex max-h-[95dvh] flex-col overflow-hidden rounded-[2.5rem] border-[0.3125rem] border-brand-crimson-50 shadow-popup",
+            CARD_WIDTH[shown.width ?? "default"],
+            surface === "white" ? "bg-white" : "bg-popup",
+          )}
+        >
+          <header className="relative flex min-h-11 shrink-0 flex-col justify-center bg-brand-crimson-50 py-3 sm:min-h-14 lg:min-h-16.25">
+            {/* `aria-label` is required, not belt-and-braces: `preserveCase` splits the
+                title into fragments the accessible-name algorithm would join with spaces. */}
+            <h2
+              id={titleId}
+              aria-label={shown.title}
               className={cn(
                 BAND_INSET,
-                "mt-1 text-center font-display text-xl font-medium tracking-wide text-white uppercase",
+                "text-center font-display text-2xl leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase sm:text-3xl lg:text-5xl",
               )}
             >
-              {preserveCase(shown.subtitle)}
-            </p>
-          )}
+              {preserveCase(shown.title)}
+            </h2>
 
-          <div className="absolute top-1/2 right-5.5 -translate-y-1/2">
-            <PopupButton
-              label={shown.title}
-              open
-              className={CLOSE_BUTTON_SIZE}
-              onClick={() => onClose()}
-            />
+            {shown.subtitle && (
+              <p
+                id={subtitleId}
+                // Same treatment and the same reason as the title above: this line
+                // is `uppercase` too, and it joins the accessible name.
+                aria-label={shown.subtitle}
+                className={cn(
+                  BAND_INSET,
+                  "mt-1 text-center font-display text-xl font-medium tracking-wide text-white uppercase",
+                )}
+              >
+                {preserveCase(shown.subtitle)}
+              </p>
+            )}
+
+            <div className="absolute top-1/2 right-5.5 -translate-y-1/2">
+              <PopupButton
+                label={shown.title}
+                open
+                className={CLOSE_BUTTON_SIZE}
+                onClick={() => onClose()}
+              />
+            </div>
+          </header>
+
+          {/* `min-h-0` is load-bearing: without it the card grows past
+              `max-h-[95dvh]` and this never scrolls. */}
+          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2 sm:px-8 lg:px-16">
+            {shown.content}
           </div>
-        </header>
-
-        {/* `min-h-0` is load-bearing: without it the card grows past
-            `max-h-[95dvh]` and this never scrolls. */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2 sm:px-8 lg:px-16">
-          {shown.children}
         </div>
-      </div>
+      )}
     </ModalLayer>
   );
 }

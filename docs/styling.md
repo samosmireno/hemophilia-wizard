@@ -390,8 +390,20 @@ untouched, and with the clamps gone any fix is a breakpoint step moving all ten 
 1066 × 645. **A real `<dialog>`, opened with `showModal()`** — the platform supplies the focus trap,
 restoration on close, and the **top layer** (escaping `DisclosureBand`'s `overflow-hidden` clip and
 every z-index). The element is a transparent viewport-filling layer with the card as a child — what
-makes a backdrop click detectable (`::backdrop` is never an event target); `open` is the single
+makes a backdrop click detectable (`::backdrop` is never an event target); openness is the single
 source of truth (`cancel` preventDefaulted, ESC routed through `onClose`); scroll lock is manual.
+
+**The card is one nullable prop, and that is a width fix** (2026-08-10). `Popup` takes
+`card: PopupCard | null` — `title`, `subtitle`, `width`, `content` — where it took an `open`
+boolean beside them. It matters here because the card must stay _rendered_ while it fades
+(`MODAL_EXIT_MS`, 150ms) and callers drop their content on the render that closes: the hold was a
+hand-assembled `{ title, subtitle, children }`, so **`width` sat outside it** and was read live.
+Closing `treatment-landscape`'s `narrow` NFT card therefore snapped it 53.75rem → 71.25rem and
+faded it out **280px too wide**, from the day the width steps landed. Anything that is part of what
+the card _is_ goes in `PopupCard` and is held by construction; `surface` is the one thing outside,
+as caller configuration no card varies — a caller that needs it per-card has to move it in.
+A closed `Popup` now draws no card element at all, where it used to wrap a blank crimson band; the
+`<dialog>` still mounts either way, so nothing that counts or indexes dialogs moved.
 
 Geometry, read off the code (a table transcribed from the design drifts): the `default` width step
 under `max-h-[95dvh]`; `rounded-[2.5rem]` / `border-[0.3125rem]` crimson-50 (drawn 40.417/5.052, rem
