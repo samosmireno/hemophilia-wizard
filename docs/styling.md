@@ -518,8 +518,18 @@ always (ADR 0005). Two raster artboards plus a later **vector export of the band
 for the shadows; it overruled two raster readings (radius 8 not 6, weight 600 not 700).
 
 **State is carried by ground and shadow both.** Open samples `crimson-50`, closed `lagoon-25` —
-exact, shipped as `--color-note-open`/`-closed` (one design fact, one home). No chevron, faithfully:
-`aria-expanded`, the open panel and the shadow carry it non-chromatically. The grammar: **open reads
+exact, shipped as `--color-note-open`/`-closed` (one design fact, one home). The export draws no
+chevron; shipped anyway (2026-08-11, deliberate usability deviation): the closed header alone gets a
+chevron-down — inline SVG in `ExpandableFigure`'s stroke idiom (`currentColor`, round caps, 2.5
+weight at `viewBox` 24), `size-5 lg:size-6`, absolutely pinned `right-4` so the centred title never
+moves. The header's inset widened `px-4` → `px-11 lg:px-12` (symmetric, so centring holds) to
+reserve the glyph's lane — measured, not guessed: at `px-4` the 62-character treatment-burden title
+ran 20px under the chevron at 768. `currentColor` means the hover lift to `#bff5ff` is inherited,
+not restyled. It fades out
+over the button's 120ms ease-out step as the header opens — the open header shows **nothing**: a
+chevron (or a `+`/`−` pair) there would promise a collapse ADR 0005 forbids, and `+` already means
+"opens a modal" on this same page (`PopupButton`). State stays non-chromatic besides it:
+`aria-expanded`, the open panel and the shadow carry it as before. The grammar: **open reads
 pressed in** (dark inset + a 1px rim riding inside the shadow — the outline is spent on the focus
 ring), **closed reads lifted** (white inset). The export's fractional values are one ~1.064 scale
 factor, rounded; it also emits two competing `shadow-[…]` classes and contradictory fonts — only

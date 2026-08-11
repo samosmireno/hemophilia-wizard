@@ -108,7 +108,9 @@ function NoteDisclosure({
             if (!open) onOpen();
           }}
           className={cn(
-            "flex min-h-11 w-full items-center justify-center rounded-lg px-4",
+            /* The inset clears the pinned chevron (right-4 + size-5/6 + a gap),
+               symmetrically, so the centred title can never run under it. */
+            "relative flex min-h-11 w-full items-center justify-center rounded-lg px-11 lg:px-12",
             "text-center text-xl font-semibold text-white lg:text-2xl",
             "transition-[background-color,box-shadow,color] duration-120 ease-out",
             open
@@ -123,6 +125,26 @@ function NoteDisclosure({
           )}
         >
           {block.title}
+          {/* Chevron only while closed — the open header can't collapse, so it
+              makes no expand/collapse promise. Deviation from the export's
+              "no chevron" is recorded in docs/styling.md §15. */}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            data-testid="note-chevron"
+            className={cn(
+              "absolute top-1/2 right-4 size-5 -translate-y-1/2 lg:size-6",
+              "transition-[opacity] duration-120 ease-out",
+              open ? "opacity-0" : "opacity-100",
+            )}
+          >
+            <path d="M6 9.5L12 15.5L18 9.5" />
+          </svg>
         </button>
       </h2>
 

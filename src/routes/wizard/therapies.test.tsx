@@ -160,6 +160,31 @@ describe("wizard therapies — the one-open accordion", () => {
     expect(strategies).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("shows the expand chevron on the closed header only", async () => {
+    const user = userEvent.setup();
+    const region = renderTherapies("B", true, "bleeding-control");
+    const [considerations, strategies] = headers(region);
+
+    /*
+      The chevron is decoration over state `aria-expanded` already carries, so it
+      is `aria-hidden` on both headers and leaves by opacity rather than unmount
+      (it fades out with the button's own 120ms transition). Classes, not
+      computed style, for the §15-recorded jsdom reason: what is pinned is that
+      the glyph tracks `open`, and that the OPEN header offers no
+      expand-me — docs/styling.md §15's deliberate deviation.
+    */
+    const chevron = (header: HTMLElement) => header.querySelector("[data-testid=note-chevron]")!;
+
+    expect(chevron(considerations)).toHaveAttribute("aria-hidden", "true");
+    expect(chevron(considerations)).toHaveClass("opacity-0");
+    expect(chevron(strategies)).toHaveClass("opacity-100");
+
+    await user.click(strategies);
+
+    expect(chevron(strategies)).toHaveClass("opacity-0");
+    expect(chevron(considerations)).toHaveClass("opacity-100");
+  });
+
   it("hides the closed panel from assistive tech", async () => {
     const user = userEvent.setup();
     const region = renderTherapies("B", true, "bleeding-control");
