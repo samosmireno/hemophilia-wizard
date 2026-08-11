@@ -42,7 +42,8 @@ npm run upgrade       # bump every dep to latest, then reinstall
 - **ESLint 10** flat config + typescript-eslint + react-hooks + react-refresh
 - **Prettier 3** + `prettier-plugin-tailwindcss` (aware of `cn`/`clsx`/`twMerge`)
 - **Vitest 3** — jsdom, Testing Library, `jest-dom` matchers; example test in `src/App.test.tsx`
-- **Analytics (optional)** — `react-ga4`, initialized only when `VITE_GA_MEASUREMENT_ID` is set (see `.env.example`)
+- **Analytics (optional)** — `react-ga4` behind `src/lib/analytics.ts`; production builds only,
+  and only when `VITE_GA_MEASUREMENT_ID` is set in the host's env (see [`docs/analytics.md`](docs/analytics.md))
 - **Vercel** SPA-rewrite config (`vercel.json`)
 
 ## Deploying

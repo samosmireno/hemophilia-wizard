@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 
 import OptionGroup, { type Option } from "../components/OptionGroup";
 import PageSection from "../components/PageSection";
+import { trackWizardSubmit } from "../lib/analytics";
 import { cn } from "../lib/cn";
 import { nextOf } from "../data/sectionOrder";
 import {
@@ -14,7 +15,7 @@ import {
   type SwitchReason,
   type WizardHemophiliaType,
 } from "../data/wizard";
-import { useWizardAnswers } from "../state/wizardAnswers";
+import { isComplete, useWizardAnswers } from "../state/wizardAnswers";
 
 const INHIBITOR_OPTIONS: Option<"yes" | "no">[] = [
   { id: "yes", label: "Yes" },
@@ -41,7 +42,10 @@ export default function Wizard() {
         className="mt-20"
         onSubmit={(event) => {
           event.preventDefault();
-          if (complete) void navigate(next);
+          // The type guard, not `complete` — the tracker needs the narrowing.
+          if (!isComplete(answers)) return;
+          trackWizardSubmit(answers);
+          void navigate(next);
         }}
       >
         <OptionGroup

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PopupButton } from "mlg-components";
 
 import ArchBand from "../../components/ArchBand";
@@ -7,13 +7,20 @@ import DrugSheetPopup from "../../components/DrugSheetPopup";
 import NoteDisclosure from "../../components/NoteDisclosure";
 import PageSection from "../../components/PageSection";
 import { leafFor, type NoteBlock } from "../../data/wizard";
+import { trackRecommendationReached } from "../../lib/analytics";
 import { cn } from "../../lib/cn";
 import { useCompleteWizardAnswers } from "../../state/wizardAnswers";
 
 type BlockId = "considerations" | "strategies";
 
 export default function Therapies() {
-  const leaf = leafFor(useCompleteWizardAnswers());
+  const { type, hasInhibitors, reason } = useCompleteWizardAnswers();
+  const leaf = leafFor({ type, hasInhibitors, reason });
+
+  // The funnel's terminal event: this page showing a leaf IS the recommendation.
+  useEffect(() => {
+    trackRecommendationReached({ type, hasInhibitors, reason });
+  }, [type, hasInhibitors, reason]);
 
   const [open, setOpen] = useState<BlockId>("considerations");
 

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 
 import PageSection from "../components/PageSection";
 import { SURVEY_QUESTIONS, type SurveyQuestionId, type SurveyResponses } from "../data/survey";
+import { trackSurveySubmit } from "../lib/analytics";
 import { submitSurvey } from "../lib/submitSurvey";
 
 /**
@@ -56,6 +57,9 @@ export default function Survey() {
             // Optimistic on purpose: the adapter's eventual `no-cors` POST is
             // unreadable, so there is no failure to wait for (issue 13).
             void submitSurvey(answers as SurveyResponses);
+            // Same optimism, and the only submission signal anywhere — the
+            // Form's opaque response means GA alone records that these happen.
+            trackSurveySubmit();
             sessionStorage.setItem(SUBMITTED_KEY, "true");
             setSubmitted(true);
           }}

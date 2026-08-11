@@ -1,9 +1,18 @@
-import { Outlet } from "react-router";
+import { useEffect } from "react";
+import { Outlet, useLocation } from "react-router";
 
+import { trackPageview } from "../lib/analytics";
 import { WizardAnswersProvider } from "../state/WizardAnswersProvider";
 import AppSidebar from "./AppSidebar";
 
 export default function AppShell() {
+  // Every route renders under this shell, so this is the one pageview hook the
+  // SPA needs. `pathname`, never the full location — no query params leave.
+  const { pathname } = useLocation();
+  useEffect(() => {
+    trackPageview(pathname);
+  }, [pathname]);
+
   return (
     <WizardAnswersProvider>
       <div
