@@ -66,9 +66,9 @@ describe("router", () => {
     expect(document.querySelectorAll("li")).toHaveLength(18);
   });
 
-  // `/survey` is still a stub; `/glossary` and `/acronyms` are built and keep
-  // their place here because the assertion — this path reaches this heading —
-  // is a routing fact either way.
+  // All three are built pages; the assertion here is only the routing fact —
+  // this path reaches this heading. Each page's behaviour lives in its own
+  // test (`survey.test.tsx` covers the form).
   it.each([
     ["/survey", /Survey/],
     ["/glossary", /Glossary/],

@@ -1,8 +1,13 @@
+export type SurveyQuestionId = "q1" | "q2" | "q3";
+
 export interface SurveyQuestion {
-  id: string;
+  id: SurveyQuestionId;
   prompt: string;
   options: string[];
 }
+
+/** One answer per question, the option label verbatim — what `submitSurvey` carries. */
+export type SurveyResponses = Record<SurveyQuestionId, string>;
 
 const LIKERT = ["Strongly agree", "Agree", "Neutral", "Disagree", "Strongly disagree"];
 

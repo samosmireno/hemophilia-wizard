@@ -1009,3 +1009,44 @@ wraps every note to three lines and pushes the board ~38px past the 800 line; `t
 every width is what buys the fit, measured, not guessed. The one-screen rule (§9 item 10) must
 hold across the whole `xl` band, 1280 through 1440 — verified in Chromium at 390 / 768 / 1152 /
 1280 / 1440, all with no sideways scroll and the board at exactly 800 from 1280 up.
+
+## 27. `/survey` — the outcomes form
+
+Built 2026-08-11 (issue 13). **No artboard exists** — like §22–§25, gate 2 delivered palette and
+typography only, so every value below is invented within the palette and a later export overrules
+it wholesale.
+
+**On the spine**, the last section — Prev comes from `AppSidebar`, there is no Next, and the route
+carries no navigation of its own. Standard §11 chapter `<h1>` via `PageSection`, `padsOwnBottom`.
+
+**Classic radios, not `OptionGroup`** (2026-08-11, user: "small rounded classic radio buttons like
+in online questionnaires, styled according to our palette"). The three §10 questions render as
+stacked fieldsets of native radio inputs, `size-4` and tinted through `accent-brand-teal-50` —
+`accent-color` keeps the UA's drawn geometry (the "classic" part) while landing the check on the
+primary. Issue 03's `LikertScale` primitive is therefore moot and was never built. Prompt ramp
+`text-lg font-bold lg:text-xl` — under §25's `<h2>`, since these are questions inside one page,
+not section headings; options `text-base lg:text-lg`; the form runs the full content column
+(`max-w-none`).
+
+**Every string except the questions is unsourced.** `CONTEXT.md` §10 supplies the three prompts
+and their options verbatim; the title ("Survey"), the button ("Submit"), the error ("Please select
+an answer.") and the thank-you ("Thank you — your response has been submitted.") are authored here
+— a client copy pass overrules any of them.
+
+**Validation is inline, not `disabled`.** Submit stays enabled; a click with gaps marks each
+unanswered fieldset with a crimson line (`text-brand-crimson-50`, wired to the group by
+`aria-describedby`) that clears the moment that question is answered. A disabled button that
+cannot say why was rejected as the worse a11y pattern.
+
+**Submit is the package `Button` in its resting §4.2 crimson skin, on the wizard submit's size
+ramp** (`px-6 leading-5 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl`, §14) — the package
+default is a fixed 26px/`px-16` at every width, so the ramp is what makes the button step with
+the page; only the colours stay unoverridden, the wizard's lagoon recolour (§14) being that
+screen's own. Right-aligned at the end of the column, where the wizard also puts its submit.
+
+**The confirmation is optimistic, and the submitted flag is per-tab.** `submitSurvey`
+(`src/lib/submitSurvey.ts`, issue 06's seam — wired 2026-08-11 to the live Google Form, whose
+linked Sheet the client reads) POSTs `no-cors`, so success is unreadable by design and the inline
+thank-you asserts handoff, not delivery. The flag lives in `sessionStorage`: a refresh in the tab
+keeps the thank-you, a new tab gets a fresh survey — deliberately unlike the wizard answers'
+in-memory scope (ADR 0003), so a reload cannot double-count a response.

@@ -19,5 +19,6 @@ screen-reader labelled, with Vitest coverage.
 ## Remaining
 
 - `FilterSelect` — the three comparison-table dropdowns; needed by issue 09.
-- `LikertScale` — survey questions; needed by issue 13.
+- ~~`LikertScale`~~ — **mooted 2026-08-11**: issue 13 shipped classic native radios by user
+  decision; no primitive needed.
 - `Tabs` — **mooted** by design changes (no artboard uses tabs).

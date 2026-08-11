@@ -45,14 +45,14 @@ to `/`.
 | 01  | 0     | Router + app shell / navigation                   | done                       |
 | 02  | 0     | Semantic design-token scaffold                    | decide: rewrite or wontfix |
 | 03  | 0     | Headless component primitives                     | in-progress                |
-| 06  | 0     | Survey submission adapter seam + stub             | ready-for-agent            |
+| 06  | 0     | Survey submission adapter seam + stub             | done — Form wiring pending |
 | 07  | 0     | Analytics: per-route pageviews                    | ready-for-agent            |
 | 08  | 1     | Wizard section                                    | done except reset          |
 | 09  | 1     | Explore comparison table                          | in-progress                |
 | 10  | 1     | Drug info sheets                                  | in-progress                |
 | 11  | 1     | Education blocks                                  | done except residues       |
 | 12  | 1     | Resources / References / Glossary / Acronyms      | done                       |
-| 13  | 1     | Survey UI                                         | ready-for-human            |
+| 13  | 1     | Survey UI                                         | done                       |
 | 17  | 1     | Landing page (`/`)                                | done                       |
 | 18  | 1     | Navigation sidebar                                | done                       |
 | 19  | 4     | Landing background video                          | done                       |
