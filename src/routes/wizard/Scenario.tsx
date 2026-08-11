@@ -6,7 +6,6 @@ import AgentBoxButton from "../../components/AgentBoxButton";
 import BulletList from "../../components/BulletList";
 import PageSection from "../../components/PageSection";
 import { classesFor } from "../../data/wizard";
-import { cn } from "../../lib/cn";
 import { formatInline } from "../../lib/formatInline";
 import { useCompleteWizardAnswers } from "../../state/wizardAnswers";
 
@@ -40,8 +39,6 @@ const BOX_ART: ReadonlyMap<string, BoxArt> = new Map([
 
 export default function Scenario() {
   const screen = classesFor(useCompleteWizardAnswers());
-
-  const captionBelow = screen.classes.length === 1;
 
   const caption = (
     <p className="text-center text-xl font-bold text-popup-caption uppercase lg:text-2xl">
@@ -84,7 +81,9 @@ export default function Scenario() {
         <p className="mt-8 text-xl text-black lg:text-2xl">{formatInline(screen.caveat)}</p>
       )}
 
-      <div className={cn("mt-40 flex flex-col gap-8", captionBelow && "flex-col-reverse")}>
+      {/* Painted boxes-then-caption via `flex-col-reverse`: source order stays
+          caption-then-boxes so the caption is read before what it describes. */}
+      <div className="mt-40 flex flex-col-reverse gap-8">
         {caption}
         {boxes}
       </div>

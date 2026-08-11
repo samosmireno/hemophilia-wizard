@@ -156,7 +156,9 @@ export interface ClassesToConsider {
   caveat?: string;
 }
 
-const BOXES_CAPTION = "Click on the boxes below to learn more about each type of therapy";
+// "above", where the export says "below": the caption paints under the boxes
+// on every screen, so the export's direction word points the wrong way.
+const BOXES_CAPTION = "Click on the boxes above to learn more about each type of therapy";
 
 /**
  * Double spaces in the exports are NOT transcribed — "for  prophylaxis" and

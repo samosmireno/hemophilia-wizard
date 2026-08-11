@@ -121,20 +121,16 @@ describe("wizard scenario — the illustration boxes", () => {
   });
 
   /**
-   * The layout fact this page derives rather than reads. Asserted through the
-   * class that flips, because the DOM order deliberately does NOT change: source
-   * order stays caption-then-boxes on all four screens so the caption is read
-   * before what it describes, and only the painting reverses.
+   * Asserted through the reversing class because the DOM order deliberately
+   * does NOT change: source order stays caption-then-boxes on all four screens
+   * so the caption is read before what it describes, and only the painting
+   * reverses.
    */
-  it.each(BRANCHES)(
-    "paints the caption below the boxes only when there is one, %s/%s",
-    (type, inh) => {
-      const region = renderScenario(type, inh);
-      const single = classesFor({ type, hasInhibitors: inh }).classes.length === 1;
+  it.each(BRANCHES)("paints the caption below the boxes, %s/%s", (type, inh) => {
+    const region = renderScenario(type, inh);
 
-      expect(region.querySelector(".flex-col-reverse") !== null).toBe(single);
-    },
-  );
+    expect(region.querySelector(".flex-col-reverse")).not.toBeNull();
+  });
 
   /**
    * The 2026-08-04 responsive pass ramped the **gap** and left the boxes alone —
