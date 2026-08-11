@@ -9,7 +9,12 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-10 (the unbuilt eligibility engine deleted from `treatments.ts` — it had
+- **Last reviewed:** 2026-08-11 (the §5 comparison table built at last — §5.2 turns its open
+  question into the exact-cell-match ruling (provisional, **flagged for the client gate**) and
+  records the class dropdown's four drawn-label buckets, with "UHL clotting factor replacement"
+  covering SHL/EHL per the client's own S4 saved view (`EXPLORE_CLASS_FILTERS`,
+  `src/data/explore.ts`); the table's agent cells deliberately open no sheet); previously
+  2026-08-10 (the unbuilt eligibility engine deleted from `treatments.ts` — it had
   zero callers and zero tests since the first data pass and modelled patient eligibility where the
   artboard specifies column filters, so §5.2 becomes the record of a specified-but-unbuilt design
   and keeps the age-parse rule; the canonical `TREATMENT_CLASSES` enum went with it, leaving
@@ -239,7 +244,7 @@ therapy"_ and links to the class-level education pop-ups. Encoded in `[BUILD]` `
 → the private `CLASSES_TO_CONSIDER[scenario]`, reached through `classesFor({ type, hasInhibitors })`
 (verbatim labels — transcribed rather than derived, since the source phrases the same class
 differently per scenario; `treatments.ts` carried a canonical `TreatmentClass` enum until
-2026-08-10 and these labels never matched it, which is [§5.2](#52-filter-logic--specified-not-built-build)'s
+2026-08-10 and these labels never matched it, which is [§5.2](#52-filter-logic-build)'s
 account of why it went).
 
 > **The four scenario screens carry copy the blueprint has no equivalent of `[BUILD]`.** Each
@@ -392,9 +397,11 @@ Indicated with inhibitors (Yes / No). "A + B" means eligible for both.
 > **The table is a pop-up, not a page `[BUILD]`.** Issue 09 specified `/explore` as the table
 > itself; the `/explore` artboard makes that route the [§9](#9-references--resources) SDM
 > conclusion node and launches the table from a button on it. Rationale in
-> `docs/adr/0007-explore-is-the-sdm-conclusion.md`. **The card is built and its body is not** —
-> the filters and the grid are still issue 09's scope, and `Popup` needs a wide variant or an
-> inner scroll region before nine columns will fit (docs/styling.md open item 27).
+> `docs/adr/0007-explore-is-the-sdm-conclusion.md`. **The card and its table are both built**
+> (2026-08-11) — three dropdown column filters over all nine S1 columns, scrolling horizontally
+> inside the wide `Popup` (docs/styling.md item 27, closed). The filter semantics are
+> [§5.2](#52-filter-logic-build)'s. The table's agent cells deliberately open nothing — the
+> sheets are indexed on the page beneath, and SHL/EHL have no sheet to open.
 >
 > **The same page indexes the [§6](#6-drug-information-sheets) sheets by class `[BUILD]`.** Below
 > the SDM copy the artboard draws three arched segments holding all seven agents that have a
@@ -405,7 +412,7 @@ Indicated with inhibitors (Yes / No). "A + B" means eligible for both.
 > singular; "UHL" is a half-life it had no term for), so they are transcribed rather than derived —
 > the same call `CLASSES_TO_CONSIDER` records. **They are now the app's only class vocabulary**,
 > which is why the enum went with the unbuilt filter engine
-> ([§5.2](#52-filter-logic--specified-not-built-build)) and why they are the natural source for the
+> ([§5.2](#52-filter-logic-build)) and why they are the natural source for the
 > comparison table's class dropdown. Encoded as `src/data/explore.ts` → `EXPLORE_SEGMENTS`. The two
 > generic SHL/EHL rows are **not** drawn, consistent with their having no sheet by design.
 
@@ -445,7 +452,7 @@ every one of these fields renders as-is in the [§5](#5-explore-therapy-options-
 comparison table — so the padding was a rendering defect waiting on a caller. `treatments.test.ts`
 pins the absence. (The one reader that would have been indifferent to it, `classOf()`, lowercased
 and substring-matched; it went with the filter engine on 2026-08-10 —
-[§5.2](#52-filter-logic--specified-not-built-build).)
+[§5.2](#52-filter-logic-build).)
 
 `[BUILD]` **the app writes `mAb` where this table and [§6](#6-drug-information-sheets) write `mAB`**
 (2026-08-06). `[PDF-V]` sets the trailing B capital in both places, against its own
@@ -458,7 +465,7 @@ strategy bullet, `drug-sheets.ts`'s two Class/Target lines, and `education.ts`'s
 drawn**: their job is to record what the source says so it can be re-verified, which is the one
 thing a silent correction would destroy.
 
-### 5.2 Filter logic — specified, not built `[BUILD]`
+### 5.2 Filter logic `[BUILD]`
 
 **The eligibility engine was deleted 2026-08-10.** `src/data/treatments.ts` carried
 `evaluateTreatments(criteria)` / `filterTreatments(criteria)` plus `typesServed`, `minAge`,
@@ -480,14 +487,28 @@ labels from the artboard (§5, `EXPLORE_SEGMENTS`) and three of the four disagre
 enum, so the app's only class vocabulary is the drawn one. What survives in `treatments.ts` is
 the roster, its shape, and `treatmentFor()` (§6).
 
-**The rules are recorded here rather than in code**, since issue 09 still has to decide them:
+**Built 2026-08-11** (`src/components/ExploreTable.tsx`): three AND-combined **column filters**
+over `TREATMENTS`, each defaulting to All, resetting when the card closes. The rules:
 
-- Age parse, as it was implemented: `0+→0, 6+→6, 12+→12, Adults→18, "TBD (…>1 year…)"→1
-(provisional)`. Read off the verbatim `age` column.
-- Per-class filtering reproduces the S2–S5 per-class tabs, which is what those sheets are.
-- **Open question for issue 09:** does picking "A" mean the three rows whose cell reads `A`, or
-  the eight that serve A? §5 above glosses "A + B" as _"eligible for both"_, which leans to the
-  second reading and makes the three options overlap rather than partition. Undecided.
+- **Hemophilia Type filters by exact cell match — decided provisionally, flagged for the client
+  gate.** Picking "A" shows the three rows whose cell reads `A`, not the eight that serve A; the
+  three options partition 3/1/5. The rejected alternative (the "serves A" reading §5's _"eligible
+  for both"_ gloss leans toward) is a one-line predicate swap if the client overrules — the
+  dropdown options are the same either way. Decided 2026-08-11 over guessing or blocking.
+  **The third option is glossed** — the dropdown shows _"A + B (eligible for both)"_ (same-day
+  user direction: the bare cell value read as a second All, when it is five rows against All's
+  nine); the value underneath and the table's cells stay the verbatim `A + B`.
+- **The class dropdown's options are the four drawn labels** (`EXPLORE_CLASS_FILTERS`,
+  `src/data/explore.ts`), each bucketing the S1 class cells it covers — with **"UHL clotting
+  factor replacement" covering all three factor rows**, SHL and EHL included, though the drawn
+  sheet index omits them. That reproduces the client's own S4 saved view and keeps every row
+  reachable; per-class filtering reproducing the S2–S5 tabs is what those sheets are.
+- Indicated with inhibitors: exact cell match, Yes / No.
+- An impossible combination (e.g. Gene therapy + Type A) shows an empty state — "No treatments
+  match the selected filters." with a Clear-filters recovery — not per-row explanations.
+- Age parse, preserved in case an age filter is ever drawn: `0+→0, 6+→6, 12+→12, Adults→18,
+"TBD (…>1 year…)"→1 (provisional)`. Read off the verbatim `age` column. No age dropdown is
+  drawn or built.
 
 ---
 

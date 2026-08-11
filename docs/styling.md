@@ -235,7 +235,7 @@ unblocks it (designer / browser / code), and where it bites.
 | 24  | The seven drug-sheet exports disagree only on the space **above** a section label (29–56px; everything else is 26 ± 1 / 33 ± 1 across 35 sections). Shipped uniform at the median (`mt-3`). Designer, same shape as 22.                                                                                                                                                                                                                                              | §16                   |
 | 25  | Drug-sheet horizontal inset: the `lg` step is 64px where five of seven exports draw 49 (two draw 64). Not split — the card is shared with the §7.5 chapters. Designer, with items 9 and 13.                                                                                                                                                                                                                                                                          | §16, §13              |
 | 26  | `/explore` class-label tracking fits 0.036em — on no step; ships `tracking-wide` (0.025em). One tracking rule across display headings beat a bespoke value. Designer to confirm.                                                                                                                                                                                                                                                                                     | §17                   |
-| 27  | Half closed. `Popup`'s `wide` step (1360px — **a picked number, no artboard**; the designer may overrule it) un-binds the nine-column table (~136px a column). What remains is the horizontal scroll region the grid needs inside the card on a phone (issue 09's own criterion) — now a precedent, not a one-off, since `SeverityTable` takes the same answer (§11). Designer/code.                                                                                 | §13, §17, ADR 0007    |
+| 27  | Closed 2026-08-11. `Popup`'s `wide` step (1360px — **a picked number, no artboard**; the designer may still overrule it) un-binds the nine-column table (~136px a column), and the grid now ships its scroll region: `overflow-x-auto` + a `min-w-240` floor inside the card, the `SeverityTable`/Table 1 answer (§11, §17). Nothing remains but the designer's option to redraw.                                                                                    | §13, §17, ADR 0007    |
 | 28  | Closed 2026-08-04, in code — title 36 → drawn 45.47 and band `py-5` → drawn `py-3`; the two errors had cancelled for eleven months. The band gained a `min-h` floor = the ✕'s own height (not a design value). Verified on twenty cards.                                                                                                                                                                                                                             | §13                   |
 | 29  | `narrow` 860 and `default` 1140 are undrawn (both moved 2026-08-04). Consequence: `hemostatic_mechanisms_diagram.webp` is stored 1772px for the old 886px body and now paints ~13% past stored width. Re-export at 2004 or return the default to 1024. Designer.                                                                                                                                                                                                     | §13, §7.6             |
 | 30  | **Browser coverage.** The §2 migration verified all ten routes at **1440 and 375 only**. Since then `/wizard/therapies` was measured at **320/375/640/768/1024/1280/1440** (112 renders, §15) and `/explore` at the same seven (§17); 1024 and 768 behaved in both. **320 is where the app's one measured horizontal overflow was found. Eight routes have never rendered at 320, and `/wizard/scenario` has never been opened in a browser at any width.** Browser. | §2, §12, §15, §17     |
@@ -603,6 +603,20 @@ only (item 50 holds `h-20` v the drawn ~100). **`preserveCase` + the flex whites
 container makes the returned span and text node anonymous items and drops the space between them —
 centring lives on a wrapper; `px-4` sits on the inner row, not the flex item (padding on a `basis-0`
 item floors its basis); `xl:px-0`.
+
+**The table card** (issue 09, built 2026-08-11 — **no artboard**, every number below is picked, the
+designer may overrule any of them): the wide `Popup`'s body is a filter bar (three `FilterSelect`s —
+native `<select>`s by decision; the open list is OS-drawn and deliberately unstyled) over the
+nine-column grid. The grid **scrolls rather than reflows** (`overflow-auto` + `min-w-240`,
+closing item 27): the floor is arithmetic — nine columns at Table 1's ~107px/column reading floor,
+item 36's weakness inherited knowingly. **The frame is fixed at `h-[75dvh]`** (user direction
+2026-08-11): sized by its rows, the card collapsed and regrew as filters cut nine rows to one, so
+the root is a fixed-height column and the grid region is bounded to it (`min-h-0 flex-1`) — rows
+scroll vertically under a filter bar that stays, `Popup`'s own body scroll never engages (75dvh +
+the header clears `max-h-[95dvh]` everywhere), and the empty state fills the same frame. Header
+band `bg-white/50` (the `SeverityTable` fill), row hairlines `black/10` under a `black/30` header
+rule and on the selects (Table 1's inferred values). `whitespace-pre-line` on the cells carries the
+two MOA cells' transcribed newline.
 
 **Responsive pass 2026-08-05** (the second measured pass): `<h1>` ramps three steps 24/30/36;
 bullets 20 → 16 (sixth exception, proportion); both absolute leadings became ratios; the CTA takes

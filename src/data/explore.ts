@@ -59,5 +59,33 @@ export const EXPLORE_AGENTS: readonly AgentName[] = EXPLORE_SEGMENTS.flatMap((se
   segment.columns.flatMap((column) => column.agents),
 );
 
+/** One option of the comparison table's class dropdown. */
+export interface ExploreClassFilter {
+  /** The drawn label, verbatim from the column above — the dropdown option text. */
+  label: string;
+  /** The S1 `treatmentClass` cells the option matches, verbatim. */
+  classes: readonly string[];
+}
+
+/**
+ * The class dropdown's buckets: drawn label → the S1 class cells it covers
+ * (decided 2026-08-11; CONTEXT.md §5.2). The labels are `EXPLORE_SEGMENTS`' four,
+ * in drawn order — `content.test.ts` pins the correspondence. The mapping is here
+ * rather than in the component because it encodes a content ruling, not a
+ * rendering choice: "UHL clotting factor replacement" covers ALL THREE factor
+ * rows — SHL and EHL included, though the drawn index above deliberately omits
+ * them — reproducing the client's own S4 saved view ("Clotting factor
+ * replacement"), which keeps every roster row reachable through some option.
+ */
+export const EXPLORE_CLASS_FILTERS: readonly ExploreClassFilter[] = [
+  {
+    label: "FVIII mimetics",
+    classes: ["Factor VIIIa mimetic", "Factor VIIIa mimetic (emerging / investigational)"],
+  },
+  { label: "Hemostatic rebalancing agents", classes: ["Hemostatic rebalancing agent"] },
+  { label: "UHL clotting factor replacement", classes: ["Clotting factor replacement"] },
+  { label: "Gene therapy", classes: ["Gene therapy"] },
+];
+
 /** One constant for both the pop-up's title and the button that opens it. */
 export const EXPLORE_TABLE_TITLE = "Explore therapy options for HA/HB";

@@ -1,6 +1,6 @@
 # 03 — Headless component primitives
 
-Status: in-progress
+Status: done — the last live item (`FilterSelect`) shipped 2026-08-11; the other two are mooted
 Phase: 0
 
 ## Goal
@@ -18,7 +18,10 @@ screen-reader labelled, with Vitest coverage.
 
 ## Remaining
 
-- `FilterSelect` — the three comparison-table dropdowns; needed by issue 09.
+- ~~`FilterSelect`~~ — **shipped 2026-08-11** as `src/components/FilterSelect.tsx` for issue 09's
+  three comparison-table dropdowns: a labelled **native `<select>`** (user decision — no artboard
+  draws the open list, and correct a11y inside a modal beats owning a listbox), `""` as the All
+  sentinel, skinned like the rest (the design precedent over headless, same as `Popup`).
 - ~~`LikertScale`~~ — **mooted 2026-08-11**: issue 13 shipped classic native radios by user
   decision; no primitive needed.
 - `Tabs` — **mooted** by design changes (no artboard uses tabs).

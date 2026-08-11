@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
@@ -12,6 +12,7 @@ import {
   SDM_LEAD,
   SDM_POINTS,
 } from "../data/explore";
+import { TREATMENTS } from "../data/treatments";
 import { routes } from "./router";
 
 /**
@@ -212,20 +213,6 @@ describe("explore — the comparison table", () => {
   });
 
   /**
-   * The table itself is issue 09's and is not built. What is asserted here is
-   * that the card is not *empty* — an opened dialog with no body is the state
-   * `DisclosureBand` refuses to enter, and the only thing making it acceptable
-   * here is that it says so.
-   */
-  it("states that the table is not built yet", async () => {
-    const user = userEvent.setup();
-    const page = renderExplore();
-
-    await user.click(within(page).getByRole("button", { name: EXPLORE_TABLE_TITLE }));
-    expect(within(screen.getByRole("dialog")).getByText(/not built yet/i)).toBeInTheDocument();
-  });
-
-  /**
    * The one card in the app off `Popup`'s default width, and the reason that
    * step exists: nine columns in the default card are 113px each. Asserted here
    * rather than left to `Popup`'s own width tests because what those cover is
@@ -251,6 +238,252 @@ describe("explore — the comparison table", () => {
     await user.click(within(dialog).getByRole("button", { name: `Close ${EXPLORE_TABLE_TITLE}` }));
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+});
+
+/**
+ * Issue 09's table: three AND-combined column filters over the nine-row roster,
+ * matching cells exactly. The semantics under test are the 2026-08-11 decisions
+ * (CONTEXT.md §5.2): exact cell match for the type dropdown (provisional,
+ * flagged for the client gate), and the UHL bucket covering SHL/EHL.
+ */
+describe("explore — the table's filters", () => {
+  const S1_HEADERS = [
+    "Treatment class",
+    "Agent",
+    "MOA",
+    "Hemophilia Type",
+    "Indicated with inhibitors",
+    "Patient Age",
+    "Administration Route",
+    "Schedule",
+    "Monitoring & Safety",
+  ];
+
+  async function openTable(user: ReturnType<typeof userEvent.setup>) {
+    const page = renderExplore();
+    await user.click(within(page).getByRole("button", { name: EXPLORE_TABLE_TITLE }));
+    return screen.getByRole("dialog");
+  }
+
+  /** The Agent cell of every data row, in document order. */
+  function agentsShown(dialog: HTMLElement) {
+    return within(dialog)
+      .getAllByRole("row")
+      .slice(1) // the header row
+      .map((row) => within(row).getAllByRole("cell")[1].textContent);
+  }
+
+  it("draws all nine S1 columns, headers verbatim, in S1 order", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    const headers = within(dialog)
+      .getAllByRole("columnheader")
+      .map((th) => th.textContent);
+    expect(headers).toEqual(S1_HEADERS);
+  });
+
+  it("shows all nine rows unfiltered, in S1 row order", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    expect(agentsShown(dialog)).toEqual(TREATMENTS.map((t) => t.agent));
+  });
+
+  // Denecimig because it is the gnarliest transcription: the parenthetical
+  // class, the TBD age, and an MOA carrying S1's own newline.
+  it("renders a row's cells verbatim", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    const denecimig = TREATMENTS.find((t) => t.agent === "Denecimig")!;
+    const row = within(dialog).getByRole("cell", { name: "Denecimig" }).closest("tr")!;
+    const cells = within(row as HTMLElement)
+      .getAllByRole("cell")
+      .map((td) => td.textContent);
+
+    expect(cells).toEqual([
+      denecimig.treatmentClass,
+      denecimig.agent,
+      denecimig.moa,
+      denecimig.hemophiliaType,
+      denecimig.inhibitors,
+      denecimig.age,
+      denecimig.route,
+      denecimig.schedule,
+      denecimig.monitoring,
+    ]);
+  });
+
+  /**
+   * Exact cell match: "A" is the three rows whose cell reads `A`, NOT the eight
+   * that serve A — the alternative reading CONTEXT.md §5.2 records as rejected
+   * (provisionally; the gate may overrule). A + B rows staying out is the
+   * assertion.
+   */
+  it("filters Hemophilia Type by exact cell match", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Hemophilia Type" }),
+      "A",
+    );
+
+    expect(agentsShown(dialog)).toEqual(["Efanesoctocog alfa", "Emicizumab", "Denecimig"]);
+  });
+
+  /**
+   * The gloss (user direction 2026-08-11): a bare "A + B" option read as a
+   * second All, when the two differ — five rows against nine. The label now
+   * says what the exact match shows; the VALUE stays the verbatim cell, which
+   * is what keeps the dropdown, the predicate and the table's own cells in one
+   * vocabulary.
+   */
+  it("glosses the A + B option, which shows the five both-type rows", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+    const select = within(dialog).getByRole("combobox", { name: "Hemophilia Type" });
+
+    await user.selectOptions(
+      select,
+      within(select).getByRole("option", { name: "A + B (eligible for both)" }),
+    );
+
+    expect(select).toHaveValue("A + B");
+    expect(agentsShown(dialog)).toEqual(["SHL", "EHL", "Concizumab", "Marstacimab", "Fitusiran"]);
+  });
+
+  /**
+   * The UHL bucket covers all three factor rows — SHL and EHL included, though
+   * the drawn class index on the page beneath deliberately omits them. This is
+   * the S4 saved-view precedent, and the one place the class filter is not an
+   * exact label match.
+   */
+  it("buckets SHL and EHL under UHL clotting factor replacement", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Treatment class" }),
+      "UHL clotting factor replacement",
+    );
+
+    expect(agentsShown(dialog)).toEqual(["SHL", "EHL", "Efanesoctocog alfa"]);
+  });
+
+  it("AND-combines the three filters", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Hemophilia Type" }),
+      "A",
+    );
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Indicated with inhibitors" }),
+      "No",
+    );
+
+    expect(agentsShown(dialog)).toEqual(["Efanesoctocog alfa"]);
+  });
+
+  /**
+   * AND-combined exact-match filters can select nothing (gene therapy is a
+   * B-only row). The bar stays so the cause is on screen; the button is the
+   * recovery and its only appearance in the card.
+   */
+  it("shows the empty state, and Clear filters recovers from it", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Treatment class" }),
+      "Gene therapy",
+    );
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Hemophilia Type" }),
+      "A",
+    );
+
+    expect(within(dialog).queryByRole("table")).not.toBeInTheDocument();
+    expect(
+      within(dialog).getByText("No treatments match the selected filters."),
+    ).toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole("button", { name: "Clear filters" }));
+
+    expect(agentsShown(screen.getByRole("dialog"))).toHaveLength(TREATMENTS.length);
+    for (const name of S1_HEADERS.filter(
+      (h) => h === "Treatment class" || h === "Hemophilia Type",
+    )) {
+      expect(within(dialog).getByRole("combobox", { name })).toHaveValue("");
+    }
+  });
+
+  /**
+   * Reset-on-close is by construction — the card's content is `null` while
+   * closed, so reopening mounts a fresh table — but the construction is exactly
+   * what a refactor to a kept-mounted card would undo without noticing. The
+   * `waitFor` is the exit fade: `useExitContent` holds the card mounted for
+   * `MODAL_EXIT_MS` after close, so an instant reopen reconciles the same
+   * table, state intact. No user reopens inside 150ms; the test must not
+   * either.
+   */
+  it("resets the filters when the card is closed and reopened", async () => {
+    const user = userEvent.setup();
+    const page = renderExplore();
+
+    await user.click(within(page).getByRole("button", { name: EXPLORE_TABLE_TITLE }));
+    let dialog = screen.getByRole("dialog");
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Treatment class" }),
+      "Gene therapy",
+    );
+    expect(agentsShown(dialog)).toEqual(["Etranacogene dezaparvovec-drlb"]);
+
+    await user.click(within(dialog).getByRole("button", { name: `Close ${EXPLORE_TABLE_TITLE}` }));
+    // Role queries can't see into the closed dialog, so the unmount is watched
+    // through the DOM itself.
+    await waitFor(() => expect(document.querySelector("select")).toBeNull());
+    await user.click(within(page).getByRole("button", { name: EXPLORE_TABLE_TITLE }));
+
+    dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByRole("combobox", { name: "Treatment class" })).toHaveValue("");
+    expect(agentsShown(dialog)).toHaveLength(TREATMENTS.length);
+  });
+
+  /**
+   * The frame is fixed (user direction 2026-08-11): sized by its rows, the
+   * dialog collapsed and regrew as filters cut nine rows to one. jsdom computes
+   * no layout, so what is pinned is the construction — the fixed-height frame,
+   * on the root through every filter state including empty, and the grid region
+   * bounded to it (`min-h-0 flex-1`) so the rows scroll under a bar that stays.
+   */
+  it("holds the card's size through filtering, down to the empty state", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    const frame = dialog.querySelector<HTMLElement>(".h-\\[75dvh\\]")!;
+    expect(frame).toHaveClass("flex", "flex-col");
+    expect(frame.querySelector(".overflow-auto")).toHaveClass("min-h-0", "flex-1");
+
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Treatment class" }),
+      "Gene therapy",
+    );
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Hemophilia Type" }),
+      "A",
+    );
+
+    expect(within(dialog).queryByRole("table")).not.toBeInTheDocument();
+    // The empty state fills the same frame rather than shrinking it.
+    expect(dialog.querySelector(".h-\\[75dvh\\]")).toBe(frame);
+    expect(
+      within(frame).getByText("No treatments match the selected filters.").parentElement,
+    ).toHaveClass("flex-1");
   });
 });
 

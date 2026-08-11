@@ -3,6 +3,7 @@ import { Button, PopupButton } from "mlg-components";
 
 import BulletList from "../components/BulletList";
 import DrugSheetPopup from "../components/DrugSheetPopup";
+import ExploreTable from "../components/ExploreTable";
 import PageSection from "../components/PageSection";
 import Popup from "../components/Popup";
 import {
@@ -63,12 +64,10 @@ export default function Explore() {
             ? {
                 title: EXPLORE_TABLE_TITLE,
                 width: "wide",
-                // The filters and the nine-column grid are issue 09's remaining scope.
-                content: (
-                  <p className="py-6 text-center text-xl leading-[1.6] text-black">
-                    The filterable comparison table is not built yet.
-                  </p>
-                ),
+                // `null` while closed is also the filter reset: once the exit
+                // fade's `MODAL_EXIT_MS` hold releases the card, the table
+                // unmounts, so the next open mounts a fresh one.
+                content: <ExploreTable />,
               }
             : null
         }

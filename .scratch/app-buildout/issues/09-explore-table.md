@@ -1,6 +1,6 @@
 # 09 — Explore comparison table
 
-Status: in-progress — the page is built, the table inside it is not
+Status: done — table built 2026-08-11; one semantics ruling provisional, flagged for the client gate
 Phase: 1
 
 ## Goal
@@ -13,18 +13,18 @@ table is the body of a `Popup` launched from its CTA.
 Page, architecture and `DrugSheetPopup` wiring (`Explore.tsx:314`): §9 bullets, the CTA opening
 a `width="wide"` (1360px) `Popup`, and the class-grouped index into the seven §6 drug sheets.
 
-## Remaining — the table itself
+The table (2026-08-11): `ExploreTable` — a filter bar of three `FilterSelect`s (native selects,
+issue 03's last primitive) over all nine S1 columns, AND-combined exact-cell-match filtering,
+S1 row order, `overflow-x-auto` + `min-w-240` scroll region (closing styling item 27), empty
+state with a Clear-filters recovery, filters reset on close. Behaviour pinned in
+`explore.test.tsx`; the class buckets in `content.test.ts`.
 
-- The table is **not built**: placeholder text in the wide `Popup` at the bottom of `Explore.tsx`.
-- Three dropdowns (class, hemophilia type, indicated-with-inhibitors) need `FilterSelect`
-  (issue 03); columns Agent, MOA, Age, Route, Schedule, Monitoring; empty state.
-- **There is no filter engine to wire up — write one.** See "The engine is gone" below.
-- Horizontal scroll region inside the wide `Popup` still due (styling item 27) — precedents are
-  `SeverityTable` and Table 1.
-- **Open question:** a drug sheet opening over the table card — does the table close first, or
-  do the two stack?
-- **Open question:** does picking "A" mean the three rows whose cell reads `A`, or the eight that
-  serve A? See below.
+## Remaining
+
+Nothing. The table landed 2026-08-11 (`src/components/ExploreTable.tsx` + `FilterSelect` +
+`EXPLORE_CLASS_FILTERS`); the decisions that closed this issue's open questions are recorded in
+CONTEXT.md §5.2 and in the 2026-08-11 comment below. One is provisional: **exact-cell-match type
+filtering is flagged for the client gate.**
 
 ## The engine is gone (2026-08-10)
 
@@ -67,6 +67,28 @@ either; §5 specifies an empty state, not per-row explanations.
 - The age-parse rule is preserved in **CONTEXT.md §5.2** in case an age filter is ever drawn.
 
 ## Comments
+
+**2026-08-11** — built, closing the issue, after a grilling session settled every open branch:
+
+- **Type filter: exact cell match** — "A" is the 3 rows whose cell reads `A`; the options
+  partition 3/1/5. **Provisional, flagged for the client gate** (the "serves A" reading is a
+  one-line predicate swap). This resolves this issue's second open question.
+- **Class dropdown: the four drawn labels**, bucketed to S1 class cells via
+  `EXPLORE_CLASS_FILTERS` in `explore.ts` — "UHL clotting factor replacement" covers **all
+  three** factor rows (the S4 saved-view precedent), so SHL/EHL stay reachable.
+- **Nine columns, not six** — the column list this issue carried ("Agent, MOA, Age, Route,
+  Schedule, Monitoring") is corrected: the three filtered columns render too, since the
+  unfiltered default view has to carry the comparison on its face. CONTEXT §5 and styling
+  item 27 always said nine.
+- **No agent→sheet links, ever** (user decision) — which dissolves this issue's first open
+  question (sheet-over-table stacking): the situation cannot arise.
+- Filter bar above the grid (not in-header); "All" defaults; empty state
+  "No treatments match the selected filters." + Clear filters (its only appearance).
+
+Two same-day follow-ups on user direction: the card's frame is **fixed at `h-[75dvh]`** so
+filtering never resizes the dialog (rows scroll under a filter bar that stays; styling §17), and
+the type dropdown's third option is **glossed "A + B (eligible for both)"** — the bare cell value
+read as a second All. Label only; the value and the table's cells stay the verbatim `A + B`.
 
 **2026-08-10** — the eligibility engine was deleted as part of an architecture review
 (candidates 02 and 03). It had zero callers and zero tests since the first data pass, and the

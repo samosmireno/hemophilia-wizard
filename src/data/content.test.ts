@@ -8,7 +8,7 @@ import {
   TREATMENT_OPTIONS_MATRIX,
   type EducationTopic,
 } from "./education";
-import { EXPLORE_AGENTS, EXPLORE_SEGMENTS } from "./explore";
+import { EXPLORE_AGENTS, EXPLORE_CLASS_FILTERS, EXPLORE_SEGMENTS } from "./explore";
 import { ACRONYMS, GLOSSARY } from "./glossary";
 import { REFERENCES, RESOURCES } from "./references";
 import { SURVEY_QUESTIONS } from "./survey";
@@ -181,6 +181,40 @@ describe("explore segments", () => {
       "UHL clotting factor replacement",
       "Gene therapy",
     ]);
+  });
+});
+
+describe("explore class filters", () => {
+  // The dropdown's options ARE the drawn labels — a bucket keyed by a label the
+  // arches don't paint would be a fifth class vocabulary, which is what the
+  // deleted enum was.
+  it("key every bucket by a drawn label, in drawn order", () => {
+    expect(EXPLORE_CLASS_FILTERS.map((f) => f.label)).toEqual(
+      EXPLORE_SEGMENTS.flatMap((s) => s.columns.map((c) => c.label)),
+    );
+  });
+
+  /*
+    Exactly one: zero would strand a row no option can reach (the SHL/EHL trap
+    the UHL bucket exists to avoid), and two would make the options overlap,
+    which the 2026-08-11 exact-match ruling says they must not.
+  */
+  it("cover every roster row in exactly one bucket", () => {
+    for (const t of TREATMENTS) {
+      const buckets = EXPLORE_CLASS_FILTERS.filter((f) => f.classes.includes(t.treatmentClass));
+      expect(buckets, `${t.agent} is in ${buckets.length} buckets`).toHaveLength(1);
+    }
+  });
+
+  // The mapping matches cells verbatim, so a cell string nothing carries is a
+  // silent no-op filter — the failure mode string joins always have.
+  it("name no class cell the roster does not carry", () => {
+    const cells = new Set(TREATMENTS.map((t) => t.treatmentClass));
+    for (const filter of EXPLORE_CLASS_FILTERS) {
+      for (const cell of filter.classes) {
+        expect(cells.has(cell), `"${cell}" matches no Treatment row`).toBe(true);
+      }
+    }
   });
 });
 
