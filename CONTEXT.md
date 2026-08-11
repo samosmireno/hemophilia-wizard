@@ -10,8 +10,10 @@ file it came from** so it can be re-verified and updated.
 ## Maintenance
 
 - **Last reviewed:** 2026-08-11 (the §5 comparison table built at last — §5.2 turns its open
-  question into the exact-cell-match ruling (provisional, **flagged for the client gate**) and
-  records the class dropdown's four drawn-label buckets, with "UHL clotting factor replacement"
+  question into the **patient-type ("serves") ruling with no "A + B" dropdown option**
+  (provisional, **flagged for the client gate**; it reversed an exact-cell-match first ruling
+  the same day, on the domain ground that no patient has both types) and records the class
+  dropdown's four drawn-label buckets, with "UHL clotting factor replacement"
   covering SHL/EHL per the client's own S4 saved view (`EXPLORE_CLASS_FILTERS`,
   `src/data/explore.ts`); the table's agent cells deliberately open no sheet); previously
   2026-08-10 (the unbuilt eligibility engine deleted from `treatments.ts` — it had
@@ -490,14 +492,18 @@ the roster, its shape, and `treatmentFor()` (§6).
 **Built 2026-08-11** (`src/components/ExploreTable.tsx`): three AND-combined **column filters**
 over `TREATMENTS`, each defaulting to All, resetting when the card closes. The rules:
 
-- **Hemophilia Type filters by exact cell match — decided provisionally, flagged for the client
-  gate.** Picking "A" shows the three rows whose cell reads `A`, not the eight that serve A; the
-  three options partition 3/1/5. The rejected alternative (the "serves A" reading §5's _"eligible
-  for both"_ gloss leans toward) is a one-line predicate swap if the client overrules — the
-  dropdown options are the same either way. Decided 2026-08-11 over guessing or blocking.
-  **The third option is glossed** — the dropdown shows _"A + B (eligible for both)"_ (same-day
-  user direction: the bare cell value read as a second All, when it is five rows against All's
-  nine); the value underneath and the table's cells stay the verbatim `A + B`.
+- **Hemophilia Type is a patient-type filter with no "A + B" option — decided provisionally,
+  flagged for the client gate.** Picking "A" shows the **eight** rows that serve an A patient
+  (cells `A` and `A + B` alike), "B" the six that serve B — the "serves" reading §5's _"eligible
+  for both"_ gloss always leaned toward. The domain ground (user ruling, 2026-08-11): **a patient
+  has hemophilia A or B, never both** — `A + B` is a property of the _treatment_ (indicated for
+  both types), not a type a patient can have — so an "A + B" option could only mean "everything
+  serving either", which is what All already means, and the redundancy read as confusing. The
+  dropdown is therefore All / A / B, **a deliberate departure from the drawn three-value set**
+  (the artboard draws A / B / A + B); the table's cells still carry `A + B` verbatim. This
+  reversed the same day's first ruling (exact cell match, a 3/1/5 partition), which survived
+  one session: it read the dropdown as a column filter where a clinician reads it as their
+  patient. Either way back is a small predicate-and-options swap if the client overrules.
 - **The class dropdown's options are the four drawn labels** (`EXPLORE_CLASS_FILTERS`,
   `src/data/explore.ts`), each bucketing the S1 class cells it covers — with **"UHL clotting
   factor replacement" covering all three factor rows**, SHL and EHL included, though the drawn

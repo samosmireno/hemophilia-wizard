@@ -609,7 +609,11 @@ designer may overrule any of them): the wide `Popup`'s body is a filter bar (thr
 native `<select>`s by decision; the open list is OS-drawn and deliberately unstyled) over the
 nine-column grid. The grid **scrolls rather than reflows** (`overflow-auto` + `min-w-240`,
 closing item 27): the floor is arithmetic — nine columns at Table 1's ~107px/column reading floor,
-item 36's weakness inherited knowingly. **The frame is fixed at `h-[75dvh]`** (user direction
+item 36's weakness inherited knowingly. **The columns are `table-fixed` over a colgroup of
+percentage shares** (12/11/10/7/8/8/12/10/22, Monitoring widest — proportioned to the cells'
+prose, user direction 2026-08-11): under auto layout the columns re-measured whichever rows
+survived a filter and jumped on every change; fixed, the geometry is markup and filtering only
+ever changes rows. **The frame is fixed at `h-[75dvh]`** (user direction
 2026-08-11): sized by its rows, the card collapsed and regrew as filters cut nine rows to one, so
 the root is a fixed-height column and the grid region is bounded to it (`min-h-0 flex-1`) — rows
 scroll vertically under a filter bar that stays, `Popup`'s own body scroll never engages (75dvh +

@@ -11,34 +11,43 @@ import FilterSelect from "./FilterSelect";
  * and the reset target, so it has to carry the comparison on its face, which a
  * grid with the type column hidden cannot.
  */
-const COLUMNS: readonly { header: string; cell: (t: Treatment) => string }[] = [
-  { header: "Treatment class", cell: (t) => t.treatmentClass },
-  { header: "Agent", cell: (t) => t.agent },
-  { header: "MOA", cell: (t) => t.moa },
-  { header: "Hemophilia Type", cell: (t) => t.hemophiliaType },
-  { header: "Indicated with inhibitors", cell: (t) => t.inhibitors },
-  { header: "Patient Age", cell: (t) => t.age },
-  { header: "Administration Route", cell: (t) => t.route },
-  { header: "Schedule", cell: (t) => t.schedule },
-  { header: "Monitoring & Safety", cell: (t) => t.monitoring },
+/**
+ * `width` is each column's share of the table, summing to 100% — under
+ * `table-fixed` these are the whole geometry, so filtering changes which rows
+ * show, never where the columns sit (auto layout re-measured the survivors and
+ * the columns jumped on every filter change). Picked, no artboard: proportioned
+ * to the cells' prose, the Monitoring column carrying the most.
+ */
+const COLUMNS: readonly { header: string; width: string; cell: (t: Treatment) => string }[] = [
+  { header: "Treatment class", width: "12%", cell: (t) => t.treatmentClass },
+  { header: "Agent", width: "11%", cell: (t) => t.agent },
+  { header: "MOA", width: "10%", cell: (t) => t.moa },
+  { header: "Hemophilia Type", width: "7%", cell: (t) => t.hemophiliaType },
+  { header: "Indicated with inhibitors", width: "8%", cell: (t) => t.inhibitors },
+  { header: "Patient Age", width: "8%", cell: (t) => t.age },
+  { header: "Administration Route", width: "12%", cell: (t) => t.route },
+  { header: "Schedule", width: "10%", cell: (t) => t.schedule },
+  { header: "Monitoring & Safety", width: "22%", cell: (t) => t.monitoring },
 ];
 
 /**
- * The drawn dropdown values, which are also the S1 cell values, verbatim — with
- * one gloss (user direction 2026-08-11): bare "A + B" read as a second All,
- * when it is the five rows eligible for both types against All's nine. The
- * label says what the exact match actually shows; the VALUE stays the verbatim
- * cell, so the predicate and the table's own cells keep agreeing.
+ * No "A + B" option, though the artboard draws one and the cells carry it: a
+ * patient has hemophilia A or B, never both, so `A + B` is a property of the
+ * TREATMENT (indicated for both types) and "everything serving either" is what
+ * All already means. Ruled 2026-08-11 on that domain ground (user direction,
+ * reversing the same day's exact-match call), flagged for the client gate —
+ * the departure from the drawn three-value set is theirs to overrule.
  */
-const TYPE_OPTIONS = ["A", "B", { value: "A + B", label: "A + B (eligible for both)" }];
+const TYPE_OPTIONS = ["A", "B"];
 const INHIBITOR_OPTIONS = ["Yes", "No"];
 
 /**
  * The §5 filterable comparison table — the body of `/explore`'s wide `Popup`
- * (issue 09). Three AND-combined column filters over the nine-row roster,
- * matching cells **exactly** ("A" is the three rows whose cell reads `A`, not
- * the eight that serve A — decided provisionally 2026-08-11, flagged for the
- * client gate; CONTEXT.md §5.2). The class dropdown matches through
+ * (issue 09). Three AND-combined filters over the nine-row roster. Type is a
+ * PATIENT-type filter: "A" shows the eight rows that serve an A patient —
+ * cells `A` and `A + B` alike — not the three whose cell reads `A` exactly
+ * (ruled 2026-08-11, flagged for the client gate; CONTEXT.md §5.2). Inhibitors
+ * matches its cell exactly; the class dropdown matches through
  * `EXPLORE_CLASS_FILTERS`' drawn-label buckets.
  *
  * Filter state lives here so it resets on close for free: the card's content is
@@ -53,7 +62,7 @@ export default function ExploreTable() {
   const rows = TREATMENTS.filter(
     (t) =>
       (!bucket || bucket.classes.includes(t.treatmentClass)) &&
-      (type === "" || t.hemophiliaType === type) &&
+      (type === "" || t.hemophiliaType === type || t.hemophiliaType === "A + B") &&
       (inhibitors === "" || t.inhibitors === inhibitors),
   );
 
@@ -112,7 +121,14 @@ export default function ExploreTable() {
         // region at the frame so it scrolls vertically too — `Popup`'s own body
         // scroll would move the filter bar away with the rows.
         <div className="mt-4 min-h-0 flex-1 overflow-auto">
-          <table className="w-full min-w-240 border-separate border-spacing-0 text-left text-black">
+          <table className="w-full min-w-240 table-fixed border-separate border-spacing-0 text-left text-black">
+            <colgroup>
+              {COLUMNS.map((column) => (
+                // Inline because the shares are data, like the segments' drawn
+                // widths on the page beneath.
+                <col key={column.header} style={{ width: column.width }} />
+              ))}
+            </colgroup>
             <thead>
               <tr>
                 {COLUMNS.map((column) => (

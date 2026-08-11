@@ -73,6 +73,7 @@ either; §5 specifies an empty state, not per-row explanations.
 - **Type filter: exact cell match** — "A" is the 3 rows whose cell reads `A`; the options
   partition 3/1/5. **Provisional, flagged for the client gate** (the "serves A" reading is a
   one-line predicate swap). This resolves this issue's second open question.
+  **Reversed later the same day — see the follow-ups below.**
 - **Class dropdown: the four drawn labels**, bucketed to S1 class cells via
   `EXPLORE_CLASS_FILTERS` in `explore.ts` — "UHL clotting factor replacement" covers **all
   three** factor rows (the S4 saved-view precedent), so SHL/EHL stay reachable.
@@ -85,10 +86,21 @@ either; §5 specifies an empty state, not per-row explanations.
 - Filter bar above the grid (not in-header); "All" defaults; empty state
   "No treatments match the selected filters." + Clear filters (its only appearance).
 
-Two same-day follow-ups on user direction: the card's frame is **fixed at `h-[75dvh]`** so
-filtering never resizes the dialog (rows scroll under a filter bar that stays; styling §17), and
-the type dropdown's third option is **glossed "A + B (eligible for both)"** — the bare cell value
-read as a second All. Label only; the value and the table's cells stay the verbatim `A + B`.
+Three same-day follow-ups on user direction:
+
+1. The card's frame is **fixed at `h-[75dvh]`** so filtering never resizes the dialog (rows
+   scroll under a filter bar that stays; styling §17).
+2. The type dropdown's third option was **glossed "A + B (eligible for both)"** after the bare
+   cell value read as a second All — then superseded by (3).
+3. **The type filter reversed to patient-type ("serves") semantics, and the "A + B" option was
+   dropped**: there is no A + B patient — the cell is a property of the treatment — so "A" shows
+   the 8 rows serving an A patient, "B" the 6 serving B, and a third option could only duplicate
+   All. The dropdown is All / A / B, a deliberate departure from the drawn three-value set;
+   **still flagged for the client gate** (both the semantics and the dropped drawn option). The
+   gloss machinery in `FilterSelect` went with it — no caller. CONTEXT §5.2 is the full record.
+4. **Column geometry fixed**: `table-fixed` over a colgroup of percentage shares
+   (12/11/10/7/8/8/12/10/22) — auto layout re-measured the surviving rows and the columns
+   jumped on every filter change. Shares picked, no artboard; styling §17.
 
 **2026-08-10** — the eligibility engine was deleted as part of an architecture review
 (candidates 02 and 03). It had zero callers and zero tests since the first data pass, and the

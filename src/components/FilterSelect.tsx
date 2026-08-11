@@ -15,14 +15,6 @@ import { cn } from "../lib/cn";
  * caller's predicate can read `value === ""` as "no filter" without a
  * reserved-word collision with the data.
  */
-
-export interface FilterSelectOption {
-  /** What `onChange` reports and a predicate matches — the verbatim cell value. */
-  value: string;
-  /** What the open list shows, where the cell value alone would mislead. */
-  label: string;
-}
-
 export default function FilterSelect({
   label,
   value,
@@ -31,10 +23,9 @@ export default function FilterSelect({
   className,
 }: {
   label: string;
-  /** The selected option's value, or `""` for All. */
+  /** The selected option, or `""` for All. */
   value: string;
-  /** A bare string is an option whose label IS its value — the common case. */
-  options: readonly (string | FilterSelectOption)[];
+  options: readonly string[];
   onChange: (value: string) => void;
   className?: string;
 }) {
@@ -54,13 +45,11 @@ export default function FilterSelect({
         className="rounded-lg border border-black/30 bg-white px-3 py-2 text-base text-black"
       >
         <option value="">All</option>
-        {options
-          .map((option) => (typeof option === "string" ? { value: option, label: option } : option))
-          .map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
       </select>
     </div>
   );

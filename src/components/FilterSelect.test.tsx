@@ -39,28 +39,6 @@ describe("FilterSelect", () => {
     expect(onChange).toHaveBeenLastCalledWith("");
   });
 
-  // The two halves of a glossed option must not swap: the label is for the
-  // open list, the value is what predicates match cells with.
-  it("shows a glossed option's label while reporting its verbatim value", async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    render(
-      <FilterSelect
-        label="Hemophilia Type"
-        value=""
-        options={["A", { value: "A + B", label: "A + B (eligible for both)" }]}
-        onChange={onChange}
-      />,
-    );
-
-    await user.selectOptions(
-      screen.getByRole("combobox"),
-      screen.getByRole("option", { name: "A + B (eligible for both)" }),
-    );
-
-    expect(onChange).toHaveBeenLastCalledWith("A + B");
-  });
-
   // Controlled: the select shows the prop, not its own last pick.
   it("renders the value it is given", () => {
     render(

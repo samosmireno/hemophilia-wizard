@@ -242,10 +242,10 @@ describe("explore — the comparison table", () => {
 });
 
 /**
- * Issue 09's table: three AND-combined column filters over the nine-row roster,
- * matching cells exactly. The semantics under test are the 2026-08-11 decisions
- * (CONTEXT.md §5.2): exact cell match for the type dropdown (provisional,
- * flagged for the client gate), and the UHL bucket covering SHL/EHL.
+ * Issue 09's table: three AND-combined filters over the nine-row roster. The
+ * semantics under test are the 2026-08-11 decisions (CONTEXT.md §5.2): the
+ * type dropdown is a PATIENT-type filter with no "A + B" option (provisional,
+ * flagged for the client gate), and the UHL bucket covers SHL/EHL.
  */
 describe("explore — the table's filters", () => {
   const S1_HEADERS = [
@@ -317,42 +317,43 @@ describe("explore — the table's filters", () => {
   });
 
   /**
-   * Exact cell match: "A" is the three rows whose cell reads `A`, NOT the eight
-   * that serve A — the alternative reading CONTEXT.md §5.2 records as rejected
-   * (provisionally; the gate may overrule). A + B rows staying out is the
-   * assertion.
+   * The type dropdown filters by PATIENT type: "A" is the eight rows that
+   * serve an A patient — cells `A` and `A + B` alike — not the three whose
+   * cell reads `A` exactly. Ruled 2026-08-11 (reversing the same day's
+   * exact-match call) on the domain ground that `A + B` is a property of the
+   * treatment, not a type a patient can have; provisional until the client
+   * gate. The `A + B` rows being IN is the assertion.
    */
-  it("filters Hemophilia Type by exact cell match", async () => {
-    const user = userEvent.setup();
-    const dialog = await openTable(user);
-
-    await user.selectOptions(
-      within(dialog).getByRole("combobox", { name: "Hemophilia Type" }),
-      "A",
-    );
-
-    expect(agentsShown(dialog)).toEqual(["Efanesoctocog alfa", "Emicizumab", "Denecimig"]);
-  });
-
-  /**
-   * The gloss (user direction 2026-08-11): a bare "A + B" option read as a
-   * second All, when the two differ — five rows against nine. The label now
-   * says what the exact match shows; the VALUE stays the verbatim cell, which
-   * is what keeps the dropdown, the predicate and the table's own cells in one
-   * vocabulary.
-   */
-  it("glosses the A + B option, which shows the five both-type rows", async () => {
+  it("filters Hemophilia Type by the patients a row serves", async () => {
     const user = userEvent.setup();
     const dialog = await openTable(user);
     const select = within(dialog).getByRole("combobox", { name: "Hemophilia Type" });
 
-    await user.selectOptions(
-      select,
-      within(select).getByRole("option", { name: "A + B (eligible for both)" }),
+    await user.selectOptions(select, "A");
+    expect(agentsShown(dialog)).toEqual(
+      TREATMENTS.filter((t) => t.hemophiliaType !== "B").map((t) => t.agent),
     );
 
-    expect(select).toHaveValue("A + B");
-    expect(agentsShown(dialog)).toEqual(["SHL", "EHL", "Concizumab", "Marstacimab", "Fitusiran"]);
+    await user.selectOptions(select, "B");
+    expect(agentsShown(dialog)).toEqual(
+      TREATMENTS.filter((t) => t.hemophiliaType !== "A").map((t) => t.agent),
+    );
+  });
+
+  /**
+   * No "A + B" option, though the artboard draws one: there is no A + B
+   * patient, so "everything serving either" is what All already means, and a
+   * third option would be All under another name — the redundancy that was
+   * reported as confusing. The table's cells still carry `A + B` verbatim.
+   */
+  it("offers only All, A and B as type options", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    const options = within(
+      within(dialog).getByRole("combobox", { name: "Hemophilia Type" }),
+    ).getAllByRole("option");
+    expect(options.map((o) => o.textContent)).toEqual(["All", "A", "B"]);
   });
 
   /**
@@ -373,6 +374,32 @@ describe("explore — the table's filters", () => {
     expect(agentsShown(dialog)).toEqual(["SHL", "EHL", "Efanesoctocog alfa"]);
   });
 
+  /**
+   * Under auto layout the columns re-measured whichever rows survived and
+   * jumped on every filter change (user report, 2026-08-11). `table-fixed`
+   * plus a colgroup of percentage shares makes the geometry markup — the same
+   * nine widths whatever the filters show. jsdom computes no layout, so the
+   * construction is the assertion: the class, the shares summing to 100%, and
+   * the identical colgroup after a filter.
+   */
+  it("keeps the column geometry fixed through filter changes", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    const widthsOf = () => [...dialog.querySelectorAll("col")].map((col) => col.style.width);
+
+    expect(within(dialog).getByRole("table")).toHaveClass("table-fixed");
+    const widths = widthsOf();
+    expect(widths).toHaveLength(9);
+    expect(widths.reduce((sum, width) => sum + parseFloat(width), 0)).toBe(100);
+
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Hemophilia Type" }),
+      "B",
+    );
+    expect(widthsOf()).toEqual(widths);
+  });
+
   it("AND-combines the three filters", async () => {
     const user = userEvent.setup();
     const dialog = await openTable(user);
@@ -386,12 +413,13 @@ describe("explore — the table's filters", () => {
       "No",
     );
 
-    expect(agentsShown(dialog)).toEqual(["Efanesoctocog alfa"]);
+    // Serves-A ∩ inhibitors-No: the three factor-replacement rows.
+    expect(agentsShown(dialog)).toEqual(["SHL", "EHL", "Efanesoctocog alfa"]);
   });
 
   /**
-   * AND-combined exact-match filters can select nothing (gene therapy is a
-   * B-only row). The bar stays so the cause is on screen; the button is the
+   * AND-combined filters can still select nothing (gene therapy serves B
+   * only). The bar stays so the cause is on screen; the button is the
    * recovery and its only appearance in the card.
    */
   it("shows the empty state, and Clear filters recovers from it", async () => {
