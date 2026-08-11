@@ -98,18 +98,18 @@ describe("wizard scenario — the caveat", () => {
 });
 
 describe("wizard scenario — the illustration boxes", () => {
-  it.each(BRANCHES)("reserves one box per class for %s/%s", (type, inh) => {
+  it.each(BRANCHES)("renders one AgentBoxButton per class for %s/%s", (type, inh) => {
     const region = renderScenario(type, inh);
 
     /*
-      The boxes are inert reserved divs with no accessible role — no asset exists
-      for any of them (CONTEXT.md §7.7), and a button that opened nothing would be
-      worse than none. So they are counted through the DOM, which is the honest
-      way to assert something deliberately invisible to assistive tech.
+      The reserved divs became `AgentBoxButton`s once the class assets arrived,
+      so each box is queried by the name the component composes — "Expand
+      {class label}" — which also pins the label→asset map covering every
+      class the screen lists.
     */
-    expect(region.querySelectorAll("div.border-\\[0\\.25rem\\]")).toHaveLength(
-      classesFor({ type, hasInhibitors: inh }).classes.length,
-    );
+    for (const label of classesFor({ type, hasInhibitors: inh }).classes) {
+      expect(within(region).getByRole("button", { name: `Expand ${label}` })).toBeInTheDocument();
+    }
   });
 
   it.each(BRANCHES)("captions the boxes for %s/%s", (type, inh) => {
@@ -147,9 +147,9 @@ describe("wizard scenario — the illustration boxes", () => {
    * Both halves are pinned, because either alone reopens it. The drawn gap must
    * stay at `xl`, where the 921px group fits its 1008px column, and the `lg`
    * step must stay unstated so the row keeps the stack's own 32px
-   * (3 × 227 + 2 × 32 = 745 in 752). The box's drawn size is asserted rather
-   * than inferred from the row fitting, since a future gap change would resume
-   * shrinking it silently.
+   * (3 × 227 + 2 × 32 = 745 in 752). The box's drawn size is `AgentBoxButton`'s
+   * own skin, pinned in its component test — this test keeps only the shrink
+   * behaviour, which is the caller's.
    *
    * jsdom computes no layout, so a class string is the only thing here that can
    * fail; the pixel arithmetic behind these values is unverified (open item 43).
@@ -158,10 +158,10 @@ describe("wizard scenario — the illustration boxes", () => {
     "ramps the row's gap rather than the boxes, which stay drawn-size at every width, %s/%s",
     (type, inh) => {
       const region = renderScenario(type, inh);
-      const boxes = [...region.querySelectorAll("div.border-\\[0\\.25rem\\]")];
+      const boxes = within(region).getAllByRole("button", { name: /^Expand / });
 
       for (const box of boxes) {
-        expect(box).toHaveClass("h-46.25", "max-w-56.75", "shrink-0", "lg:shrink");
+        expect(box).toHaveClass("shrink-0", "lg:shrink");
       }
 
       const row = boxes[0].parentElement!;
