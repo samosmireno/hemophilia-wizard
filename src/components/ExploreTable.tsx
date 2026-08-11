@@ -15,19 +15,24 @@ import FilterSelect from "./FilterSelect";
  * `width` is each column's share of the table, summing to 100% — under
  * `table-fixed` these are the whole geometry, so filtering changes which rows
  * show, never where the columns sit (auto layout re-measured the survivors and
- * the columns jumped on every filter change). Picked, no artboard: proportioned
- * to the cells' prose, the Monitoring column carrying the most.
+ * the columns jumped on every filter change). Sized from measurement, not an
+ * artboard: a fixed column narrower than a word does not wrap it, it paints it
+ * over the neighbour, so each share at the table's 72rem floor covers its
+ * column's widest unbreakable chunk (bold header word or cell word — bold
+ * "Hemophilia" ~89px, "Administration" ~117px, "immunosuppressive" ~149px,
+ * measured in Chromium/DM Sans) plus the px-3 padding, with a few px over.
+ * Monitoring still carries the most, for its prose.
  */
 const COLUMNS: readonly { header: string; width: string; cell: (t: Treatment) => string }[] = [
   { header: "Treatment class", width: "12%", cell: (t) => t.treatmentClass },
-  { header: "Agent", width: "11%", cell: (t) => t.agent },
-  { header: "MOA", width: "10%", cell: (t) => t.moa },
-  { header: "Hemophilia Type", width: "7%", cell: (t) => t.hemophiliaType },
-  { header: "Indicated with inhibitors", width: "8%", cell: (t) => t.inhibitors },
+  { header: "Agent", width: "12%", cell: (t) => t.agent },
+  { header: "MOA", width: "9%", cell: (t) => t.moa },
+  { header: "Hemophilia Type", width: "10%", cell: (t) => t.hemophiliaType },
+  { header: "Indicated with inhibitors", width: "9%", cell: (t) => t.inhibitors },
   { header: "Patient Age", width: "8%", cell: (t) => t.age },
-  { header: "Administration Route", width: "12%", cell: (t) => t.route },
-  { header: "Schedule", width: "10%", cell: (t) => t.schedule },
-  { header: "Monitoring & Safety", width: "22%", cell: (t) => t.monitoring },
+  { header: "Administration Route", width: "13%", cell: (t) => t.route },
+  { header: "Schedule", width: "9%", cell: (t) => t.schedule },
+  { header: "Monitoring & Safety", width: "18%", cell: (t) => t.monitoring },
 ];
 
 /**
@@ -116,12 +121,16 @@ export default function ExploreTable() {
       ) : (
         // Scrolls rather than reflows, like `SeverityTable` and Table 1
         // (styling item 27): restacking nine columns would flatten the row
-        // association for assistive tech. The floor is arithmetic: nine columns
-        // at Table 1's ~107px/column reading floor. `min-h-0 flex-1` bounds the
-        // region at the frame so it scrolls vertically too — `Popup`'s own body
-        // scroll would move the filter bar away with the rows.
+        // association for assistive tech. The floor is the sum of the columns'
+        // measured word floors (~1079px — see COLUMNS) plus slack; it fits the
+        // wide `Popup`'s ~1222px body without scroll. `break-words` is the net
+        // under that arithmetic: should a word outgrow its column anyway (font
+        // substitution, new copy), it wraps mid-word rather than painting over
+        // the neighbour. `min-h-0 flex-1` bounds the region at the frame so it
+        // scrolls vertically too — `Popup`'s own body scroll would move the
+        // filter bar away with the rows.
         <div className="mt-4 min-h-0 flex-1 overflow-auto">
-          <table className="w-full min-w-240 table-fixed border-separate border-spacing-0 text-left text-black">
+          <table className="w-full min-w-288 table-fixed border-separate border-spacing-0 text-left break-words text-black">
             <colgroup>
               {COLUMNS.map((column) => (
                 // Inline because the shares are data, like the segments' drawn
