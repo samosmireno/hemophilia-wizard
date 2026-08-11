@@ -1,25 +1,10 @@
 import { useEffect, useRef } from "react";
-import {
-  BookIcon,
-  DocumentIcon,
-  HomeIcon,
-  InfoIcon,
-  Sidebar,
-  WizardIcon,
-  type SidebarItem,
-} from "mlg-components";
+import { Sidebar, type SidebarItem } from "mlg-components";
 import { Link, useLocation, useNavigate } from "react-router";
 
 import { isSpinePath, nextOf, prevOf, type SectionPath } from "../data/sectionOrder";
 import { useWizardAnswers } from "../state/wizardAnswers";
-
-const JUMP_TARGETS = [
-  { path: "/", label: "Home", Icon: HomeIcon },
-  { path: "/wizard", label: "Wizard", Icon: WizardIcon },
-  { path: "/acronyms", label: "Acronyms", Icon: BookIcon },
-  { path: "/references", label: "References", Icon: DocumentIcon },
-  { path: "/glossary", label: "Glossary", Icon: InfoIcon },
-] as const;
+import { JUMP_TARGETS } from "./jumpTargets";
 
 export default function AppSidebar() {
   const { pathname } = useLocation();

@@ -17,7 +17,7 @@ function renderLanding() {
   const router = createMemoryRouter(
     [
       { path: "/", element: <Landing /> },
-      { path: "/education/:section", element: <h1>chapter</h1> },
+      { path: "/how-to", element: <h1>how-to</h1> },
     ],
     { initialEntries: ["/"] },
   );
@@ -75,6 +75,6 @@ describe("landing hero", () => {
 
     await userEvent.click(screen.getByRole("button", { name: /get started/i }));
 
-    expect(router.state.location.pathname).toBe("/education/disease-background");
+    expect(router.state.location.pathname).toBe("/how-to");
   });
 });

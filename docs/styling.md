@@ -964,3 +964,48 @@ and because the cost of being wrong is a sideways page.
 footing as §22 and §24. jsdom computes no layout, so the column, the wrap and the bullet indent
 were arithmetic until the page was opened. **No widths were recorded**, so item 30 covers this
 route too: it has been seen, not swept.
+
+## 26. `/how-to` — the interaction legend
+
+Built 2026-08-11 to the user's brief, condensing the client's reference "HOW-TO-USE" board
+(a sibling activity's) onto one screen. No artboard of our own exists; everything here is
+derivation, which is why the page owns almost no styling: **every demo is the real component
+doing its real job** — the `+` opens a real `Popup`, the figure is §5's clotting-cascade
+`ExpandableFigure` reused, the agent box serves Fitusiran's §16 sheet, the drawer pair is §15's
+accordion bar extracted to `src/components/NoteDisclosure.tsx` — so the legend cannot drift from
+the controls it explains. Two decided exceptions: the BEGIN `Button` is look-only (advancing is
+the Next arrow's job, per the user), and the sidebar replicas press like the real thing — hover,
+focus, active, the package's own skins — but navigate nowhere (2026-08-11, user: "behave like
+buttons, they don't have to navigate"). The arrow replicas' accessible names append
+"example" ("Previous example") and the jump replicas are icon-only with the printed labels beside
+them, so no replica ever answers to a live rail control's name — the spine walk reaches the real
+arrows by exactly "Previous"/"Next", on this page too.
+
+**On the spine**, index 1 between `/` and the first chapter — the landing CTA and both arrows
+route through it via `SECTION_ORDER` with no special-casing.
+
+**The reference board's "sections unlock after viewing" line is not carried**: the app has no
+such locking, and the legend describes only the real gate — Next disabled on `/wizard` until the
+three inputs are answered.
+
+**Shape — three layouts, not two** (the `lg`→`xl` step added 2026-08-11, user). Standard
+`PageSection` `<h1>`, then one grid wearing three arrangements: a stack below `lg`; **two columns
+from `lg`** (`lg:grid-cols-2`, auto-placed from DOM order into buttons+pop-ups / images+agent box
+/ legend+drawers rows — which is why `SidebarLegend` sits after the agent box in the DOM); and
+the four-column board from `xl` (`xl:grid-cols-[1fr_1fr_1.2fr_1.1fr]`, the legend explicitly
+spanning both rows in the column nearest the live rail, the drawers `xl:col-span-2`). The
+two-column step is taller than a viewport and scrolls, so item 53's clearance rides on the grid
+as `lg:mb-16 xl:mb-0` — `padsOwnBottom` cannot be width-conditional. Cards are `rounded-3xl
+bg-demo-card p-5` — `--background-image-demo-card`, a client-pasted Figma radial (2026-08-11)
+whose stops decode onto the palette: `agents-panel` (#00d8ff) at 5% into the same hue × 0.6 at
+5%, so the token derives its first stop from `--color-agents-panel` and transcribes the second
+(the fractional channels are Figma's colour output, not the §9 length-scale trap). It replaced
+the earlier `bg-white/50` — a faint cool tint over the page gradient instead of a frosted panel.
+Captions are on the mechanisms-caption voice (`font-bold text-popup-caption`, sentence case, no
+shout).
+
+**The legend labels do not step to `lg:text-lg`.** At `xl`'s narrowest (1280) the larger size
+wraps every note to three lines and pushes the board ~38px past the 800 line; `text-base` at
+every width is what buys the fit, measured, not guessed. The one-screen rule (§9 item 10) must
+hold across the whole `xl` band, 1280 through 1440 — verified in Chromium at 390 / 768 / 1152 /
+1280 / 1440, all with no sideways scroll and the board at exactly 800 from 1280 up.

@@ -26,6 +26,13 @@ describe("router", () => {
     expect(heading()).toHaveTextContent(ACTIVITY_TITLE);
   });
 
+  // The interaction legend between the landing page and the first chapter; its
+  // own behaviour is covered in `howTo.test.tsx`.
+  it("renders the how-to legend at /how-to", () => {
+    renderAt("/how-to");
+    expect(heading()).toHaveTextContent("How to Use");
+  });
+
   // Not a stub any more: the card carries the blueprint's entry-node line.
   it("renders the wizard intro card at /wizard-intro", () => {
     renderAt("/wizard-intro");
@@ -193,6 +200,7 @@ describe("router", () => {
     const rule = () => document.querySelector("[data-top-rule]");
 
     it.each([
+      "/how-to",
       "/wizard-intro",
       "/wizard",
       "/explore",

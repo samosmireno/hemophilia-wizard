@@ -9,6 +9,7 @@ import RebalancingAgents from "./education/RebalancingAgents";
 import TreatmentLandscape from "./education/TreatmentLandscape";
 import Explore from "./Explore";
 import Glossary from "./Glossary";
+import HowTo from "./HowTo";
 import Landing from "./Landing";
 import References from "./References";
 import Resources from "./Resources";
@@ -31,6 +32,7 @@ export const routes: RouteObject[] = [
       {
         element: <TopRule />,
         children: [
+          { path: "how-to", element: <HowTo /> },
           {
             path: "education",
             /*

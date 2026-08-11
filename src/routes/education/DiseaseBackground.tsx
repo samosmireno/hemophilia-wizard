@@ -12,7 +12,8 @@ import { cn } from "../../lib/cn";
 import { usePreloadImages } from "../../lib/preloadImage";
 import ClottingCascadeFigure from "./ClottingCascadeFigure";
 
-const CASCADE_TITLE = "Initiation and Amplification of the Clotting Cascade";
+/** Exported for `/how-to`, whose clickable-image demo is this same figure. */
+export const CASCADE_TITLE = "Initiation and Amplification of the Clotting Cascade";
 
 const MECHANISM = EDUCATION_TOPICS["disease-mechanism"];
 const DIAGNOSIS = EDUCATION_TOPICS["diagnosis"];

@@ -108,6 +108,17 @@
   --background-image-emerging-panel: linear-gradient(117.03deg, #ffffff 21.12%, #d3f1e9 91.03%);
   --shadow-emerging-panel: -20px -1px 47.2px -22px rgba(0, 0, 0, 0.25);
 
+  /* ─── /how-to demo cards (docs/styling.md §26) ────────────────────────────── */
+  /* Figma codegen, decoded: the first stop is `agents-panel` (#00d8ff) at 5%;
+     the second is the SAME hue × 0.6 (0,216.2,255 → 0,129.72,153 — both channels
+     share the factor), also at 5%. The fractional channels are Figma's own
+     colour output, not the §9 length-scale trap. */
+  --background-image-demo-card: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    color-mix(in srgb, var(--color-agents-panel) 5%, transparent) 0%,
+    rgba(0, 129.72, 153, 0.05) 100%
+  );
+
   --color-figure-note: color-mix(
     in srgb,
     var(--color-brand-teal-25) 27%,
