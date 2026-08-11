@@ -1,5 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { RouterProvider, createMemoryRouter } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SURVEY_QUESTIONS } from "../data/survey";
@@ -11,6 +12,20 @@ vi.mock("../lib/submitSurvey", () => ({
 }));
 
 const ERROR = "Please select an answer.";
+
+/** A router because the thank-you's "Back to home" navigates; the stub `/`
+ *  keeps the test off the real landing page's video and data. */
+function renderSurvey() {
+  const router = createMemoryRouter(
+    [
+      { path: "/survey", element: <Survey /> },
+      { path: "/", element: <h1>Home stub</h1> },
+    ],
+    { initialEntries: ["/survey"] },
+  );
+  const view = render(<RouterProvider router={router} />);
+  return { router, ...view };
+}
 
 /** The fieldset named by a question's prompt — the two Likert questions share
  *  every option label, so radios are only unambiguous inside their group. */
@@ -29,7 +44,7 @@ beforeEach(() => {
 
 describe("Survey", () => {
   it("renders each question as a radio group with its options", () => {
-    render(<Survey />);
+    renderSurvey();
     for (const question of SURVEY_QUESTIONS) {
       expect(group(question.prompt).getAllByRole("radio")).toHaveLength(question.options.length);
     }
@@ -37,7 +52,7 @@ describe("Survey", () => {
 
   it("marks every unanswered question on submit and sends nothing", async () => {
     const user = userEvent.setup();
-    render(<Survey />);
+    renderSurvey();
 
     await user.click(screen.getByRole("button", { name: "Submit" }));
 
@@ -49,7 +64,7 @@ describe("Survey", () => {
 
   it("clears a question's error the moment it is answered", async () => {
     const user = userEvent.setup();
-    render(<Survey />);
+    renderSurvey();
     const [first] = SURVEY_QUESTIONS;
 
     await user.click(screen.getByRole("button", { name: "Submit" }));
@@ -60,7 +75,7 @@ describe("Survey", () => {
 
   it("submits the answers through the adapter and swaps to the thank-you", async () => {
     const user = userEvent.setup();
-    render(<Survey />);
+    renderSurvey();
 
     await answerAll(user);
     await user.click(screen.getByRole("button", { name: "Submit" }));
@@ -78,17 +93,28 @@ describe("Survey", () => {
 
   it("keeps the thank-you across a remount in the same tab", async () => {
     const user = userEvent.setup();
-    const { unmount } = render(<Survey />);
+    const { unmount } = renderSurvey();
 
     await answerAll(user);
     await user.click(screen.getByRole("button", { name: "Submit" }));
     unmount();
-    render(<Survey />);
+    renderSurvey();
 
     // `sessionStorage` scoping: a refresh in this tab keeps the submitted
     // state; only a new tab (a fresh session store) gets a blank survey.
     expect(screen.getByRole("status")).toBeInTheDocument();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
     expect(submitSurvey).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers the way home from the thank-you", async () => {
+    const user = userEvent.setup();
+    const { router } = renderSurvey();
+
+    await answerAll(user);
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+    await user.click(screen.getByRole("button", { name: "Back to home" }));
+
+    expect(router.state.location.pathname).toBe("/");
   });
 });

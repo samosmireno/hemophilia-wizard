@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import { Button } from "mlg-components";
+import { useNavigate } from "react-router";
 
 import PageSection from "../components/PageSection";
 import { SURVEY_QUESTIONS, type SurveyQuestionId, type SurveyResponses } from "../data/survey";
@@ -14,6 +15,7 @@ import { submitSurvey } from "../lib/submitSurvey";
 const SUBMITTED_KEY = "survey-submitted";
 
 export default function Survey() {
+  const navigate = useNavigate();
   const errorsId = useId();
   const [answers, setAnswers] = useState<Partial<SurveyResponses>>({});
   const [submitted, setSubmitted] = useState(() => sessionStorage.getItem(SUBMITTED_KEY) !== null);
@@ -26,9 +28,22 @@ export default function Survey() {
     // Last section on the spine — Prev comes from `AppSidebar`, there is no Next.
     <PageSection title="Survey" padsOwnBottom>
       {submitted ? (
-        <p role="status" className="mt-8 text-lg text-black lg:text-xl">
-          Thank you — your response has been submitted.
-        </p>
+        <>
+          <p role="status" className="mt-8 text-lg text-black lg:text-xl">
+            Thank you — your response has been submitted.
+          </p>
+          {/* The thank-you is the walkthrough's dead end — last spine section,
+              no Next — so it offers the one move that makes sense. Navigation
+              via the landing CTA's idiom: `Button` + `useNavigate`. */}
+          <div className="mt-8">
+            <Button
+              className="px-6 leading-5 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl"
+              onClick={() => void navigate("/")}
+            >
+              Back to home
+            </Button>
+          </div>
+        </>
       ) : (
         <form
           className="max-w-none"

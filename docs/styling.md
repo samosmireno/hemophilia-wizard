@@ -1030,8 +1030,10 @@ not section headings; options `text-base lg:text-lg`; the form runs the full con
 
 **Every string except the questions is unsourced.** `CONTEXT.md` §10 supplies the three prompts
 and their options verbatim; the title ("Survey"), the button ("Submit"), the error ("Please select
-an answer.") and the thank-you ("Thank you — your response has been submitted.") are authored here
-— a client copy pass overrules any of them.
+an answer.") and the thank-you ("Thank you — your response has been submitted.", with its
+"Back to home" button — the landing CTA's `Button` + `useNavigate` idiom on the submit's size
+ramp, since the thank-you is the walkthrough's dead end) are authored here — a client copy pass
+overrules any of them.
 
 **Validation is inline, not `disabled`.** Submit stays enabled; a click with gaps marks each
 unanswered fieldset with a crimson line (`text-brand-crimson-50`, wired to the group by
