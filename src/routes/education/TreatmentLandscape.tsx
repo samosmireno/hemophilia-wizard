@@ -33,7 +33,7 @@ interface CardImage {
 }
 
 const BLOOD_DROP: CardImage = { src: bloodDropUrl, width: 552, height: 1020 };
-const BLOOD_GEAR: CardImage = { src: bloodGearUrl, width: 980, height: 1188 };
+const BLOOD_GEAR: CardImage = { src: bloodGearUrl, width: 568, height: 688 };
 
 /** A row's inline figure: the images carry their captions, so each needs an alt. */
 interface RowImage extends CardImage {

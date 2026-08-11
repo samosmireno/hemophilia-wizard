@@ -20,7 +20,7 @@ interface BoxArt {
 const CONCENTRATES: BoxArt = { src: factorConcentratesUrl, width: 584, height: 652 };
 const MIMETIC: BoxArt = { src: mimeticUrl, width: 804, height: 716 };
 const REBALANCING: BoxArt = { src: rebalancingUrl, width: 848, height: 716 };
-const GENE: BoxArt = { src: geneTherapyUrl, width: 600, height: 716 };
+const GENE: BoxArt = { src: geneTherapyUrl, width: 403, height: 480 };
 
 /**
  * Keyed by the verbatim class labels `classesFor` lists — the only join there

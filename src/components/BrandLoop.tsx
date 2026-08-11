@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import loopUrl from "../assets/landing-loop.mp4";
-import posterUrl from "../assets/landing-poster.jpg";
+import posterUrl from "../assets/landing-poster.webp";
 import { cn } from "../lib/cn";
 
 /** True when the OS asks for reduced motion. Read once, at mount. */

@@ -48,7 +48,7 @@ const DENECIMIG_FIGURE_ALT =
   "platelet surface and bridges them, converting factor X to factor Xa. Factor Xa with " +
   "factor Va then converts factor II to factor IIa, which forms a blood clot.";
 
-// Not half of the current 2176 × 1392 file: the width is a cap, and the ratio —
+// Half of the 3852 × 2465 file (rounded): the width is a cap, and the ratio —
 // which is what the reservation needs — still matches.
 const DENECIMIG_FIGURE = { width: 1926, height: 1232 } as const;
 
@@ -90,7 +90,7 @@ const INNO8_FIGURE_ALT =
   "arrow leads to FIXa cleaving FX: FXa is freed, and a crossed reverse arrow marks the released " +
   "FX activation peptide (FX AP) as not rebinding.";
 
-// Not half of the current 4352 × 1676 file: the width is a cap, and the ratio still matches.
+// The file's own 2612 × 1006: the width is a cap, and the pair feeds `aspect-ratio`.
 const INNO8_FIGURE = { width: 2612, height: 1006 } as const;
 
 // The artboard's "in early- stage development:" is a PDF soft-hyphen artifact, so it
