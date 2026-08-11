@@ -22,7 +22,7 @@ export default function ClottingCascadeFigure() {
 
         <img
           src={cascadeUrl}
-          alt="Vascular injury exposes tissue factor, which with FVIIa initiates coagulation. FVIIa and tissue factor drive FVa, FXa, calcium and phospholipid to generate thrombin, which forms a fibrin clot. Thrombin feeds back to amplify the cascade through FXa and the FVIIIa–FIXa complex."
+          alt="Vascular injury exposes tissue factor, which with FVIIa generates thrombin and a fibrin clot; thrombin feeds back to amplify the cascade."
           style={{ aspectRatio: "1220 / 650" }}
           className="w-full"
         />

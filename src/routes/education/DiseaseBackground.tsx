@@ -27,7 +27,7 @@ const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
         src={diagnosticUrl}
         width={720}
         height={608}
-        alt="Diagnostic algorithm for hemophilia A and B. Initial testing: PT/aPTT, then a mixing study if the aPTT is prolonged. A prolonged aPTT that corrects leads to factor assays, which split into reduced FVIII activity and reduced FIX activity. Reduced FVIII activity also prompts VWF testing (VWF:Ag and VWF:Act) to rule out von Willebrand disease. Both arms lead to genetic analysis: F8 genotyping confirms hemophilia A and F9 genotyping confirms hemophilia B, identifying the mutation and inhibitor risk. VWF testing is repeated for discrepant results, suspected inhibitors, and complex cases."
+        alt="Diagnostic algorithm for hemophilia A/B: prolonged aPTT leads to mixing study, factor and VWF assays, then F8 or F9 genotyping to confirm."
       />
     ),
   },
@@ -45,7 +45,7 @@ const DISCLOSURES: readonly [Disclosure, Disclosure, Disclosure] = [
         src={bleedingUrl}
         width={720}
         height={640}
-        alt="Typical bleeding manifestations in males and females with hemophilia A or B, annotated on a body diagram. Musculoskeletal bleeding, mainly the elbows, ankles, and knees, accounts for 80%. Also shown: intracranial hemorrhage; oropharyngeal cavity bleeding; epistaxis, rarely; gastrointestinal bleeding; genitourinary bleeding; heavy menstrual bleeding and postpartum hemorrhage; and easy bruising."
+        alt="Body diagram of bleeding in hemophilia A/B: musculoskeletal bleeds (80%), intracranial, oropharyngeal, GI, genitourinary bleeding, easy bruising."
       />
     ),
   },

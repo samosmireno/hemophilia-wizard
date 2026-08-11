@@ -31,22 +31,20 @@ const DENECIMIG_CARD_TITLE = "Denecimig (Mim8)";
 
 /**
  * Structural rather than mechanistic: `EMICIZUMAB_MOA.body` carries the mechanism
- * in words directly beneath the picture. Do not "fix" this into the longer house
- * style without moving that prose.
+ * in words directly beneath the picture. Under the 150-character alt cap, like
+ * every figure alt.
  */
 const MOA_FIGURE_ALT =
-  "Diagram of emicizumab, a Y-shaped bispecific antibody, with double-headed arrows to " +
-  "factor Xa, factor X, factor IXa, and factor IX on a phospholipid membrane.";
+  "Emicizumab, a Y-shaped bispecific antibody, with double-headed arrows to factor Xa, " +
+  "factor X, factor IXa, and factor IX on a phospholipid membrane.";
 
 /** Half of `emicizumab.webp`'s 1408 × 1468 — the drawn size, and the reserved ratio. */
 const MOA_FIGURE = { width: 704, height: 734 } as const;
 
-/** Opens with the panel's own heading, which `denecimig.webp` paints in its pixels. */
+/** The mechanism `denecimig.webp` paints, compressed under the 150-character alt cap. */
 const DENECIMIG_FIGURE_ALT =
-  "Diagram titled “Mechanism of Action for Denecimig (Mim8): FVIII mimetic BsAb”. " +
-  "Denecimig (Mim8), a Y-shaped bispecific antibody, binds factor IXa and factor X on an activated " +
-  "platelet surface and bridges them, converting factor X to factor Xa. Factor Xa with " +
-  "factor Va then converts factor II to factor IIa, which forms a blood clot.";
+  "Denecimig (Mim8), a Y-shaped bispecific antibody, bridges factor IXa and factor X on " +
+  "a platelet surface, generating FXa, thrombin, and a clot.";
 
 // Half of the 3852 × 2465 file (rounded): the width is a cap, and the ratio —
 // which is what the reservation needs — still matches.
@@ -59,13 +57,10 @@ const DENECIMIG_FIGURE = { width: 1926, height: 1232 } as const;
  */
 const NXT007_FIGURE_TITLE = "Zemocimig (NXT007) BsAb structure";
 
-/** Opens with the panel's own heading, which `nxt007.webp` paints in its pixels. */
+/** The structure `nxt007.webp` paints, compressed under the 150-character alt cap. */
 const NXT007_FIGURE_ALT =
-  "Diagram titled “Zemocimig (NXT007) BsAb structure”, subtitled “Emicizumab-derived heavy " +
-  "chains”. NXT007 is a Y-shaped bispecific antibody whose two arms are labelled anti-FIXa " +
-  "and anti-FX. Each arm pairs a heavy chain with its own novel light chain, and plus and " +
-  "minus symbols mark the charged residues at the two interfaces. The paired stem below is " +
-  "labelled as having increased binding activity against FcRn.";
+  "Zemocimig (NXT007) bispecific antibody structure: anti-FIXa and anti-FX arms with " +
+  "novel light chains, and a stem with increased FcRn binding.";
 
 // Half of `nxt007.webp`'s 2176 × 1500. The ratio must match the file — `PopupFigure`
 // writes the pair straight into `aspect-ratio`.
@@ -74,21 +69,10 @@ const NXT007_FIGURE = { width: 1088, height: 750 } as const;
 /** The source's caption, not the thirteen-word one painted in the raster. */
 const INNO8_FIGURE_TITLE = "Inno8 Mechanism of Action";
 
-/**
- * Opens with the panel's own painted heading. The second annotation reads
- * "Anti-FIXa VHH" against the FX arm — as drawn, and not repaired here; CONTEXT.md
- * §7.5 records it as a source defect.
- */
+/** The mechanism `inno8.webp` paints, compressed under the 150-character alt cap. */
 const INNO8_FIGURE_ALT =
-  "Diagram titled “Inno8: Novel Factor VIII Mimetic Bispecific Binder Engineered for Oral " +
-  "Administration”, in three panels. At the left, Inno8 — two linked heavy-chain-only VHH " +
-  "domains — sits between factor IX and factor X with a double-headed arrow to each: one VHH " +
-  "binds the serum FIXa serine protease domain, the other binds the FX activation peptide so " +
-  "that FXa is released upon activation, and Inno8 itself is about five times smaller than an " +
-  "IgG antibody, with conjugated fatty acids that bind serum albumin to extend its half-life. " +
-  "In the centre, those two domains bridge FIXa and FX on a membrane surface. At the right, an " +
-  "arrow leads to FIXa cleaving FX: FXa is freed, and a crossed reverse arrow marks the released " +
-  "FX activation peptide (FX AP) as not rebinding.";
+  "Inno8, a small two-VHH bispecific binder designed for oral dosing, bridges factor IXa " +
+  "and factor X on a membrane, releasing FXa on activation.";
 
 // The file's own 2612 × 1006: the width is a cap, and the pair feeds `aspect-ratio`.
 const INNO8_FIGURE = { width: 2612, height: 1006 } as const;

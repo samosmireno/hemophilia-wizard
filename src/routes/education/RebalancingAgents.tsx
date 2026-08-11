@@ -34,13 +34,10 @@ const MECHANISMS_LABEL =
 const MECHANISM_FIGURE_TITLE =
   "Mechanisms of Hemostatic Rebalancing Agents in the Coagulation Cascade";
 
+// Under the 150-character alt cap; the tests hold it to naming all three agents.
 const MECHANISM_FIGURE_ALT =
-  "Coagulation cascade showing where hemostatic rebalancing agents act. FXI activates FIX; " +
-  "FIX and FVIIa converge on FX, which with FV generates thrombin, and thrombin converts " +
-  "fibrinogen to fibrin. Two endogenous anticoagulants restrain the cascade: TFPI inhibits " +
-  "FVIIa and FX, and antithrombin inhibits FX and thrombin. Concizumab and marstacimab " +
-  "inhibit TFPI; fitusiran inhibits antithrombin — removing those brakes restores thrombin " +
-  "generation.";
+  "Coagulation cascade in which concizumab and marstacimab inhibit TFPI and fitusiran " +
+  "inhibits antithrombin, restoring thrombin generation.";
 
 /** Colour by mechanism class, as drawn: the anti-TFPI mAbs in blue, the siRNA in crimson. */
 const MECHANISM_TONE: Record<RebalancingMechanism, string> = {
