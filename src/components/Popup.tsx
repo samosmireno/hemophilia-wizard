@@ -78,7 +78,7 @@ export default function Popup({
             surface === "white" ? "bg-white" : "bg-popup",
           )}
         >
-          <header className="relative flex min-h-11 shrink-0 flex-col justify-center bg-brand-crimson-50 py-3 sm:min-h-14 lg:min-h-16.25">
+          <header className="relative flex min-h-11 shrink-0 flex-col justify-center bg-brand-crimson-50 py-4 sm:min-h-14 lg:min-h-16.25">
             {/* `aria-label` is required, not belt-and-braces: `preserveCase` splits the
                 title into fragments the accessible-name algorithm would join with spaces. */}
             <h2
