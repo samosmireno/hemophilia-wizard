@@ -78,12 +78,12 @@ export default function Scenario() {
       <BulletList items={screen.classes} className="text-xl lg:text-2xl" format={formatInline} />
 
       {screen.caveat && (
-        <p className="mt-8 text-xl text-black lg:text-2xl">{formatInline(screen.caveat)}</p>
+        <p className="mt-12 text-xl text-black lg:text-2xl">{formatInline(screen.caveat)}</p>
       )}
 
       {/* Painted boxes-then-caption via `flex-col-reverse`: source order stays
           caption-then-boxes so the caption is read before what it describes. */}
-      <div className="mt-40 flex flex-col-reverse gap-8">
+      <div className="mt-8 flex flex-col-reverse gap-8 lg:mt-20 xl:mt-40">
         {caption}
         {boxes}
       </div>
