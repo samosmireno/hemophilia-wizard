@@ -31,10 +31,10 @@ const OFF_LINE = ["/glossary", "/acronyms", "/references"] as const;
 
 describe("sidebar — walkthrough spine", () => {
   /**
-   * Both walks need an answered wizard. Two of the thirteen steps are the pages
-   * past `/wizard`, which only exist for a scenario: without answers Next is
-   * dead on `/wizard` and `WizardGate` bounces the two beyond it back there. The
-   * gate itself is asserted below and in `wizard.test.tsx`; here it is a
+   * Both walks need an answered wizard. Three of the fifteen steps are the pages
+   * past `/wizard`, which only exist for answers: without them Next is dead on
+   * `/wizard` and the gates bounce the pages beyond it back there. The gates
+   * themselves are asserted below and in `wizard.test.tsx`; here they are a
    * precondition, so that these two stay tests of the spine.
    */
   it("steps Next through the whole section order", async () => {
@@ -60,12 +60,13 @@ describe("sidebar — walkthrough spine", () => {
   });
 
   /**
-   * The arrow and the page's Submit button are one gate, not two — the reason
+   * The arrow and each form's Submit button are one gate, not two — the reason
    * this lives in the sidebar's suite is that the coupling runs the wrong way to
    * be visible from the page: `AppSidebar` owns the arrow, so only it can
-   * disable it.
+   * disable it. Two doors since the reason split off `/wizard`: the patient
+   * answers open `/wizard`, the reason opens `/wizard/reason`.
    */
-  it("disables Next on /wizard until the answers are complete", async () => {
+  it("disables Next on /wizard until the patient answers are complete", async () => {
     const user = userEvent.setup();
     const router = renderAt("/wizard");
 
@@ -74,14 +75,45 @@ describe("sidebar — walkthrough spine", () => {
     expect(at(router)).toBe("/wizard");
   });
 
-  it("enables Next on /wizard once the answers are complete", async () => {
-    seedWizardAnswers();
+  it("enables Next on /wizard on the patient answers alone — no reason needed", async () => {
+    seedWizardAnswers({ reason: null });
     const user = userEvent.setup();
     const router = renderAt("/wizard");
 
     expect(button("Next")).toBeEnabled();
     await user.click(button("Next"));
     expect(at(router)).toBe("/wizard/scenario");
+  });
+
+  it("disables Next on /wizard/reason until the reason is picked", async () => {
+    seedWizardAnswers({ reason: null });
+    const user = userEvent.setup();
+    const router = renderAt("/wizard/reason");
+
+    expect(button("Next")).toBeDisabled();
+    await user.click(button("Next"));
+    expect(at(router)).toBe("/wizard/reason");
+  });
+
+  it("enables Next on /wizard/reason once the reason is picked", async () => {
+    seedWizardAnswers();
+    const user = userEvent.setup();
+    const router = renderAt("/wizard/reason");
+
+    expect(button("Next")).toBeEnabled();
+    await user.click(button("Next"));
+    expect(at(router)).toBe("/wizard/therapies");
+  });
+
+  /** The scenario interlude between the two forms is never gated forward. */
+  it("leaves Next open on /wizard/scenario without a reason", async () => {
+    seedWizardAnswers({ reason: null });
+    const user = userEvent.setup();
+    const router = renderAt("/wizard/scenario");
+
+    expect(button("Next")).toBeEnabled();
+    await user.click(button("Next"));
+    expect(at(router)).toBe("/wizard/reason");
   });
 
   it("disables Prev at the first step", () => {

@@ -1,6 +1,16 @@
 # Session-scoped wizard answers, held above the shell
 
-**Status:** accepted
+**Status:** accepted — amended 2026-08-12
+
+> **Amendment (2026-08-12).** The flow is now **four** routes: on client direction the
+> reason question moved out of `/wizard` to its own step, `/wizard/reason`, between the
+> scenario screen and the leaf — restoring the blueprint's order (classes shown before
+> the reason question, CONTEXT.md §4). Decision 4's gate is now stated twice **per
+> door**: the two patient answers open `/wizard` (sidebar arrow + `ScenarioGate` over
+> `/wizard/scenario` and `/wizard/reason`), and the reason opens `/wizard/reason`
+> (sidebar arrow + `LeafGate` over `/wizard/therapies`, which bounces a reason-less
+> session to `/wizard/reason` — the nearest missing step — rather than to `/wizard`).
+> Everything else here stands unchanged.
 
 The Treatment Wizard's three answers — hemophilia type, inhibitor status, reason for
 considering a new therapy — live in a React context mounted in `AppShell`, mirrored into

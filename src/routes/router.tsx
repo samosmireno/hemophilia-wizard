@@ -17,7 +17,8 @@ import Survey from "./Survey";
 import TopRule from "./TopRule";
 import Wizard from "./Wizard";
 import WizardIntro from "./WizardIntro";
-import WizardGate from "./wizard/Gate";
+import { LeafGate, ScenarioGate } from "./wizard/Gate";
+import Reason from "./wizard/Reason";
 import Scenario from "./wizard/Scenario";
 import Therapies from "./wizard/Therapies";
 
@@ -59,10 +60,17 @@ export const routes: RouteObject[] = [
             children: [
               { index: true, element: <Wizard /> },
               {
-                element: <WizardGate />,
+                // Two gate levels, nested: the scenario pages need the two
+                // patient answers; the leaf additionally needs the reason, and
+                // its gate can assume the outer one held (see Gate.tsx).
+                element: <ScenarioGate />,
                 children: [
                   { path: "scenario", element: <Scenario /> },
-                  { path: "therapies", element: <Therapies /> },
+                  { path: "reason", element: <Reason /> },
+                  {
+                    element: <LeafGate />,
+                    children: [{ path: "therapies", element: <Therapies /> }],
+                  },
                 ],
               },
               { path: "*", element: <Navigate to="/wizard" replace /> },

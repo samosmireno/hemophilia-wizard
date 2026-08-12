@@ -19,14 +19,15 @@ Only when **both** hold (`initAnalytics` in `src/main.tsx`):
 
 **Pageviews** — every route change, sent manually from `AppShell` (`useLocation`
 effect); init passes `send_page_view: false` so the landing page isn't double-counted.
-Path only, never query strings. The 14-step `SECTION_ORDER` spine means the funnel is
-built in GA4 reporting straight from page paths.
+Path only, never query strings. The 15-step `SECTION_ORDER` spine means the funnel is
+built in GA4 reporting straight from page paths — including the intake→scenario drop-off,
+since `/wizard`'s Submit fires no event (see the table).
 
 **Events** (all fired through typed helpers in `src/lib/analytics.ts`):
 
 | Event                    | Fires when                                            | Params                                                                                                          |
 | ------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `wizard_submit`          | Submit on `/wizard` with all three answers            | `hemophilia_type` (`A`/`B`), `has_inhibitors` (`yes`/`no`), `switch_reason`                                     |
+| `wizard_submit`          | Submit on `/wizard/reason` with all three answers     | `hemophilia_type` (`A`/`B`), `has_inhibitors` (`yes`/`no`), `switch_reason`                                     |
 | `recommendation_reached` | `/wizard/therapies` renders a leaf                    | `scenario` (e.g. `A-without-inhibitors`), `switch_reason`                                                       |
 | `drug_sheet_open`        | Any agent drug sheet opens, except the `/how-to` demo | `agent`, `page`                                                                                                 |
 | `survey_submit`          | The outcomes survey validates and submits             | — (the Google Form owns answer content; GA is the only success signal, since the Form POST is opaque `no-cors`) |
@@ -34,7 +35,9 @@ built in GA4 reporting straight from page paths.
 **Deliberately not collected**: recommended agent lists (derivable offline from
 `scenario` + `switch_reason` via `src/data/wizard.ts`), per-radio-click answer changes,
 generic popup/accordion opens, back-navigation, timings, survey answer content, query
-params, anything identifying. Outbound clicks on `/references` and `/resources` come
+params, anything identifying. Also no event on `/wizard`'s own Submit — the reason split
+(2026-08-12) moved `wizard_submit` to `/wizard/reason`, the first moment all three params
+exist; who completed the patient questions is the `/wizard/scenario` pageview. Outbound clicks on `/references` and `/resources` come
 from GA4 Enhanced Measurement, not from code.
 
 ## GA4 console checklist (one-time, property `G-JE497010X0`)
@@ -86,7 +89,7 @@ npm run preview` (the local `.env` supplies the ID; the dev server never sends).
       `session_start` / `first_visit`.
 - [ ] `npm run dev` with the extension on: DebugView stays **silent** — the `PROD`
       guard holds.
-- [ ] Walk the spine with the Front arrow through all 14 steps: one `page_view` per
+- [ ] Walk the spine with the Front arrow through all 15 steps: one `page_view` per
       step, page path correct each time; Back likewise, no doubles.
 - [ ] Sidebar jump links (`/glossary`, `/acronyms`, `/references`): pageviews arrive for
       off-spine pages too.
@@ -99,20 +102,27 @@ npm run preview` (the local `.env` supplies the ID; the dev server never sends).
       fires a stray `page_view` (accepted noise either way, just know which).
 - [ ] Deep-link `/wizard/scenario` in a fresh tab (no answers): the gate bounces to
       `/wizard` and fires its pageview — accepted noise, per the schema decision.
+- [ ] Deep-link `/wizard/therapies` with the patient answers in but no reason (answer
+      the two questions, then paste the URL in the same tab): the leaf gate bounces to
+      `/wizard/reason` — same accepted noise, one pageview for the landing page.
 
 ### `wizard_submit`
 
-- [ ] With any answer missing, Submit is disabled — nothing fires.
-- [ ] Complete the three answers, Submit: one `wizard_submit`; expand it and check
+- [ ] Answer the two patient questions on `/wizard` and Submit: **no event** — only the
+      `/wizard/scenario` pageview. The event needs all three answers and belongs to the
+      reason step.
+- [ ] On `/wizard/reason` with no reason picked, Submit is disabled — nothing fires.
+- [ ] Pick a reason, Submit: one `wizard_submit`; expand it and check
       `hemophilia_type`, `has_inhibitors` (`yes`/`no`), `switch_reason` match exactly
-      what was clicked.
-- [ ] Go Back, change an answer, resubmit: a second event with the updated values
-      (expected — the once-per-session counting method absorbs this in reports).
+      what was clicked across both screens.
+- [ ] Go Back, change an answer on either screen, resubmit the reason step: a second
+      event with the updated values (expected — the once-per-session counting method
+      absorbs this in reports).
 - [ ] If key events are already registered: the event row carries the key-event flag.
 
 ### `recommendation_reached`
 
-- [ ] Front arrow from `/wizard/scenario` to `/wizard/therapies`: one event;
+- [ ] Front arrow from `/wizard/reason` to `/wizard/therapies`: one event;
       `scenario` is `A|B-with|without-inhibitors` and matches the answers,
       `switch_reason` rides along.
 - [ ] Reload `/wizard/therapies`: fires again alongside the `page_view` — each viewing

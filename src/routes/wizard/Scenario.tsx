@@ -10,7 +10,7 @@ import ClassTablePopup from "../../components/ClassTablePopup";
 import PageSection from "../../components/PageSection";
 import { classesFor } from "../../data/wizard";
 import { formatInline } from "../../lib/formatInline";
-import { useCompleteWizardAnswers } from "../../state/wizardAnswers";
+import { useScenarioWizardAnswers } from "../../state/wizardAnswers";
 
 /** One class illustration: the asset plus its own intrinsic pixels — the four
     exports do not share a size the way §7.7's agent thumbnails do. */
@@ -41,7 +41,7 @@ const BOX_ART: ReadonlyMap<string, BoxArt> = new Map([
 ]);
 
 export default function Scenario() {
-  const screen = classesFor(useCompleteWizardAnswers());
+  const screen = classesFor(useScenarioWizardAnswers());
 
   const [openClass, setOpenClass] = useState<string | null>(null);
 

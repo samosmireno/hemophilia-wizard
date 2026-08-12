@@ -9,7 +9,12 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-11 (the §5 comparison table built at last — §5.2 turns its open
+- **Last reviewed:** 2026-08-12 (the wizard flow split to the blueprint's order on client
+  direction — `/wizard` now asks only the two patient questions, and Q3 is its own walkthrough
+  step `/wizard/reason` between the scenario screen and the leaf, wearing the same
+  "Input patient characteristics" title; the gate is two-level (`ScenarioGate`/`LeafGate`,
+  ADR 0003 amended) with a reason-less leaf deep link landing on `/wizard/reason`, and
+  `wizard_submit` fires from the reason step — see §4); previously 2026-08-11 (the §5 comparison table built at last — §5.2 turns its open
   question into the **patient-type ("serves") ruling with no "A + B" dropdown option**
   (provisional, **flagged for the client gate**; it reversed an exact-cell-match first ruling
   the same day, on the domain ground that no patient has both types) and records the class
@@ -196,11 +201,20 @@ Entry node (purple diamond): **"Explore Novel Prophylactic Therapy Options for Y
 > into `Leaf.archTitle` by `leafFor()` and is not otherwise exported.
 > This is a copy decision on one screen, not a change to the source content.
 >
-> **The flow is three app routes `[BUILD]`.** `/wizard` collects the three answers behind a
-> Submit button; `/wizard/scenario` is the "Therapeutic classes to consider" box below;
-> `/wizard/therapies` the leaf ([§4.1](#41-recommendation-matrix-scenario--reason--agents)–4.2).
-> All three are walkthrough steps, and the answers are held for the browsing session only —
-> rationale in `docs/adr/0003-session-scoped-wizard-answers.md`.
+> **The flow is four app routes `[BUILD]`** (`[CLIENT]` 2026-08-12 — previously three, with all
+> three questions on `/wizard`): `/wizard` collects **the two patient answers** behind a Submit
+> button; `/wizard/scenario` is the "Therapeutic classes to consider" box below;
+> `/wizard/reason` asks Q3 behind its own "Submit inputs" button; `/wizard/therapies` the leaf
+> ([§4.1](#41-recommendation-matrix-scenario--reason--agents)–4.2). The split restores the
+> blueprint's own order — the classes box is drawn _before_ the reason question (see the table
+> below) — which the one-form `/wizard` had flattened. `/wizard/reason` wears `/wizard`'s
+> "Input patient characteristics" title: the two screens are halves of one intake form, and the
+> client supplied no other heading (flagged for the styling gate). All four are walkthrough
+> steps, and the answers are held for the browsing session only — rationale in
+> `docs/adr/0003-session-scoped-wizard-answers.md` (amended for the split: the gate is two-level,
+> patient answers then reason, and a leaf deep-linked without a reason lands on `/wizard/reason`).
+> The `wizard_submit` GA4 event moved with Q3 — it fires from `/wizard/reason`, the first moment
+> all three params exist; `/wizard`'s own Submit fires nothing (`docs/analytics.md`).
 >
 > **The leaf renders its note pair as a one-open accordion `[BUILD]`.** Two `/wizard/therapies`
 > artboards were delivered for the same leaf, one per open block, and both draw exactly one open:

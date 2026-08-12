@@ -10,11 +10,12 @@ import { ANSWERS_STORAGE_KEY, isComplete, useWizardAnswers } from "./wizardAnswe
  * the store's whole surface, without a route or a form in the way.
  */
 function Probe() {
-  const { answers, setAnswer, reset, complete } = useWizardAnswers();
+  const { answers, setAnswer, reset, scenarioComplete, complete } = useWizardAnswers();
 
   return (
     <>
       <output>{JSON.stringify(answers)}</output>
+      <span data-testid="scenario-complete">{String(scenarioComplete)}</span>
       <span data-testid="complete">{String(complete)}</span>
       <button onClick={() => setAnswer("type", "B")}>set type</button>
       <button onClick={() => setAnswer("hasInhibitors", true)}>set inhibitors</button>
@@ -99,6 +100,23 @@ describe("wizard answers", () => {
 
     await press("set reason");
     expect(complete()).toHaveTextContent("true");
+  });
+
+  /**
+   * The two-level gate's lower door: the patient answers alone resolve a
+   * scenario, which is what `/wizard`'s Submit and the pages before the reason
+   * question run on. The reason must not factor in — that is `complete`'s job.
+   */
+  it("is scenario-complete on the two patient answers alone", async () => {
+    renderProbe();
+    const scenarioComplete = () => screen.getByTestId("scenario-complete");
+
+    await press("set type");
+    expect(scenarioComplete()).toHaveTextContent("false");
+
+    await press("set inhibitors");
+    expect(scenarioComplete()).toHaveTextContent("true");
+    expect(screen.getByTestId("complete")).toHaveTextContent("false");
   });
 
   it("reset clears all three", async () => {

@@ -21,8 +21,12 @@ export default function AppSidebar() {
   const spineBack = onSpine ? prevOf(pathname) : undefined;
   const front = onSpine ? nextOf(pathname) : undefined;
 
-  const { complete: wizardComplete } = useWizardAnswers();
-  const gatedByWizard = pathname === "/wizard" && !wizardComplete;
+  // Each wizard form pairs the arrow with its own Submit gate (ADR 0003's
+  // double statement): the patient answers open `/wizard`, the reason opens
+  // `/wizard/reason`.
+  const { complete, scenarioComplete } = useWizardAnswers();
+  const gatedByWizard =
+    (pathname === "/wizard" && !scenarioComplete) || (pathname === "/wizard/reason" && !complete);
   const backDisabled = onSpine && spineBack === undefined;
 
   const items: SidebarItem[] = JUMP_TARGETS.map(({ path, label, Icon }) => ({

@@ -4,20 +4,14 @@ import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { nextOf } from "../data/sectionOrder";
-import {
-  REASON_CHOICES,
-  WIZARD_INPUT_TITLE,
-  WIZARD_QUESTIONS,
-  classesFor,
-  leafFor,
-} from "../data/wizard";
+import { WIZARD_INPUT_TITLE, WIZARD_QUESTIONS, classesFor, leafFor } from "../data/wizard";
 import { seedWizardAnswers } from "../test/setup";
 import { routes } from "./router";
 
 /**
  * Mounted through the app's own `routes` rather than as a bare component, unlike
  * `wizardIntro.test.tsx`: the answers live in a provider in `AppShell` and the
- * pages beyond are guarded by a layout route, so the wiring under test only
+ * pages beyond are guarded by layout routes, so the wiring under test only
  * exists when the real tree is rendered.
  */
 function renderAt(path: string) {
@@ -30,11 +24,10 @@ const at = (router: ReturnType<typeof renderAt>) => router.state.location.pathna
 const radio = (name: RegExp | string) => screen.getByRole("radio", { name });
 const submit = () => screen.getByRole("button", { name: "Submit inputs" });
 
-/** Answer all three questions through the UI, as a learner would. */
-async function answerAll(user: ReturnType<typeof userEvent.setup>) {
+/** Answer the two patient questions through the UI, as a learner would. */
+async function answerPatient(user: ReturnType<typeof userEvent.setup>) {
   await user.click(radio("Hemophilia B"));
   await user.click(radio("Yes"));
-  await user.click(radio("Increase adherence"));
 }
 
 describe("wizard — patient characteristics", () => {
@@ -46,56 +39,20 @@ describe("wizard — patient characteristics", () => {
     expect(title).toHaveClass("uppercase");
   });
 
-  it("asks the three questions as named groups", () => {
+  /**
+   * Two questions, not three: the reason moved to its own step past the
+   * scenario screen (client direction 2026-08-12, the blueprint's own order),
+   * so its group must NOT render here — a page asking all three again is the
+   * exact regression the split exists to prevent.
+   */
+  it("asks the two patient questions as named groups, and not the reason", () => {
     renderAt("/wizard");
 
-    for (const question of Object.values(WIZARD_QUESTIONS)) {
+    for (const question of [WIZARD_QUESTIONS.type, WIZARD_QUESTIONS.inhibitors]) {
       expect(screen.getByRole("group", { name: question })).toBeInTheDocument();
     }
-  });
 
-  /**
-   * The reason buttons read left-to-right, top-to-bottom in the artboard's own
-   * order, which is NOT `SWITCH_REASONS`' (the blueprint's). Asserted as DOM
-   * order because that is also the tab and screen-reader order — the two must be
-   * the one the design draws.
-   */
-  it("lays the four reasons out in the artboard's reading order", () => {
-    renderAt("/wizard");
-
-    const reasons = screen
-      .getByRole("group", { name: WIZARD_QUESTIONS.reason })
-      .querySelectorAll("input[type=radio]");
-
-    expect([...reasons].map((input) => (input as HTMLInputElement).value)).toEqual([
-      "bleeding-control",
-      "monitoring",
-      "adherence",
-      "treatment-burden",
-    ]);
-  });
-
-  /**
-   * The screen renders the artboard's imperative labels, not the source's gerunds.
-   * The gerunds are literals here rather than a field read: they belong to the
-   * blueprint's arch sentence, which is `wizard.ts`'s to compose and `wizard.test.ts`'s
-   * to assert. What this pins is that none of the four reaches a radio.
-   */
-  it("labels the reasons with the artboard's wording", () => {
-    renderAt("/wizard");
-
-    for (const choice of REASON_CHOICES) {
-      expect(radio(choice.label)).toBeInTheDocument();
-    }
-
-    for (const gerund of [
-      "Improving bleeding control",
-      "Increased adherence",
-      "Reduced treatment burden",
-      "Reduced monitoring requirement",
-    ]) {
-      expect(screen.queryByRole("radio", { name: gerund })).not.toBeInTheDocument();
-    }
+    expect(screen.queryByRole("group", { name: WIZARD_QUESTIONS.reason })).not.toBeInTheDocument();
   });
 
   /** YES/NO is the artboard shouting, so it is a class — the copy stays Yes/No. */
@@ -146,7 +103,7 @@ describe("wizard — patient characteristics", () => {
   });
 
   describe("the submit gate", () => {
-    it("is disabled until all three questions are answered", async () => {
+    it("is disabled until both patient questions are answered", async () => {
       const user = userEvent.setup();
       renderAt("/wizard");
 
@@ -154,15 +111,13 @@ describe("wizard — patient characteristics", () => {
       await user.click(radio("Hemophilia B"));
       expect(submit()).toBeDisabled();
       await user.click(radio("Yes"));
-      expect(submit()).toBeDisabled();
-      await user.click(radio("Increase adherence"));
       expect(submit()).toBeEnabled();
     });
 
     it("closes again when an answer is cleared", async () => {
       const user = userEvent.setup();
       renderAt("/wizard");
-      await answerAll(user);
+      await answerPatient(user);
 
       await user.click(radio("Yes")); // picking the chosen option clears it
 
@@ -172,11 +127,11 @@ describe("wizard — patient characteristics", () => {
 
     /**
      * The release is announced, not just permitted (docs/styling.md §20): the
-     * moment `complete` flips, Submit eases out of the disabled dimming and
-     * plays a one-shot pulse. The transition class is asserted alongside
-     * because it is the other half of the same cue — the package's own list
-     * restated with `opacity` added, which is what makes the un-dim ease at
-     * all.
+     * moment the patient answers complete, Submit eases out of the disabled
+     * dimming and plays a one-shot pulse. The transition class is asserted
+     * alongside because it is the other half of the same cue — the package's
+     * own list restated with `opacity` added, which is what makes the un-dim
+     * ease at all.
      */
     it("announces the release with a one-shot pulse", async () => {
       const user = userEvent.setup();
@@ -185,7 +140,7 @@ describe("wizard — patient characteristics", () => {
       expect(submit()).toHaveClass("transition-[background-color,box-shadow,color,opacity]");
       expect(submit()).not.toHaveClass("animate-gate-release");
 
-      await answerAll(user);
+      await answerPatient(user);
 
       // motion-reduce travels with the pulse: the scale motion is dropped for
       // learners who asked for that, while the opacity ease stays.
@@ -210,7 +165,7 @@ describe("wizard — patient characteristics", () => {
     it("re-arms the pulse when the gate closes and reopens", async () => {
       const user = userEvent.setup();
       renderAt("/wizard");
-      await answerAll(user);
+      await answerPatient(user);
 
       await user.click(radio("Yes")); // picking the chosen option clears it
       expect(submit()).not.toHaveClass("animate-gate-release");
@@ -228,7 +183,7 @@ describe("wizard — patient characteristics", () => {
     it("submits to the next walkthrough step", async () => {
       const user = userEvent.setup();
       const router = renderAt("/wizard");
-      await answerAll(user);
+      await answerPatient(user);
 
       await user.click(submit());
 
@@ -244,7 +199,7 @@ describe("wizard — patient characteristics", () => {
   it("keeps the answers when the learner leaves and returns", async () => {
     const user = userEvent.setup();
     const router = renderAt("/wizard");
-    await answerAll(user);
+    await answerPatient(user);
     await user.click(submit());
 
     await user.click(screen.getByRole("link", { name: "Wizard" }));
@@ -252,26 +207,26 @@ describe("wizard — patient characteristics", () => {
     expect(at(router)).toBe("/wizard");
     expect(radio("Hemophilia B")).toBeChecked();
     expect(radio("Yes")).toBeChecked();
-    expect(radio("Increase adherence")).toBeChecked();
   });
 
   it("restores answers stored by an earlier visit in the same session", () => {
-    seedWizardAnswers({ type: "A", hasInhibitors: false, reason: "monitoring" });
+    seedWizardAnswers({ type: "A", hasInhibitors: false });
     renderAt("/wizard");
 
     expect(radio("Hemophilia A")).toBeChecked();
     expect(radio("No")).toBeChecked();
-    expect(radio("Reduce monitoring requirement")).toBeChecked();
   });
 });
 
 /**
- * The other half of the gate: the sidebar's arrow is disabled (asserted in
- * `sidebar.test.tsx`), and these two pages refuse to render for a session that
- * has no scenario — which is what a reload, a bookmark or a pasted link is.
+ * The other half of the gates: the sidebar's arrow is disabled (asserted in
+ * `sidebar.test.tsx`), and the pages past the questions refuse to render for a
+ * session missing what they need — which is what a reload, a bookmark or a
+ * pasted link is. Two levels: the scenario pages need the two patient answers,
+ * the leaf all three.
  */
 describe("wizard — the pages past the questions", () => {
-  it.each(["/wizard/scenario", "/wizard/therapies"])(
+  it.each(["/wizard/scenario", "/wizard/reason", "/wizard/therapies"])(
     "sends a cold %s back to the questions",
     (path) => {
       const router = renderAt(path);
@@ -282,15 +237,40 @@ describe("wizard — the pages past the questions", () => {
   );
 
   /**
+   * The nearest-missing-step rule: a session holding the two patient answers
+   * but no reason is bounced from the leaf to the reason question, not all the
+   * way back to `/wizard` — the gate lands the learner where the gap is.
+   */
+  it("sends a leaf missing only the reason to /wizard/reason", () => {
+    seedWizardAnswers({ reason: null });
+    const router = renderAt("/wizard/therapies");
+
+    expect(at(router)).toBe("/wizard/reason");
+    expect(screen.getByRole("group", { name: WIZARD_QUESTIONS.reason })).toBeInTheDocument();
+  });
+
+  /** The scenario pages themselves need no reason — patient answers suffice. */
+  it.each(["/wizard/scenario", "/wizard/reason"])(
+    "renders %s for a session with only the patient answers",
+    (path) => {
+      seedWizardAnswers({ reason: null });
+      const router = renderAt(path);
+
+      expect(at(router)).toBe(path);
+    },
+  );
+
+  /**
    * `seedWizardAnswers`' default is HA without inhibitors for bleeding control,
    * so the scenario page wears that screen's heading and the leaf wears that
    * reason's. Both come from the data module rather than as literals — the
    * titles are transcribed copy, and `scenario.test.tsx` / `therapies.test.tsx`
    * are where they are asserted against each branch. Here the only claim is that
-   * the gate lets an answered session through.
+   * the gates let an answered session through.
    */
   it.each([
     ["/wizard/scenario", classesFor({ type: "A", hasInhibitors: false }).title],
+    ["/wizard/reason", WIZARD_INPUT_TITLE],
     [
       "/wizard/therapies",
       leafFor({ type: "A", hasInhibitors: false, reason: "bleeding-control" }).heading,

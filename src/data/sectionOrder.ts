@@ -9,6 +9,7 @@ export const SECTION_ORDER = [
   "/wizard-intro",
   "/wizard",
   "/wizard/scenario",
+  "/wizard/reason",
   "/wizard/therapies",
   "/explore",
   "/resources",

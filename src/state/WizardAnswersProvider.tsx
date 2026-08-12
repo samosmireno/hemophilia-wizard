@@ -4,6 +4,7 @@ import {
   NO_ANSWERS,
   WizardAnswersContext,
   isComplete,
+  isScenarioComplete,
   readStoredAnswers,
   writeStoredAnswers,
   type WizardAnswers,
@@ -31,6 +32,7 @@ export function WizardAnswersProvider({ children }: { children: ReactNode }) {
       // snapshot, and the last write would win alone.
       setAnswer: (key, answer) => setAnswers((prev) => ({ ...prev, [key]: answer })),
       reset: () => setAnswers(NO_ANSWERS),
+      scenarioComplete: isScenarioComplete(answers),
       complete: isComplete(answers),
     }),
     [answers],

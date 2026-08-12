@@ -745,17 +745,18 @@ Items 47, 48 and 51 record what this pass did not settle.
 
 ## 20. The wizard gate's release cue
 
-`/wizard`'s Submit and the sidebar Next arrow open together on the third answer (ADR 0003); until
-2026-08-06 the un-dim was an instant snap. Two classes on Submit in `Wizard.tsx`: **the un-dim
-eases** (the caller restates the package's transition list with `opacity` added — tailwind-merge
-keeps the caller's list whole) and **the release plays a one-shot pulse**, `--animate-gate-release`,
-300ms ease-out peaking at `scale: 1.05`. **All three numbers are invented — no artboard draws
-motion** — each derived from an existing value: the 5% mirrors `active:scale-95` (press pushes in,
-release swells out — §15's grammar), the 300ms is the app's 150ms fade step out and back (designer
-question, item 52). State-driven, not CSS-only: a `:not(:disabled)` animation would fire on every
-mount where the button is born enabled — the case that must NOT pulse (a learner returning from
-`/wizard/scenario`); `Wizard.tsx` arms the class only when `complete` flips false → true on the
-current mount. `motion-reduce:animate-none` drops the pulse and keeps the opacity ease. The sidebar
+Each wizard form's Submit and the sidebar Next arrow open together — on the second answer for
+`/wizard`, on the reason for `/wizard/reason` (ADR 0003, amended for the 2026-08-12 reason split);
+until 2026-08-06 the un-dim was an instant snap. Two classes on Submit in `WizardSubmit.tsx` (the
+"Submit inputs" row both forms share): **the un-dim eases** (the caller restates the package's
+transition list with `opacity` added — tailwind-merge keeps the caller's list whole) and **the
+release plays a one-shot pulse**, `--animate-gate-release`, 300ms ease-out peaking at `scale: 1.05`.
+**All three numbers are invented — no artboard draws motion** — each derived from an existing
+value: the 5% mirrors `active:scale-95` (press pushes in, release swells out — §15's grammar), the
+300ms is the app's 150ms fade step out and back (designer question, item 52). State-driven, not
+CSS-only: a `:not(:disabled)` animation would fire on every mount where the button is born
+enabled — the case that must NOT pulse (a learner returning from `/wizard/scenario`);
+`WizardSubmit` arms the class only when its gate flips closed → open on the current mount. `motion-reduce:animate-none` drops the pulse and keeps the opacity ease. The sidebar
 arrow still snaps — `Sidebar` exposes no class hook for its arrows, and reaching into the package's
 DOM is the brittleness debt 4 rejected; the fix is the package's (`opacity` in its transition lists
 — mlg-reskin debt 7). Verified in Chromium at the canvas 2026-08-06 (item 52); the scaled boards are
