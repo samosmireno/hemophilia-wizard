@@ -1,9 +1,12 @@
+import { useState } from "react";
+
 import factorConcentratesUrl from "../../assets/images/factor_concentrates.webp";
 import geneTherapyUrl from "../../assets/images/gene_therapy.webp";
 import rebalancingUrl from "../../assets/images/hemostatic_rebalancing_agents.webp";
 import mimeticUrl from "../../assets/images/mimetic_bispecific_antibody.webp";
 import AgentBoxButton from "../../components/AgentBoxButton";
 import BulletList from "../../components/BulletList";
+import ClassTablePopup from "../../components/ClassTablePopup";
 import PageSection from "../../components/PageSection";
 import { classesFor } from "../../data/wizard";
 import { formatInline } from "../../lib/formatInline";
@@ -40,6 +43,8 @@ const BOX_ART: ReadonlyMap<string, BoxArt> = new Map([
 export default function Scenario() {
   const screen = classesFor(useCompleteWizardAnswers());
 
+  const [openClass, setOpenClass] = useState<string | null>(null);
+
   const caption = (
     <p className="text-center text-xl font-bold text-popup-caption uppercase lg:text-2xl">
       {screen.caption}
@@ -59,9 +64,7 @@ export default function Scenario() {
             agent={label}
             width={art.width}
             height={art.height}
-            // Deliberately inert: the therapy popups are not wired yet, so the
-            // buttons ship with their skin and name but open nothing.
-            onClick={() => {}}
+            onClick={() => setOpenClass(label)}
             className="shrink-0 lg:shrink"
           />
         );
@@ -87,6 +90,8 @@ export default function Scenario() {
         {caption}
         {boxes}
       </div>
+
+      <ClassTablePopup classLabel={openClass} onClose={() => setOpenClass(null)} />
     </PageSection>
   );
 }

@@ -270,13 +270,17 @@ account of why it went).
 > Where the caption is _drawn_ is not in the data: above the boxes on the three multi-box screens,
 > below the single one. That is a layout fact and lives on the page.
 >
-> **The boxes open nothing.** They ship as reserved rectangles at the drawn size. The
-> per-scenario therapeutic-class illustration panels are image-borne
-> ([§7.7](#77-click-through-pop-up-index)) and no asset exists for any of them, and of the five
-> distinct class labels only two — FVIIIa mimetics and hemostatic rebalancing agents — have an
-> education chapter to point at; "Gene therapy" has no chapter, pop-up or authored copy anywhere.
-> So the caption is an instruction that does not yet work, the same state
-> `education/rebalancing-agents` is in. Wiring needs the designer to say what a box opens.
+> **Each box opens the [§5](#5-explore-therapy-options-table-secondary-engine) comparison table cut to its own class**
+> (ruled 2026-08-12, closing issue 08's residue — the boxes shipped inert for want of this
+> ruling). `ClassTablePopup` resolves the clicked box's verbatim label through
+> `classFilterFor` in `src/data/explore.ts` to a [§5.2](#52-filter-logic-build) bucket and
+> renders the same nine-column grid (`TreatmentGrid`, extracted from `ExploreTable`) over
+> that bucket's rows, titled by the label. **Deliberately no filter dropdowns**: the box
+> already chose the class, and the other two filters would let the fixed view contradict its
+> own title — the full filterable table stays `/explore`'s. The join's non-obvious half:
+> both factor-replacement labels ("Recombinant FVIII concentrates", "FIX prophylaxis") share
+> the UHL bucket, whose three rows include the FIX products, and both mimetic wordings share
+> the FVIII bucket. `content.test.ts` pins that every label `classesFor` lists resolves.
 
 `[BUILD]` **Known drift:** `treatment-wizard-demo.html` mirrors `CLASSES_TO_CONSIDER` and still
 carries the singular "Hemostatic rebalancing agent", plus none of the three new fields. The demo

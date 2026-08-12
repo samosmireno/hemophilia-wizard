@@ -8,12 +8,12 @@ import {
   TREATMENT_OPTIONS_MATRIX,
   type EducationTopic,
 } from "./education";
-import { EXPLORE_AGENTS, EXPLORE_CLASS_FILTERS, EXPLORE_SEGMENTS } from "./explore";
+import { classFilterFor, EXPLORE_AGENTS, EXPLORE_CLASS_FILTERS, EXPLORE_SEGMENTS } from "./explore";
 import { ACRONYMS, GLOSSARY } from "./glossary";
 import { REFERENCES, RESOURCES } from "./references";
 import { SURVEY_QUESTIONS } from "./survey";
 import { TREATMENTS } from "./treatments";
-import { AGENTS, ALL_REASONS, ALL_SCENARIOS, leafFor } from "./wizard";
+import { AGENTS, ALL_REASONS, ALL_SCENARIOS, classesFor, leafFor } from "./wizard";
 
 describe("drug sheets", () => {
   it("cover every novel agent the wizard can recommend, plus Efanesoctocog alfa", () => {
@@ -213,6 +213,22 @@ describe("explore class filters", () => {
     for (const filter of EXPLORE_CLASS_FILTERS) {
       for (const cell of filter.classes) {
         expect(cells.has(cell), `"${cell}" matches no Treatment row`).toBe(true);
+      }
+    }
+  });
+
+  /*
+    The wizard→explore join the scenario boxes ride (2026-08-12): every class
+    label any of the four screens lists must resolve through `classFilterFor`,
+    because `ClassTablePopup` is partial the way `sheetFor()` is — an unmapped
+    label is a box that opens nothing, silently, which is exactly the shipped
+    bug this wiring closed. The labels are plain strings, so this join is the
+    one thing no type can state.
+  */
+  it("resolve every scenario box label to a filter bucket", () => {
+    for (const scenario of ALL_SCENARIOS) {
+      for (const label of classesFor(scenario).classes) {
+        expect(classFilterFor(label), `"${label}" resolves to no filter bucket`).toBeDefined();
       }
     }
   });

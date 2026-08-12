@@ -87,5 +87,36 @@ export const EXPLORE_CLASS_FILTERS: readonly ExploreClassFilter[] = [
   { label: "Gene therapy", classes: ["Gene therapy"] },
 ];
 
+/**
+ * Which filter bucket each `/wizard/scenario` illustration box opens, keyed by
+ * the verbatim class labels `classesFor` lists — the same join key `Scenario`'s
+ * own `BOX_ART` uses, since those labels are plain strings. The boxes open the
+ * §5 comparison table pre-filtered to their class (ruled 2026-08-12), so this
+ * map is the ruling: two mimetic wordings (the `A-with` copy edit) share the
+ * FVIII bucket, and both factor-replacement labels share the UHL bucket —
+ * which covers all three factor rows, FIX products included, so the
+ * "FIX prophylaxis" box is not a dead end. `content.test.ts` pins coverage.
+ */
+const CLASS_BOX_FILTERS: ReadonlyMap<string, string> = new Map([
+  ["Recombinant FVIII concentrates", "UHL clotting factor replacement"],
+  ["FIX prophylaxis", "UHL clotting factor replacement"],
+  ["Factor VIIIa mimetics", "FVIII mimetics"],
+  ["Factor VIII mimetic", "FVIII mimetics"],
+  ["Hemostatic rebalancing agents", "Hemostatic rebalancing agents"],
+  ["Gene therapy", "Gene therapy"],
+]);
+
+/**
+ * The filter bucket a scenario class box opens, or `undefined` for a label the
+ * map does not carry. Partial like `sheetFor()` and for the same reason: the
+ * key is a plain string arriving from component state, so coverage of the
+ * labels `classesFor` actually lists is `content.test.ts`'s to pin, not a
+ * type's to state.
+ */
+export function classFilterFor(label: string): ExploreClassFilter | undefined {
+  const bucketLabel = CLASS_BOX_FILTERS.get(label);
+  return EXPLORE_CLASS_FILTERS.find((filter) => filter.label === bucketLabel);
+}
+
 /** One constant for both the pop-up's title and the button that opens it. */
 export const EXPLORE_TABLE_TITLE = "Explore therapy options for HA/HB";

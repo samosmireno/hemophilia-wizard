@@ -1,7 +1,10 @@
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
+import { classFilterFor } from "../../data/explore";
+import { TREATMENTS } from "../../data/treatments";
 import { ALL_SCENARIOS, classesFor, type WizardHemophiliaType } from "../../data/wizard";
 import { seedWizardAnswers } from "../../test/setup";
 import { routes } from "../router";
@@ -165,6 +168,76 @@ describe("wizard scenario — the illustration boxes", () => {
       expect(row).not.toHaveClass("lg:gap-x-30");
     },
   );
+});
+
+/**
+ * The 2026-08-12 wiring: each illustration box opens the §5 comparison table
+ * cut to its own class — `ClassTablePopup`, resolved through `classFilterFor`.
+ * The boxes shipped inert until this ruling (issue 08's residue), so the suite
+ * that pinned them dead now pins each one open.
+ */
+describe("wizard scenario — the class table pop-ups", () => {
+  it.each(BRANCHES)("opens each box's own slice of the S1 table, %s/%s", async (type, inh) => {
+    const user = userEvent.setup();
+    const region = renderScenario(type, inh);
+
+    // Sequentially, not per-test: the card is modal, so a reader reaches the
+    // next box by closing the current one — the order the clicks reproduce.
+    for (const label of classesFor({ type, hasInhibitors: inh }).classes) {
+      await user.click(within(region).getByRole("button", { name: `Expand ${label}` }));
+
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toHaveAccessibleName(label);
+
+      /*
+        The rows are exactly the bucket's, in S1 row order — computed from the
+        same join the component uses, so what this pins is the render, while
+        `content.test.ts` pins that the join resolves for every label at all.
+      */
+      const bucket = classFilterFor(label)!;
+      const agents = within(dialog)
+        .getAllByRole("row")
+        .slice(1) // the header row
+        .map((row) => within(row).getAllByRole("cell")[1].textContent);
+      expect(agents).toEqual(
+        TREATMENTS.filter((t) => bucket.classes.includes(t.treatmentClass)).map((t) => t.agent),
+      );
+
+      await user.click(within(dialog).getByRole("button", { name: `Close ${label}` }));
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    }
+  });
+
+  /**
+   * No `FilterSelect`s, by design: the box already chose the class, and the
+   * type/inhibitor dropdowns would let the fixed view contradict its own
+   * title. A combobox appearing here means `ClassTablePopup` started rendering
+   * `ExploreTable` instead of the bare grid.
+   */
+  it("offers no filters — the box already chose the class", async () => {
+    const user = userEvent.setup();
+    const region = renderScenario("A", false);
+
+    await user.click(within(region).getByRole("button", { name: "Expand Factor VIIIa mimetics" }));
+
+    expect(within(screen.getByRole("dialog")).queryByRole("combobox")).not.toBeInTheDocument();
+  });
+
+  /**
+   * The wide card, asserted here for the reason `/explore`'s table test gives:
+   * `Popup`'s own tests cover that the prop works, this covers that this card
+   * asks for it — nine S1 columns in the default card are 113px each.
+   */
+  it("opens the card at the wide width", async () => {
+    const user = userEvent.setup();
+    const region = renderScenario("B", true);
+
+    await user.click(
+      within(region).getByRole("button", { name: "Expand Hemostatic rebalancing agents" }),
+    );
+
+    expect(screen.getByRole("dialog").firstElementChild).toHaveClass("w-[min(85rem,96vw)]");
+  });
 });
 
 describe("wizard scenario — the responsive pass", () => {

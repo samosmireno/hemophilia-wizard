@@ -483,6 +483,25 @@ describe("explore — the table's filters", () => {
   });
 
   /**
+   * The header sticks while the rows scroll (user direction 2026-08-12): nine
+   * dense columns in a 75dvh frame scroll at laptop heights, and a cell
+   * reading "Yes" is meaningless once its header has left — the filter bar's
+   * own argument, extended one row down. Both halves are pinned because either
+   * alone regresses visibly: without `sticky top-0` the headers leave, and
+   * without `backdrop-blur` the band's drawn `bg-white/50` translucency lets
+   * the rows ghost through it as they pass beneath. jsdom computes no layout,
+   * so the classes are the assertion.
+   */
+  it("keeps the header row in view, blurring what scrolls beneath it", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    for (const header of within(dialog).getAllByRole("columnheader")) {
+      expect(header).toHaveClass("sticky", "top-0", "backdrop-blur");
+    }
+  });
+
+  /**
    * The frame is fixed (user direction 2026-08-11): sized by its rows, the
    * dialog collapsed and regrew as filters cut nine rows to one. jsdom computes
    * no layout, so what is pinned is the construction — the fixed-height frame,

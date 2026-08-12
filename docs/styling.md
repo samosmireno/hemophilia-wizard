@@ -617,10 +617,22 @@ ever changes rows. **The frame is fixed at `h-[75dvh]`** (user direction
 2026-08-11): sized by its rows, the card collapsed and regrew as filters cut nine rows to one, so
 the root is a fixed-height column and the grid region is bounded to it (`min-h-0 flex-1`) — rows
 scroll vertically under a filter bar that stays, `Popup`'s own body scroll never engages (75dvh +
-the header clears `max-h-[95dvh]` everywhere), and the empty state fills the same frame. Header
-band `bg-white/50` (the `SeverityTable` fill), row hairlines `black/10` under a `black/30` header
-rule and on the selects (Table 1's inferred values). `whitespace-pre-line` on the cells carries the
-two MOA cells' transcribed newline.
+the header clears `max-h-[95dvh]` everywhere), and the empty state fills the same frame. **The grid wears Table 1's skin** (user direction
+2026-08-12, overruling the picked hairlines this paragraph first shipped with — row rules
+`black/10` under a `black/30` header rule): the header is `TreatmentOptionsTable`'s rounded
+`rounded-{l,r}-2xl` `bg-white/50` band (the `SeverityTable` fill) at normal weight with no rule
+under it, and the cells rule `black/30` (`MATRIX_RULE`'s inferred #A0A0A0) between rows **and**
+between columns — nothing under the last row, nothing on the outer edges; every cell centres
+vertically (`align-middle`, Table 1's own cell alignment, replacing the header's `align-bottom`
+and the cells' `align-top`). Spacing did not move with the reskin. **The header is sticky**
+(`sticky top-0` on the `th`s, 2026-08-12): nine dense columns scroll inside the 75dvh frame at
+laptop heights, and the header carries the column semantics the way the pinned filter bar carries
+the row set's cause — `backdrop-blur` is what lets the band keep its drawn `bg-white/50`
+translucency while floating, smearing the rows that pass beneath instead of ghosting them
+through; a shadow under the floating band was considered and left off to keep the resting look
+unchanged. Inert in `ClassTablePopup`, whose `overflow-x-auto` wrapper is the sticky containing
+block and never scrolls vertically. The selects keep their `black/30` hairline. `whitespace-pre-line` on the cells
+carries the two MOA cells' transcribed newline.
 
 **Responsive pass 2026-08-05** (the second measured pass): `<h1>` ramps three steps 24/30/36;
 bullets 20 → 16 (sixth exception, proportion); both absolute leadings became ratios; the CTA takes

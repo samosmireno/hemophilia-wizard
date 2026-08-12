@@ -3,6 +3,7 @@ import { Button } from "mlg-components";
 
 import { EXPLORE_CLASS_FILTERS } from "../data/explore";
 import { TREATMENTS, type Treatment } from "../data/treatments";
+import { cn } from "../lib/cn";
 import FilterSelect from "./FilterSelect";
 
 /**
@@ -18,10 +19,12 @@ import FilterSelect from "./FilterSelect";
  * the columns jumped on every filter change). Sized from measurement, not an
  * artboard: a fixed column narrower than a word does not wrap it, it paints it
  * over the neighbour, so each share at the table's 72rem floor covers its
- * column's widest unbreakable chunk (bold header word or cell word — bold
- * "Hemophilia" ~89px, "Administration" ~117px, "immunosuppressive" ~149px,
- * measured in Chromium/DM Sans) plus the px-3 padding, with a few px over.
- * Monitoring still carries the most, for its prose.
+ * column's widest unbreakable chunk (header word or cell word — "Hemophilia"
+ * ~89px, "Administration" ~117px, "immunosuppressive" ~149px, measured in
+ * Chromium/DM Sans **in bold**; the header dropped to normal weight with the
+ * 2026-08-12 reskin, so the bold figures stand as upper bounds) plus the px-3
+ * padding, with a few px over. Monitoring still carries the most, for its
+ * prose.
  */
 const COLUMNS: readonly { header: string; width: string; cell: (t: Treatment) => string }[] = [
   { header: "Treatment class", width: "12%", cell: (t) => t.treatmentClass },
@@ -119,57 +122,101 @@ export default function ExploreTable() {
           </Button>
         </div>
       ) : (
-        // Scrolls rather than reflows, like `SeverityTable` and Table 1
-        // (styling item 27): restacking nine columns would flatten the row
-        // association for assistive tech. The floor is the sum of the columns'
-        // measured word floors (~1079px — see COLUMNS) plus slack; it fits the
-        // wide `Popup`'s ~1222px body without scroll. `break-words` is the net
-        // under that arithmetic: should a word outgrow its column anyway (font
-        // substitution, new copy), it wraps mid-word rather than painting over
-        // the neighbour. `min-h-0 flex-1` bounds the region at the frame so it
-        // scrolls vertically too — `Popup`'s own body scroll would move the
-        // filter bar away with the rows.
+        // `min-h-0 flex-1` bounds the region at the frame so the rows scroll
+        // vertically under a filter bar that stays — `Popup`'s own body scroll
+        // would move the bar away with them.
         <div className="mt-4 min-h-0 flex-1 overflow-auto">
-          <table className="w-full min-w-288 table-fixed border-separate border-spacing-0 text-left break-words text-black">
-            <colgroup>
-              {COLUMNS.map((column) => (
-                // Inline because the shares are data, like the segments' drawn
-                // widths on the page beneath.
-                <col key={column.header} style={{ width: column.width }} />
-              ))}
-            </colgroup>
-            <thead>
-              <tr>
-                {COLUMNS.map((column) => (
-                  <th
-                    key={column.header}
-                    scope="col"
-                    className="border-b border-black/30 bg-white/50 px-3 py-3 align-bottom text-base font-bold"
-                  >
-                    {column.header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((treatment) => (
-                <tr key={treatment.agent}>
-                  {COLUMNS.map((column) => (
-                    // `whitespace-pre-line` carries the MOA cells' transcribed
-                    // newline ("Factor VIIIa–mimetic\nBsAb") to the screen.
-                    <td
-                      key={column.header}
-                      className="border-b border-black/10 px-3 py-3 align-top text-base whitespace-pre-line"
-                    >
-                      {column.cell(treatment)}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <TreatmentGrid rows={rows} />
         </div>
       )}
     </div>
+  );
+}
+
+/** The hairline between cells — `TreatmentOptionsTable`'s `MATRIX_RULE`, adopted with the rest of its skin. */
+const GRID_RULE = "border-black/30";
+
+/**
+ * The nine-column grid alone, shared between the filterable card above and
+ * `ClassTablePopup`'s fixed-class views — one grid so the scenario popups can
+ * never drift from the §5 table they claim to be a slice of.
+ *
+ * The skin is `TreatmentOptionsTable`'s (user direction 2026-08-12, overruling
+ * issue 09's picked-without-artboard hairlines): the header is that table's
+ * rounded `bg-white/50` band at normal weight with no rule under it, and the
+ * cells rule `black/30` between rows and between columns — nothing under the
+ * last row, nothing on the outer edges. Every cell centres vertically
+ * (`align-middle`, the matrix's own `MATRIX_CELL` alignment — followed the
+ * skin by user direction, same day). The spacing (`px-3 py-3`, `text-base`,
+ * left-aligned) deliberately did NOT move.
+ *
+ * The header is sticky (user direction 2026-08-12): nine dense columns in
+ * `ExploreTable`'s 75dvh frame scroll at laptop heights, and a cell reading
+ * "Yes" or "Weekly" is meaningless once its header has left — the same
+ * argument that keeps the filter bar pinned above the scroll region. The
+ * `backdrop-blur` is load-bearing, not decoration: the band keeps its drawn
+ * `bg-white/50` translucency, so without the blur the rows would ghost
+ * through it as they pass beneath. In `ClassTablePopup` the whole construction
+ * is inert by geometry — its `overflow-x-auto` wrapper is the sticky
+ * containing block and never scrolls vertically — which is why the grid can
+ * carry it unconditionally.
+ *
+ * Scrolls rather than reflows, like `SeverityTable` and Table 1 (styling item
+ * 27): restacking nine columns would flatten the row association for assistive
+ * tech. The `min-w-288` floor is the sum of the columns' measured word floors
+ * (~1079px — see COLUMNS) plus slack; it fits the wide `Popup`'s ~1222px body
+ * without scroll. `break-words` is the net under that arithmetic: should a word
+ * outgrow its column anyway (font substitution, new copy), it wraps mid-word
+ * rather than painting over the neighbour. The scroll container is the
+ * caller's, because the two callers bound it differently.
+ */
+export function TreatmentGrid({ rows }: { rows: readonly Treatment[] }) {
+  return (
+    <table className="w-full min-w-288 table-fixed border-separate border-spacing-0 text-left break-words text-black">
+      <colgroup>
+        {COLUMNS.map((column) => (
+          // Inline because the shares are data, like the segments' drawn
+          // widths on the page beneath.
+          <col key={column.header} style={{ width: column.width }} />
+        ))}
+      </colgroup>
+      <thead>
+        <tr>
+          {COLUMNS.map((column, index) => (
+            <th
+              key={column.header}
+              scope="col"
+              className={cn(
+                "sticky top-0 bg-white/50 px-3 py-3 align-middle text-base font-normal backdrop-blur",
+                index === 0 && "rounded-l-2xl",
+                index === COLUMNS.length - 1 && "rounded-r-2xl",
+              )}
+            >
+              {column.header}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((treatment, rowIndex) => (
+          <tr key={treatment.agent}>
+            {COLUMNS.map((column, columnIndex) => (
+              // `whitespace-pre-line` carries the MOA cells' transcribed
+              // newline ("Factor VIIIa–mimetic\nBsAb") to the screen.
+              <td
+                key={column.header}
+                className={cn(
+                  "px-3 py-3 align-middle text-base whitespace-pre-line",
+                  rowIndex > 0 && cn("border-t", GRID_RULE),
+                  columnIndex > 0 && cn("border-l", GRID_RULE),
+                )}
+              >
+                {column.cell(treatment)}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
