@@ -342,3 +342,16 @@
 :root {
   scrollbar-color: var(--color-brand-teal-25) transparent;
 }
+
+/* Buttons are controls, not copy (docs/styling.md §28): a double-click or a drag across
+   one must not highlight its label or icon. One element rule reaches the app's <button>s
+   and mlg-components' alike (every package control renders through a single <button>).
+   In `base`, not bare, so a `select-text` utility can still opt a button back in.
+   OptionGroup's radio-backed <label>s are buttons in every way but the tag — they carry
+   `select-none` at the call site. */
+@layer base {
+  button {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}

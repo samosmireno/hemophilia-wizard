@@ -1082,3 +1082,31 @@ linked Sheet the client reads) POSTs `no-cors`, so success is unreadable by desi
 thank-you asserts handoff, not delivery. The flag lives in `sessionStorage`: a refresh in the tab
 keeps the thank-you, a new tab gets a fresh survey — deliberately unlike the wizard answers'
 in-memory scope (ADR 0003), so a reload cannot double-count a response.
+
+## 28. Buttons are not copy — the `user-select` base rule
+
+One element rule at the end of `tokens.css`, in `@layer base`:
+
+```css
+@layer base {
+  button {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+```
+
+**Why**: a double-click on a control, or a drag that starts on one, highlights its label (and
+flashes a selection over icon/image content) — selection UI on something that is an action, not
+copy. The element selector reaches every `<button>` in the app AND inside mlg-components, whose
+DOM no app class can otherwise touch (§21's reasoning) — verified that all five package controls
+render through a single `<button>` element. Layered under `base`, not left bare, so a one-off
+`select-text` utility can still opt a specific button's content back in if one ever carries
+copyable text.
+
+**The one non-`<button>` button**: OptionGroup's options are radio-backed `<label>`s (§14), which
+the element rule cannot see — they carry `select-none` at the call site instead. Plain links (the
+sidebar jump items, §24's references) stay selectable: they are content, not controls.
+
+Both declarations are what Tailwind's own `select-none` utility emits; the `-webkit-` form is
+still required by Safari.

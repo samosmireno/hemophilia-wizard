@@ -44,7 +44,9 @@ export default function OptionGroup<T extends string>({
             <label
               key={option.id}
               className={cn(
-                "flex min-h-14 cursor-pointer items-center justify-center rounded-lg px-6 py-3",
+                // `select-none`: the §28 base rule covers <button> only; this label is a
+                // button in every way but the tag.
+                "flex min-h-14 cursor-pointer items-center justify-center rounded-lg px-6 py-3 select-none",
                 "text-center text-base leading-tight font-semibold wrap-break-word lg:text-xl xl:text-2xl",
                 "shadow-ui-btn transition-[background-color,color] duration-120 ease-out",
                 selected &&

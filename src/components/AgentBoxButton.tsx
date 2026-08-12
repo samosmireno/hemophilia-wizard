@@ -57,6 +57,8 @@ export default function AgentBoxButton({
         alt=""
         width={width}
         height={height}
+        // §28 kills selection but not the drag ghost — this does.
+        draggable={false}
         className="h-full w-full object-contain"
       />
     </button>

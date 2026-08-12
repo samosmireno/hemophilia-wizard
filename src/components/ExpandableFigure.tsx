@@ -47,6 +47,8 @@ export default function ExpandableFigure({
           src={thumbSrc}
           alt=""
           style={{ aspectRatio: `${thumbWidth} / ${thumbHeight}` }}
+          // §28 kills selection but not the drag ghost — this does.
+          draggable={false}
           className="block w-full"
         />
 
