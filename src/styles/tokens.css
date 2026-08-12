@@ -311,12 +311,26 @@
   }
 }
 
-/* Above the canvas the board SCALES, it does not reflow (docs/styling.md §19). A step,
-   not a `clamp()` — `ce9e4fb` removed all 13 of those and that decision still holds. `%`
-   rather than `px`, so a user's own browser font-size stays multiplied in. Gated on WIDTH
-   AND HEIGHT: a width-only step can make a page that fits start to scroll. The three
-   queries OVERLAP and are ordered shortest-to-tallest on purpose — keep the order; the
-   rungs only ever move together. Re-measure when issues 12/13 land. */
+/* Above and below the canvas the board SCALES, it does not reflow (docs/styling.md §19).
+   A step, not a `clamp()` — `ce9e4fb` removed all 13 of those and that decision still
+   holds. `%` rather than `px`, so a user's own browser font-size stays multiplied in.
+   Gated on WIDTH AND HEIGHT: a width-only step can make a page that fits start to
+   scroll. The queries are ordered shortest-to-tallest on purpose and the three upper
+   ones OVERLAP — keep the order; the rungs only ever move together. All rungs measured
+   2026-08-12 (§19) — issues 12/13 had landed and the reason split had moved /wizard. */
+
+/* The DOWN-rung: a 1366×768 or 1536×864 laptop with browser chrome leaves ~650–740px,
+   under the tallest one-screen routes at 1.00×. Width-gated at 64rem — §5's Sidebar
+   boundary — so the below-lg layouts, which already reflow, are not shrunk on top.
+   770 = the tallest one-screen route at 1.00× and canvas width (`treatment-landscape`,
+   763) rounded up to the next 10 — NOT to the next 100, which would pull the 1440×900
+   and chrome-less 1536×864 fleets (~780–830 free) off full-size type they can fit. */
+@media (min-width: 64rem) and (max-height: 770px) {
+  :root {
+    font-size: 87.5%; /* 14px — board 1260 × 700 */
+  }
+}
+
 @media (min-width: 1800px) and (min-height: 900px) {
   :root {
     font-size: 112.5%; /* 18px — board 1620 × 900 */

@@ -218,7 +218,7 @@ unblocks it (designer / browser / code), and where it bites.
 | 7   | §6 inner gradient's second stop is off-scale (dE .042 from `teal-25`) while the other three are exact palette; probably wanted to be `teal-25`. Designer.                                                                                                                                                                                                                                                                                                            | §6                    |
 | 8   | Landing footage does not loop (dolly-in, 46.5/255 end-to-end); ping-pong is a workaround. Ask for an 8–12 s cleanly looping clip — halves the asset, removes the reversal. Designer.                                                                                                                                                                                                                                                                                 | §7, ADR 0002          |
 | 9   | The references disagree with the §2 scale **and each other** (~32/18/22px on one artboard, ~24/25 on another); the §2 migration made every reading round to one step without resolving which is right. Needs the designer's type sizes.                                                                                                                                                                                                                              | §11                   |
-| 10  | One-screen rule: chapters should fit 1440 × 800; wants one rule across chapters, not per-page constants. `disease-background` re-measured **756px** (2026-08-05) and fits; still the tallest route — §19's height gates derive from it. Confirm with item 32, then close. Code/designer.                                                                                                                                                                             | §11                   |
+| 10  | One-screen rule: chapters should fit 1440 × 800; wants one rule across chapters, not per-page constants. `disease-background` re-measured **756px** (2026-08-05); overtaken by `treatment-landscape` (**763px**, 2026-08-12) — §19's height gates, the down-rung's 770 included, now derive from that. Confirm with item 32, then close. Code/designer.                                                                                                              | §11                   |
 | 11  | Four of `disease-background`'s eight vertical gaps are ink-to-ink measurements, rendering slightly loose; replace when the Figma numbers arrive. Designer.                                                                                                                                                                                                                                                                                                           | §11                   |
 | 12  | The pop-up export has **no scrim**; the shipped `rgb(0 0 0 / .5)` backdrop is inferred. Designer.                                                                                                                                                                                                                                                                                                                                                                    | §13                   |
 | 13  | Closed 2026-08-04 — the drawn 45.47px title is genuinely on screen (was capped at 36); §8's precedent answers the off-scale question.                                                                                                                                                                                                                                                                                                                                | §13                   |
@@ -265,14 +265,15 @@ unblocks it (designer / browser / code), and where it bites.
 | 53 | `AppShell`'s `<main>` is `lg:pb-0` — **no page can breathe at the bottom edge at ≥1024**. Never bit, because every route fit one screen; `/acronyms` (§22) is the first that does not, `/glossary` (§23) the second, `/references` (§24) the third and `/resources` (§25) the fourth, and all four pad themselves. **Four routes repeating the same class is past the point at which the shell-wide fix costs less than the workaround** — but items 10/32 record every chapter at `scrollHeight` exactly 800, and bottom padding breaks that measurement for nine routes at once. Designer/code, with 10 and 32. | §12, §22, §23, §24, §9, §25 |
 | 54 | **`src/data/` was transcribed from a text extraction, which carries no font style.** ADR 0009 found the two bibliographies shipping without the italic journal runs the board draws — 29 runs across 47 entries, missed because `out_raw.txt` cannot show them. The same dump is the source for the education chapters, the drug sheets, the glossary and the acronyms, and ADR 0004 already records `F8`/`F9` shipping upright where §7.2/§7.3 set them italic. **The bibliographies are fixed; nothing else has been checked.** `pdftohtml -xml` exposes the font subset per run (`BAAAAA+` = NotoSans-Italic), so this is a sweep, not an investigation. Code. | §24, §25, ADR 0009 |
 | 55 | ~~**`/resources` and the reworked `/references` have never been opened in a browser.**~~ **Closed 2026-08-07** — both were opened and checked after the ADR 0009 rework, including §24's `break-words` claim on `r8`'s URL. No widths recorded, so the residue is item 30's, not its own. | §24, §25 |
+| 56 | **§19's 0.875× down-rung is invented end to end** — no artboard draws 1260 × 700, and it puts 14px body text on exactly the institutional fleet (1366 × 768 / 1536 × 864) it serves. Shipped 2026-08-12, boundary-verified in Chromium; the floor is recorded (≤653px viewports scroll ≤15px on the two tallest chapters; 1024–1279 wide scrolls at either factor). A second rung (81.25%) deliberately not taken. Designer to bless the trade — full-size type that scrolls v 0.875× that fits. | §19, §2 |
 
 **Invention ledger (summary)** — shipped values that are not straight transcriptions:
 
-| Kind                                | Values                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Transcribed-literal (off-scale)** | `#939393` press fg (§4.1/4.2); `#f73150`, `#bff5ff` (item 3); `#d2d5d4` (§4.3); §6 gradient stop (7); chapter `text-black` (§11); `--color-agent-mab` (14); `--color-agents-panel` (`#00d8ff`, §11); emerging-panel mint (19); `#747474` (21)                                                                                                                                                                                                                                                                                                                  |
-| **Inferred (never exported)**       | navbar tooltip (5); sidebar `teal-100` (§4.5); pop-up scrim (12); table hairlines `black/30` (§11)                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| **Invented (no artboard)**          | below-`sm`/`sm` gutters + `lg` bottom padding (§12); every below-`lg` type step (§2); `DisclosureBand` `md` row, `ArchBand` 150px radius, panel 60px radius, `treatment-landscape` `sm` step (§11); `Popup` band floor + ✕ base/`sm` steps (§13); `wide` 1360 (27); hover/press derivations (§4.2, §14, §15) and the agent-box states incl. the crimson focus swap (16); `px-7.5` (51); gate pulse (52); scrollbars (§21); the §19 ladder; `/acronyms`' crimson terms and its own `lg:pb-16` (§22); `/references`' lagoon link colour and hanging indent (§24) |
+| Kind                                | Values                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Transcribed-literal (off-scale)** | `#939393` press fg (§4.1/4.2); `#f73150`, `#bff5ff` (item 3); `#d2d5d4` (§4.3); §6 gradient stop (7); chapter `text-black` (§11); `--color-agent-mab` (14); `--color-agents-panel` (`#00d8ff`, §11); emerging-panel mint (19); `#747474` (21)                                                                                                                                                                                                                                                                                                                                                  |
+| **Inferred (never exported)**       | navbar tooltip (5); sidebar `teal-100` (§4.5); pop-up scrim (12); table hairlines `black/30` (§11)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Invented (no artboard)**          | below-`sm`/`sm` gutters + `lg` bottom padding (§12); every below-`lg` type step (§2); `DisclosureBand` `md` row, `ArchBand` 150px radius, panel 60px radius, `treatment-landscape` `sm` step (§11); `Popup` band floor + ✕ base/`sm` steps (§13); `wide` 1360 (27); hover/press derivations (§4.2, §14, §15) and the agent-box states incl. the crimson focus swap (16); `px-7.5` (51); gate pulse (52); scrollbars (§21); the §19 ladder incl. its 0.875× down-rung (56); `/acronyms`' crimson terms and its own `lg:pb-16` (§22); `/references`' lagoon link colour and hanging indent (§24) |
 
 ## 10. Page top rule
 
@@ -664,23 +665,25 @@ so every caption in the app agrees on size. `mt-40` does not ramp — the screen
 regardless. **This screen has never been opened in a browser at any width** — even the 1440 case is
 untested. Item 43.
 
-## 19. Above the canvas — the board scales, it does not reflow
+## 19. Off the canvas — the board scales, it does not reflow
 
-Every artboard is 1440 × 800. Above the canvas the drawing **scales**: three media queries at the
+Every artboard is 1440 × 800. Off the canvas the drawing **scales**: four media queries at the
 foot of `tokens.css` step the root font size — **a step ladder, not a clamp**:
 
 | Viewport                      | root   | factor | board       |
 | ----------------------------- | ------ | -----: | ----------- |
+| ≥1024 wide **and** ≤770 tall  | 87.5%  | 0.875× | 1260 × 700  |
 | 1441–1799 (any height)        | 16px   |  1.00× | 1440 × 800  |
 | ≥1800 wide **and** ≥900 tall  | 112.5% | 1.125× | 1620 × 900  |
 | ≥1800 wide **and** ≥1000 tall | 125%   |  1.25× | 1800 × 1000 |
 | ≥2160 wide **and** ≥1200 tall | 150%   |  1.50× | 2160 × 1200 |
 
-The queries overlap, ordered shortest-to-tallest — a 2560 × 1440 panel matches all three and the
-last wins; they only move together. **Why scaling, not widening**: 1168px is already the top of a
+The three upper queries overlap, ordered shortest-to-tallest — a 2560 × 1440 panel matches all
+three and the last wins; they only move together, and the down-rung can meet none of them (≤770
+against ≥900). **Why scaling, not widening**: 1168px is already the top of a
 comfortable line length, and scaling leaves the measure in _characters_ exactly what the artboard
 drew; every fixed track in this file was measured off a 1440 canvas — widening reopens all of them,
-scaling reopens none; and nothing exists to transcribe up there, so the four numbers are **plain
+scaling reopens none; and nothing exists to transcribe up there, so the ladder's numbers are **plain
 values in a media query, not tokens** (§12's rule). **Why 1.5× and not fill-the-screen**: 1.25× is
 the angular-size parity answer for a 27" panel; 1.5× ships as a preference, the parity argument kept
 on record against it; 1.78× makes the factor a property of the window, not the hardware.
@@ -689,27 +692,61 @@ the 1441–1799 dead band is the 14"/16" MacBook Pro defaults — the reference 
 
 **The steps are gated on height AS WELL AS width** — a width-only step can make a fitting page
 scroll because the screen got _wider_ (a 2560 × 1080 ultrawide clears 2160 on width but needs the
-1.25× rung to fit). Each height threshold is the tallest route at that step rounded up to the next 100. **Measured in Chromium at every rung, 2026-08-05** (`min-h-dvh` neutralised):
+1.25× rung to fit). Each height threshold is the tallest one-screen route at that step rounded up to
+the next 100. **Measured in Chromium at every rung, 2026-08-12** (`min-h-dvh` neutralised; ≥1440
+wide at 1.00×; the gated wizard routes at their tallest combos — `therapies` A-with-inhibitors ×
+treatment-burden, `scenario` B-with, `reason` A-with):
 
-| route                             | 1.00× | 1.125× | 1.25× | 1.50× |
-| --------------------------------- | ----: | -----: | ----: | ----: |
-| `/education/disease-background`   |   756 |    850 |   945 |  1134 |
-| `/education/fviii-mimetics`       |   735 |    827 |   919 |  1103 |
-| `/education/treatment-landscape`  |   729 |    821 |   912 |  1094 |
-| `/education/rebalancing-agents`   |   727 |    818 |   909 |  1091 |
-| `/wizard`                         |   724 |    810 |   896 |  1068 |
-| `/explore`                        |   667 |    751 |   834 |  1001 |
-| `/`                               |   413 |    465 |   517 |   620 |
-| `/wizard-intro`                   |   361 |    406 |   451 |   542 |
-| `/education/prophylaxis-guidance` |   282 |    318 |   353 |   423 |
+| route                             | 0.875× | 1.00× | 1.125× | 1.25× | 1.50× |
+| --------------------------------- | -----: | ----: | -----: | ----: | ----: |
+| `/education/treatment-landscape`  |    668 |   763 |    859 |   954 |  1145 |
+| `/education/disease-background`   |    661 |   756 |    850 |   945 |  1134 |
+| `/education/rebalancing-agents`   |    658 |   751 |    845 |   939 |  1127 |
+| `/wizard/therapies`               |    650 |   743 |    836 |   929 |  1115 |
+| `/how-to`                         |    646 |   738 |    830 |   923 |  1107 |
+| `/education/fviii-mimetics`       |    643 |   735 |    827 |   919 |  1103 |
+| `/wizard/scenario`                |    629 |   718 |    808 |   898 |  1077 |
+| `/explore`                        |    595 |   679 |    764 |   849 |  1019 |
+| `/wizard`                         |    429 |   490 |    552 |   613 |   735 |
+| `/wizard/reason`                  |    413 |   472 |    531 |   590 |   708 |
+| `/`                               |    357 |   408 |    459 |   510 |   612 |
+| `/wizard-intro`                   |    316 |   361 |    406 |   451 |   542 |
+| `/education/prophylaxis-guidance` |    247 |   282 |    318 |   353 |   423 |
 
-850 → **900**, 945 → **1000**, 1134 → **1200**. Measuring each rung rather than multiplying caught
-`/wizard` running 4.5/9/18px short of proportion — one thing not growing (item 51); rounding up
-absorbed three later 1.00× changes without moving a gate, and 900 (not 950) keeps a 1920 × 1080
-desktop with a bookmarks bar (~920px) on the ladder. The five placeholder routes are 94px of padding
-and not in the table — **re-measure when issues 12/13 land** (the bibliography will exceed one
-screen at every factor). Width gates are exact fits (1440 × factor) except **1.125×, which keeps
-1800** — its exact 1620 would reopen the dead band, deliberately preserved.
+859 → **900**, 954 → **1000**, 1145 → **1200**. The 2026-08-12 re-measure (issues 12/13 landed, the
+reason split, and the gated wizard routes measured for the first time) moved values but no gate:
+`/wizard` fell 724 → 490 (the split took the reason question with it), `treatment-landscape`
+overtook `disease-background` as the tallest, and rounding up absorbed all of it — again. The
+2026-08-05 pass had caught `/wizard` running 4.5/9/18px short of proportion (item 51), and 900 (not 950) keeps a 1920 × 1080 desktop with a bookmarks bar (~920px) on the ladder. The five scrolling
+routes are measured but outside the gate derivation — each exceeds one screen at every factor by
+design (§22–§25; at 1.00×: `/references` 2034, `/resources` 1890, `/acronyms` 1810, `/glossary`
+1082, `/survey` 1008). Width gates are exact fits (1440 × factor) except **1.125×, which keeps
+1800** — its exact 1620 would reopen the dead band, deliberately preserved — and the down-rung's,
+which is §5's `64rem` Sidebar boundary, not a board fit.
+
+**Below the canvas the ladder steps DOWN — one rung.** The activity's fleet skews to 1366 × 768 and
+1536 × 864 panels whose browser chrome leaves ~650–740px of viewport — under every education
+chapter at 1.00×. Down there the geometry inverts twice: at 1.00× the column narrows below 1440 and
+the board grows as the window shrinks (`treatment-landscape` 763 → 799 at 1366 → 914 at 1280),
+while at 0.875× the 73rem cap is 1022px and fits even a 1280 viewport — so the 0.875× column above
+is width-flat from 1280 up, and the whole one-screen set lands in ≤668px. **The height gate is
+770 — the tallest one-screen route at 1.00× (763) rounded up to the next 10, NOT the next 100**:
+800 would pull the 1440 × 900 MacBook Air (~790–830 free) and a chrome-less 1536 × 864 (~795) off
+full-size type they fit. **The width gate is `64rem`** — §5's Sidebar boundary — because below `lg`
+the layout already reflows and must not be shrunk on top of reflowing; 1024–1279 above it is
+tablet-landscape territory where the tall routes scroll at either factor (`treatment-landscape`
+still measures 1145 at 1024 **on** the rung) — the rung shortens that scroll, it is not asked to
+end it. A second rung (81.25%) was considered and deliberately not taken: it closes an 18px
+worst-case scroll on two routes and charges every short-laptop user 13px body text for it.
+
+**Verified at the down-rung's boundary (Chromium, 2026-08-12)**: the rung lands at 1440 × 770 and
+releases at 1440 × 771 and at 1023 × 700 — either axis alone; 1366 × 681 (that panel, no bookmarks
+bar) fits every one-screen route with zero scroll on either axis; 653 (bookmarks bar) is the
+recorded floor — the two tallest chapters scroll 15/8px; 1280 × 650 scrolls ≤18px; 1536 × 864 fits
+both with chrome (~740, on the rung) and without (~795, at 1.00×); and 1920 × 760 — a short window
+on a big monitor — takes the rung and fits. The rung is **invented**: no artboard draws 1260 × 700,
+and 14px body text on exactly the institutional fleet is a readability trade — item 56, designer to
+bless.
 
 **The breakpoints do not move**: inside a media query `rem` resolves against the initial 16px, so
 every `sm:`/`lg:`/`xl:` utility and §5's `64rem` stay put; the Sidebar's `matchMedia` builds from a
