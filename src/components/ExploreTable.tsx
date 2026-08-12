@@ -147,8 +147,10 @@ const GRID_RULE = "border-black/30";
  * cells rule `black/30` between rows and between columns — nothing under the
  * last row, nothing on the outer edges. Every cell centres vertically
  * (`align-middle`, the matrix's own `MATRIX_CELL` alignment — followed the
- * skin by user direction, same day). The spacing (`px-3 py-3`, `text-base`,
- * left-aligned) deliberately did NOT move.
+ * skin by user direction, same day) and horizontally (`text-center`, headers
+ * and cells alike — user direction 2026-08-12, moving off the skin's left
+ * alignment). The spacing (`px-3 py-3`, `text-base`) deliberately did NOT
+ * move.
  *
  * The header is sticky (user direction 2026-08-12): nine dense columns in
  * `ExploreTable`'s 75dvh frame scroll at laptop heights, and a cell reading
@@ -172,7 +174,7 @@ const GRID_RULE = "border-black/30";
  */
 export function TreatmentGrid({ rows }: { rows: readonly Treatment[] }) {
   return (
-    <table className="w-full min-w-288 table-fixed border-separate border-spacing-0 text-left break-words text-black">
+    <table className="w-full min-w-288 table-fixed border-separate border-spacing-0 text-center break-words text-black">
       <colgroup>
         {COLUMNS.map((column) => (
           // Inline because the shares are data, like the segments' drawn
