@@ -139,7 +139,7 @@ describe("treatment-landscape chapter", () => {
       "sm:gap-x-4",
       "xl:grid-cols-[1fr_20rem_18.75rem]",
       "xl:items-center",
-      "xl:gap-y-4",
+      "xl:gap-y-2",
     );
 
     // The prose spanning both tracks is what puts the other two cells on the

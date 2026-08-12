@@ -64,7 +64,7 @@ export default function DiseaseBackground() {
           <h2 className="text-2xl font-bold tracking-wide text-black lg:text-3xl">
             {MECHANISM.title}
           </h2>
-          <BulletList items={MECHANISM.body} className="mt-4" />
+          <BulletList items={MECHANISM.body} className="mt-4 text-lg" />
           <h2 className="mt-4 text-2xl font-bold tracking-wide text-black lg:text-3xl">
             Diagnosis:
           </h2>
@@ -81,7 +81,7 @@ export default function DiseaseBackground() {
           <ClottingCascadeFigure />
         </ExpandableFigure>
 
-        <BulletList items={DIAGNOSIS.body} className="mt-4 xl:col-span-2" />
+        <BulletList items={DIAGNOSIS.body} className="mt-4 text-lg xl:col-span-2" />
       </div>
 
       <DisclosureBand title="Hemophilia Severity and Bleeding Patterns" disclosures={DISCLOSURES} />

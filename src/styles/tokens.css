@@ -322,10 +322,10 @@
 /* The DOWN-rung: a 1366×768 or 1536×864 laptop with browser chrome leaves ~650–740px,
    under the tallest one-screen routes at 1.00×. Width-gated at 64rem — §5's Sidebar
    boundary — so the below-lg layouts, which already reflow, are not shrunk on top.
-   770 = the tallest one-screen route at 1.00× and canvas width (`treatment-landscape`,
-   763) rounded up to the next 10 — NOT to the next 100, which would pull the 1440×900
-   and chrome-less 1536×864 fleets (~780–830 free) off full-size type they can fit. */
-@media (min-width: 64rem) and (max-height: 770px) {
+   780 = the tallest one-screen route at 1.00× and canvas width (`disease-background`,
+   779) rounded up to the next 10 — NOT to the next 100, which would pull the 1440×900
+   and chrome-less 1536×864 fleets (~790–830 free) off full-size type they can fit. */
+@media (min-width: 64rem) and (max-height: 780px) {
   :root {
     font-size: 87.5%; /* 14px — board 1260 × 700 */
   }

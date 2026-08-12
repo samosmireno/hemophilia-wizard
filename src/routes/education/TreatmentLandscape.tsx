@@ -98,14 +98,14 @@ export default function TreatmentLandscape() {
   return (
     <PageSection title={LANDSCAPE.title}>
       {/* 20rem / 18.75rem === the drawn 320px / 300px at a 16px root. */}
-      <div className="mt-8 grid gap-y-10 sm:grid-cols-[1fr_1fr] sm:gap-x-4 xl:grid-cols-[1fr_20rem_18.75rem] xl:items-center xl:gap-y-4">
+      <div className="mt-8 grid gap-y-10 sm:grid-cols-[1fr_1fr] sm:gap-x-4 xl:grid-cols-[1fr_20rem_18.75rem] xl:items-center xl:gap-y-2">
         {ROWS.map((row, index) => (
           <Fragment key={row.heading}>
             <div className="sm:col-span-2 xl:col-span-1">
               <h2 className="text-2xl font-bold tracking-wide text-black lg:text-3xl">
                 {row.heading}
               </h2>
-              <BulletList items={row.bullets} className="mt-4" />
+              <BulletList items={row.bullets} className="mt-4 text-lg" />
             </div>
 
             {/* The imageless row still emits a cell so the disclosure column
