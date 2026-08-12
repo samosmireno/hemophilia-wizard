@@ -107,15 +107,15 @@ describe("OptionGroup", () => {
      * computes no styles, so the class is the seam — see docs/styling.md §14 for
      * where each colour came from.
      */
-    it("gives every option the resting Button skin while the group is unanswered", () => {
+    it("gives every option the resting lagoon skin while the group is unanswered", () => {
       renderGroup(null);
 
       for (const label of ["Option A", "Option B", "Option C"]) {
-        expect(radio(label).closest("label")).toHaveClass("bg-ui-btn-bg");
+        expect(radio(label).closest("label")).toHaveClass("bg-brand-lagoon-50");
       }
     });
 
-    it("gives the chosen option the teal skin", () => {
+    it("gives the chosen option the crimson skin", () => {
       renderGroup("b");
 
       expect(radio("Option B").closest("label")).toHaveClass("bg-choice-selected");
@@ -126,7 +126,7 @@ describe("OptionGroup", () => {
 
       for (const label of ["Option A", "Option C"]) {
         const pill = radio(label).closest("label");
-        expect(pill).toHaveClass("bg-ui-btn-bg-active");
+        expect(pill).toHaveClass("bg-choice-muted");
         expect(pill).toHaveClass("text-ui-btn-fg-active");
       }
     });

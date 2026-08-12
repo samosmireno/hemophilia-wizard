@@ -32,7 +32,7 @@ export default function OptionGroup<T extends string>({
     // `min-w-0`: a `<fieldset>` carries `min-inline-size: min-content` in the UA
     // stylesheet — without it the page scrolls sideways on a phone.
     <fieldset className={cn("mx-auto max-w-110 min-w-0 lg:max-w-225", className)}>
-      <legend className="mx-auto mb-2.5 w-full max-w-175 text-center font-sans text-xl font-bold text-brand-teal-75 uppercase lg:text-3xl">
+      <legend className="mx-auto mb-2.5 w-full max-w-175 text-center font-sans text-xl font-bold text-brand-crimson-50 uppercase lg:text-3xl">
         {legend}
       </legend>
 
@@ -53,11 +53,11 @@ export default function OptionGroup<T extends string>({
                   "bg-choice-selected text-ui-btn-fg hover:bg-choice-selected-hover active:bg-choice-selected-active",
                 !selected &&
                   answered &&
-                  "bg-ui-btn-bg-active text-ui-btn-fg-active hover:bg-ui-btn-bg hover:text-ui-btn-fg",
+                  "bg-choice-muted text-ui-btn-fg-active hover:bg-brand-lagoon-50 hover:text-ui-btn-fg",
                 !selected &&
                   !answered &&
-                  "bg-ui-btn-bg text-ui-btn-fg hover:bg-ui-btn-bg-hover hover:text-ui-btn-fg-hover",
-                !selected && "active:bg-ui-btn-bg-active",
+                  "bg-brand-lagoon-50 text-ui-btn-fg hover:bg-brand-lagoon-25 hover:text-ui-btn-fg-hover",
+                !selected && "active:bg-brand-lagoon-75",
                 // `has-[:focus-visible]`, NOT `peer-focus-visible` — the peer
                 // form matches nothing and fails silently.
                 "has-focus-visible:outline-[3px] has-focus-visible:outline-offset-[-3px] has-focus-visible:outline-ui-btn-ring",

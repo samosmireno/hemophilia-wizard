@@ -142,13 +142,18 @@
     0px 1px 2px 0px rgba(0, 0, 0, 0.15), inset 0px 1px 4px 0px rgba(0, 0, 0, 0.36);
 
   /* ─── Wizard option buttons (docs/styling.md §14) ─────────────────────────── */
-  --color-choice-selected: var(--color-brand-teal-75);
+  --color-choice-selected: var(--color-brand-crimson-50);
   --color-choice-selected-hover: color-mix(
     in oklab,
-    var(--color-brand-teal-75) 96%,
-    var(--color-brand-teal-25)
+    var(--color-brand-crimson-50) 96%,
+    var(--color-brand-crimson-25)
   );
-  --color-choice-selected-active: var(--color-brand-teal-100);
+  --color-choice-selected-active: var(--color-brand-crimson-75);
+
+  /* The passed-over ground — off every ramp (nearest is lagoon-75, a shade and
+     a hue away): a transcribed literal per §3/§4. Its label keeps Button's
+     press grey (ui-btn-fg-active). */
+  --color-choice-muted: #2b606a;
 
   /* ─── Wizard gate release (docs/styling.md §20) ───────────────────────────── */
   /* One-shot pulse, re-armed per false→true flip; motion-reduce:animate-none at the

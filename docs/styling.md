@@ -485,13 +485,18 @@ title repair across all twenty cards at both canvases (45.46px everywhere, no ba
 
 ## 14. Wizard option buttons
 
-`src/components/OptionGroup.tsx`, `/wizard`'s answer control; reference is two artboard exports —
-every state the design has. **It is `Button`'s skin, referenced not copied**: unanswered =
-`Button`'s resting pair; **passed-over = `Button`'s press pair used as a resting state**; Submit =
-lagoon-50; only the chosen fill is new — `--color-choice-selected` (teal-75 aliased, plus
-`-hover`/`-active`). **Hover, press, focus and disabled are not drawn**, derived by §4.2's model:
-passed-over hover lifts to the resting crimson pair ("you can pick me" — the only invented
-behaviour); chosen press is teal-100. Submit's disabled state has no reference at all.
+`src/components/OptionGroup.tsx`, `/wizard`'s answer control; reference was two artboard exports,
+**retinted 2026-08-12 against a full-page client mock** (all three questions on one canvas — the
+reason split predates it; only the colours transfer, each sampled exact). Unanswered = **the
+Submit's lagoon skin borrowed whole** (`lagoon-50`, hover `lagoon-25`, press `lagoon-75` — §15's
+rule: the identical ground on the same page answers the identical question); chosen =
+`--color-choice-selected` (**crimson-50** aliased, plus `-hover`/`-active` by §4.2's model rerun on
+the new ramp — the 4% `-25` mix, press one step darker, which lands on `Button`'s own pair);
+passed-over = `--color-choice-muted` (**`#2b606a`** — off every ramp, nearest is lagoon-75 a shade
+and a hue away: a transcribed literal per §3) under `Button`'s press grey; the legend leaves
+teal-75 to join the page title on crimson-50. Submit = lagoon-50, unchanged. **Hover, press, focus
+and disabled are not drawn**: passed-over hover lifts to the resting lagoon pair ("you can pick
+me" — the only invented behaviour). Submit's disabled state has no reference at all.
 
 > **Focus must be `has-[:focus-visible]:`, never `peer-focus-visible:`.** `peer-*` compiles to a
 > sibling combinator and the input is a **child** of the label — the peer form matches nothing,
