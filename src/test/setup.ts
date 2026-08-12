@@ -3,6 +3,8 @@ import "@testing-library/jest-dom/vitest";
 
 // RTL's auto-cleanup only self-registers under `globals: true`, which this config
 // does not use — register it explicitly or renders leak across tests.
+import { transferableAbortController } from "node:util";
+
 import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, vi } from "vitest";
 
@@ -37,6 +39,21 @@ if (!HTMLDialogElement.prototype.showModal) {
     this.open = false;
     this.dispatchEvent(new Event("close"));
   };
+}
+
+// Node 24's fetch brand-checks `RequestInit.signal` against Node's own AbortSignal,
+// but Vitest 3's jsdom environment shadows that global with jsdom's implementation —
+// so react-router's data router, which builds a fetch Request per navigation, rejects
+// EVERY navigation/redirect ("Expected signal to be an instance of AbortSignal").
+// Restore Node's pair; `node:util`'s transferable helper is the one import path back
+// to them once the globals are shadowed. Vitest 4 stops copying these two from jsdom
+// (vitest-dev/vitest#8374), which the probe detects — this then becomes a no-op.
+try {
+  new Request("http://localhost/", { signal: new AbortController().signal });
+} catch {
+  const controller = transferableAbortController();
+  globalThis.AbortController = controller.constructor as typeof AbortController;
+  globalThis.AbortSignal = controller.signal.constructor as typeof AbortSignal;
 }
 
 // jsdom implements no `window.matchMedia`. Stubbed per query, not uniformly:
