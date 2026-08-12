@@ -2,7 +2,7 @@ import { Button } from "mlg-components";
 import { useNavigate } from "react-router";
 
 import BrandLoop from "../components/BrandLoop";
-import { ACTIVITY_CODE, ACTIVITY_TITLE_LEAD, ACTIVITY_TITLE_TAIL } from "../data/activity";
+import { ACTIVITY_TITLE_LEAD, ACTIVITY_TITLE_TAIL } from "../data/activity";
 import { nextOf } from "../data/sectionOrder";
 
 export default function Landing() {
@@ -17,11 +17,6 @@ export default function Landing() {
         aria-labelledby="landing-heading"
         className="flex flex-1 flex-col items-center justify-center text-center text-white"
       >
-        {/* Outside the <h1>: the activity code identifies the CME activity, it
-            is not part of its title. */}
-        <p className="font-display text-2xl/none font-normal sm:text-4xl/none lg:text-5xl/none xl:text-6xl/none">
-          {ACTIVITY_CODE}
-        </p>
         {/* One heading, split into two typographic halves — so the accessible
             name is the whole title, exactly as `ACTIVITY_TITLE` spells it. */}
         <h1 id="landing-heading" className="mt-2 max-w-280 font-display">

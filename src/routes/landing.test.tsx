@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
-import { ACTIVITY_CODE, ACTIVITY_TITLE } from "../data/activity";
+import { ACTIVITY_TITLE } from "../data/activity";
 import { setReducedMotion } from "../test/setup";
 import Landing from "./Landing";
 
@@ -67,7 +67,6 @@ describe("landing hero", () => {
     renderLanding();
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(ACTIVITY_TITLE);
-    expect(screen.getByText(ACTIVITY_CODE)).toBeInTheDocument();
   });
 
   it("sends the CTA to the first walkthrough step after /", async () => {
