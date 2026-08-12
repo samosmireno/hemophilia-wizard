@@ -3,12 +3,9 @@ import { useNavigate } from "react-router";
 
 import BrandLoop from "../components/BrandLoop";
 import { ACTIVITY_TITLE_LEAD, ACTIVITY_TITLE_TAIL } from "../data/activity";
-import { nextOf } from "../data/sectionOrder";
 
 export default function Landing() {
   const navigate = useNavigate();
-
-  const next = nextOf("/")!;
 
   return (
     <>
@@ -29,12 +26,22 @@ export default function Landing() {
             {ACTIVITY_TITLE_TAIL}
           </span>
         </h1>
-        <Button
-          className="mt-12 px-8 py-3 text-base/tight sm:px-12 sm:py-3.5 sm:text-lg/tight lg:mt-20 lg:px-14 lg:py-4 lg:text-xl/tight xl:px-16 xl:py-4.5 xl:text-2xl/tight"
-          onClick={() => void navigate(next)}
-        >
-          LET’S GET STARTED
-        </Button>
+        {/* A grid rather than flex so the two buttons share one width: stacked
+            they stretch to the wider label, and the md+ columns are equal `1fr`s. */}
+        <div className="mt-12 grid gap-4 md:grid-cols-2 md:gap-6 lg:mt-20 lg:gap-8">
+          <Button
+            className="px-8 py-3 text-base/tight sm:px-12 sm:py-3.5 sm:text-lg/tight lg:px-14 lg:py-4 lg:text-xl/tight xl:px-16 xl:py-4.5 xl:text-2xl/tight"
+            onClick={() => void navigate("/education/disease-background")}
+          >
+            HEMOPHILIA DISEASE BACKGROUND
+          </Button>
+          <Button
+            className="px-8 py-3 text-base/tight sm:px-12 sm:py-3.5 sm:text-lg/tight lg:px-14 lg:py-4 lg:text-xl/tight xl:px-16 xl:py-4.5 xl:text-2xl/tight"
+            onClick={() => void navigate("/wizard")}
+          >
+            HEMOPHILIA TREATMENT WIZARD
+          </Button>
+        </div>
       </section>
     </>
   );

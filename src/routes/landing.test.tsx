@@ -17,7 +17,8 @@ function renderLanding() {
   const router = createMemoryRouter(
     [
       { path: "/", element: <Landing /> },
-      { path: "/how-to", element: <h1>how-to</h1> },
+      { path: "/education/disease-background", element: <h1>disease-background</h1> },
+      { path: "/wizard", element: <h1>wizard</h1> },
     ],
     { initialEntries: ["/"] },
   );
@@ -69,11 +70,19 @@ describe("landing hero", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(ACTIVITY_TITLE);
   });
 
-  it("sends the CTA to the first walkthrough step after /", async () => {
+  it("sends the disease-background button to the education page", async () => {
     const router = renderLanding();
 
-    await userEvent.click(screen.getByRole("button", { name: /get started/i }));
+    await userEvent.click(screen.getByRole("button", { name: /disease background/i }));
 
-    expect(router.state.location.pathname).toBe("/how-to");
+    expect(router.state.location.pathname).toBe("/education/disease-background");
+  });
+
+  it("sends the treatment-wizard button to the wizard", async () => {
+    const router = renderLanding();
+
+    await userEvent.click(screen.getByRole("button", { name: /treatment wizard/i }));
+
+    expect(router.state.location.pathname).toBe("/wizard");
   });
 });
