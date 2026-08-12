@@ -30,6 +30,7 @@ const DEMO_POPUP_TITLE = "This is a pop-up";
 const JUMP_NOTES: Record<(typeof JUMP_TARGETS)[number]["label"], string> = {
   Home: "returns to the start",
   Wizard: "opens the treatment wizard",
+  "How To": "opens this how-to page",
   Acronyms: "opens the acronym list",
   References: "opens the references",
   Glossary: "opens the glossary",

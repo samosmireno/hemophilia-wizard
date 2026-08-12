@@ -19,6 +19,7 @@ function renderLanding() {
       { path: "/", element: <Landing /> },
       { path: "/education/disease-background", element: <h1>disease-background</h1> },
       { path: "/wizard", element: <h1>wizard</h1> },
+      { path: "/how-to", element: <h1>how-to</h1> },
     ],
     { initialEntries: ["/"] },
   );
@@ -84,5 +85,17 @@ describe("landing hero", () => {
     await userEvent.click(screen.getByRole("button", { name: /treatment wizard/i }));
 
     expect(router.state.location.pathname).toBe("/wizard");
+  });
+
+  // A real link, not a button — so the quiet third choice supports cmd-click
+  // and open-in-new-tab like the sidebar's jump targets do.
+  it("offers the how-to page as a link below the two buttons", async () => {
+    const router = renderLanding();
+    const howTo = screen.getByRole("link", { name: /how to use this tool/i });
+
+    expect(howTo).toHaveAttribute("href", "/how-to");
+    await userEvent.click(howTo);
+
+    expect(router.state.location.pathname).toBe("/how-to");
   });
 });

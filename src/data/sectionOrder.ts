@@ -1,6 +1,5 @@
 export const SECTION_ORDER = [
   "/",
-  "/how-to",
   "/education/disease-background",
   "/education/treatment-landscape",
   "/education/rebalancing-agents",

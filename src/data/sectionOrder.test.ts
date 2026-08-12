@@ -3,10 +3,9 @@ import { describe, expect, it } from "vitest";
 import { SECTION_ORDER, isSpinePath, nextOf, prevOf } from "./sectionOrder";
 
 describe("sectionOrder", () => {
-  it("is the fifteen-step walkthrough spine in blueprint order", () => {
+  it("is the fourteen-step walkthrough spine in blueprint order", () => {
     expect([...SECTION_ORDER]).toEqual([
       "/",
-      "/how-to",
       "/education/disease-background",
       "/education/treatment-landscape",
       "/education/rebalancing-agents",
@@ -23,15 +22,14 @@ describe("sectionOrder", () => {
     ]);
   });
 
-  it("excludes the three off-line reference pages", () => {
-    for (const offLine of ["/glossary", "/acronyms", "/references"]) {
+  it("excludes the four off-line reference pages", () => {
+    for (const offLine of ["/glossary", "/acronyms", "/references", "/how-to"]) {
       expect(SECTION_ORDER).not.toContain(offLine);
     }
   });
 
   it("nextOf steps forward through the spine", () => {
-    expect(nextOf("/")).toBe("/how-to");
-    expect(nextOf("/how-to")).toBe("/education/disease-background");
+    expect(nextOf("/")).toBe("/education/disease-background");
     expect(nextOf("/education/fviii-mimetics")).toBe("/education/prophylaxis-guidance");
     expect(nextOf("/education/prophylaxis-guidance")).toBe("/wizard-intro");
     expect(nextOf("/wizard-intro")).toBe("/wizard");
@@ -52,8 +50,7 @@ describe("sectionOrder", () => {
     expect(prevOf("/wizard")).toBe("/wizard-intro");
     expect(prevOf("/wizard-intro")).toBe("/education/prophylaxis-guidance");
     expect(prevOf("/education/prophylaxis-guidance")).toBe("/education/fviii-mimetics");
-    expect(prevOf("/education/disease-background")).toBe("/how-to");
-    expect(prevOf("/how-to")).toBe("/");
+    expect(prevOf("/education/disease-background")).toBe("/");
   });
 
   it("has no neighbour past either end", () => {
@@ -68,7 +65,7 @@ describe("sectionOrder", () => {
     and rejecting these is the half of its contract the spine test above can't pin.
   */
   it("isSpinePath rejects off-line and unknown paths", () => {
-    for (const path of ["/glossary", "/acronyms", "/references", "/nope"]) {
+    for (const path of ["/glossary", "/acronyms", "/references", "/how-to", "/nope"]) {
       expect(isSpinePath(path)).toBe(false);
     }
     for (const path of SECTION_ORDER) {

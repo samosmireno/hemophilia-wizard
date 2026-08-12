@@ -110,7 +110,7 @@ describe("how-to — the sidebar legend replicas", () => {
     const replicas = within(region)
       .getAllByRole("listitem")
       .flatMap((item) => within(item).queryAllByRole("button"));
-    expect(replicas).toHaveLength(7); // five jump buttons + the two arrows
+    expect(replicas).toHaveLength(8); // six jump buttons + the two arrows
 
     for (const replica of replicas) {
       expect(replica).toBeEnabled();
@@ -123,7 +123,7 @@ describe("how-to — the sidebar legend replicas", () => {
   it("answers to no live rail control's name inside the page", () => {
     const { region } = renderHowTo();
 
-    for (const name of ["Home", "Wizard", "Acronyms", "References", "Glossary"]) {
+    for (const name of ["Home", "Wizard", "How To", "Acronyms", "References", "Glossary"]) {
       expect(within(region).queryByRole("button", { name })).toBeNull();
       expect(within(region).queryByRole("link", { name })).toBeNull();
     }
@@ -134,7 +134,7 @@ describe("how-to — the sidebar legend replicas", () => {
   it("prints a label for every live jump button plus the arrows", () => {
     const { region } = renderHowTo();
 
-    for (const label of ["Home", "Wizard", "Acronyms", "References", "Glossary"]) {
+    for (const label of ["Home", "Wizard", "How To", "Acronyms", "References", "Glossary"]) {
       expect(within(region).getByText(label)).toBeInTheDocument();
     }
     expect(within(region).getByText("Previous / Next")).toBeInTheDocument();

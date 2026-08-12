@@ -74,9 +74,28 @@ The sidebar also carries direct **jump buttons** to Home and Wizard even though 
 in-flow steps — Wizard is the app's centerpiece interactive tool and must be reachable in
 one click from any step, not only by Next-ing to it.
 
-Five buttons in all: Home, Wizard, Acronyms, References, Glossary. The current page's own
-button is **disabled and dimmed** and carries `aria-current="page"` — one dead button
-always marks where you are, and every live button means "go somewhere else".
+Six buttons in all (amended below): Home, Wizard, How To, Acronyms, References, Glossary.
+The current page's own button is **disabled and dimmed** and carries `aria-current="page"`
+— one dead button always marks where you are, and every live button means "go somewhere
+else".
+
+### How-to moves off the line (amended, 2026-08-12)
+
+`/how-to` began as the walkthrough's second step. Then the landing page's CTA became two
+direct destination buttons — Disease Background and the Wizard — and the primary entry
+paths stopped passing through it: only a learner who stepped Next from the landing ever
+saw the instructions. Rather than force a detour, `/how-to` becomes the **fourth off-line
+reference page**, on the same reasoning as the other three — it is a legend of the app's
+controls, looked up on demand from anywhere, not a station to be worked through. Two
+affordances replace the spine slot:
+
+- a sixth **jump button** (`HelpIcon`), directly under Wizard in the rail, and
+- a quiet **"How to use this tool" link** on the landing page below the two buttons.
+
+Next from `/` now goes straight to `/education/disease-background` — the same place as
+the left landing button, so the arrows and the buttons agree on what comes first. Off the
+spine, `/how-to` inherits the amended arrow contract above: Next disabled, Prev returns
+to the last walkthrough step visited.
 
 ## Consequences
 

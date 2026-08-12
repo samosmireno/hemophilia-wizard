@@ -18,16 +18,17 @@ const button = (name: string) => screen.getByRole("button", { name });
 /** A jump target you are not currently on — renders as a real `<a>`. */
 const link = (name: string) => screen.getByRole("link", { name });
 
-/** The five always-visible jump targets, as label → path. */
+/** The six always-visible jump targets, as label → path. */
 const JUMPS = [
   ["Home", "/"],
   ["Wizard", "/wizard"],
+  ["How To", "/how-to"],
   ["Acronyms", "/acronyms"],
   ["References", "/references"],
   ["Glossary", "/glossary"],
 ] as const;
 
-const OFF_LINE = ["/glossary", "/acronyms", "/references"] as const;
+const OFF_LINE = ["/how-to", "/glossary", "/acronyms", "/references"] as const;
 
 describe("sidebar — walkthrough spine", () => {
   /**

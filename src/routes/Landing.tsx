@@ -1,5 +1,5 @@
 import { Button } from "mlg-components";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import BrandLoop from "../components/BrandLoop";
 import { ACTIVITY_TITLE_LEAD, ACTIVITY_TITLE_TAIL } from "../data/activity";
@@ -42,6 +42,14 @@ export default function Landing() {
             HEMOPHILIA TREATMENT WIZARD
           </Button>
         </div>
+        {/* A real anchor, not a Button: quiet third choice under the two equal
+            destinations, and cmd-click / open-in-new-tab keep working. */}
+        <Link
+          to="/how-to"
+          className="mt-6 text-sm/tight text-white underline underline-offset-4 hover:opacity-80 sm:text-base/tight lg:mt-8 lg:text-lg/tight"
+        >
+          How to use this tool
+        </Link>
       </section>
     </>
   );
