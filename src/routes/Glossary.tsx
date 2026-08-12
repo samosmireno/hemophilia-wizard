@@ -9,8 +9,8 @@ export default function Glossary() {
       <DefinitionList
         items={GLOSSARY}
         // A fixed 20rem track, not `/acronyms`' `max-content`: the widest term
-        // ("Factor VIIIa-mimetic bispecific antibody") is a phrase, and letting
-        // it set the column would spend 406px on it and forbid it wrapping.
+        // ("Factor VIII mimetic bispecific antibody") is a phrase, and letting
+        // it set the column would spend ~400px on it and forbid it wrapping.
         // The pair stacks below `xl`, not `sm` — 1024 leaves only 400px beside
         // that track, and a sentence set to ~38 characters is not a column.
         className="mt-5 xl:grid xl:grid-cols-[20rem_1fr] xl:gap-x-8 xl:gap-y-6"

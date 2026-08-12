@@ -72,9 +72,9 @@ export const TREATMENTS: readonly Treatment[] = [
       "FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed; hypersensitivity reactions,FVIII inhibitor development",
   },
   {
-    treatmentClass: "Factor VIIIa mimetic",
+    treatmentClass: "Factor VIII mimetic",
     agent: AGENT_NAMES.emicizumab,
-    moa: "Factor VIIIa–mimetic\nBsAb",
+    moa: "Factor VIII mimetic\nBsAb",
     hemophiliaType: "A",
     inhibitors: "Yes",
     age: "0+",
@@ -83,9 +83,9 @@ export const TREATMENTS: readonly Treatment[] = [
     monitoring: "Thrombotic events in pts on aPCC at high doses",
   },
   {
-    treatmentClass: "Factor VIIIa mimetic (emerging / investigational)",
+    treatmentClass: "Factor VIII mimetic (emerging / investigational)",
     agent: AGENT_NAMES.denecimig,
-    moa: "Factor VIIIa–mimetic\nBsAb",
+    moa: "Factor VIII mimetic\nBsAb",
     hemophiliaType: "A",
     inhibitors: "Yes",
     age: "TBD (studied in pts >1 year of age)",

@@ -9,7 +9,12 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-12 (the wizard flow split to the blueprint's order on client
+- **Last reviewed:** 2026-08-12 (the mimetic terminology unified app-wide on client direction —
+  every "Factor VIIIa mimetic" / "FVIIIa(-)mimetic" the app paints drops the `a` and the
+  hyphen/dash, extending the 2026-08-05 `fviii-mimetics` copy edit to the wizard's class boxes
+  and notes, the S1 class and MOA cells, and the glossary term — see §4, §5.1, §7.5, §8; the
+  transcription sections keep the sources' activated form, as before); previously
+  2026-08-12 (the wizard flow split to the blueprint's order on client
   direction — `/wizard` now asks only the two patient questions, and Q3 is its own walkthrough
   step `/wizard/reason` between the scenario screen and the leaf, wearing the same
   "Input patient characteristics" title; the gate is two-level (`ScenarioGate`/`LeafGate`,
@@ -244,16 +249,19 @@ shown before the reason question) `[PDF-V]`:
 | **HB +inhib** | Hemostatic rebalancing agents. _Note: Bypassing agents (aPCC, rFVIIa) can manage breakthrough bleeds in patients with inhibitors, but sustained prophylaxis with these agents remains challenging._ |
 | **HB −inhib** | Hemostatic rebalancing agents · FIX prophylaxis · Gene therapy                                                                                                                                      |
 | **HA +inhib** | Factor VIII mimetic ᶜ · Hemostatic rebalancing agents ᴮ                                                                                                                                             |
-| **HA −inhib** | Recombinant FVIII concentrates · Factor VIIIa mimetics · Hemostatic rebalancing agents                                                                                                              |
+| **HA −inhib** | Recombinant FVIII concentrates · Factor VIII mimetics ᶜ · Hemostatic rebalancing agents                                                                                                             |
 
 ᴮ `[BUILD]` **the artboard sets this one plural where `[PDF-V]` sets it singular** ("Hemostatic
 rebalancing agent"). The app renders the plural, on the standing rule that the artboard is the
 filing authority where the two disagree — the same call recorded for the `fviii-mimetics` cards'
 copy. Note the first item in the same list _is_ singular on both, deliberately.
 
-ᶜ `[CLIENT]` 2026-08-05 copy edit — the "a" was dropped from "Factor VIIIa mimetic" on this screen
-only. `HA −inhib` keeps the activated form the artboards and `[PDF-V]` draw, so the two screens now
-diverge on purpose.
+ᶜ `[CLIENT]` 2026-08-05 copy edit — the "a" was dropped from "Factor VIIIa mimetic" on the
+`HA +inhib` screen first, then on 2026-08-12 from every mimetic mention the app paints —
+`HA −inhib` above (which had kept the activated form on purpose for a week), the §4.2 wizard
+notes, the S1 class and MOA cells ([§5.1](#51-treatment-roster-9-rows-s1-verbatim-xlsx)), and the
+glossary term ([§8](#8-glossary)). The artboards and `[PDF-V]` draw the activated form; the two
+screens still differ in number (singular here, plural on `HA −inhib`), as drawn.
 
 Each box carries the annotation _"Click on the box(es) below to learn more about each type of
 therapy"_ and links to the class-level education pop-ups. Encoded in `[BUILD]` `src/data/wizard.ts`
@@ -317,11 +325,11 @@ Fitu = Fitusiran, Gene = Etranacogene dezaparvovec-drlb (gene therapy).
 
 **Authored nuances (why it's not a filter):**
 
-- Hemophilia A + _reduced monitoring_ → **only the two FVIIIa mimetics** (rebalancing agents
+- Hemophilia A + _reduced monitoring_ → **only the two FVIII mimetics** (rebalancing agents
   need AT/plasma monitoring).
 - **Gene therapy** appears **only** for Hemophilia B _without_ inhibitors, under adherence &
   treatment burden (Etranacogene is HB, no-inhibitor, adults only).
-- FVIIIa mimetics (Emi, Dene) never appear in Hemophilia B branches (they are HA-only).
+- FVIII mimetics (Emi, Dene) never appear in Hemophilia B branches (they are HA-only).
 
 Encoded in `[BUILD]` `src/data/wizard.ts` → the private `RECOMMENDATIONS[scenario][reason]`,
 reached through `leafFor({ type, hasInhibitors, reason })`.
@@ -464,6 +472,12 @@ for detail.
 
 ᴬ Fitusiran route: enriched from S3 / `[PDF-V]` (`…pen or vial/syringe`); S1 had `…pen` only —
 the one deliberate departure from S1 (see [Data quality](#data-quality--conflicts)).
+
+`[CLIENT]` **the app drops the activated `a` from S1's mimetic cells** (2026-08-12, the
+terminology pass that took the 2026-08-05 `fviii-mimetics` copy edit app-wide): `treatments.ts`
+writes "Factor VIII mimetic" / "Factor VIII mimetic (emerging / investigational)" in Class and
+"Factor VIII mimetic\nBsAb" (dash gone too) in MOA. The rows above keep S1's wording, as
+transcription.
 
 `[BUILD]` **S1's cell padding is not transcribed** (2026-08-07). Three `monitoring` cells open with
 a space, the SHL/EHL/Efanesoctocog class labels close with one, and Denecimig's parenthetical is
@@ -775,8 +789,11 @@ first — `denecimig-moa.title` and the quoted heading in `DENECIMIG_FIGURE_ALT`
 baked into `denecimig.webp`'s pixels rather than copy the app sets — and the client then supplied
 a re-export painting "FVIII MIMETIC BSAB", so both now quote that and the hold is spent. The route
 slug, the topic ids and the component name are unaffected — `fviii-mimetics` is contractual
-(issue 08 cross-links to it). Elsewhere in the app the source's wording still stands: `/explore`'s
-"FVIIIa mimetics" column, the glossary, and the §7.7 wizard notes were outside the edit.
+(issue 08 cross-links to it). Elsewhere the source's wording stood until 2026-08-12, when a
+follow-up client pass took the edit app-wide: the comparison table's S1 class and MOA cells
+([§5.1](#51-treatment-roster-9-rows-s1-verbatim-xlsx)), the glossary term ([§8](#8-glossary)),
+and the wizard's class boxes and notes ([§4](#4-treatment-wizard-flow-main-engine)) all write
+"FVIII mimetic" now. This transcription keeps `[PDF-V]`'s wording, as before.
 
 `[BUILD]` **two more client edits of 2026-08-05, both scoped to the Denecimig pop-up.** (1) The
 FRONTIER age limits are set with `≥` where this section transcribes the source's bare `>` — the
@@ -948,7 +965,9 @@ Use this vocabulary in issues/ADRs/tests. Definitions (abridged from source):
 - **Bispecific antibody** — engineered antibody binding two distinct antigens simultaneously.
 - **Breakthrough bleeding** — a bleed occurring despite ongoing prophylaxis.
 - **Bypassing agent** — hemostatic therapy promoting clot formation without needing FVIII/FIX.
-- **Factor VIIIa-mimetic bispecific antibody** — NFT bridging FIXa and FX to mimic FVIIIa cofactor activity.
+- **Factor VIII mimetic bispecific antibody** — NFT bridging FIXa and FX to mimic FVIIIa cofactor
+  activity. (The source draws "Factor VIIIa-mimetic"; the `a` and hyphen came out in the
+  2026-08-12 client terminology pass, and the app's glossary follows.)
 - **Factor replacement therapy** — IV FVIII/FIX concentrates to restore deficient clotting factor.
 - **Gene therapy** — AAV vector-based therapy delivering a functional clotting-factor transgene.
 - **Hemophilia A** — congenital bleeding disorder from deficient/dysfunctional factor VIII.

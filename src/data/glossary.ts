@@ -24,7 +24,9 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
       "Hemostatic therapy that promotes clot formation without requiring FVIII or FIX activity",
   },
   {
-    term: "Factor VIIIa-mimetic bispecific antibody",
+    // The source draws "Factor VIIIa-mimetic" — the `a` and hyphen came out in
+    // the 2026-08-12 client terminology pass, like every mimetic mention app-wide.
+    term: "Factor VIII mimetic bispecific antibody",
     definition: "Nonfactor therapy that bridges FIXa and FX to mimic FVIIIa cofactor activity",
   },
   {
@@ -58,10 +60,11 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
       "Neutralizing alloantibodies that reduce or eliminate response to factor replacement therapy",
   },
   {
-    // Source verbatim, including "homeostatic balancing agents" (sic — hemostatic rebalancing).
+    // Source verbatim, including "homeostatic balancing agents" (sic — hemostatic
+    // rebalancing) — except the mimetic's `a`, dropped in the 2026-08-12 pass.
     term: "Nonfactor therapy",
     definition:
-      "Therapy that improves hemostasis without directly replacing FVIII or FIX. Examples include FVIIIa mimetic bispecific antibodies and homeostatic balancing agents.",
+      "Therapy that improves hemostasis without directly replacing FVIII or FIX. Examples include FVIII mimetic bispecific antibodies and homeostatic balancing agents.",
   },
   {
     term: "Prophylaxis",

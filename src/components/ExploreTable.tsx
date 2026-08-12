@@ -204,7 +204,7 @@ export function TreatmentGrid({ rows }: { rows: readonly Treatment[] }) {
           <tr key={treatment.agent}>
             {COLUMNS.map((column, columnIndex) => (
               // `whitespace-pre-line` carries the MOA cells' transcribed
-              // newline ("Factor VIIIa–mimetic\nBsAb") to the screen.
+              // newline ("Factor VIII mimetic\nBsAb") to the screen.
               <td
                 key={column.header}
                 className={cn(

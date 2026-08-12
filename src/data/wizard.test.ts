@@ -203,8 +203,8 @@ describe("leafFor — the recommendation matrix", () => {
     }
   });
 
-  /** No mimetic is a hemophilia B option — an FVIIIa mimetic has no FVIII to mimic. */
-  it("keeps the FVIIIa mimetics off every hemophilia B leaf", () => {
+  /** No mimetic is a hemophilia B option — an FVIII mimetic has no FVIII to mimic. */
+  it("keeps the FVIII mimetics off every hemophilia B leaf", () => {
     for (const scenario of ALL_SCENARIOS.filter((s) => s.type === "B")) {
       for (const reason of ALL_REASONS) {
         const agents = leafFor({ ...scenario, reason }).recommendations.map((t) => t.agent);

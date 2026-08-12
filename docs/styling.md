@@ -889,8 +889,10 @@ overrules all of it. Same `<h1>` (§11's chapter treatment, `uppercase`, left-al
 `DefinitionList`, same crimson-term/black-definition pairing, same `lg:pb-16` against item 53.
 
 **What could not carry over is the column.** `/acronyms` sizes its term track to `max-content`;
-here the widest term is a phrase — "Factor VIIIa-mimetic bispecific antibody", **406px** at the
-`lg` ramp — so `max-content` would spend a third of the width on one entry _and_ forbid it wrapping.
+here the widest term is a phrase — "Factor VIII mimetic bispecific antibody", **406px** at the
+`lg` ramp when measured as "Factor VIIIa-mimetic" (a glyph wider than today's wording, which the
+2026-08-12 terminology pass shortened; the conclusion is unmoved) — so `max-content` would spend
+a third of the width on one entry _and_ forbid it wrapping.
 The track is a flat `20rem` (320px) instead, which fits eleven of the twelve terms on one line and
 wraps only that one.
 
@@ -910,8 +912,10 @@ reason.
 
 **Scroll.** 1082px at 1440×900, 1530px at 1024×768, 1633px at 375×812 — it scrolls at every board,
 like §22 and for the same reasons, with no horizontal overflow at any of the five measured. The
-`uppercase` prohibition also carries over and is _not_ only inherited pedantry: `Factor VIIIa-mimetic`
-uppercased reads `VIIIA`, which names nothing. `src/routes/glossary.test.tsx` pins it the same way.
+`uppercase` prohibition also carries over and was _not_ only inherited pedantry when it was made:
+the term then read `Factor VIIIa-mimetic`, which uppercased reads `VIIIA`, naming nothing. The
+2026-08-12 terminology pass ("Factor VIII mimetic") retired that example, not the rule.
+`src/routes/glossary.test.tsx` pins it the same way.
 
 **No ids, no search.** Same as §22 — the sidebar button is the only way in, nothing links a term.
 

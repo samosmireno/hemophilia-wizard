@@ -170,7 +170,7 @@ const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
     lead: "Therapeutic classes to consider for prophylaxis of HA _without_ inhibitors",
     classes: [
       "Recombinant FVIII concentrates",
-      "Factor VIIIa mimetics",
+      "Factor VIII mimetics",
       "Hemostatic rebalancing agents",
     ],
     caption: BOXES_CAPTION,
@@ -179,8 +179,9 @@ const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
     title: "Hemophilia A with inhibitors",
     lead: "Therapeutic classes to consider for prophylaxis of HA _with_ inhibitors",
     /**
-     * "Factor VIII mimetic", not "Factor VIIIa" — a client copy edit (2026-08-05)
-     * on this screen only; `A-without` keeps the activated form. Not a typo.
+     * "Factor VIII mimetic", not the activated form the artboards draw — a
+     * client copy edit (2026-08-05) that landed here first and reached every
+     * screen on 2026-08-12. Singular where `A-without` is plural, as drawn.
      */
     classes: ["Factor VIII mimetic", "Hemostatic rebalancing agents"],
     caption: BOXES_CAPTION,
@@ -316,7 +317,7 @@ const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote>> = {
           "Patients with inhibitors often have inadequate bleeding control with bypassing agents and may benefit significantly from novel NFTs",
           "Monitoring includes clinical bleeding assessment and product-specific laboratory monitoring",
           "Early evidence suggests that joint protection with NFTs is comparable to that of traditional factor prophylaxis",
-          "For patients with inhibitors, guidelines recommend prophylaxis with emicizumab over bypassing agents; FVIIIa mimetics do not cause/increase FVIII inhibitors and maintain efficacy in their presence",
+          "For patients with inhibitors, guidelines recommend prophylaxis with emicizumab over bypassing agents; FVIII mimetics do not cause/increase FVIII inhibitors and maintain efficacy in their presence",
         ],
       },
       strategies: {

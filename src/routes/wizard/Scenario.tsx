@@ -28,13 +28,13 @@ const GENE: BoxArt = { src: geneTherapyUrl, width: 403, height: 480 };
 /**
  * Keyed by the verbatim class labels `classesFor` lists — the only join there
  * is, since the classes are plain strings. Both mimetic wordings appear because
- * `A-with` carries the 2026-08-05 copy edit; both factor-replacement classes
- * share the vial asset.
+ * the tree sets `A-without` plural and `A-with` singular; both
+ * factor-replacement classes share the vial asset.
  */
 const BOX_ART: ReadonlyMap<string, BoxArt> = new Map([
   ["Recombinant FVIII concentrates", CONCENTRATES],
   ["FIX prophylaxis", CONCENTRATES],
-  ["Factor VIIIa mimetics", MIMETIC],
+  ["Factor VIII mimetics", MIMETIC],
   ["Factor VIII mimetic", MIMETIC],
   ["Hemostatic rebalancing agents", REBALANCING],
   ["Gene therapy", GENE],

@@ -80,7 +80,7 @@ export interface ExploreClassFilter {
 export const EXPLORE_CLASS_FILTERS: readonly ExploreClassFilter[] = [
   {
     label: "FVIII mimetics",
-    classes: ["Factor VIIIa mimetic", "Factor VIIIa mimetic (emerging / investigational)"],
+    classes: ["Factor VIII mimetic", "Factor VIII mimetic (emerging / investigational)"],
   },
   { label: "Hemostatic rebalancing agents", classes: ["Hemostatic rebalancing agent"] },
   { label: "UHL clotting factor replacement", classes: ["Clotting factor replacement"] },
@@ -92,15 +92,16 @@ export const EXPLORE_CLASS_FILTERS: readonly ExploreClassFilter[] = [
  * the verbatim class labels `classesFor` lists — the same join key `Scenario`'s
  * own `BOX_ART` uses, since those labels are plain strings. The boxes open the
  * §5 comparison table pre-filtered to their class (ruled 2026-08-12), so this
- * map is the ruling: two mimetic wordings (the `A-with` copy edit) share the
- * FVIII bucket, and both factor-replacement labels share the UHL bucket —
+ * map is the ruling: two mimetic wordings (the tree's plural, `A-with`'s
+ * singular) share the FVIII bucket, and both factor-replacement labels share
+ * the UHL bucket —
  * which covers all three factor rows, FIX products included, so the
  * "FIX prophylaxis" box is not a dead end. `content.test.ts` pins coverage.
  */
 const CLASS_BOX_FILTERS: ReadonlyMap<string, string> = new Map([
   ["Recombinant FVIII concentrates", "UHL clotting factor replacement"],
   ["FIX prophylaxis", "UHL clotting factor replacement"],
-  ["Factor VIIIa mimetics", "FVIII mimetics"],
+  ["Factor VIII mimetics", "FVIII mimetics"],
   ["Factor VIII mimetic", "FVIII mimetics"],
   ["Hemostatic rebalancing agents", "Hemostatic rebalancing agents"],
   ["Gene therapy", "Gene therapy"],

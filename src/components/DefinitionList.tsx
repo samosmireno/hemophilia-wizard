@@ -15,7 +15,7 @@ export interface Definition {
  * body ramp and the two colours.
  *
  * No `uppercase` near a `<dt>`: the case is content on both pages (`aPCC` is
- * activated PCC; `FVIIIa`-mimetic is not `FVIIIA`-mimetic), not a heading style.
+ * activated PCC; `FVIIIa` is not `FVIIIA`), not a heading style.
  */
 export default function DefinitionList({
   items,
