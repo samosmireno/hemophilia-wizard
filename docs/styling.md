@@ -1100,21 +1100,25 @@ not section headings; options `text-base lg:text-lg`; the form runs the full con
 (`max-w-none`).
 
 **Every string except the questions is unsourced.** `CONTEXT.md` §10 supplies the three prompts
-and their options verbatim; the title ("Survey"), the button ("Submit"), the error ("Please select
-an answer.") and the thank-you ("Thank you — your response has been submitted.", with its
+and their options verbatim; the title ("Survey"), the button ("Submit") and the thank-you
+("Thank you — your response has been submitted.", with its
 "Back to home" button — the landing CTA's `Button` + `useNavigate` idiom on the submit's size
 ramp, since the thank-you is the walkthrough's dead end) are authored here — a client copy pass
 overrules any of them.
 
-**Validation is inline, not `disabled`.** Submit stays enabled; a click with gaps marks each
-unanswered fieldset with a crimson line (`text-brand-crimson-50`, wired to the group by
-`aria-describedby`) that clears the moment that question is answered. A disabled button that
-cannot say why was rejected as the worse a11y pattern.
+**Validation is the wizard's gate, not inline errors** (2026-08-12, client ask — reversing the
+launch pattern, which kept Submit enabled and marked gapped fieldsets with crimson
+`aria-describedby` lines on the grounds that a disabled button cannot say why). Submit is
+`disabled` until every question is answered; the package's `disabled:` skin dims it and the
+un-dim eases via §20's restated transition list (`opacity` added). The release pulse is NOT
+copied — §20's cue stays the wizard's own until the designer rules on it (item 52).
 
-**Submit is the package `Button` in its resting §4.2 crimson skin, on the wizard submit's size
-ramp** (`px-6 leading-5 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl`, §14) — the package
-default is a fixed 26px/`px-16` at every width, so the ramp is what makes the button step with
-the page; only the colours stay unoverridden, the wizard's lagoon recolour (§14) being that
+**Submit is the package `Button` in the wizard submit's lagoon skin and size ramp**
+(`bg-brand-lagoon-50 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75` + `px-6 leading-5
+max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl`, §14) — the package default is a fixed
+26px/`px-16` at every width in the resting crimson, so the ramp is what makes the button step
+with the page. The recolour (2026-08-12, client ask) matches the survey's buttons — "Back to
+home" included — to the wizard's submit; only the wizard's gate transition/pulse stays that
 screen's own. Right-aligned at the end of the column, where the wizard also puts its submit.
 
 **The confirmation is optimistic, and the submitted flag is per-tab.** `submitSurvey`

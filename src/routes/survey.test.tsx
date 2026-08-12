@@ -11,8 +11,6 @@ vi.mock("../lib/submitSurvey", () => ({
   submitSurvey: vi.fn(() => Promise.resolve()),
 }));
 
-const ERROR = "Please select an answer.";
-
 /** A router because the thank-you's "Back to home" navigates; the stub `/`
  *  keeps the test off the real landing page's video and data. */
 function renderSurvey() {
@@ -50,27 +48,19 @@ describe("Survey", () => {
     }
   });
 
-  it("marks every unanswered question on submit and sends nothing", async () => {
+  it("keeps Submit disabled until every question is answered", async () => {
     const user = userEvent.setup();
     renderSurvey();
+    const submit = screen.getByRole("button", { name: "Submit" });
 
-    await user.click(screen.getByRole("button", { name: "Submit" }));
+    for (const question of SURVEY_QUESTIONS) {
+      // Disabled with zero answers, and still disabled with one gap left.
+      expect(submit).toBeDisabled();
+      await user.click(group(question.prompt).getByRole("radio", { name: question.options[0] }));
+    }
 
-    expect(screen.getAllByText(ERROR)).toHaveLength(SURVEY_QUESTIONS.length);
+    expect(submit).toBeEnabled();
     expect(submitSurvey).not.toHaveBeenCalled();
-    // Still the form, not the thank-you.
-    expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
-  });
-
-  it("clears a question's error the moment it is answered", async () => {
-    const user = userEvent.setup();
-    renderSurvey();
-    const [first] = SURVEY_QUESTIONS;
-
-    await user.click(screen.getByRole("button", { name: "Submit" }));
-    await user.click(group(first.prompt).getByRole("radio", { name: first.options[0] }));
-
-    expect(screen.getAllByText(ERROR)).toHaveLength(SURVEY_QUESTIONS.length - 1);
   });
 
   it("submits the answers through the adapter and swaps to the thank-you", async () => {

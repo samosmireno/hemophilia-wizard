@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Button } from "mlg-components";
 import { useNavigate } from "react-router";
 
@@ -17,13 +17,13 @@ const SUBMITTED_KEY = "survey-submitted";
 
 export default function Survey() {
   const navigate = useNavigate();
-  const errorsId = useId();
   const [answers, setAnswers] = useState<Partial<SurveyResponses>>({});
   const [submitted, setSubmitted] = useState(() => sessionStorage.getItem(SUBMITTED_KEY) !== null);
-  const [showErrors, setShowErrors] = useState(false);
 
   const setAnswer = (id: SurveyQuestionId, option: string) =>
     setAnswers((prev) => ({ ...prev, [id]: option }));
+
+  const allAnswered = SURVEY_QUESTIONS.every((q) => answers[q.id] !== undefined);
 
   return (
     // Last section on the spine — Prev comes from `AppSidebar`, there is no Next.
@@ -38,7 +38,7 @@ export default function Survey() {
               via the landing CTA's idiom: `Button` + `useNavigate`. */}
           <div className="mt-8">
             <Button
-              className="px-6 leading-5 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl"
+              className="bg-brand-lagoon-50 px-6 leading-5 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl"
               onClick={() => void navigate("/")}
             >
               Back to home
@@ -50,10 +50,9 @@ export default function Survey() {
           className="max-w-none"
           onSubmit={(event) => {
             event.preventDefault();
-            if (SURVEY_QUESTIONS.some((q) => answers[q.id] === undefined)) {
-              setShowErrors(true);
-              return;
-            }
+            // Unreachable through the UI (Submit is disabled until complete);
+            // kept so the `as SurveyResponses` cast below cannot lie.
+            if (!allAnswered) return;
             // Optimistic on purpose: the adapter's eventual `no-cors` POST is
             // unreadable, so there is no failure to wait for (issue 13).
             void submitSurvey(answers as SurveyResponses);
@@ -65,18 +64,11 @@ export default function Survey() {
           }}
         >
           {SURVEY_QUESTIONS.map((question) => {
-            const invalid = showErrors && answers[question.id] === undefined;
-            const errorId = `${errorsId}-${question.id}`;
-
             return (
               // `min-w-0`: a `<fieldset>` carries `min-inline-size: min-content`
               // in the UA stylesheet — without it a long prompt scrolls the
               // page sideways on a phone (same guard as `OptionGroup`).
-              <fieldset
-                key={question.id}
-                className="mt-10 min-w-0 first:mt-8"
-                aria-describedby={invalid ? errorId : undefined}
-              >
+              <fieldset key={question.id} className="mt-10 min-w-0 first:mt-8">
                 <legend className="text-lg font-bold text-black lg:text-xl">
                   {question.prompt}
                 </legend>
@@ -98,23 +90,20 @@ export default function Survey() {
                     </label>
                   ))}
                 </div>
-
-                {invalid && (
-                  <p id={errorId} className="mt-2 text-base font-semibold text-brand-crimson-50">
-                    Please select an answer.
-                  </p>
-                )}
               </fieldset>
             );
           })}
 
           <div className="mt-8 flex justify-end">
-            {/* The wizard submit's size ramp verbatim (docs/styling.md §14) —
-                the package default is a fixed 26px/px-16 at every width. Skin
-                stays the resting crimson; only the wizard recolours. */}
+            {/* The wizard submit's size ramp, lagoon skin and gate verbatim
+                (docs/styling.md §14, §20) — disabled until every question is
+                answered, and the un-dim eases (the restated transition list
+                adds `opacity` to the package's). The release pulse stays the
+                wizard's own. */}
             <Button
               type="submit"
-              className="px-6 leading-5 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl"
+              disabled={!allAnswered}
+              className="bg-brand-lagoon-50 px-6 leading-5 transition-[background-color,box-shadow,color,opacity] hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl"
             >
               Submit
             </Button>
