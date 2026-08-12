@@ -12,7 +12,7 @@ export const WIZARD_INPUT_TITLE = "Input patient characteristics";
  */
 export const WIZARD_QUESTIONS = {
   type: "Disease type",
-  inhibitors: "Does the patient have inhibitors",
+  inhibitors: "Does the patient have inhibitors?",
   reason: "What is the primary reason for considering a treatment option?",
 } as const;
 
@@ -413,7 +413,7 @@ const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote>> = {
         title: "Strategies for Improving Bleeding Control",
         points: [
           "Plan for multidisciplinary monitoring to maintain hemostatic coverage during transition to a new prophylaxis strategy",
-          "Plan transition from FIX or bypassing-agent prophylaxis to hemostatic rebalancing therapy to avoid gaps in bleed protection",
+          "Plan transition from FIX or bypassing agent prophylaxis to hemostatic rebalancing therapy to avoid gaps in bleed protection",
           "Account for agent-specific initiation requirements, including loading dose, dose optimization, or laboratory-guided dose adjustment when applicable",
           "Monitor for decreased clinical response or loss of bleed control",
           "Anticipate treatment interactions when managing breakthrough bleeding, especially thrombotic risk with high or repeated doses of clotting factor concentrates or bypassing agents",
