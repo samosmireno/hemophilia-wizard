@@ -10,6 +10,7 @@ npm run build         # Type-check (tsc -b) then bundle (vite build)
 npm run lint          # ESLint across all files (flat config)
 npm run format        # Prettier write
 npm test              # Vitest suite (jsdom + Testing Library)
+npm run export:pdf    # PDF slide deck of every screen → export/ (see "PDF export" below)
 
 npx vitest run src/routes/router.test.tsx   # single test file
 npx vitest -t "renders"           # tests matching a name
@@ -43,6 +44,21 @@ Test files live next to source as `*.test.ts`/`*.test.tsx` — the Vitest glob i
 
 The `package-lock.json` is committed and authoritative — installs are reproducible.
 Bump dependencies deliberately with `npm run upgrade` (npm-check-updates), never ad hoc.
+
+## PDF export
+
+`npm run export:pdf` (`scripts/export-pdf.mjs`, Playwright + pdf-lib) builds the app with
+`VITE_GA_MEASUREMENT_ID` forced empty, serves `dist/` on a local `vite preview`, and drives a
+1440×800 Chromium through every screen in spine order: each page, every `<dialog>` overlay on its
+first occurrence (keyed by title + body), every wizard branch via the real radios/Submit/Next with
+the selection shown before each descent, both result-page panes per leaf, and 800 px scroll windows
+for the pages that scroll. Output: `export/hemophilia-wizard-<date>.pdf` (one 1440×800 pt slide per
+screen, 2× JPEG), `export/frames/NNN.png`, `export/manifest.json` (per-slide route/state/overlay,
+the overlay ledger, skipped repeats, blocked external requests). Flags: `--scale 1`, `--quality N`,
+`--out`, `--skip-build`. The browser context aborts every non-localhost request, so no GA hit or
+survey POST can escape. Triggers are discovered generically (`button[aria-haspopup="dialog"]`,
+nested `Expand …` lightboxes, the "View mechanism" step), so new popups are picked up without
+touching the script; `/how-to`'s demo popups and drawers are deliberately not opened.
 
 ## Deploy
 

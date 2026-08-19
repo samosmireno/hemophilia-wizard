@@ -32,3 +32,6 @@ treatment-wizard-demo.html
 # the derived `landing-loop.mp4` / `landing-poster.jpg` are committed; the ffmpeg
 # recipe that produces them from this file is in docs/styling.md §7.
 src/assets/landing-video.mp4
+
+# PDF slide-deck export (scripts/export-pdf.mjs) — regenerate with `npm run export:pdf`
+export/
