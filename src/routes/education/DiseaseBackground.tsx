@@ -1,5 +1,5 @@
 import bleedingUrl from "../../assets/images/bleeding_manifestations_diagram.webp";
-import cascadeThumbUrl from "../../assets/images/clotting-cascade-thumb.webp";
+import cascadeThumbUrl from "../../assets/images/clotting-cascade-thumb.svg";
 import diagnosticUrl from "../../assets/images/diagnostic_approach_diagram.webp";
 import BulletList from "../../components/BulletList";
 import DisclosureBand from "../../components/DisclosureBand";
@@ -72,8 +72,8 @@ export default function DiseaseBackground() {
 
         <ExpandableFigure
           thumbSrc={cascadeThumbUrl}
-          thumbWidth={940}
-          thumbHeight={538}
+          thumbWidth={473.26}
+          thumbHeight={271}
           title={CASCADE_TITLE}
           surface="white"
           className="mx-auto mt-8 max-w-120 xl:mx-0 xl:mt-0"

@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Button, NavArrowButton, NavBarButton, PopupButton } from "mlg-components";
 
-import cascadeThumbUrl from "../assets/images/clotting-cascade-thumb.webp";
+import cascadeThumbUrl from "../assets/images/clotting-cascade-thumb.svg";
 import fitusiranUrl from "../assets/images/fitusiran.webp";
 import AgentBoxButton from "../components/AgentBoxButton";
 import DrugSheetPopup from "../components/DrugSheetPopup";
@@ -75,8 +75,8 @@ export default function HowTo() {
         <DemoCard caption="Click images that offer “click to enlarge” to expand them.">
           <ExpandableFigure
             thumbSrc={cascadeThumbUrl}
-            thumbWidth={940}
-            thumbHeight={538}
+            thumbWidth={473.26}
+            thumbHeight={271}
             title={CASCADE_TITLE}
             surface="white"
             className="max-w-72"
