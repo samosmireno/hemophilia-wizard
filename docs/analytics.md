@@ -19,7 +19,8 @@ Only when **both** hold (`initAnalytics` in `src/main.tsx`):
 
 **Pageviews** — every route change, sent manually from `AppShell` (`useLocation`
 effect); init passes `send_page_view: false` so the landing page isn't double-counted.
-Path only, never query strings. The 15-step `SECTION_ORDER` spine means the funnel is
+Path only, never query strings — and the address bar itself is reduced to `utm_*` on
+boot, see "Campaign links" below. The 15-step `SECTION_ORDER` spine means the funnel is
 built in GA4 reporting straight from page paths — including the intake→scenario drop-off,
 since `/wizard`'s Submit fires no event (see the table).
 
@@ -39,6 +40,39 @@ params, anything identifying. Also no event on `/wizard`'s own Submit — the re
 (2026-08-12) moved `wizard_submit` to `/wizard/reason`, the first moment all three params
 exist; who completed the patient questions is the `/wizard/scenario` pageview. Outbound clicks on `/references` and `/resources` come
 from GA4 Enhanced Measurement, not from code.
+
+## Campaign links (QR, website, email)
+
+Channel attribution — did this visit come from the printed QR code, the client's site or
+the email? — comes from GA4's automatic UTM handling, not from code. Without UTMs a QR
+scan and an email click both arrive with no referrer and both report as `(direct)`;
+only the website link is distinguishable, as a `referral`. So every distribution channel
+gets its own tagged URL, all pointing at `/`:
+
+| Channel     | Link                                                                 |
+| ----------- | -------------------------------------------------------------------- |
+| Printed QR  | `/?utm_source=qr&utm_medium=print&utm_campaign=<wave>`               |
+| Client site | `/?utm_source=<site-domain>&utm_medium=referral&utm_campaign=<wave>` |
+| Email       | `/?utm_source=email&utm_medium=email&utm_campaign=<wave>`            |
+
+`utm_campaign` names the wave; `utm_content` distinguishes placements within a channel
+(`congress-poster` vs `leaflet`). Point links at `/`, not a deep route: the
+`<Navigate replace>` redirects in `src/routes/router.tsx` drop the query string, and
+whether gtag reads the UTMs before that happens is a race. GA never sees email _opens_ —
+that is the email tool's metric; GA sees the clicks that land.
+
+**Per-recipient tokens are stripped on boot.** Email platforms append a recipient
+identifier to every link (Mailchimp `mc_eid`, HubSpot `_hsenc`/`_hsmi`, Klaviyo `_kx`,
+…), and a token in the address bar is a token in `page_location` on every hit — gtag's
+automatic `scroll` / `user_engagement` included — in browser history, and in the
+referrer of outbound clicks. `sanitizeLocation` (`src/lib/sanitizeLocation.ts`, the
+first thing `main.tsx` runs) rewrites the URL to keep only `utm_source`, `utm_medium`,
+`utm_campaign`, `utm_content`, `utm_term` and `utm_id`; anything else is gone before
+the router, gtag or any hit sees it. It is an allowlist, not a blocklist, so the email
+tool — unchosen as of 2026-08-25 — never matters. What it cannot police: the utm values
+themselves are trusted, so a tool configured to write a per-recipient value into
+`utm_content` would pass. Campaign authors own that — keep utm values to channel, wave
+and placement.
 
 ## GA4 console checklist (one-time, property `G-JE497010X0`)
 
@@ -93,10 +127,11 @@ npm run preview` (the local `.env` supplies the ID; the dev server never sends).
       step, page path correct each time; Back likewise, no doubles.
 - [ ] Sidebar jump links (`/glossary`, `/acronyms`, `/references`): pageviews arrive for
       off-spine pages too.
-- [ ] Load `/?utm_source=debugtest`: our `page` param is `/` with no query string.
-      Expanding the event, `page_location` (gtag's automatic field) DOES carry the full
-      URL — expected, it's what powers utm attribution. Watch-item only if campaign
-      links ever carry per-recipient tokens; then we override `page_location` too.
+- [ ] Load `/?utm_source=debugtest&mc_eid=abc123`: the address bar drops `mc_eid`
+      before the page renders. Our `page` param is `/` with no query string; expanding
+      the event, `page_location` (gtag's automatic field) carries `?utm_source=debugtest`
+      and nothing else — the utm is what powers attribution, the token must never appear.
+      Same check on `scroll` / `user_engagement` later in the session.
 - [ ] Visit `/education` and a bogus URL like `/nope`: note the redirects land on
       `/education/disease-background` and `/` — check whether the pre-redirect path also
       fires a stray `page_view` (accepted noise either way, just know which).

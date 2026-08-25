@@ -52,3 +52,17 @@ volume to capture indecision nobody will query. The submitted combination is the
 - The full event schema and the GA4-console setup it needs live in `docs/analytics.md`.
 - Any future param must clear the same bar: closed vocabulary, no person attached,
   never URL-carried. Free-text or identity-adjacent values re-open this ADR.
+
+## Amendment 2026-08-25: campaign links are sanitized on boot
+
+Point 1 covered our own hits. gtag's automatic ones — `page_location` on every event,
+`scroll`, `user_engagement` — still carried the full address-bar URL, which the
+DebugView checklist noted as a watch-item "if campaign links ever carry per-recipient
+tokens". The client's plan for QR, website and email links (2026-08-25) made it live:
+email platforms append a recipient token (`mc_eid`, `_hsenc`, …) to every link, and the
+platform is not chosen. `sanitizeLocation` (`src/lib/sanitizeLocation.ts`, the first
+thing `main.tsx` runs, before the router is built and before GA initializes) rewrites the
+URL to keep only the `utm_*` campaign params, so a token is gone before the router, gtag,
+browser history or any outbound referrer can carry it. An allowlist, not a blocklist, so
+the tool never matters. The line holds: campaign attribution (aggregate, channel-level)
+in; anything per person out.

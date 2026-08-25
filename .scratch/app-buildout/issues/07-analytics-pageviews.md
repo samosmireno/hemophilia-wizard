@@ -22,3 +22,12 @@ per-route pageviews from `AppShell`, plus `wizard_submit`, `recommendation_reach
 condition, tracking also no-ops outside production builds, so a dev `.env` can't pollute
 the live property. Schema: `docs/analytics.md`; the answers-as-params privacy ruling:
 `docs/adr/0010`.
+
+2026-08-25 — client meeting asked for channel attribution (QR / website / email). No
+event needed: UTM-tagged links per channel, GA reads them. What it did need was
+`src/lib/sanitizeLocation.ts`: on boot the address bar is reduced to `utm_*`, so a
+per-recipient token from whatever email tool they eventually pick never reaches
+`page_location`, history or referrers. `main.tsx` now builds the browser router itself
+(after sanitizing) instead of importing it from `router.tsx`. Link table and the
+"point campaign links at `/`" rule: `docs/analytics.md` → Campaign links; ruling:
+`docs/adr/0010` amendment.
