@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 
 import OptionGroup, { type Option } from "../components/OptionGroup";
 import PageSection from "../components/PageSection";
+import WizardReset from "../components/WizardReset";
 import WizardSubmit from "../components/WizardSubmit";
 import { nextOf } from "../data/sectionOrder";
 import {
@@ -54,7 +55,11 @@ export default function Wizard() {
           onChange={(id) => setAnswer("hasInhibitors", id === null ? null : id === "yes")}
         />
 
-        <WizardSubmit open={scenarioComplete} />
+        {/* Reset shares Submit's row from its left end; `/wizard/reason` has no
+            reset of its own (ADR 0003, amended 2026-08-25). */}
+        <WizardSubmit open={scenarioComplete}>
+          <WizardReset />
+        </WizardSubmit>
       </form>
     </PageSection>
   );

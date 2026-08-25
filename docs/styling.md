@@ -266,14 +266,15 @@ unblocks it (designer / browser / code), and where it bites.
 | 54 | **`src/data/` was transcribed from a text extraction, which carries no font style.** ADR 0009 found the two bibliographies shipping without the italic journal runs the board draws — 29 runs across 47 entries, missed because `out_raw.txt` cannot show them. The same dump is the source for the education chapters, the drug sheets, the glossary and the acronyms, and ADR 0004 already records `F8`/`F9` shipping upright where §7.2/§7.3 set them italic. **The bibliographies are fixed; nothing else has been checked.** `pdftohtml -xml` exposes the font subset per run (`BAAAAA+` = NotoSans-Italic), so this is a sweep, not an investigation. Code. | §24, §25, ADR 0009 |
 | 55 | ~~**`/resources` and the reworked `/references` have never been opened in a browser.**~~ **Closed 2026-08-07** — both were opened and checked after the ADR 0009 rework, including §24's `break-words` claim on `r8`'s URL. No widths recorded, so the residue is item 30's, not its own. | §24, §25 |
 | 56 | **§19's 0.875× down-rung is invented end to end** — no artboard draws 1260 × 700, and it puts 14px body text on exactly the institutional fleet (1366 × 768 / 1536 × 864) it serves. Shipped 2026-08-12, boundary-verified in Chromium; the same-day `text-lg` bullet bump on the two tallest chapters moved the gate 770 → 780 and the floor from 15 to 28px (≤653px viewports, the two tallest chapters; 1024–1279 wide scrolls at either factor). A second rung (81.25%) deliberately not taken. Designer to bless the trade — full-size type that scrolls v 0.875× that fits. | §19, §2 |
+| 57 | **`/wizard`'s Reset row is invented end to end** — no artboard (§29). Designer: a second form-button colour (Reset is lagoon; hierarchy by position only), and whether the phone stack should be full-width like the pills or label-width as shipped. Code: on click the button disables itself under focus, which falls to the body — a focus target for the cleared form is one line once someone says which. Browser-verified at six widths 2026-08-25. | §29, §14 |
 
 **Invention ledger (summary)** — shipped values that are not straight transcriptions:
 
-| Kind                                | Values                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Transcribed-literal (off-scale)** | `#939393` press fg (§4.1/4.2); `#f73150`, `#bff5ff` (item 3); `#d2d5d4` (§4.3); §6 gradient stop (7); chapter `text-black` (§11); `--color-agent-mab` (14); `--color-agents-panel` (`#00d8ff`, §11); emerging-panel mint (19); `#747474` (21)                                                                                                                                                                                                                                                                                                                                                  |
-| **Inferred (never exported)**       | navbar tooltip (5); sidebar `teal-100` (§4.5); pop-up scrim (12); table hairlines `black/30` (§11)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| **Invented (no artboard)**          | below-`sm`/`sm` gutters + `lg` bottom padding (§12); every below-`lg` type step (§2); `DisclosureBand` `md` row, `ArchBand` 150px radius, panel 60px radius, `treatment-landscape` `sm` step (§11); `Popup` band floor + ✕ base/`sm` steps (§13); `wide` 1360 (27); hover/press derivations (§4.2, §14, §15) and the agent-box states incl. the crimson focus swap (16); `px-7.5` (51); gate pulse (52); scrollbars (§21); the §19 ladder incl. its 0.875× down-rung (56); `/acronyms`' crimson terms and its own `lg:pb-16` (§22); `/references`' lagoon link colour and hanging indent (§24) |
+| Kind                                | Values                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Transcribed-literal (off-scale)** | `#939393` press fg (§4.1/4.2); `#f73150`, `#bff5ff` (item 3); `#d2d5d4` (§4.3); §6 gradient stop (7); chapter `text-black` (§11); `--color-agent-mab` (14); `--color-agents-panel` (`#00d8ff`, §11); emerging-panel mint (19); `#747474` (21)                                                                                                                                                                                                                                                                                                                                                                               |
+| **Inferred (never exported)**       | navbar tooltip (5); sidebar `teal-100` (§4.5); pop-up scrim (12); table hairlines `black/30` (§11)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **Invented (no artboard)**          | below-`sm`/`sm` gutters + `lg` bottom padding (§12); every below-`lg` type step (§2); `DisclosureBand` `md` row, `ArchBand` 150px radius, panel 60px radius, `treatment-landscape` `sm` step (§11); `Popup` band floor + ✕ base/`sm` steps (§13); `wide` 1360 (27); hover/press derivations (§4.2, §14, §15) and the agent-box states incl. the crimson focus swap (16); `px-7.5` (51); gate pulse (52); scrollbars (§21); the §19 ladder incl. its 0.875× down-rung (56); `/acronyms`' crimson terms and its own `lg:pb-16` (§22); `/references`' lagoon link colour and hanging indent (§24); `/wizard`'s Reset row (§29) |
 
 ## 10. Page top rule
 
@@ -1175,3 +1176,38 @@ sidebar jump items, §24's references) stay selectable: they are content, not co
 
 Both declarations are what Tailwind's own `select-none` utility emits; the `-webkit-` form is
 still required by Safari.
+
+## 29. `/wizard`'s Reset
+
+Built 2026-08-25 on a client ask ("a reset input button too"). **No artboard exists** — every
+value below is invented within the palette, each derived from something already drawn, and a
+later export overrules it wholesale.
+
+**The row.** `WizardSubmit` grew a leading slot: from `sm` Reset sits on the pill grid's left edge
+and Submit keeps its right (`sm:flex justify-end gap-4`, the slot `sm:mr-auto`), so the pair frames
+the grid the way the pills do — measured 246/1146 at 1440, 100/540 at 640. **Below `sm` the pair
+stacks, Reset over Submit, on one track** (client ask, same day — the survey pair's idiom, §27):
+the row is a one-column `grid justify-end`, which is what sizes the track to the wider label
+rather than the box — a grid's auto track stretches only under `justify-content: normal` — and
+`justify-items: stretch` then gives both buttons that width (170px at 375, 480 and 600). The slot
+wrapper is `grid` itself so the button inside it stretches too; a bare wrapper would hold its own
+intrinsic width and the pair would not match. Aligned to the right edge because that is Submit's
+edge at every other width, and to the pill grid's right edge rather than the column's — the row
+keeps the grid's `mx-auto max-w-110` box, which matters between ~490 and 639px, where the box is
+centred inside a wider column (measured: stack and grid both end at 520 at 600, 456 at 480,
+351 at 375). Reset wears **Submit's lagoon skin verbatim** — §27's rule, every form button in the
+app on one string (`wizardButton.ts`, extracted from `WizardSubmit` and `Survey` the same day) —
+so position, not colour, carries the hierarchy: a second form-button colour is a designer call,
+and crimson, the only candidate, reads as _chosen_ on this screen (§14). Disabled until anything
+at all is answered (the package's `disabled:` dim), a hidden reason from an earlier run included —
+it is the thing a reset most needs to clear (ADR 0003, amended). `type="button"` is stated inside
+the form: a native `type="reset"` would clear the radios and not the state they mirror.
+
+**One click, no are-you-sure.** An "Are you sure?" prompt was built the same morning — a third
+dressing of `ModalLayer` (§13's card at a `min(36rem, 92vw)` step, no ✕, Cancel first for initial
+focus) — and removed within the hour on client direction: the answers are three radio picks, cheap
+to redo, and a prompt in front of them was friction, not protection. It went out entirely rather
+than staying as an unused component; the git history has it if a destructive action ever earns one.
+
+Verified in Chromium at 1440, 1024, 640, 600, 480 and 375 (2026-08-25): row edges and the stack,
+the store cleared and both gates shut on click, no horizontal scroll.

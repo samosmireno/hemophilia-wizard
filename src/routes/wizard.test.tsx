@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { nextOf } from "../data/sectionOrder";
 import { WIZARD_INPUT_TITLE, WIZARD_QUESTIONS, classesFor, leafFor } from "../data/wizard";
+import { ANSWERS_STORAGE_KEY } from "../state/wizardAnswers";
 import { seedWizardAnswers } from "../test/setup";
 import { routes } from "./router";
 
@@ -287,5 +288,102 @@ describe("wizard — the pages past the questions", () => {
     const router = renderAt("/wizard/nonsense");
 
     expect(at(router)).toBe("/wizard");
+  });
+});
+
+/**
+ * The reset control (client ask, 2026-08-25): the one caller of the provider's
+ * `reset()`, which ADR 0003 had left unwired pending a designed affordance.
+ * It sits at the start of Submit's row and clears on one click — an
+ * are-you-sure was built and removed the same day on client direction.
+ */
+describe("wizard — the reset control", () => {
+  const reset = () => screen.getByRole("button", { name: "Reset inputs" });
+  const stored = () => JSON.parse(sessionStorage.getItem(ANSWERS_STORAGE_KEY)!) as unknown;
+
+  /**
+   * A plain button, and stated as one: inside the form a bare button would
+   * submit, and a native `type="reset"` would clear the radios without
+   * touching the state they mirror.
+   */
+  it("shares Submit's row as a plain button", () => {
+    renderAt("/wizard");
+
+    expect(reset()).toHaveAttribute("type", "button");
+    expect(reset().closest("div")!.parentElement).toBe(submit().parentElement);
+  });
+
+  /**
+   * Below `sm` the pair stacks, Reset over Submit, on one grid track sized by
+   * the wider label (client ask, 2026-08-25 — the survey pair's idiom). Both
+   * halves are pinned: `justify-end` is what keeps a grid's auto track at
+   * max-content rather than stretching, and the wrapper must be `grid` itself
+   * or the button inside it keeps its own width and the pair stops matching.
+   */
+  it("stacks over Submit on one shared track below sm", () => {
+    renderAt("/wizard");
+    const row = submit().parentElement!;
+    const wrapper = reset().parentElement!;
+
+    expect(row).toHaveClass("grid", "justify-end", "gap-4", "sm:flex");
+    expect(wrapper.parentElement).toBe(row);
+    expect(wrapper).toHaveClass("grid", "sm:mr-auto");
+  });
+
+  it("is disabled until anything at all is answered", async () => {
+    const user = userEvent.setup();
+    renderAt("/wizard");
+
+    expect(reset()).toBeDisabled();
+    await user.click(radio("Hemophilia B"));
+    expect(reset()).toBeEnabled();
+  });
+
+  /**
+   * A reason left over from an earlier run is not on this screen, but it is
+   * something to clear — and the thing a reset most needs to clear, since it
+   * would otherwise re-open the leaf's gate the moment the patient questions
+   * were re-answered.
+   */
+  it("counts a hidden reason as something to clear", () => {
+    seedWizardAnswers({ type: null, hasInhibitors: null });
+    renderAt("/wizard");
+
+    expect(radio("Hemophilia A")).not.toBeChecked();
+    expect(reset()).toBeEnabled();
+  });
+
+  /**
+   * All three answers go, the store with them, and both gates close — Submit
+   * without the release pulse, which marks a gate opening, not closing.
+   */
+  it("clears every answer on one click and closes the gates again", async () => {
+    const user = userEvent.setup();
+    seedWizardAnswers();
+    renderAt("/wizard");
+    expect(radio("Hemophilia A")).toBeChecked();
+
+    await user.click(reset());
+
+    for (const name of ["Hemophilia A", "Hemophilia B", "Yes", "No"]) {
+      expect(radio(name)).not.toBeChecked();
+    }
+    expect(stored()).toEqual({ type: null, hasInhibitors: null, reason: null });
+    expect(submit()).toBeDisabled();
+    expect(submit()).not.toHaveClass("animate-gate-release");
+    expect(reset()).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+  });
+
+  it("re-arms Submit's release pulse after a reset", async () => {
+    const user = userEvent.setup();
+    seedWizardAnswers();
+    renderAt("/wizard");
+    await user.click(reset());
+
+    await answerPatient(user);
+
+    expect(submit()).toBeEnabled();
+    expect(submit()).toHaveClass("animate-gate-release");
   });
 });

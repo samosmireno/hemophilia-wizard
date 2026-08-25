@@ -1,6 +1,6 @@
 # 08 — Wizard section
 
-Status: done (2026-08-04) — except one acceptance item (reset)
+Status: done (2026-08-04; the reset acceptance item closed 2026-08-25)
 Phase: 1
 
 ## Outcome
@@ -14,8 +14,9 @@ leaves against `recommend()`; the `+` buttons open `DrugSheetPopup` by component
 
 ## Open residues
 
-- **Reset — designer's call.** `reset()` exists at `WizardAnswersProvider.tsx:45` but is never
-  called: no artboard draws a reset control, so there is no affordance to wire it to.
+- ~~**Reset — designer's call.** `reset()` exists at `WizardAnswersProvider.tsx:45` but is never
+  called: no artboard draws a reset control, so there is no affordance to wire it to.~~
+  **Closed 2026-08-25** — the client asked for it directly. See Comments.
 - ~~**The scenario illustration boxes open nothing**, though the caption says they do. No assets
   exist for the per-scenario panels, and of the five class labels **"Gene therapy" has no
   education chapter, pop-up or authored copy anywhere** — a best-effort wiring leaves one box
@@ -43,3 +44,16 @@ that frame exists so _filtering_ can't resize the card, and these rows never cha
 `content.test.ts` pins the label→bucket join total over `classesFor`; `scenario.test.tsx`
 pins each box's dialog, rows, filterlessness and wide width. CONTEXT.md §4's "boxes open
 nothing" block rewritten to record the wiring.
+
+---
+
+**2026-08-25 — reset shipped.** Client ask: "on wizard page, add a reset input button too".
+`WizardReset` (`src/components/WizardReset.tsx`) sits at the start of the Submit row through a new
+leading slot on `WizardSubmit` (stacked over Submit on one shared track below `sm`), wears Submit's
+lagoon skin (now one shared string, `src/components/wizardButton.ts`, which `Survey` imports too),
+is disabled until anything at all is answered, and calls the provider's `reset()` on click — all
+three answers. An "Are you sure?" prompt (`ConfirmDialog` on `ModalLayer`) was built with it and
+removed the same day on client direction; it is in the git history, not the tree.
+`/wizard/reason` deliberately has no reset. Tests in `wizard.test.tsx`. Docs: styling §29 +
+item 57, ADR 0003 amended. Nothing tracks in GA4 — a `wizard_reset` event would need the console
+step in `docs/analytics.md`; not asked for.

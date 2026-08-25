@@ -1,6 +1,6 @@
 # Session-scoped wizard answers, held above the shell
 
-**Status:** accepted — amended 2026-08-12
+**Status:** accepted — amended 2026-08-12, 2026-08-25
 
 > **Amendment (2026-08-12).** The flow is now **four** routes: on client direction the
 > reason question moved out of `/wizard` to its own step, `/wizard/reason`, between the
@@ -99,8 +99,17 @@ and the learner would have to walk back to `/wizard` to continue.
 - A test that walks the spine needs answers in session state first; `seedWizardAnswers()`
   in `src/test/setup.ts` is that seam, and the same file clears `sessionStorage` between
   tests so one test's answers cannot un-gate another's.
-- There is no reset control. The provider exposes `reset()` and nothing calls it: the
+- ~~There is no reset control. The provider exposes `reset()` and nothing calls it: the
   artboard draws no such affordance, and per-group deselect already clears one answer at a
   time. Issue 08's "back/reset work" criterion is knowingly unmet pending a designed
-  control.
+  control.~~ **Amended 2026-08-25 (client ask):** `/wizard` carries a "Reset inputs"
+  control (`WizardReset`) at the start of its Submit row — the one caller of `reset()`,
+  and one click: an are-you-sure was built and removed the same day on client direction,
+  the answers being three radio picks. It clears **all three** answers, the
+  reason included: a reason surviving a reset would re-open the leaf's gate the moment the
+  patient questions were re-answered, so it counts as something to clear even while it is
+  not on screen, and the control is disabled only when every answer is `null`. The
+  write-through effect scrubs the store on the same commit. `/wizard/reason` has no reset
+  of its own; per-group deselect still clears one answer at a time. Issue 08's criterion
+  is met; the affordance is undrawn (styling item 57).
 - Analytics is untouched. Issue 07 owns GA4 events; submitting the wizard emits nothing.

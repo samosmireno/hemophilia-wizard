@@ -3,6 +3,7 @@ import { Button } from "mlg-components";
 import { useNavigate } from "react-router";
 
 import PageSection from "../components/PageSection";
+import { WIZARD_BUTTON_SKIN } from "../components/wizardButton";
 import { SURVEY_QUESTIONS, type SurveyQuestionId, type SurveyResponses } from "../data/survey";
 import { trackSurveySubmit } from "../lib/analytics";
 import { cn } from "../lib/cn";
@@ -15,14 +16,6 @@ import { submitSurvey } from "../lib/submitSurvey";
  * Sheet instead.
  */
 const SUBMITTED_KEY = "survey-submitted";
-
-/**
- * The wizard submit's lagoon skin and size ramp (docs/styling.md §14, §27) —
- * every button on this page wears it, so Submit and the thank-you's two
- * destinations cannot drift apart.
- */
-const BUTTON_SKIN =
-  "bg-brand-lagoon-50 px-6 leading-5 hover:bg-brand-lagoon-25 active:bg-brand-lagoon-75 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl";
 
 export default function Survey() {
   const navigate = useNavigate();
@@ -51,10 +44,10 @@ export default function Survey() {
               it — rather than a wrapped flex row of ragged intrinsic widths.
               From `sm` the row fits and the buttons keep their own widths. */}
           <div className="mt-8 grid w-fit gap-4 sm:flex sm:w-auto sm:flex-wrap">
-            <Button className={BUTTON_SKIN} onClick={() => void navigate("/")}>
+            <Button className={WIZARD_BUTTON_SKIN} onClick={() => void navigate("/")}>
               Back to home
             </Button>
-            <Button className={BUTTON_SKIN} onClick={() => void navigate("/wizard")}>
+            <Button className={WIZARD_BUTTON_SKIN} onClick={() => void navigate("/wizard")}>
               Back to wizard
             </Button>
           </div>
@@ -117,7 +110,10 @@ export default function Survey() {
             <Button
               type="submit"
               disabled={!allAnswered}
-              className={cn(BUTTON_SKIN, "transition-[background-color,box-shadow,color,opacity]")}
+              className={cn(
+                WIZARD_BUTTON_SKIN,
+                "transition-[background-color,box-shadow,color,opacity]",
+              )}
             >
               Submit
             </Button>
