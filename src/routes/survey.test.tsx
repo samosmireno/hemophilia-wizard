@@ -11,13 +11,14 @@ vi.mock("../lib/submitSurvey", () => ({
   submitSurvey: vi.fn(() => Promise.resolve()),
 }));
 
-/** A router because the thank-you's "Back to home" navigates; the stub `/`
- *  keeps the test off the real landing page's video and data. */
+/** A router because the thank-you's buttons navigate; the stubs keep the test
+ *  off the real landing page's video and the wizard's data. */
 function renderSurvey() {
   const router = createMemoryRouter(
     [
       { path: "/survey", element: <Survey /> },
       { path: "/", element: <h1>Home stub</h1> },
+      { path: "/wizard", element: <h1>Wizard stub</h1> },
     ],
     { initialEntries: ["/survey"] },
   );
@@ -106,5 +107,16 @@ describe("Survey", () => {
     await user.click(screen.getByRole("button", { name: "Back to home" }));
 
     expect(router.state.location.pathname).toBe("/");
+  });
+
+  it("offers the way back into the wizard from the thank-you", async () => {
+    const user = userEvent.setup();
+    const { router } = renderSurvey();
+
+    await answerAll(user);
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+    await user.click(screen.getByRole("button", { name: "Back to wizard" }));
+
+    expect(router.state.location.pathname).toBe("/wizard");
   });
 });

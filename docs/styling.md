@@ -1118,9 +1118,13 @@ not section headings; options `text-base lg:text-lg`; the form runs the full con
 **Every string except the questions is unsourced.** `CONTEXT.md` §10 supplies the three prompts
 and their options verbatim; the title ("Survey"), the button ("Submit") and the thank-you
 ("Thank you — your response has been submitted.", with its
-"Back to home" button — the landing CTA's `Button` + `useNavigate` idiom on the submit's size
-ramp, since the thank-you is the walkthrough's dead end) are authored here — a client copy pass
-overrules any of them.
+"Back to home" and "Back to wizard" buttons — the landing CTA's `Button` + `useNavigate` idiom on
+the submit's size ramp, since the thank-you is the walkthrough's dead end; the wizard button added
+2026-08-25 on a client ask, so a second patient does not need the sidebar) are authored here — a
+client copy pass overrules any of them. The pair sits left-aligned under the thank-you in a
+`gap-4` flex row from `sm`; below it the row cannot fit the 327px column, so the container is a
+`grid w-fit` instead — one auto track sized by the wider label, both buttons stretched to it — and
+the stack has one straight right edge rather than two intrinsic widths (2026-08-25, client ask).
 
 **Validation is the wizard's gate, not inline errors** (2026-08-12, client ask — reversing the
 launch pattern, which kept Submit enabled and marked gapped fieldsets with crimson
@@ -1134,7 +1138,7 @@ copied — §20's cue stays the wizard's own until the designer rules on it (ite
 max-lg:text-lg lg:px-7.5 lg:py-4.5 lg:text-2xl`, §14) — the package default is a fixed
 26px/`px-16` at every width in the resting crimson, so the ramp is what makes the button step
 with the page. The recolour (2026-08-12, client ask) matches the survey's buttons — "Back to
-home" included — to the wizard's submit; only the wizard's gate transition/pulse stays that
+home" and "Back to wizard" included, all three share one `BUTTON_SKIN` string — to the wizard's submit; only the wizard's gate transition/pulse stays that
 screen's own. Right-aligned at the end of the column, where the wizard also puts its submit.
 
 **The confirmation is optimistic, and the submitted flag is per-tab.** `submitSurvey`
