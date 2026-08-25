@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import factorConcentratesUrl from "../../assets/images/factor_concentrates.webp";
+import factorFixConcentratesUrl from "../../assets/images/factor_fix_concentrates.webp";
 import geneTherapyUrl from "../../assets/images/gene_therapy.webp";
 import rebalancingUrl from "../../assets/images/hemostatic_rebalancing_agents.webp";
 import mimeticUrl from "../../assets/images/mimetic_bispecific_antibody.webp";
@@ -20,22 +21,23 @@ interface BoxArt {
   height: number;
 }
 
-const CONCENTRATES: BoxArt = { src: factorConcentratesUrl, width: 584, height: 652 };
-const MIMETIC: BoxArt = { src: mimeticUrl, width: 804, height: 716 };
+const FVIII_CONCENTRATES: BoxArt = { src: factorConcentratesUrl, width: 584, height: 652 };
+const FIX_CONCENTRATES: BoxArt = { src: factorFixConcentratesUrl, width: 584, height: 652 };
+const MIMETIC: BoxArt = { src: mimeticUrl, width: 624, height: 708 };
 const REBALANCING: BoxArt = { src: rebalancingUrl, width: 848, height: 716 };
 const GENE: BoxArt = { src: geneTherapyUrl, width: 403, height: 480 };
 
 /**
  * Keyed by the verbatim class labels `classesFor` lists — the only join there
  * is, since the classes are plain strings. Both mimetic wordings appear because
- * the tree sets `A-without` plural and `A-with` singular; both
- * factor-replacement classes share the vial asset.
+ * the tree sets `A-without` plural and `A-with` singular; the two
+ * factor-replacement classes each get their own vial, captioned FVIII or FIX.
  */
 const BOX_ART: ReadonlyMap<string, BoxArt> = new Map([
-  ["Recombinant FVIII concentrates", CONCENTRATES],
-  ["FIX prophylaxis", CONCENTRATES],
-  ["Factor VIII mimetics", MIMETIC],
-  ["Factor VIII mimetic", MIMETIC],
+  ["FVIII concentrates", FVIII_CONCENTRATES],
+  ["FIX prophylaxis", FIX_CONCENTRATES],
+  ["FVIIIa mimetics", MIMETIC],
+  ["FVIIIa mimetic", MIMETIC],
   ["Hemostatic rebalancing agents", REBALANCING],
   ["Gene therapy", GENE],
 ]);

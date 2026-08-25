@@ -80,7 +80,7 @@ export interface ExploreClassFilter {
 export const EXPLORE_CLASS_FILTERS: readonly ExploreClassFilter[] = [
   {
     label: "FVIII mimetics",
-    classes: ["Factor VIII mimetic", "Factor VIII mimetic (emerging / investigational)"],
+    classes: ["FVIIIa mimetic", "FVIIIa mimetic (emerging / investigational)"],
   },
   { label: "Hemostatic rebalancing agents", classes: ["Hemostatic rebalancing agent"] },
   { label: "UHL clotting factor replacement", classes: ["Clotting factor replacement"] },
@@ -99,10 +99,10 @@ export const EXPLORE_CLASS_FILTERS: readonly ExploreClassFilter[] = [
  * "FIX prophylaxis" box is not a dead end. `content.test.ts` pins coverage.
  */
 const CLASS_BOX_FILTERS: ReadonlyMap<string, string> = new Map([
-  ["Recombinant FVIII concentrates", "UHL clotting factor replacement"],
+  ["FVIII concentrates", "UHL clotting factor replacement"],
   ["FIX prophylaxis", "UHL clotting factor replacement"],
-  ["Factor VIII mimetics", "FVIII mimetics"],
-  ["Factor VIII mimetic", "FVIII mimetics"],
+  ["FVIIIa mimetics", "FVIII mimetics"],
+  ["FVIIIa mimetic", "FVIII mimetics"],
   ["Hemostatic rebalancing agents", "Hemostatic rebalancing agents"],
   ["Gene therapy", "Gene therapy"],
 ]);

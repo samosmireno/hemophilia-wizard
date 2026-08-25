@@ -53,9 +53,11 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   },
   {
     agent: AGENT_NAMES.emicizumab,
-    /* "Factor VIII mimetic", not the source's "Factor VIIIa–mimetic" — client copy
-       edit, 2026-08-05. Not a typo to reconcile against the artboard. */
-    classTarget: ["Factor VIII mimetic", "FIXa x FX BsAb"],
+    /* "FVIIIa mimetic": the source's activated form, abbreviated — the client's
+       2026-08-25 relabel, which reverses the 2026-08-05 edit that had spelled it
+       out as "Factor VIII mimetic". The source's en-dash ("Factor VIIIa–mimetic")
+       stays dropped. Not a typo to reconcile against the artboard. */
+    classTarget: ["FVIIIa mimetic", "FIXa x FX BsAb"],
     indication: ["HA +/- inhibitors, newborn + older patients"],
     dosing: [
       "Subcutaneous injection (vial and syringe)",
@@ -78,9 +80,8 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
   {
     agent: AGENT_NAMES.denecimig,
     title: "Denecimig (emerging/investigational)",
-    /* "Factor VIII mimetic", not "Factor VIIIa–mimetic" — client copy edit,
-       2026-08-05. Not a typo to reconcile. */
-    classTarget: ["Factor VIII mimetic BsAb", "FIXa x FX BsAb"],
+    /* "FVIIIa mimetic" — see the Emicizumab sheet for the 2026-08-25 relabel. */
+    classTarget: ["FVIIIa mimetic BsAb", "FIXa x FX BsAb"],
     /* `≥`, not the source's bare `>` — client copy edit, 2026-08-05. Every age
        threshold in this module reads `≥`. */
     indication: [

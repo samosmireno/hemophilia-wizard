@@ -73,11 +73,7 @@ describe("treatment-landscape chapter", () => {
       within(lead)
         .getAllByRole("listitem")
         .map((li) => li.textContent),
-    ).toEqual([
-      "FVIII mimetic BsAbs (HA)",
-      "Hemostatic rebalancing agents (HA/HB)",
-      "Gene therapy (HB)",
-    ]);
+    ).toEqual(["Factor VIIIa", "Hemostatic rebalancing agents (HA/HB)", "Gene therapy (HB)"]);
   });
 
   // Each caption is both the visible text under the `+` and the button's

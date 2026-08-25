@@ -98,19 +98,21 @@ describe("drug sheets", () => {
     }
   });
 
-  it("keep the client's 2026-08-05 edits on the Denecimig sheet", () => {
+  it("keep the client's copy edits on the Denecimig sheet", () => {
     /*
       Three copy edits landing on one sheet, pinned as data rather than as
-      rendering: the mimetic bullet loses the activated form's `a` and its dash,
-      the age threshold becomes `≥`, and the whole-section "TBD; based on phase 3
-      clinical trial data" qualifier is gone. Each would re-appear from the PDF on
-      any re-transcription, which is what makes them worth stating.
+      rendering: the mimetic bullet abbreviates the source's activated form and
+      loses its dash ("Factor VIIIa–mimetic" → "FVIIIa mimetic", 2026-08-05 then
+      2026-08-25 — the intermediate unactivated "Factor VIII mimetic" is gone
+      too), the age threshold becomes `≥`, and the whole-section "TBD; based on
+      phase 3 clinical trial data" qualifier is gone. Each would re-appear from
+      the PDF on any re-transcription, which is what makes them worth stating.
     */
     const denecimig = DRUG_SHEETS.find((s) => s.agent === "Denecimig")!;
 
-    expect(denecimig.classTarget[0]).toBe("Factor VIII mimetic BsAb");
+    expect(denecimig.classTarget[0]).toBe("FVIIIa mimetic BsAb");
     expect(denecimig.indication[0]).toContain("patients ≥1 year");
-    expect(JSON.stringify(denecimig)).not.toMatch(/VIIIa|>1 year|TBD;/);
+    expect(JSON.stringify(denecimig)).not.toMatch(/Factor VIII|VIIIa–|>1 year|TBD;/);
   });
 
   it("write every numeric threshold as `≥`", () => {
@@ -309,6 +311,20 @@ describe("the definition lists", () => {
   it("expand each acronym once", () => {
     const abbrs = ACRONYMS.map((entry) => entry.abbr);
     expect(new Set(abbrs).size).toBe(abbrs.length);
+  });
+
+  /*
+    Alphabetical by term, case-insensitively — the source's order, and the app's
+    rule from 2026-08-25, when the client relabel turned "Factor VIII mimetic
+    bispecific antibody" into "FVIIIa mimetic bispecific antibody". That sorts a
+    row later, so the entry moved rather than the rule bending; a future relabel
+    that re-spells a term fails here until it is filed again. `ACRONYMS` is
+    deliberately not asserted — it preserves an inversion the source draws.
+  */
+  it("keep the glossary alphabetical", () => {
+    const terms = GLOSSARY.map((entry) => entry.term);
+    const sorted = [...terms].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+    expect(terms).toEqual(sorted);
   });
 });
 

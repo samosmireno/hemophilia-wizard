@@ -26,11 +26,16 @@ export default function Explore() {
     // On the app-wide §2 ramp since 2026-08-10 (user direction), replacing the
     // page's bespoke centred three-step fit — docs/styling.md §17, item 31.
     <PageSection title={SDM_CONCLUSION} className="flex flex-1 flex-col lg:-mr-rail">
-      {/* `ps-6` is the list's own `pl-6`, so this sentence's left edge sits on the
-          bullets' text rather than on their discs. */}
-      <p className="mt-6 ps-6 text-base/[1.6] text-black lg:text-xl/[1.6]">{SDM_LEAD}</p>
+      {/* The sentence keeps the 24 it has always had; it is the list below that moved
+          onto it (user direction 2026-08-25, which also bolded this line). */}
+      <p className="mt-6 ps-6 text-base/[1.6] font-bold text-black lg:text-xl/[1.6]">{SDM_LEAD}</p>
 
-      <BulletList items={SDM_POINTS} className="mt-4 text-base/[1.6] lg:text-xl/[1.6]" />
+      {/* 44 = the sentence's own 24 + the ~1em Chrome hangs a disc left of its text
+          (measured 20 at `xl`, 17 at `base`), so the discs sit on the sentence's
+          first letter at both steps rather than a level out from it. `pl-`, not
+          `ps-`: tailwind-merge treats the logical property as a separate group and
+          would leave the list's own `pl-6` standing beside it. */}
+      <BulletList items={SDM_POINTS} className="mt-4 pl-11 text-base/[1.6] lg:text-xl/[1.6]" />
 
       {/* `xl:mb-6` is the arch row's `mt-6`, moved to this side of the pin: a margin
           on the pinned row would be the pin. */}

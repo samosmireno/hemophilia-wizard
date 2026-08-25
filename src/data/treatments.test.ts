@@ -46,4 +46,23 @@ describe("the roster rows", () => {
       }
     }
   });
+
+  /*
+    The client's two 2026-08-25 spelling edits on cells S1 writes otherwise, pinned
+    for the same reason the sheets' are: each would come straight back from the XLSX
+    on any re-transcription. Denecimig's age threshold takes the `≥` the drug sheets
+    took on 2026-08-05 ("underline the > sign, ie, greater than or equal to"), and
+    Fitusiran's monitoring cell closes "gall bladder" up to the one word the §6 sheet
+    has always used. Asserted across every row, not the two named ones, so a third
+    row arriving with either spelling fails here.
+  */
+  it("keep the client's spelling edits on the cells that carry them", () => {
+    for (const t of TREATMENTS) {
+      for (const [field, value] of Object.entries(t)) {
+        if (typeof value !== "string") continue;
+        expect(value, `${t.agent}.${field}`).not.toMatch(/>\s*\d/);
+        expect(value, `${t.agent}.${field}`).not.toMatch(/gall bladder/i);
+      }
+    }
+  });
 });

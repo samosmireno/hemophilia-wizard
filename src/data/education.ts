@@ -126,12 +126,12 @@ export const EDUCATION_TOPICS = {
     ],
   },
   "fviii-mimetics": {
-    title: "FVIII Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
+    title: "FVIIIa Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
     body: [
       "BsAbs work by simultaneously targeting two antigens",
-      "FVIII mimetic BsAbs are engineered to bridge FIXa and FX, mimicking the cofactor functions of FVIII and triggering the coagulation cascade",
-      "Emicizumab established FVIII mimetic therapy as a first-in-class subcutaneous, nonfactor prophylaxis option for HA",
-      "Emerging FVIII mimetic therapies, including denecimig (Mim8), are being developed to further optimize hemostatic activity while improving dosing convenience",
+      "FVIIIa mimetic BsAbs are engineered to bridge FIXa and FX, mimicking the cofactor functions of FVIIIa and triggering the coagulation cascade",
+      "Emicizumab established FVIIIa mimetic therapy as a first-in-class subcutaneous, nonfactor prophylaxis option for HA",
+      "Emerging FVIIIa mimetic therapies, including denecimig (Mim8), are being developed to further optimize hemostatic activity while improving dosing convenience",
     ],
   },
   "emicizumab-overview": {
@@ -146,7 +146,7 @@ export const EDUCATION_TOPICS = {
   "emicizumab-moa": {
     title: "Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa",
     body: [
-      "FVIII mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
+      "FVIIIa mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
     ],
   },
   /**
@@ -156,7 +156,7 @@ export const EDUCATION_TOPICS = {
   "denecimig-overview": {
     title: "Denecimig (Mim8): Investigational currently under FDA review",
     body: [
-      "FVIII mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
+      "FVIIIa mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
       "BLA submitted for use as routine prophylaxis in adult and pediatric patients with HA with or without inhibitors",
       {
         text: "FDA submission supported by results from the phase 3 FRONTIER clinical program:",
@@ -168,14 +168,14 @@ export const EDUCATION_TOPICS = {
       },
       "Tiered dosing based on body weight avoids dose calculations, reduces treatment burden, and minimizes medication waste",
     ],
-    figures: ["Mechanism of Action for Denecimig (Mim8): FVIII mimetic BsAb"],
+    figures: ["Mechanism of Action for Denecimig (Mim8): FVIIIa mimetic BsAb"],
   },
   /**
    * `title` quotes the heading painted into `denecimig.webp`'s own pixels;
    * `DENECIMIG_FIGURE_ALT` in the chapter quotes it too — both move if the asset does.
    */
   "denecimig-moa": {
-    title: "Mechanism of Action for Denecimig (Mim8): FVIII mimetic BsAb",
+    title: "Mechanism of Action for Denecimig (Mim8): FVIIIa mimetic BsAb",
     body: [
       "A monovalent anti-FIXa arm enhances FIXa proteolytic activity to facilitate FX activation and subsequent thrombin generation and clot formation",
       "Pre-clinical studies demonstrated denecimig (Mim8) potency up to 18-fold greater than emicizumab-equivalent analog",
@@ -188,11 +188,7 @@ export const EDUCATION_TOPICS = {
       "Novel therapies improve bleed protection, reduce treatment burden, and enable individualized treatment",
       {
         text: "Novel therapeutic classes:",
-        children: [
-          "FVIII mimetic BsAbs (HA)",
-          "Hemostatic rebalancing agents (HA/HB)",
-          "Gene therapy (HB)",
-        ],
+        children: ["Factor VIIIa", "Hemostatic rebalancing agents (HA/HB)", "Gene therapy (HB)"],
       },
     ],
     benefitsChallenges: {
@@ -255,7 +251,7 @@ export const EDUCATION_TOPICS = {
     title: "NXT007",
     body: [
       "Next-generation BsAb engineered by modifying emicizumab to enhance hemostasis in HA",
-      "In vitro studies demonstrated that NXT007-treated plasma samples achieved coagulation activity equivalent to 100 IU/dL FVIII in a tissue factor–triggered thrombin generation assay",
+      "In vitro studies demonstrated that NXT007-treated plasma samples achieved coagulation activity equivalent to 100 IU/dL FVIIIa in a tissue factor–triggered thrombin generation assay",
       {
         text: "Initiated in phase 3 trials:",
         children: ["ZEBRHA 1 (NCT07416526)", "ZEBRHA 2 (NCT07416604)"],
@@ -279,9 +275,9 @@ export const EDUCATION_TOPICS = {
    * 2026-08-05 (CONTEXT.md §7.5). "1/2" is two phase numbers, not a fraction.
    */
   "inno8-overview": {
-    title: "Inno8: Oral FVIII Mimetic for HA",
+    title: "Inno8: Oral FVIIIa Mimetic for HA",
     body: [
-      "Novel VHH-based FVIII mimetic; once-daily oral treatment of HA",
+      "Novel VHH-based FVIIIa mimetic; once-daily oral treatment of HA",
       "Currently under evaluation in nonrandomized open-label phase 1/2 VOYAGER2 trial (NCT07220564)",
     ],
     figures: ["Inno8 Mechanism of Action"],
@@ -356,7 +352,7 @@ export const TREATMENT_OPTIONS_MATRIX: readonly TreatmentOptionRow[] = [
     footnote: "a",
   },
   {
-    option: "FVIII mimetics",
+    option: "Factor VIIIa mimetics",
     // The client's 2026-08-05 wording, left exactly as given — asked and
     // answered, so do not re-litigate it.
     moa: "Mimics activity of emicizumab equivalent to FVIII ~10–12 IU/dL",

@@ -168,22 +168,21 @@ const CLASSES_TO_CONSIDER: Record<ScenarioKey, ClassesToConsider> = {
   "A-without": {
     title: "Hemophilia A without inhibitors",
     lead: "Therapeutic classes to consider for prophylaxis of HA _without_ inhibitors",
-    classes: [
-      "Recombinant FVIII concentrates",
-      "Factor VIII mimetics",
-      "Hemostatic rebalancing agents",
-    ],
+    /* "FVIII concentrates", not the artboard's "Recombinant FVIII concentrates"
+       — client copy edit, 2026-08-25. */
+    classes: ["FVIII concentrates", "FVIIIa mimetics", "Hemostatic rebalancing agents"],
     caption: BOXES_CAPTION,
   },
   "A-with": {
     title: "Hemophilia A with inhibitors",
     lead: "Therapeutic classes to consider for prophylaxis of HA _with_ inhibitors",
     /**
-     * "Factor VIII mimetic", not the activated form the artboards draw — a
-     * client copy edit (2026-08-05) that landed here first and reached every
-     * screen on 2026-08-12. Singular where `A-without` is plural, as drawn.
+     * "FVIIIa mimetic" — the artboards' activated form, abbreviated to match the
+     * "FVIII concentrates" box beside it, restored on this screen
+     * (2026-08-25) after the 2026-08-05 copy edit had spelled it out unactivated.
+     * Singular where `A-without` is plural, as drawn.
      */
-    classes: ["Factor VIII mimetic", "Hemostatic rebalancing agents"],
+    classes: ["FVIIIa mimetic", "Hemostatic rebalancing agents"],
     caption: BOXES_CAPTION,
   },
   "B-without": {
@@ -215,8 +214,12 @@ interface ReasonNote {
 }
 
 /**
- * 32 notes, verbatim from `[PDF-V]` (CONTEXT.md §4.2). The copy and the title
- * wording are SCENARIO-SPECIFIC, not shared per reason — preserved as-is.
+ * 32 notes, verbatim from `[PDF-V]` (CONTEXT.md §4.2), with one departure: the
+ * three mimetic mentions read "FVIIIa", where the source has "FVIII" (client
+ * relabel, 2026-08-25 — the same edit the scenario boxes and the §5 roster took).
+ * "FVIII inhibitors" and "FVIII/FIX monitoring" are NOT mimetic mentions and
+ * keep the unactivated form. The copy and the title wording are
+ * SCENARIO-SPECIFIC, not shared per reason — preserved as-is.
  */
 const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote>> = {
   "A-without": {
@@ -294,7 +297,7 @@ const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote>> = {
         points: [
           "NFTs avoid the need for routine FVIII/FIX peak/trough monitoring and PK-guided dose optimization",
           "Monitoring patients on NFTs presents unique challenges; traditional tests, such as aPTT do not accurately measure bleeding risk",
-          "FVIII mimetics require monitoring of clinical bleed control and product-specific safety considerations; for emicizumab, monitor for thrombotic microangiopathy or thromboembolic events if aPCC is administered",
+          "FVIIIa mimetics require monitoring of clinical bleed control and product-specific safety considerations; for emicizumab, monitor for thrombotic microangiopathy or thromboembolic events if aPCC is administered",
           "Thoughtful patient selection for NFTs is essential",
         ],
       },
@@ -317,7 +320,7 @@ const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote>> = {
           "Patients with inhibitors often have inadequate bleeding control with bypassing agents and may benefit significantly from novel NFTs",
           "Monitoring includes clinical bleeding assessment and product-specific laboratory monitoring",
           "Early evidence suggests that joint protection with NFTs is comparable to that of traditional factor prophylaxis",
-          "For patients with inhibitors, guidelines recommend prophylaxis with emicizumab over bypassing agents; FVIII mimetics do not cause/increase FVIII inhibitors and maintain efficacy in their presence",
+          "For patients with inhibitors, guidelines recommend prophylaxis with emicizumab over bypassing agents; FVIIIa mimetics do not cause/increase FVIII inhibitors and maintain efficacy in their presence",
         ],
       },
       strategies: {
@@ -329,7 +332,7 @@ const SCENARIO_NOTES: Record<ScenarioKey, Record<SwitchReason, ReasonNote>> = {
           "Anticipate treatment interactions when managing breakthrough bleeding",
           "Plan for treatment with clotting factors or other hemostatic agents for more serious bleeding episodes or major surgery",
           "Plan for a washout period when transitioning from prior therapies, as appropriate, based on the selected agent",
-          "For patients requiring bypassing-agent therapy while receiving FVIII mimetic prophylaxis, avoid or minimize aPCC when possible because of thrombotic risk",
+          "For patients requiring bypassing-agent therapy while receiving FVIIIa mimetic prophylaxis, avoid or minimize aPCC when possible because of thrombotic risk",
         ],
       },
     },

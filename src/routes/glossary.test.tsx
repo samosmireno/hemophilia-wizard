@@ -38,15 +38,16 @@ describe("glossary page", () => {
 
   /**
    * Same reason as `/acronyms`: the case is content. The page's sharpest proof
-   * left with the 2026-08-12 terminology pass — "Factor VIIIa-mimetic"
-   * uppercased read `VIIIA`, which names nothing — but the prohibition is the
-   * design's, not the example's. jsdom cannot compute `text-transform`, so the
-   * class is what guards against a styling sweep reaching this page.
+   * came back with the 2026-08-25 relabel — `FVIIIa mimetic` uppercased reads
+   * `FVIIIA MIMETIC`, which names nothing — after the 2026-08-12 pass had spent
+   * a fortnight without it. The prohibition is the design's, not the example's.
+   * jsdom cannot compute `text-transform`, so the class is what guards against
+   * a styling sweep reaching this page.
    */
   it("never uppercases a term", () => {
     const list = renderGlossary();
 
-    const mimetic = GLOSSARY.find((entry) => entry.term.includes("VIII mimetic"));
+    const mimetic = GLOSSARY.find((entry) => entry.term.includes("FVIIIa mimetic"));
     expect(mimetic).toBeDefined();
 
     for (const dt of list.querySelectorAll("dt")) {

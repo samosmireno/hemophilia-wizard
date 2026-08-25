@@ -9,7 +9,19 @@ file it came from** so it can be re-verified and updated.
 
 ## Maintenance
 
-- **Last reviewed:** 2026-08-12 (the mimetic terminology unified app-wide on client direction —
+- **Last reviewed:** 2026-08-25 (client relabel pass, partly reversing 2026-08-12 — every
+  mimetic mention the app paints becomes **"FVIIIa mimetic(s)"**: the activated form is back,
+  abbreviated to `FVIIIa` and still un-dashed, across the `fviii-mimetics` chapter (§7.5) and
+  the §7.3 class matrix, the wizard's class boxes and notes (§4), the S1 class and MOA
+  cells (§5.1) and the two mimetic drug sheets (§6). The same pass drops **"Recombinant"** from
+  the `HA −inhib` factor box (§4), rewrites Denecimig's S1 `age` cell's bare `>` as `≥`
+  (§5.1), matching the sheet edit of 2026-08-05, and closes "gall bladder" up to **"gallbladder"**
+  in Fitusiran's S1 `monitoring` cell (§5.1), matching the §6 sheet. The glossary term followed a step later the same
+  day, and the §8 NFT definition that names the class with it — **"FVIIIa mimetic bispecific
+  antibod(y|ies)"**. **One surface is still left out**: `EXPLORE_SEGMENTS`' drawn label
+  "FVIII mimetics" (§5). The transcription sections keep their
+  sources' wording, as before); previously
+  2026-08-12 (the mimetic terminology unified app-wide on client direction —
   every "Factor VIIIa mimetic" / "FVIIIa(-)mimetic" the app paints drops the `a` and the
   hyphen/dash, extending the 2026-08-05 `fviii-mimetics` copy edit to the wizard's class boxes
   and notes, the S1 class and MOA cells, and the glossary term — see §4, §5.1, §7.5, §8; the
@@ -248,8 +260,8 @@ shown before the reason question) `[PDF-V]`:
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **HB +inhib** | Hemostatic rebalancing agents. _Note: Bypassing agents (aPCC, rFVIIa) can manage breakthrough bleeds in patients with inhibitors, but sustained prophylaxis with these agents remains challenging._ |
 | **HB −inhib** | Hemostatic rebalancing agents · FIX prophylaxis · Gene therapy                                                                                                                                      |
-| **HA +inhib** | Factor VIII mimetic ᶜ · Hemostatic rebalancing agents ᴮ                                                                                                                                             |
-| **HA −inhib** | Recombinant FVIII concentrates · Factor VIII mimetics ᶜ · Hemostatic rebalancing agents                                                                                                             |
+| **HA +inhib** | FVIIIa mimetic ᶜ · Hemostatic rebalancing agents ᴮ                                                                                                                                                  |
+| **HA −inhib** | FVIII concentrates ᶜ · FVIIIa mimetics ᶜ · Hemostatic rebalancing agents                                                                                                                            |
 
 ᴮ `[BUILD]` **the artboard sets this one plural where `[PDF-V]` sets it singular** ("Hemostatic
 rebalancing agent"). The app renders the plural, on the standing rule that the artboard is the
@@ -260,8 +272,13 @@ copy. Note the first item in the same list _is_ singular on both, deliberately.
 `HA +inhib` screen first, then on 2026-08-12 from every mimetic mention the app paints —
 `HA −inhib` above (which had kept the activated form on purpose for a week), the §4.2 wizard
 notes, the S1 class and MOA cells ([§5.1](#51-treatment-roster-9-rows-s1-verbatim-xlsx)), and the
-glossary term ([§8](#8-glossary)). The artboards and `[PDF-V]` draw the activated form; the two
-screens still differ in number (singular here, plural on `HA −inhib`), as drawn.
+glossary term ([§8](#8-glossary)). Then on **2026-08-25** the activated form came back on every
+one of those surfaces, abbreviated: the boxes, the §4.2 notes, the S1 cells, the §6 sheets and the
+glossary term all read **"FVIIIa mimetic(s)"** — the `a` restored, the dash still gone.
+The same 2026-08-25 edit drops **"Recombinant"** from the `HA −inhib` factor box, which the
+artboard draws as "Recombinant FVIII concentrates". The artboards and `[PDF-V]` draw the
+spelled-out activated form; the two screens still differ in number (singular here, plural on
+`HA −inhib`), as drawn.
 
 Each box carries the annotation _"Click on the box(es) below to learn more about each type of
 therapy"_ and links to the class-level education pop-ups. Encoded in `[BUILD]` `src/data/wizard.ts`
@@ -300,7 +317,7 @@ account of why it went).
 > that bucket's rows, titled by the label. **Deliberately no filter dropdowns**: the box
 > already chose the class, and the other two filters would let the fixed view contradict its
 > own title — the full filterable table stays `/explore`'s. The join's non-obvious half:
-> both factor-replacement labels ("Recombinant FVIII concentrates", "FIX prophylaxis") share
+> both factor-replacement labels ("FVIII concentrates", "FIX prophylaxis") share
 > the UHL bucket, whose three rows include the FIX products, and both mimetic wordings share
 > the FVIII bucket. `content.test.ts` pins that every label `classesFor` lists resolves.
 
@@ -473,11 +490,21 @@ for detail.
 ᴬ Fitusiran route: enriched from S3 / `[PDF-V]` (`…pen or vial/syringe`); S1 had `…pen` only —
 the one deliberate departure from S1 (see [Data quality](#data-quality--conflicts)).
 
-`[CLIENT]` **the app drops the activated `a` from S1's mimetic cells** (2026-08-12, the
-terminology pass that took the 2026-08-05 `fviii-mimetics` copy edit app-wide): `treatments.ts`
-writes "Factor VIII mimetic" / "Factor VIII mimetic (emerging / investigational)" in Class and
-"Factor VIII mimetic\nBsAb" (dash gone too) in MOA. The rows above keep S1's wording, as
+`[CLIENT]` **the app abbreviates S1's mimetic cells to `FVIIIa`** (2026-08-25, superseding the
+2026-08-12 pass that had dropped the activated `a` outright): `treatments.ts` writes
+"FVIIIa mimetic" / "FVIIIa mimetic (emerging / investigational)" in Class and
+"FVIIIa mimetic\nBsAb" (dash still gone) in MOA. The rows above keep S1's wording, as
 transcription.
+
+`[CLIENT]` **Denecimig's `age` cell reads `≥1`** where S1 writes a bare `>1` (2026-08-25) — the
+2026-08-05 sheet edit ("underline the `>` sign, ie, greater than or equal to") extended to the S1
+roster, so the §5 table and the §6 sheet now agree. The row above keeps S1's `>`, as
+transcription.
+
+`[CLIENT]` **Fitusiran's `monitoring` cell reads "gallbladder"**, one word, where S1 writes "gall
+bladder" (2026-08-25) — the §6 sheet's spelling ("Acute/recurrent gallbladder disease") applied to
+the S1 roster, the same both-tables-agree call as the `≥` above. The representative value quoted
+earlier in this section keeps S1's two words, as transcription.
 
 `[BUILD]` **S1's cell padding is not transcribed** (2026-08-07). Three `monitoring` cells open with
 a space, the SHL/EHL/Efanesoctocog class labels close with one, and Denecimig's parenthetical is
@@ -545,7 +572,8 @@ over `TREATMENTS`, each defaulting to All, resetting when the card closes. The r
 - An impossible combination (e.g. Gene therapy + Type A) shows an empty state — "No treatments
   match the selected filters." with a Clear-filters recovery — not per-row explanations.
 - Age parse, preserved in case an age filter is ever drawn: `0+→0, 6+→6, 12+→12, Adults→18,
-"TBD (…>1 year…)"→1 (provisional)`. Read off the verbatim `age` column. No age dropdown is
+"TBD (…≥1 year…)"→1 (provisional)`. Read off the `age` column as `treatments.ts` carries it
+  (`≥`, not S1's `>` — see [§5.1](#51-treatment-roster-9-rows-s1-verbatim-xlsx)). No age dropdown is
   drawn or built.
 
 ---
@@ -604,11 +632,14 @@ them. `ClinicalTrial` therefore has no `citation` field, every trial renders `Na
 the card contains no link at all. The four tails are recorded below and remain in
 `documents/out_raw.txt`, but are stored nowhere in the code.
 
-**"Factor VIIIa–mimetic" → "Factor VIII mimetic", 2026-08-05 `[CLIENT]`.** The Class/Target line of
-the two mimetic sheets drops the activated form's "a" and the dash — Denecimig's first, Emicizumab's
-a step later, so the two sheets agree. It is the same terminology pass §7.5 records (see the note
-under that heading); the artboards and `[PDF-V]` still draw the activated form, and the class labels
-elsewhere in this file are unaffected except where footnoted.
+**"Factor VIIIa–mimetic" → "FVIIIa mimetic", 2026-08-05 then 2026-08-25 `[CLIENT]`.** The
+Class/Target line of the two mimetic sheets drops the dash and abbreviates the activated form.
+It went via an intermediate: 2026-08-05 took the "a" off too ("Factor VIII mimetic" — Denecimig's
+first, Emicizumab's a step later, so the two sheets agree), and 2026-08-25 put it back as `FVIIIa`
+across every painted mimetic mention (§4, §5.1) and, a step later that day, the §8 glossary term
+and the NFT definition naming the class. It is the same terminology pass §7.5 records (see
+the note under that heading); the artboards and `[PDF-V]` still draw the spelled-out activated
+form, and the class labels elsewhere in this file are unaffected except where footnoted.
 
 **Two more edits on the Denecimig sheet, 2026-08-05 `[CLIENT]`.** (1) Its Indication reads
 _"patients ≥1 year"_ where the source writes a bare `>` — the direction asked for the `>` to be
@@ -629,14 +660,14 @@ perioperative management. _Dosage:_ IV, 50 IU/kg once weekly; optimize via plasm
 (aPTT one-stage assay). _Monitoring:_ hypersensitivity/anaphylaxis; neutralizing antibodies
 (inhibitors); ADAs. _Trials:_ Study 1 (NCT04161495), Study 2 (NCT04759193).
 
-**Emicizumab** — _Class/Target:_ Factor VIII mimetic, FIXa×FX BsAb. _Indication:_ HA ±inhibitors,
+**Emicizumab** — _Class/Target:_ FVIIIa mimetic, FIXa×FX BsAb. _Indication:_ HA ±inhibitors,
 newborn & older. _Dosage:_ SC (vial & syringe); load 3 mg/kg weekly ×4 wks; maintenance
 1.5 mg/kg weekly, 3 mg/kg q2wks, or 6 mg/kg monthly. _Monitoring:_ injection-site reactions;
 lab coagulation test interference (don't use intrinsic-pathway clotting tests — ACT, Bethesda,
 aPTT-based — for FVIII inhibitor titers); thrombotic microangiopathy/thrombotic events; aPCC
 interaction; ADAs. _Trials:_ HAVEN 3 (NCT02847637), HAVEN 4 (NCT03020160), HAVEN 2 (NCT02795767).
 
-**Denecimig (emerging/investigational)** — _Class/Target:_ Factor VIII mimetic BsAb, FIXa×FX.
+**Denecimig (emerging/investigational)** — _Class/Target:_ FVIIIa mimetic BsAb, FIXa×FX.
 _Indication:_ TBD (FDA); trials in HA ±inhibitors, patients ≥1 yr. _Dosage:_ SC prefilled pen
 w/ attachable syringe; no washout when switching from emicizumab. _Monitoring:_
 mostly mild transient injection-site reactions; no thromboembolic/TMA events; no
@@ -762,6 +793,12 @@ agent table:
 FVIII/FIX concentrates; with inhibitors → treat with bypassing agents. ᶜ Responses show
 inter-individual variability and uncertain duration.
 
+`[CLIENT]` **the matrix's first mimetic cell reads "Factor VIIIa mimetics"** where the slide writes
+"FVIII mimetics" (2026-08-25, the pass §7.5 records) — spelled out here, where the wizard and the
+S1 cells abbreviate to `FVIIIa`. Its `moa` cell keeps the client's own 2026-08-05 wording
+("Mimics activity of emicizumab equivalent to FVIII ~10–12 IU/dL"), asked and answered. The row
+above keeps the slide's wording, as transcription.
+
 ### 7.4 Clotting factor replacement therapy
 
 - Historically HA/HB were managed with clotting factor replacement, given prophylactically to
@@ -792,8 +829,17 @@ slug, the topic ids and the component name are unaffected — `fviii-mimetics` i
 (issue 08 cross-links to it). Elsewhere the source's wording stood until 2026-08-12, when a
 follow-up client pass took the edit app-wide: the comparison table's S1 class and MOA cells
 ([§5.1](#51-treatment-roster-9-rows-s1-verbatim-xlsx)), the glossary term ([§8](#8-glossary)),
-and the wizard's class boxes and notes ([§4](#4-treatment-wizard-flow-main-engine)) all write
-"FVIII mimetic" now. This transcription keeps `[PDF-V]`'s wording, as before.
+and the wizard's class boxes and notes ([§4](#4-treatment-wizard-flow-main-engine)) all wrote
+"FVIII mimetic" from then on. **2026-08-25 reversed it**: the `a` came back as `FVIIIa` on every
+string the app paints — this chapter included (the `<h1>`, the four chapter bullets, both MOA
+bullets, the `denecimig-moa` title and `figures` caption, the panel heading and the Inno8 band),
+plus the S1 cells, the wizard's boxes and notes, and the two §6 sheets. The dash stays gone.
+The glossary term and the NFT definition that names the class came across a step later the same
+day ("FVIIIa mimetic bispecific antibod(y|ies)", [§8](#8-glossary)). **One surface is still left
+out** and writes the unactivated form: `EXPLORE_SEGMENTS`' arch label / class dropdown option
+"FVIII mimetics" ([§5](#5-explore-therapy-options-table-secondary-engine)) — drawn that way, so it
+is a transcription question, not drift. This transcription keeps
+`[PDF-V]`'s wording, as before.
 
 `[BUILD]` **two more client edits of 2026-08-05, both scoped to the Denecimig pop-up.** (1) The
 FRONTIER age limits are set with `≥` where this section transcribes the source's bare `>` — the
@@ -965,16 +1011,18 @@ Use this vocabulary in issues/ADRs/tests. Definitions (abridged from source):
 - **Bispecific antibody** — engineered antibody binding two distinct antigens simultaneously.
 - **Breakthrough bleeding** — a bleed occurring despite ongoing prophylaxis.
 - **Bypassing agent** — hemostatic therapy promoting clot formation without needing FVIII/FIX.
-- **Factor VIII mimetic bispecific antibody** — NFT bridging FIXa and FX to mimic FVIIIa cofactor
-  activity. (The source draws "Factor VIIIa-mimetic"; the `a` and hyphen came out in the
-  2026-08-12 client terminology pass, and the app's glossary follows.)
 - **Factor replacement therapy** — IV FVIII/FIX concentrates to restore deficient clotting factor.
+- **FVIIIa mimetic bispecific antibody** — NFT bridging FIXa and FX to mimic FVIIIa cofactor
+  activity. (The source draws "Factor VIIIa-mimetic"; the hyphen came out in the 2026-08-12 client
+  terminology pass, which took the `a` too, and 2026-08-25 put the `a` back abbreviated. The
+  new spelling sorts a row later than the old, so the entry moved with it — see the ordering note
+  below. The **NFT** definition below names the class the same way, on the same pass.)
 - **Gene therapy** — AAV vector-based therapy delivering a functional clotting-factor transgene.
 - **Hemophilia A** — congenital bleeding disorder from deficient/dysfunctional factor VIII.
 - **Hemophilia B** — congenital bleeding disorder from deficient/dysfunctional factor IX.
 - **Hemostatic rebalancing agent** — NFT enhancing thrombin generation by targeting endogenous anticoagulant pathways.
 - **Inhibitors** — neutralizing alloantibodies that reduce/eliminate response to factor replacement.
-- **Nonfactor therapy (NFT)** — improves hemostasis without directly replacing FVIII/FIX (mimetics, rebalancing agents).
+- **Nonfactor therapy (NFT)** — improves hemostasis without directly replacing FVIII/FIX ("FVIIIa mimetic bispecific antibodies" per the 2026-08-25 relabel, rebalancing agents).
 - **Prophylaxis** — scheduled therapy administered to prevent or reduce bleeding episodes.
 
 `[BUILD]` **This list ships as `/glossary`** (2026-08-06) — all twelve entries, definitions and array
@@ -985,8 +1033,15 @@ where the bullets above abridge them. Two transcription facts:
   balancing agents" where the term everywhere else — including the bullet two rows up — is
   _hemostatic rebalancing_ agents. It is a definition in a reference list, so it is transcribed and
   marked `sic` in the data file rather than silently repaired. **A client content question**, in
-  the same class as the six unglossed abbreviations below.
-- **Source order is alphabetical and complete** — unlike the acronym list, no inversion to preserve.
+  the same class as the six unglossed abbreviations below. The 2026-08-25 relabel of the same
+  sentence's mimetic is not a counter-example: that is a client direction, not a repair, and it
+  left the typo standing.
+- **Source order is alphabetical and complete** — unlike the acronym list, no inversion to
+  preserve. The one entry whose position is the app's rather than the source's is the mimetic: the
+  2026-08-25 relabel re-spelled it "FVIIIa mimetic…", which files a row later than "Factor VIII
+  mimetic…" did, so the entry moved below "Factor replacement therapy" (`[CLIENT]` 2026-08-25 —
+  _"sort alphabetically"_). Alphabetical wins over source sequence where a relabel splits the two;
+  `content.test.ts` pins it for the next one.
 
 ### Acronyms `[PDF-V]`
 

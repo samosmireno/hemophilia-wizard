@@ -527,8 +527,8 @@ for the shadows; it overruled two raster readings (radius 8 not 6, weight 600 no
 exact, shipped as `--color-note-open`/`-closed` (one design fact, one home). The export draws no
 chevron; shipped anyway (2026-08-11, deliberate usability deviation): the closed header alone gets a
 chevron-down — inline SVG in `ExpandableFigure`'s stroke idiom (`currentColor`, round caps, 2.5
-weight at `viewBox` 24), `size-5 lg:size-6`, absolutely pinned `right-4` so the centred title never
-moves. The header's inset widened `px-4` → `px-11 lg:px-12` (symmetric, so centring holds) to
+weight at `viewBox` 24), `size-6 lg:size-7` (bumped from `size-5 lg:size-6` on 2026-08-25 — the 20/24px glyph read too faint against the 20/24px title), absolutely pinned `right-4` so the centred title never
+moves. The header's inset widened `px-4` → `px-12 lg:px-13` (symmetric, so centring holds; it tracks the glyph — `right-4` + the size + an 8px gap) to
 reserve the glyph's lane — measured, not guessed: at `px-4` the 62-character treatment-burden title
 ran 20px under the chevron at 768. `currentColor` means the hover lift to `#bff5ff` is inherited,
 not restyled. It fades out
@@ -603,7 +603,12 @@ drawn 42, shipped `text-4xl` 36 until 2026-08-10, when it **joined `PageSection`
 (`text-3xl` → `lg:text-5xl` 48, left-aligned, `max-w-content` cap dropped) on user direction,
 closing item 31; class-label tracking is item 26. **The client cut the copy on 2026-08-05**, which
 is what made the bespoke centred fit droppable — the 53-character clause no longer needs the
-three-step ramp the 190-character sentence did. **The label row is a fixed height because the export says so four times** (all
+three-step ramp the 190-character sentence did. **The lead sentence is bold and the bullets hang off it** (user direction 2026-08-25): the
+sentence keeps its drawn `ps-6`, the list moved out to `pl-11` — 24 + the ~1em Chrome hangs a disc
+left of its own text (measured 20px at `xl`, 17px at `base`), which lands the discs on the
+sentence's first letter within a pixel at `xl` and 2.5 at `base`. `pl-`, not `ps-`: tailwind-merge
+files the logical property in its own group, so a `ps-` here would ride beside `BulletList`'s
+`pl-6` and lose to it on source order. **The label row is a fixed height because the export says so four times** (all
 four label midpoints at y = 751.5 to half a pixel): captions `h-15`, label row `h-20`, both `xl:`
 only (item 50 holds `h-20` v the drawn ~100). **`preserveCase` + the flex whitespace trap**: a flex
 container makes the returned span and text node anonymous items and drops the space between them —
@@ -889,10 +894,10 @@ overrules all of it. Same `<h1>` (§11's chapter treatment, `uppercase`, left-al
 `DefinitionList`, same crimson-term/black-definition pairing, same `lg:pb-16` against item 53.
 
 **What could not carry over is the column.** `/acronyms` sizes its term track to `max-content`;
-here the widest term is a phrase — "Factor VIII mimetic bispecific antibody", **406px** at the
+here the widest term is a phrase — "FVIIIa mimetic bispecific antibody", **406px** at the
 `lg` ramp when measured as "Factor VIIIa-mimetic" (a glyph wider than today's wording, which the
-2026-08-12 terminology pass shortened; the conclusion is unmoved) — so `max-content` would spend
-a third of the width on one entry _and_ forbid it wrapping.
+2026-08-12 terminology pass shortened and 2026-08-25 shortened again; the conclusion is unmoved) —
+so `max-content` would spend a third of the width on one entry _and_ forbid it wrapping.
 The track is a flat `20rem` (320px) instead, which fits eleven of the twelve terms on one line and
 wraps only that one.
 
@@ -914,7 +919,8 @@ reason.
 like §22 and for the same reasons, with no horizontal overflow at any of the five measured. The
 `uppercase` prohibition also carries over and was _not_ only inherited pedantry when it was made:
 the term then read `Factor VIIIa-mimetic`, which uppercased reads `VIIIA`, naming nothing. The
-2026-08-12 terminology pass ("Factor VIII mimetic") retired that example, not the rule.
+2026-08-12 terminology pass ("Factor VIII mimetic") retired that example without touching the rule;
+the 2026-08-25 relabel to `FVIIIa mimetic` restored it — uppercased, `FVIIIA` names nothing either.
 `src/routes/glossary.test.tsx` pins it the same way.
 
 **No ids, no search.** Same as §22 — the sidebar button is the only way in, nothing links a term.
@@ -1051,9 +1057,9 @@ Built 2026-08-11 to the user's brief, condensing the client's reference "HOW-TO-
 (a sibling activity's) onto one screen. No artboard of our own exists; everything here is
 derivation, which is why the page owns almost no styling: **every demo is the real component
 doing its real job** — the `+` opens a real `Popup`, the figure is §5's clotting-cascade
-`ExpandableFigure` reused, the agent box serves Fitusiran's §16 sheet, the drawer pair is §15's
+`ExpandableFigure` reused, the agent box serves Concizumab's §16 sheet, the drawer pair is §15's
 accordion bar extracted to `src/components/NoteDisclosure.tsx` — so the legend cannot drift from
-the controls it explains. Two decided exceptions: the BEGIN `Button` is look-only (advancing is
+the controls it explains. Two decided exceptions: the CLICK HERE `Button` is look-only (advancing is
 the Next arrow's job, per the user), and the sidebar replicas press like the real thing — hover,
 focus, active, the package's own skins — but navigate nowhere (2026-08-11, user: "behave like
 buttons, they don't have to navigate"). The arrow replicas' accessible names append

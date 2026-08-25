@@ -16,7 +16,7 @@ const DENECIMIG_MOA = EDUCATION_TOPICS["denecimig-moa"];
 const NXT007_STRUCTURE = EDUCATION_TOPICS["nxt007-structure"];
 
 /** The panel's group heading — a chapter literal, no topic holds it. */
-const PANEL_HEADING = "Investigational FVIII mimetic therapies in earlier-stage development:";
+const PANEL_HEADING = "Investigational FVIIIa mimetic therapies in earlier-stage development:";
 
 /**
  * Every card that is currently up — which for this chapter should never be more
@@ -96,7 +96,7 @@ describe("fviii-mimetics chapter", () => {
    */
   it("keeps the punctuation its two-tone headings split on", () => {
     expect(CHAPTER.title).toBe(
-      "FVIII Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
+      "FVIIIa Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
     );
     expect(EMICIZUMAB.title).toBe("Emicizumab (FDA-approved)");
     expect(DENECIMIG.title).toBe("Denecimig (Mim8): Investigational currently under FDA review");
@@ -106,17 +106,16 @@ describe("fviii-mimetics chapter", () => {
 
   /**
    * `uppercase` is a CSS transform, so nothing here can be asserted by reading
-   * text — what is assertable is that the abbreviation is carried in its own
+   * text — what is assertable is that each cased term is carried in its own
    * element, which is the only way it can opt out of it. A heading that shouted
-   * it would render "BSABS" and destroy it. (`FVIII` needs no such span: every
-   * letter of it is already a capital, so the transform is a no-op.)
+   * them would render "BSABS" and "FVIIIA", destroying both.
    */
-  it("keeps BsAbs out of the heading's uppercase transform", () => {
+  it("keeps BsAbs and FVIIIa out of the heading's uppercase transform", () => {
     render(<FviiiMimetics />);
     const heading = screen.getByRole("heading", { level: 1 });
 
-    const span = within(heading).getByText("BsAbs");
-    expect(span).toHaveClass("normal-case");
+    expect(within(heading).getByText("BsAbs")).toHaveClass("normal-case");
+    expect(within(heading).getByText("FVIIIa")).toHaveClass("normal-case");
   });
 
   /**
@@ -740,31 +739,28 @@ describe("the Inno8 card", () => {
     const user = userEvent.setup();
     await open(user);
 
-    expect(card()).toHaveAccessibleName("Inno8: Oral FVIII Mimetic for HA");
-    expect(INNO8.title).toBe("Inno8: Oral FVIII Mimetic for HA");
+    expect(card()).toHaveAccessibleName("Inno8: Oral FVIIIa Mimetic for HA");
+    expect(INNO8.title).toBe("Inno8: Oral FVIIIa Mimetic for HA");
     expect(disclosure("Close Inno8")).toBeInTheDocument();
   });
 
   /**
-   * The band shouts everything except the agent's name, which is what the
-   * artboard draws — so "Inno8" is carried in its own element to opt out of the
-   * `uppercase`. Nothing about this is assertable by reading text: `uppercase` is
-   * a CSS transform, and the element is the only mechanism.
-   *
-   * It is the band's only cased term since the 2026-08-05 terminology pass —
-   * "FVIIIa Mimetic" became "FVIII Mimetic", every letter of which is already a
-   * capital, so the transform has nothing left to destroy there.
+   * The band shouts everything except the agent's name and the cased "FVIIIa",
+   * which is what the artboard draws — so each is carried in its own element to
+   * opt out of the `uppercase`. Nothing about this is assertable by reading
+   * text: `uppercase` is a CSS transform, and the element is the only mechanism.
    *
    * The sibling card lands the other way on the same authority — the designer
    * shouts "MIM8" — which is why this is worth pinning rather than reading as a
    * general rule about product names.
    */
-  it("keeps Inno8 out of the band's uppercase transform", async () => {
+  it("keeps Inno8 and FVIIIa out of the band's uppercase transform", async () => {
     const user = userEvent.setup();
     await open(user);
     const band = within(card()).getByRole("heading", { name: INNO8.title });
 
     expect(within(band).getByText("Inno8")).toHaveClass("normal-case");
+    expect(within(band).getByText("FVIIIa")).toHaveClass("normal-case");
   });
 
   /**
@@ -849,7 +845,7 @@ describe("the Inno8 card", () => {
 
     await user.click(disclosure("Expand Inno8"));
     expect(openCards()).toHaveLength(1);
-    expect(openCards()[0]).toHaveAccessibleName("Inno8: Oral FVIII Mimetic for HA");
+    expect(openCards()[0]).toHaveAccessibleName("Inno8: Oral FVIIIa Mimetic for HA");
   });
 });
 

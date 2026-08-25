@@ -21,11 +21,11 @@ function renderHowTo() {
 }
 
 describe("how-to — the demos are real and live", () => {
-  it("keeps the BEGIN demo look-only: clicking it navigates nowhere", async () => {
+  it("keeps the CLICK HERE demo look-only: clicking it navigates nowhere", async () => {
     const user = userEvent.setup();
     const { router, region } = renderHowTo();
 
-    await user.click(within(region).getByRole("button", { name: "Begin" }));
+    await user.click(within(region).getByRole("button", { name: "Click here" }));
 
     expect(router.state.location.pathname).toBe("/how-to");
   });
@@ -60,10 +60,10 @@ describe("how-to — the demos are real and live", () => {
     const { region } = renderHowTo();
 
     await user.click(
-      within(region).getByRole("button", { name: `Expand ${AGENT_NAMES.fitusiran}` }),
+      within(region).getByRole("button", { name: `Expand ${AGENT_NAMES.concizumab}` }),
     );
 
-    expect(screen.getByRole("dialog")).toHaveAccessibleName(AGENT_NAMES.fitusiran);
+    expect(screen.getByRole("dialog")).toHaveAccessibleName(AGENT_NAMES.concizumab);
   });
 });
 

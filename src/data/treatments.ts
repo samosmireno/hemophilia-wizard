@@ -24,8 +24,11 @@ export interface Treatment {
 }
 
 /**
- * The 9 treatments, S1 verbatim — with one intentional departure, on Fitusiran's
- * `route` (see there).
+ * The 9 treatments, S1 verbatim — with four intentional departures: Fitusiran's
+ * `route` (see there), the two mimetic rows' `treatmentClass`/`moa` cells, which
+ * S1 spells "Factor VIII" and the client relabelled "FVIIIa" (2026-08-25),
+ * Denecimig's `age`, whose ">1" the same edit made "≥1", and Fitusiran's
+ * `monitoring`, whose "gall bladder" it closed up to "gallbladder".
  *
  * **In S1 row order**, which is the only record of it now: each row carried its own
  * 1-indexed `row` number and nothing ever read it, so the array position is the
@@ -72,9 +75,13 @@ export const TREATMENTS: readonly Treatment[] = [
       "FVIII/FIX monitoring; PK-guided dose optimization; peak/trough levels as needed; hypersensitivity reactions,FVIII inhibitor development",
   },
   {
-    treatmentClass: "Factor VIII mimetic",
+    /* "FVIIIa", not S1's "Factor VIII": the client's 2026-08-25 relabel, which
+       reached the `/wizard/scenario` boxes first. `treatmentClass` is a join
+       key — `EXPLORE_CLASS_FILTERS` matches these cells verbatim and moves with
+       them (content.test.ts pins that). */
+    treatmentClass: "FVIIIa mimetic",
     agent: AGENT_NAMES.emicizumab,
-    moa: "Factor VIII mimetic\nBsAb",
+    moa: "FVIIIa mimetic\nBsAb",
     hemophiliaType: "A",
     inhibitors: "Yes",
     age: "0+",
@@ -83,12 +90,13 @@ export const TREATMENTS: readonly Treatment[] = [
     monitoring: "Thrombotic events in pts on aPCC at high doses",
   },
   {
-    treatmentClass: "Factor VIII mimetic (emerging / investigational)",
+    treatmentClass: "FVIIIa mimetic (emerging / investigational)",
     agent: AGENT_NAMES.denecimig,
-    moa: "Factor VIII mimetic\nBsAb",
+    moa: "FVIIIa mimetic\nBsAb",
     hemophiliaType: "A",
     inhibitors: "Yes",
-    age: "TBD (studied in pts >1 year of age)",
+    /* "≥1", not S1's ">1" — client relabel, 2026-08-25. */
+    age: "TBD (studied in pts ≥1 year of age)",
     route: "SC (single-use prefilled pen)",
     schedule: "Monthly, bimonthly, weekly",
     monitoring: "TBD",
@@ -127,7 +135,9 @@ export const TREATMENTS: readonly Treatment[] = [
     // Richer value taken from S3; S1 had "SC (single-use prefilled pen)".
     route: "SC (single-use prefilled pen or vial/syringe)",
     schedule: "Every 1-2 months",
-    monitoring: "Thrombotic events; liver enzymes, gall bladder disease, Anti-thrombin monitoring",
+    /* "gallbladder", one word, not S1's "gall bladder" — client relabel, 2026-08-25,
+       which is how the §6 sheet has always spelled it. */
+    monitoring: "Thrombotic events; liver enzymes, gallbladder disease, Anti-thrombin monitoring",
   },
   {
     treatmentClass: "Gene therapy",

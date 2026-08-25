@@ -79,7 +79,7 @@ const INNO8_FIGURE = { width: 2612, height: 1006 } as const;
 
 // The artboard's "in early- stage development:" is a PDF soft-hyphen artifact, so it
 // is one word here. The trailing colon IS drawn and is kept.
-const PANEL_HEADING = "Investigational FVIII mimetic therapies in earlier-stage development:";
+const PANEL_HEADING = "Investigational FVIIIa mimetic therapies in earlier-stage development:";
 
 // The client's display name (CONTEXT.md §7.5); `nxt007-overview.title` keeps the
 // source's bare "NXT007" — the data module transcribes, this is presentation.
@@ -134,7 +134,7 @@ export default function FviiiMimetics() {
   return (
     <PageSection
       // `titleLabel` is required, not belt-and-braces: the two-tone split makes
-      // the name algorithm announce "FVIII Mimetic BsAbs : Approved…". The `{" "}`
+      // the name algorithm announce "FVIIIa Mimetic BsAbs : Approved…". The `{" "}`
       // keeps `textContent` equal to the source title.
       title={
         <>

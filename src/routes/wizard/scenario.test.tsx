@@ -218,7 +218,7 @@ describe("wizard scenario — the class table pop-ups", () => {
     const user = userEvent.setup();
     const region = renderScenario("A", false);
 
-    await user.click(within(region).getByRole("button", { name: "Expand Factor VIII mimetics" }));
+    await user.click(within(region).getByRole("button", { name: "Expand FVIIIa mimetics" }));
 
     expect(within(screen.getByRole("dialog")).queryByRole("combobox")).not.toBeInTheDocument();
   });

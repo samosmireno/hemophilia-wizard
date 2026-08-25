@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Button, NavArrowButton, NavBarButton, PopupButton } from "mlg-components";
 
 import cascadeThumbUrl from "../assets/images/clotting-cascade-thumb.svg";
-import fitusiranUrl from "../assets/images/fitusiran.webp";
+import concizumabUrl from "../assets/images/concizumab.webp";
 import AgentBoxButton from "../components/AgentBoxButton";
 import DrugSheetPopup from "../components/DrugSheetPopup";
 import ExpandableFigure from "../components/ExpandableFigure";
@@ -19,7 +19,7 @@ import { JUMP_TARGETS } from "./jumpTargets";
   Every demo on this page is the real component doing its real job - the popup
   opens, the figure enlarges, the agent box serves its sheet - so the legend can
   never drift out of sync with the controls it explains. The two exceptions are
-  decided ones: the BEGIN button and the sidebar replicas press like the real
+  decided ones: the CLICK HERE button and the sidebar replicas press like the real
   thing but go nowhere - moving through the activity belongs to the live rail
   alone, and the rail this legend mirrors is on this very page.
 */
@@ -56,7 +56,7 @@ export default function HowTo() {
       <div className="mt-5 mb-4 grid gap-4 lg:mb-16 lg:flex-1 lg:grid-cols-2 xl:mb-0 xl:grid-cols-[1fr_1fr_1.2fr_1.1fr] xl:grid-rows-[auto_auto]">
         <DemoCard caption="Click buttons to interact with page content.">
           {/* Look-only on purpose: moving forward is the Next arrow's job. */}
-          <Button className="px-8 py-2.5 text-xl uppercase lg:px-12 lg:text-2xl">Begin</Button>
+          <Button className="px-8 py-2.5 text-xl uppercase lg:px-12 lg:text-2xl">Click here</Button>
         </DemoCard>
 
         {/* U+2011 non-breaking hyphen - "pop-ups" must not split across lines
@@ -87,9 +87,9 @@ export default function HowTo() {
 
         <DemoCard caption="Click agent boxes to open that agent’s drug information sheet.">
           <AgentBoxButton
-            src={fitusiranUrl}
-            agent={AGENT_NAMES.fitusiran}
-            onClick={() => setOpenAgent(AGENT_NAMES.fitusiran)}
+            src={concizumabUrl}
+            agent={AGENT_NAMES.concizumab}
+            onClick={() => setOpenAgent(AGENT_NAMES.concizumab)}
           />
         </DemoCard>
 
@@ -201,7 +201,7 @@ function SidebarLegend() {
           </span>
           <p className="text-base text-black">
             <span className="font-bold">Previous / Next</span> - step through the activity. Next
-            unlocks on the wizard once all three inputs are answered.
+            unlocks on the wizard once inputs are answered.
           </p>
         </li>
       </ul>

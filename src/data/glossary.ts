@@ -24,15 +24,18 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
       "Hemostatic therapy that promotes clot formation without requiring FVIII or FIX activity",
   },
   {
-    // The source draws "Factor VIIIa-mimetic" — the `a` and hyphen came out in
-    // the 2026-08-12 client terminology pass, like every mimetic mention app-wide.
-    term: "Factor VIII mimetic bispecific antibody",
-    definition: "Nonfactor therapy that bridges FIXa and FX to mimic FVIIIa cofactor activity",
-  },
-  {
     term: "Factor replacement therapy",
     definition:
       "Intravenous administration of FVIII or FIX concentrates to restore deficient clotting factor activity",
+  },
+  {
+    // The source draws "Factor VIIIa-mimetic". The hyphen came out in the
+    // 2026-08-12 client terminology pass, which took the `a` with it; 2026-08-25
+    // put the `a` back abbreviated, like every mimetic mention app-wide. That
+    // relabel also moved this row below "Factor replacement therapy": the list
+    // is alphabetical, and under the new spelling the source's slot was wrong.
+    term: "FVIIIa mimetic bispecific antibody",
+    definition: "Nonfactor therapy that bridges FIXa and FX to mimic FVIIIa cofactor activity",
   },
   {
     term: "Gene therapy",
@@ -61,10 +64,11 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
   },
   {
     // Source verbatim, including "homeostatic balancing agents" (sic — hemostatic
-    // rebalancing) — except the mimetic's `a`, dropped in the 2026-08-12 pass.
+    // rebalancing) — except the mimetic, which follows the client relabel the term
+    // above carries: `a` dropped 2026-08-12, back as `FVIIIa` on 2026-08-25.
     term: "Nonfactor therapy",
     definition:
-      "Therapy that improves hemostasis without directly replacing FVIII or FIX. Examples include FVIII mimetic bispecific antibodies and homeostatic balancing agents.",
+      "Therapy that improves hemostasis without directly replacing FVIII or FIX. Examples include FVIIIa mimetic bispecific antibodies and homeostatic balancing agents.",
   },
   {
     term: "Prophylaxis",

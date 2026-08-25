@@ -52,9 +52,9 @@ export default function NoteDisclosure({
             if (!open) onOpen();
           }}
           className={cn(
-            /* The inset clears the pinned chevron (right-4 + size-5/6 + a gap),
+            /* The inset clears the pinned chevron (right-4 + size-6/7 + a gap),
                symmetrically, so the centred title can never run under it. */
-            "relative flex min-h-11 w-full items-center justify-center rounded-lg px-11 lg:px-12",
+            "relative flex min-h-11 w-full items-center justify-center rounded-lg px-12 lg:px-13",
             "text-center text-xl font-semibold text-white lg:text-2xl",
             "transition-[background-color,box-shadow,color] duration-120 ease-out",
             open
@@ -82,7 +82,7 @@ export default function NoteDisclosure({
             aria-hidden="true"
             data-testid="note-chevron"
             className={cn(
-              "absolute top-1/2 right-4 size-5 -translate-y-1/2 lg:size-6",
+              "absolute top-1/2 right-4 size-6 -translate-y-1/2 lg:size-7",
               "transition-[opacity] duration-120 ease-out",
               open ? "opacity-0" : "opacity-100",
             )}
