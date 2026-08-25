@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "mlg-components";
 
-import { EXPLORE_CLASS_FILTERS } from "../data/explore";
+import { EXPLORE_AGE_FILTERS, EXPLORE_CLASS_FILTERS, minAge } from "../data/explore";
 import { TREATMENTS, type Treatment } from "../data/treatments";
 import { cn } from "../lib/cn";
 import FilterSelect from "./FilterSelect";
@@ -51,11 +51,18 @@ const INHIBITOR_OPTIONS = ["Yes", "No"];
 
 /**
  * The §5 filterable comparison table — the body of `/explore`'s wide `Popup`
- * (issue 09). Three AND-combined filters over the nine-row roster. Type is a
- * PATIENT-type filter: "A" shows the eight rows that serve an A patient —
- * cells `A` and `A + B` alike — not the three whose cell reads `A` exactly
- * (ruled 2026-08-11, flagged for the client gate; CONTEXT.md §5.2). Inhibitors
- * matches its cell exactly; the class dropdown matches through
+ * (issue 09). Four AND-combined filters over the nine-row roster. Type,
+ * Inhibitors and Age are PATIENT filters, not column filters. Type "A" shows
+ * the eight rows that serve an A patient — cells `A` and `A + B` alike — not
+ * the three whose cell reads `A` exactly (ruled 2026-08-11). Inhibitors "No"
+ * shows every row: the S1 column is a capability flag (`Yes` = *also*
+ * indicated with inhibitors), and all nine agents serve a patient without
+ * them, so only "Yes" narrows — to the five `Yes` cells (client correction,
+ * 2026-08-25; the exact-cell reading had hidden the mimetics and rebalancing
+ * agents from an inhibitor-free patient). Age is a band of patient ages
+ * (`EXPLORE_AGE_FILTERS`, added 2026-08-25 on the client's ask): a row is in
+ * when its `minAge()` is at or under the band's floor. CONTEXT.md §5.2 holds
+ * all three rulings. The class dropdown matches through
  * `EXPLORE_CLASS_FILTERS`' drawn-label buckets.
  *
  * Filter state lives here so it resets on close for free: the card's content is
@@ -65,19 +72,23 @@ export default function ExploreTable() {
   const [classLabel, setClassLabel] = useState("");
   const [type, setType] = useState("");
   const [inhibitors, setInhibitors] = useState("");
+  const [age, setAge] = useState("");
 
   const bucket = EXPLORE_CLASS_FILTERS.find((filter) => filter.label === classLabel);
+  const band = EXPLORE_AGE_FILTERS.find((filter) => filter.label === age);
   const rows = TREATMENTS.filter(
     (t) =>
       (!bucket || bucket.classes.includes(t.treatmentClass)) &&
       (type === "" || t.hemophiliaType === type || t.hemophiliaType === "A + B") &&
-      (inhibitors === "" || t.inhibitors === inhibitors),
+      (inhibitors === "" || inhibitors === "No" || t.inhibitors === "Yes") &&
+      (!band || minAge(t.age) <= band.floor),
   );
 
   const clearFilters = () => {
     setClassLabel("");
     setType("");
     setInhibitors("");
+    setAge("");
   };
 
   return (
@@ -106,6 +117,12 @@ export default function ExploreTable() {
           value={inhibitors}
           options={INHIBITOR_OPTIONS}
           onChange={setInhibitors}
+        />
+        <FilterSelect
+          label="Patient age (years)"
+          value={age}
+          options={EXPLORE_AGE_FILTERS.map((filter) => filter.label)}
+          onChange={setAge}
         />
       </div>
 

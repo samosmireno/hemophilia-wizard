@@ -1,6 +1,6 @@
 # 09 — Explore comparison table
 
-Status: done — table built 2026-08-11; one semantics ruling provisional, flagged for the client gate
+Status: done — table built 2026-08-11; inhibitors filter corrected on client review 2026-08-25
 Phase: 1
 
 ## Goal
@@ -101,6 +101,23 @@ Three same-day follow-ups on user direction:
 4. **Column geometry fixed**: `table-fixed` over a colgroup of percentage shares
    (12/11/10/7/8/8/12/10/22) — auto layout re-measured the surviving rows and the columns
    jumped on every filter change. Shares picked, no artboard; styling §17.
+
+**2026-08-25** — client review: "Hemophilia A / No inhibitors" showed clotting factor
+replacement alone; the FVIIIa mimetics and rebalancing agents "should also come up" (and HB / No
+was missing the rebalancing agents). The XLSX transcription checked out; the **inhibitors
+dropdown was the one filter still read as a column filter** after follow-up (3) moved the type
+dropdown to patient semantics. S1's column is a capability flag (`Yes` = also indicated with
+inhibitors) and all nine agents serve an inhibitor-free patient, so **"No" now shows all nine
+rows and "Yes" the five `Yes` cells** — a one-clause predicate swap in `ExploreTable.tsx`, with
+the AND-combination test re-pointed at "Yes" and a new serves-semantics test. CONTEXT §5.2 is the
+record. Open for the client: relabelling the dropdown "Patient has inhibitors".
+
+Same day, on the client's follow-up ("is it possible to add an additional filter for patient
+age"): **a fourth dropdown, "Patient age (years)"** — Under 1 / 1–5 / 6–11 / 12–17 / 18+, a
+patient filter whose band floors are the roster's own thresholds (0, 1, 6, 12, 18), read off
+the verbatim `age` cells by `minAge()` in `explore.ts` (the parse CONTEXT §5.2 had preserved
+for this). Denecimig's "TBD (≥1 year)" counts as 1. No artboard draws it; band set and label
+picked, provisional. `content.test.ts` pins that every row's minimum age is a band floor.
 
 **2026-08-10** — the eligibility engine was deleted as part of an architecture review
 (candidates 02 and 03). It had zero callers and zero tests since the first data pass, and the

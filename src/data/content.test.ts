@@ -8,7 +8,14 @@ import {
   TREATMENT_OPTIONS_MATRIX,
   type EducationTopic,
 } from "./education";
-import { classFilterFor, EXPLORE_AGENTS, EXPLORE_CLASS_FILTERS, EXPLORE_SEGMENTS } from "./explore";
+import {
+  classFilterFor,
+  EXPLORE_AGE_FILTERS,
+  EXPLORE_AGENTS,
+  EXPLORE_CLASS_FILTERS,
+  EXPLORE_SEGMENTS,
+  minAge,
+} from "./explore";
 import { ACRONYMS, GLOSSARY } from "./glossary";
 import { REFERENCES, RESOURCES } from "./references";
 import { SURVEY_QUESTIONS } from "./survey";
@@ -233,6 +240,38 @@ describe("explore class filters", () => {
         expect(classFilterFor(label), `"${label}" resolves to no filter bucket`).toBeDefined();
       }
     }
+  });
+});
+
+describe("explore age filters", () => {
+  /*
+    The dropdown's predicate is `minAge(row) <= band.floor`, which reads as
+    "serves every patient in the band" only while no band straddles a
+    threshold — so every minimum age the roster parses to must be a floor.
+    A tenth row arriving with `2+` would fail here until a band starts at 2.
+  */
+  it("start a band at every minimum age the roster carries", () => {
+    const floors = EXPLORE_AGE_FILTERS.map((f) => f.floor);
+    for (const t of TREATMENTS) {
+      expect(floors, `${t.agent}: "${t.age}" → ${minAge(t.age)}`).toContain(minAge(t.age));
+    }
+  });
+
+  it("run from birth upward, each floor once", () => {
+    const floors = EXPLORE_AGE_FILTERS.map((f) => f.floor);
+    expect(floors[0]).toBe(0);
+    expect(floors).toEqual([...new Set(floors)].sort((a, b) => a - b));
+  });
+
+  // The five S1 spellings, read the way CONTEXT.md §5.2 records; anything else
+  // throws rather than quietly serving every band.
+  it("parse the S1 age spellings and refuse the rest", () => {
+    expect(minAge("0+")).toBe(0);
+    expect(minAge("6+")).toBe(6);
+    expect(minAge("12+")).toBe(12);
+    expect(minAge("Adults")).toBe(18);
+    expect(minAge("TBD (studied in pts ≥1 year of age)")).toBe(1);
+    expect(() => minAge("TBD")).toThrow(/Unparseable age cell/);
   });
 });
 

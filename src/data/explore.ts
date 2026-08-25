@@ -87,6 +87,49 @@ export const EXPLORE_CLASS_FILTERS: readonly ExploreClassFilter[] = [
   { label: "Gene therapy", classes: ["Gene therapy"] },
 ];
 
+/** One option of the comparison table's patient-age dropdown. */
+export interface ExploreAgeFilter {
+  /** The dropdown option text — a band of patient ages, in years. */
+  label: string;
+  /** The youngest age in the band; the age every patient in it has reached. */
+  floor: number;
+}
+
+/**
+ * The age dropdown's bands (built 2026-08-25 on the client's ask; CONTEXT.md
+ * §5.2). A PATIENT filter like the type and inhibitors dropdowns: picking a
+ * band shows the rows that serve every patient in it, which is the rows whose
+ * `minAge()` is at or under the band's `floor`. The floors are the roster's
+ * own thresholds — 0, 1, 6, 12 and 18 are the only minimum ages any `age`
+ * cell parses to — so no band straddles a threshold and "serves the whole
+ * band" and "serves anyone in it" are the same set; `content.test.ts` pins
+ * that every roster row's `minAge()` is a floor here. No artboard draws this
+ * dropdown, so the band set is picked and provisional.
+ */
+export const EXPLORE_AGE_FILTERS: readonly ExploreAgeFilter[] = [
+  { label: "Under 1", floor: 0 },
+  { label: "1–5", floor: 1 },
+  { label: "6–11", floor: 6 },
+  { label: "12–17", floor: 12 },
+  { label: "18+", floor: 18 },
+];
+
+/**
+ * The youngest patient a roster row serves, read off its verbatim S1 `age`
+ * cell: `0+ → 0`, `6+ → 6`, `12+ → 12`, `Adults → 18`, and Denecimig's
+ * `TBD (studied in pts ≥1 year of age) → 1` — the studied population, since
+ * the agent is investigational and carries no approved age; provisional, and
+ * the cell itself renders in the row so the caveat is on screen. Throws on a
+ * spelling it does not know rather than silently serving everyone, because a
+ * re-transcribed cell that parses to nothing should fail loudly.
+ */
+export function minAge(age: string): number {
+  if (age === "Adults") return 18;
+  const match = /^(\d+)\+$/.exec(age) ?? /≥\s*(\d+)\s*year/.exec(age);
+  if (!match) throw new Error(`Unparseable age cell: "${age}"`);
+  return Number(match[1]);
+}
+
 /**
  * Which filter bucket each `/wizard/scenario` illustration box opens, keyed by
  * the verbatim class labels `classesFor` lists — the same join key `Scenario`'s

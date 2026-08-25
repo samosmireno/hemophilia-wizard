@@ -437,7 +437,8 @@ The filterable comparison table the yellow sticky note asks for. Columns (S1 hea
 Administration Route · Schedule · Monitoring & Safety`
 
 Three columns are dropdown **filters**: Treatment class, Hemophilia Type (A / B / A + B),
-Indicated with inhibitors (Yes / No). "A + B" means eligible for both.
+Indicated with inhibitors (Yes / No). "A + B" means eligible for both. `[BUILD]` A fourth,
+Patient age, was added 2026-08-25 on the client's ask — no source draws it; [§5.2](#52-filter-logic-build).
 
 > **The table is a pop-up, not a page `[BUILD]`.** Issue 09 specified `/explore` as the table
 > itself; the `/explore` artboard makes that route the [§9](#9-references--resources) SDM
@@ -548,8 +549,10 @@ labels from the artboard (§5, `EXPLORE_SEGMENTS`) and three of the four disagre
 enum, so the app's only class vocabulary is the drawn one. What survives in `treatments.ts` is
 the roster, its shape, and `treatmentFor()` (§6).
 
-**Built 2026-08-11** (`src/components/ExploreTable.tsx`): three AND-combined **column filters**
-over `TREATMENTS`, each defaulting to All, resetting when the card closes. The rules:
+**Built 2026-08-11** (`src/components/ExploreTable.tsx`): three AND-combined filters over
+`TREATMENTS` — column filters as first built, patient filters as the rulings below moved them —
+each defaulting to All, resetting when the card closes; a fourth, Patient age, joined them
+2026-08-25. The rules:
 
 - **Hemophilia Type is a patient-type filter with no "A + B" option — decided provisionally,
   flagged for the client gate.** Picking "A" shows the **eight** rows that serve an A patient
@@ -568,13 +571,39 @@ over `TREATMENTS`, each defaulting to All, resetting when the card closes. The r
   factor replacement" covering all three factor rows**, SHL and EHL included, though the drawn
   sheet index omits them. That reproduces the client's own S4 saved view and keeps every row
   reachable; per-class filtering reproducing the S2–S5 tabs is what those sheets are.
-- Indicated with inhibitors: exact cell match, Yes / No.
+- **Indicated with inhibitors is a patient-status filter too — client correction, 2026-08-25.**
+  Built 2026-08-11 as an exact cell match (Yes / No), it partitioned the roster 5/4, and the
+  client's review found "Hemophilia A / No inhibitors" showing the three factor rows alone where
+  the FVIIIa mimetics and rebalancing agents "should also come up" (and HB / No missing the
+  rebalancing agents). The XLSX was transcribed correctly; the column was read wrong. S1's
+  "Indicated for use with inhibitors" is a **capability** flag — `Yes` means the agent is _also_
+  indicated for a patient with inhibitors, not _only_ for one — and every one of the nine serves
+  a patient without them (§6's sheets: Emicizumab "HA ±inhibitors", the three rebalancing agents
+  "HA/HB ±inhibitors"; the wizard's own HA-without scenario boxes list mimetics and rebalancing
+  agents). The sheet has no "indicated without inhibitors" column because that answer is Yes on
+  every row. So: **"No" shows all nine rows, "Yes" the five whose cell says `Yes`** — the same
+  "serves this patient" reading the type dropdown got on 2026-08-11, now applied to both. The
+  cells still carry Yes / No verbatim. The dropdown keeps the drawn label "Indicated with
+  inhibitors"; a "Patient has inhibitors" relabel would make the semantics self-describing and is
+  open for the client.
 - An impossible combination (e.g. Gene therapy + Type A) shows an empty state — "No treatments
   match the selected filters." with a Clear-filters recovery — not per-row explanations.
-- Age parse, preserved in case an age filter is ever drawn: `0+→0, 6+→6, 12+→12, Adults→18,
-"TBD (…≥1 year…)"→1 (provisional)`. Read off the `age` column as `treatments.ts` carries it
-  (`≥`, not S1's `>` — see [§5.1](#51-treatment-roster-9-rows-s1-verbatim-xlsx)). No age dropdown is
-  drawn or built.
+- **Patient age — built 2026-08-25 on the client's ask ("is it possible to add an additional
+  filter for patient age").** No artboard draws it, so everything below is picked and
+  provisional. A patient filter like the two above, not a column filter: the dropdown
+  (`EXPLORE_AGE_FILTERS`, `src/data/explore.ts`; labelled "Patient age (years)") offers
+  **Under 1 / 1–5 / 6–11 / 12–17 / 18+**, and a band shows the rows whose minimum age is at or
+  under the band's floor. The floors are the roster's own thresholds — `minAge()` reads the
+  verbatim `age` cell as `0+→0, 6+→6, 12+→12, Adults→18, "TBD (studied in pts ≥1 year of
+age)"→1` (the parse this bullet had preserved since 2026-08-10; `≥`, not S1's `>` — see
+  [§5.1](#51-treatment-roster-9-rows-s1-verbatim-xlsx)) — so no band straddles a threshold, and
+  "serves every patient in the band" and "serves anyone in it" are one set; `content.test.ts`
+  pins that every row's `minAge()` is a floor, so a new threshold forces a new band. Row counts:
+  Under 1 → 4 (the `0+` rows), 1–5 → 5 (+ Denecimig), 6–11 → 6 (+ Marstacimab), 12–17 → 8
+  (+ Concizumab, Fitusiran), 18+ → 9. **Denecimig counts as ≥1** — the studied population,
+  since the investigational agent carries no approved age; its "TBD" cell still renders in the
+  row, so the caveat is on screen wherever it appears. Unknown spellings throw rather than
+  silently serving every band.
 
 ---
 

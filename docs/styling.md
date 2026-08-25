@@ -616,7 +616,8 @@ centring lives on a wrapper; `px-4` sits on the inner row, not the flex item (pa
 item floors its basis); `xl:px-0`.
 
 **The table card** (issue 09, built 2026-08-11 — **no artboard**, every number below is picked, the
-designer may overrule any of them): the wide `Popup`'s body is a filter bar (three `FilterSelect`s —
+designer may overrule any of them): the wide `Popup`'s body is a filter bar (four `FilterSelect`s, the
+age one added 2026-08-25 —
 native `<select>`s by decision; the open list is OS-drawn and deliberately unstyled) over the
 nine-column grid. The grid **scrolls rather than reflows** (`overflow-auto` + `min-w-240`,
 closing item 27): the floor is arithmetic — nine columns at Table 1's ~107px/column reading floor,

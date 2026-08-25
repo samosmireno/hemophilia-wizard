@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { sheetFor } from "../data/drug-sheets";
 import {
+  EXPLORE_AGE_FILTERS,
   EXPLORE_AGENTS,
   EXPLORE_SEGMENTS,
   EXPLORE_TABLE_TITLE,
@@ -341,6 +342,74 @@ describe("explore — the table's filters", () => {
   });
 
   /**
+   * The inhibitors dropdown filters by PATIENT status too. S1's column is a
+   * capability flag — `Yes` means the agent is *also* indicated with
+   * inhibitors — and every one of the nine serves a patient without them, so
+   * "No" is all nine rows and only "Yes" narrows, to the five `Yes` cells.
+   * The client's 2026-08-25 correction: the exact-cell reading had shown an
+   * inhibitor-free HA patient the three factor rows alone, hiding the
+   * mimetics and rebalancing agents the wizard's own scenario boxes list for
+   * that patient. The `Yes` rows being IN under "No" is the assertion.
+   */
+  it("filters Indicated with inhibitors by the patients a row serves", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+    const select = within(dialog).getByRole("combobox", { name: "Indicated with inhibitors" });
+
+    await user.selectOptions(select, "No");
+    expect(agentsShown(dialog)).toEqual(TREATMENTS.map((t) => t.agent));
+
+    await user.selectOptions(select, "Yes");
+    expect(agentsShown(dialog)).toEqual(
+      TREATMENTS.filter((t) => t.inhibitors === "Yes").map((t) => t.agent),
+    );
+  });
+
+  /**
+   * The age dropdown is the third PATIENT filter (built 2026-08-25 on the
+   * client's ask, from the parse §5.2 had preserved for it). Its options are
+   * bands whose floors are the roster's own thresholds — 0, 1, 6, 12, 18 — so
+   * no band straddles one, and a row is in when its minimum age is at or
+   * under the band's floor. Denecimig's "TBD (studied in pts ≥1 year of age)"
+   * reads as 1 — provisional, like the band set itself. Under 1 being the four
+   * `0+` rows and 18+ being all nine are the assertions; the two bands between
+   * pin that each threshold admits exactly the rows that cross it.
+   */
+  it("filters Patient age by the patients a row serves", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+    const select = within(dialog).getByRole("combobox", { name: "Patient age (years)" });
+
+    expect(EXPLORE_AGE_FILTERS.map((f) => f.label)).toEqual([
+      "Under 1",
+      "1–5",
+      "6–11",
+      "12–17",
+      "18+",
+    ]);
+
+    await user.selectOptions(select, "Under 1");
+    expect(agentsShown(dialog)).toEqual(["SHL", "EHL", "Efanesoctocog alfa", "Emicizumab"]);
+
+    await user.selectOptions(select, "1–5");
+    expect(agentsShown(dialog)).toEqual([
+      "SHL",
+      "EHL",
+      "Efanesoctocog alfa",
+      "Emicizumab",
+      "Denecimig",
+    ]);
+
+    await user.selectOptions(select, "12–17");
+    expect(agentsShown(dialog)).toEqual(
+      TREATMENTS.filter((t) => t.age !== "Adults").map((t) => t.agent),
+    );
+
+    await user.selectOptions(select, "18+");
+    expect(agentsShown(dialog)).toEqual(TREATMENTS.map((t) => t.agent));
+  });
+
+  /**
    * No "A + B" option, though the artboard draws one: there is no A + B
    * patient, so "everything serving either" is what All already means, and a
    * third option would be All under another name — the redundancy that was
@@ -410,11 +479,17 @@ describe("explore — the table's filters", () => {
     );
     await user.selectOptions(
       within(dialog).getByRole("combobox", { name: "Indicated with inhibitors" }),
-      "No",
+      "Yes",
     );
 
-    // Serves-A ∩ inhibitors-No: the three factor-replacement rows.
-    expect(agentsShown(dialog)).toEqual(["SHL", "EHL", "Efanesoctocog alfa"]);
+    // Serves-A ∩ inhibitors-Yes: the two mimetics and the three rebalancing agents.
+    expect(agentsShown(dialog)).toEqual([
+      "Emicizumab",
+      "Denecimig",
+      "Concizumab",
+      "Marstacimab",
+      "Fitusiran",
+    ]);
   });
 
   /**
