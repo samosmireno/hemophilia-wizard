@@ -129,6 +129,12 @@ and placement.
    unanswerable.
 
 5. **Admin → Events**: mark `wizard_submit` and `survey_submit` as key events.
+6. **Admin → Data collection and modification → Data retention**: set _Event data
+   retention_ to **14 months** (the default is 2). Standard reports are pre-aggregated and
+   unaffected; the Explore reports this doc leans on — Free form for Step seconds ÷ Views,
+   the Funnel for elapsed time between steps — read raw event data and can only look back
+   this far. Not retroactive: anything past the window is gone for good, so do it before
+   launch data accumulates.
 
 ## DebugView verification (before the client link goes out)
 
