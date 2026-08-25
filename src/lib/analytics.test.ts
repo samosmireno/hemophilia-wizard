@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { initialize, send, event } = vi.hoisted(() => ({
+const { initialize, send, gtag } = vi.hoisted(() => ({
   initialize: vi.fn(),
   send: vi.fn(),
-  event: vi.fn(),
+  gtag: vi.fn(),
 }));
 
-vi.mock("react-ga4", () => ({ default: { initialize, send, event } }));
+vi.mock("react-ga4", () => ({ default: { initialize, send, gtag } }));
 
 /** The module keeps its enabled flag in module state, so every test gets a
  *  fresh copy — `initAnalytics` from one test must not leak into the next. */
@@ -52,8 +52,9 @@ describe("tracking before init", () => {
     analytics.trackRecommendationReached(ANSWERS);
     analytics.trackDrugSheetOpen("Fitusiran", "/explore");
     analytics.trackSurveySubmit();
+    analytics.trackStepDuration("/wizard", 12);
     expect(send).not.toHaveBeenCalled();
-    expect(event).not.toHaveBeenCalled();
+    expect(gtag).not.toHaveBeenCalled();
   });
 });
 
@@ -73,7 +74,7 @@ describe("tracking after init", () => {
   it("maps the wizard answers onto three separate params", async () => {
     const analytics = await loadInitialized();
     analytics.trackWizardSubmit({ type: "B", hasInhibitors: true, reason: "monitoring" });
-    expect(event).toHaveBeenCalledExactlyOnceWith("wizard_submit", {
+    expect(gtag).toHaveBeenCalledExactlyOnceWith("event", "wizard_submit", {
       hemophilia_type: "B",
       has_inhibitors: "yes",
       switch_reason: "monitoring",
@@ -83,7 +84,7 @@ describe("tracking after init", () => {
   it("derives the scenario for a recommendation, without agent names", async () => {
     const analytics = await loadInitialized();
     analytics.trackRecommendationReached(ANSWERS);
-    expect(event).toHaveBeenCalledExactlyOnceWith("recommendation_reached", {
+    expect(gtag).toHaveBeenCalledExactlyOnceWith("event", "recommendation_reached", {
       scenario: "A-without-inhibitors",
       switch_reason: "adherence",
     });
@@ -92,7 +93,7 @@ describe("tracking after init", () => {
   it("tags a drug-sheet open with agent and page", async () => {
     const analytics = await loadInitialized();
     analytics.trackDrugSheetOpen("Emicizumab", "/wizard/therapies");
-    expect(event).toHaveBeenCalledExactlyOnceWith("drug_sheet_open", {
+    expect(gtag).toHaveBeenCalledExactlyOnceWith("event", "drug_sheet_open", {
       agent: "Emicizumab",
       page: "/wizard/therapies",
     });
@@ -101,12 +102,21 @@ describe("tracking after init", () => {
   it("ignores the /how-to legend's demo drug sheet", async () => {
     const analytics = await loadInitialized();
     analytics.trackDrugSheetOpen("Fitusiran", "/how-to");
-    expect(event).not.toHaveBeenCalled();
+    expect(gtag).not.toHaveBeenCalled();
   });
 
   it("sends a bare survey_submit", async () => {
     const analytics = await loadInitialized();
     analytics.trackSurveySubmit();
-    expect(event).toHaveBeenCalledExactlyOnceWith("survey_submit", {});
+    expect(gtag).toHaveBeenCalledExactlyOnceWith("event", "survey_submit", {});
+  });
+
+  it("sends step_duration with the route and numeric seconds", async () => {
+    const analytics = await loadInitialized();
+    analytics.trackStepDuration("/education/disease-background", 42);
+    expect(gtag).toHaveBeenCalledExactlyOnceWith("event", "step_duration", {
+      page: "/education/disease-background",
+      seconds: 42,
+    });
   });
 });

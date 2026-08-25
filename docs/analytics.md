@@ -24,6 +24,22 @@ boot, see "Campaign links" below. The 15-step `SECTION_ORDER` spine means the fu
 built in GA4 reporting straight from page paths — including the intake→scenario drop-off,
 since `/wizard`'s Submit fires no event (see the table).
 
+**Use time** — `step_duration` carries the foreground seconds spent on each route. GA4's
+own _Average engagement time_ is unreliable for this SPA: gtag credits engaged time to the
+next event it sends, which after reading a slide is the next slide's `page_view`, so every
+route's number shifts one step forward. `step_duration` is measured by us instead
+(`src/lib/useStepDuration.ts` over the pure `src/lib/stepTimer.ts`): the clock runs while
+the tab is visible, pauses while hidden, and reports whole seconds on route change, on
+tab-hide (the last reliable signal on mobile, where a backgrounded tab can be killed
+without `pagehide`) and on unload. A tab-switch mid-slide therefore splits one visit into
+two events — sums are unaffected, so per-route time is **Step seconds ÷ Views**, never an
+average of the event values. Sub-second chunks (redirect hops) are dropped; a chunk is
+capped at 1800 s so an idle desktop tab can't swamp the average. Report: Explore → Free
+form, dimension _App route_, metrics _Step seconds_ and _Views_ (or Reports → Engagement →
+Events → `step_duration` with _App route_ as secondary dimension). For wall-clock time
+between steps — including time away from the tab — a Funnel exploration over the routes
+with _Show elapsed time_ needs no code.
+
 **Events** (all fired through typed helpers in `src/lib/analytics.ts`):
 
 | Event                    | Fires when                                            | Params                                                                                                          |
@@ -32,11 +48,18 @@ since `/wizard`'s Submit fires no event (see the table).
 | `recommendation_reached` | `/wizard/therapies` renders a leaf                    | `scenario` (e.g. `A-without-inhibitors`), `switch_reason`                                                       |
 | `drug_sheet_open`        | Any agent drug sheet opens, except the `/how-to` demo | `agent`, `page`                                                                                                 |
 | `survey_submit`          | The outcomes survey validates and submits             | — (the Google Form owns answer content; GA is the only success signal, since the Form POST is opaque `no-cors`) |
+| `step_duration`          | Leaving a route, the tab being hidden, or unload      | `page`, `seconds` (whole foreground seconds on that route since the last report, capped at 1800)                |
+
+Params reach gtag exactly as written: `sendEvent` calls `ReactGA.gtag` raw, because
+`ReactGA.event` rewrites `page` to `page_path` on the way through (its Universal-Analytics
+field map). That silently emptied the `page` dimension until 2026-08-25;
+`src/lib/analytics.wire.test.ts` now runs real react-ga4 against jsdom's `dataLayer` to
+guard the wire format.
 
 **Deliberately not collected**: recommended agent lists (derivable offline from
 `scenario` + `switch_reason` via `src/data/wizard.ts`), per-radio-click answer changes,
-generic popup/accordion opens, back-navigation, timings, survey answer content, query
-params, anything identifying. Also no event on `/wizard`'s own Submit — the reason split
+generic popup/accordion opens, back-navigation, scroll depth or reading position within
+a route, survey answer content, query params, anything identifying. Also no event on `/wizard`'s own Submit — the reason split
 (2026-08-12) moved `wizard_submit` to `/wizard/reason`, the first moment all three params
 exist; who completed the patient questions is the `/wizard/scenario` pageview. Outbound clicks on `/references` and `/resources` come
 from GA4 Enhanced Measurement, not from code.
@@ -86,19 +109,26 @@ and placement.
    else it's invisible in standard reports. One dimension per row; the **Event
    parameter** field must match the code's param name exactly:
 
-   | Dimension name   | Scope | Description                                                                      | Event parameter   |
-   | ---------------- | ----- | -------------------------------------------------------------------------------- | ----------------- |
-   | Hemophilia type  | Event | Wizard answer: hemophilia type, `A` or `B`                                       | `hemophilia_type` |
-   | Has inhibitors   | Event | Wizard answer: inhibitor status, `yes` or `no`                                   | `has_inhibitors`  |
-   | Switch reason    | Event | Wizard answer: `bleeding-control`, `monitoring`, `adherence`, `treatment-burden` | `switch_reason`   |
-   | Scenario         | Event | Type + inhibitor status on `recommendation_reached`, e.g. `A-without-inhibitors` | `scenario`        |
-   | Drug sheet agent | Event | Which agent's drug sheet was opened                                              | `agent`           |
-   | Drug sheet page  | Event | Route the drug sheet was opened from, e.g. `/wizard/therapies`                   | `page`            |
+   | Dimension name   | Scope | Description                                                                                                                 | Event parameter   |
+   | ---------------- | ----- | --------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+   | Hemophilia type  | Event | Wizard answer: hemophilia type, `A` or `B`                                                                                  | `hemophilia_type` |
+   | Has inhibitors   | Event | Wizard answer: inhibitor status, `yes` or `no`                                                                              | `has_inhibitors`  |
+   | Switch reason    | Event | Wizard answer: `bleeding-control`, `monitoring`, `adherence`, `treatment-burden`                                            | `switch_reason`   |
+   | Scenario         | Event | Type + inhibitor status on `recommendation_reached`, e.g. `A-without-inhibitors`                                            | `scenario`        |
+   | Drug sheet agent | Event | Which agent's drug sheet was opened                                                                                         | `agent`           |
+   | App route        | Event | Route an event belongs to: where a drug sheet was opened from, the route timed by `step_duration`, e.g. `/wizard/therapies` | `page`            |
 
-   The "Drug sheet …" display names are deliberate: bare "Page" or "Agent" would sit
-   confusingly next to GA4's built-in Page/User dimensions in report pickers.
+   The display names are deliberate: bare "Page" or "Agent" would sit confusingly next to
+   GA4's built-in Page/User dimensions in report pickers. `page` was "Drug sheet page"
+   until `step_duration` started sharing it (2026-08-25) — if it is already registered,
+   edit the display name; the parameter binding is what matters.
 
-4. **Admin → Events**: mark `wizard_submit` and `survey_submit` as key events.
+4. **Admin → Custom definitions → Custom metrics → Create custom metric**: _Step
+   seconds_, scope Event, event parameter `seconds`, unit of measurement **Seconds**.
+   Without it `step_duration` reports as a count only and the use-time question is
+   unanswerable.
+
+5. **Admin → Events**: mark `wizard_submit` and `survey_submit` as key events.
 
 ## DebugView verification (before the client link goes out)
 
@@ -179,6 +209,19 @@ npm run preview` (the local `.env` supplies the ID; the dev server never sends).
 - [ ] Submit with a question unanswered: inline errors, **no** event.
 - [ ] Complete and submit: one `survey_submit`, no answer params on it; then reload
       `/survey` — the thank-you state holds and nothing can double-fire.
+
+### `step_duration`
+
+- [ ] Open an education slide, wait ~10 s, press Next: one `step_duration` arrives with
+      the new `page_view`; `page` is the slide just left, `seconds` ≈ 10.
+- [ ] On a slide, switch to another tab for a while, come back, wait ~5 s, press Next:
+      two events for that slide — one on the switch-away, one on Next with ≈ 5. The
+      hidden interval is in neither.
+- [ ] Close the tab: a final event for the current route (beacon transport — allow a
+      moment for it to appear).
+- [ ] Visit `/education` (redirects at once): no `step_duration` for `/education` itself.
+- [ ] If the custom metric is registered: `seconds` shows as _Step seconds_ in the
+      Events report, not only in DebugView.
 
 ### Enhanced Measurement (no code — verifies console step 2)
 

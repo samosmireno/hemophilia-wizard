@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router";
 
 import { trackPageview } from "../lib/analytics";
+import { useStepDuration } from "../lib/useStepDuration";
 import { WizardAnswersProvider } from "../state/WizardAnswersProvider";
 import AppSidebar from "./AppSidebar";
 
@@ -12,6 +13,8 @@ export default function AppShell() {
   useEffect(() => {
     trackPageview(pathname);
   }, [pathname]);
+  // Foreground seconds per route (`step_duration`) — one timer for the whole SPA.
+  useStepDuration(pathname);
 
   return (
     <WizardAnswersProvider>

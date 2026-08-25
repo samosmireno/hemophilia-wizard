@@ -69,7 +69,20 @@ export function trackSurveySubmit() {
   sendEvent("survey_submit", {});
 }
 
-function sendEvent(name: string, params: Record<string, string>) {
+/** Foreground seconds on a route, reported in chunks — on leaving it, on
+ *  tab-hide (the tab may never come back) and on unload. Measured by
+ *  `useStepDuration`, not taken from gtag, whose engagement time credits an SPA
+ *  route's reading time to the next route's pageview. Per-route time in reports
+ *  is Step seconds ÷ Views, since a tab-switch splits one visit into two events. */
+export function trackStepDuration(page: string, seconds: number) {
+  sendEvent("step_duration", { page, seconds });
+}
+
+function sendEvent(name: string, params: Record<string, string | number>) {
   if (!enabled) return;
-  ReactGA.event(name, params);
+  // Raw gtag, not `ReactGA.event`: that path runs params through react-ga4's
+  // Universal-Analytics field map, which rewrites `page` to `page_path` (and
+  // `userId`, `nonInteraction`, …) — the `page` dimension silently never
+  // populated until 2026-08-25. `analytics.wire.test.ts` guards what reaches gtag.
+  ReactGA.gtag("event", name, params);
 }
