@@ -46,8 +46,10 @@ const DENECIMIG_FIGURE_ALT =
   "Denecimig (Mim8), a Y-shaped bispecific antibody, bridges factor IXa and factor X on " +
   "a platelet surface, generating FXa, thrombin, and a clot.";
 
-// Half of the 3852 × 2465 file (rounded): the width is a cap, and the ratio —
-// which is what the reservation needs — still matches.
+// The drawn 1926, not half the file: the client's 2026-08-25 refresh arrived at
+// 2170 × 1388 (1.13× drawn — under the 2× budget, so retina paints it soft until a
+// larger export lands). The width is a cap; the ratio — which is what the
+// reservation needs — still matches the file to three places.
 const DENECIMIG_FIGURE = { width: 1926, height: 1232 } as const;
 
 /**
@@ -246,8 +248,8 @@ function DenecimigCard() {
             about the BUTTON — it clips the hover wash to the asset's own corner. */}
         <ExpandableFigure
           thumbSrc={denecimigUrl}
-          thumbWidth={2176}
-          thumbHeight={1392}
+          thumbWidth={2170}
+          thumbHeight={1388}
           title={DENECIMIG_MOA.title}
           variant="bare"
           className="rounded-2xl"
@@ -329,8 +331,8 @@ function Inno8Card() {
           wash to the asset's own corner. */}
       <ExpandableFigure
         thumbSrc={inno8Url}
-        thumbWidth={4352}
-        thumbHeight={1676}
+        thumbWidth={2612}
+        thumbHeight={1006}
         title={INNO8_FIGURE_TITLE}
         variant="bare"
         className="rounded-3xl"

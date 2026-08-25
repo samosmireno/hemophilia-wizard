@@ -476,7 +476,10 @@ value, fires on `:focus-visible`; touch gets a "Tap to enlarge" badge under `@me
 `min(<w/16>rem, 100%)` (rem since §19 — item 47 holds the retina trade); **assets are stored at 2×
 their drawn width and no wider** (decode cost, not bytes); keep stored size and props in step (they
 feed `aspect-ratio`) — since 2026-08-06 the element is a definite `width` + `object-contain`, so a
-cold card opens at final size. **Two UA `dialog` rules to fight** (both shipped as bugs once;
+cold card opens at final size. The 2026-08-25 client refresh re-ran `7940545`'s
+`cwebp -q 80 -sharp_yuv` pass (`inno8` back to 2612); `denecimig` now arrives 2170 × 1388 —
+**1.13× drawn, under the budget** — soft on retina until re-exported larger.
+**Two UA `dialog` rules to fight** (both shipped as bugs once;
 invisible to jsdom, which has no dialog UA styles): `hidden open:grid`, never bare `grid` (any
 author `display` beats the UA's `display: none`, leaving an unclosable card from first render), and
 `size-full` (the UA sizes dialogs `fit-content`; `inset-0` cannot stretch a sized element). The
