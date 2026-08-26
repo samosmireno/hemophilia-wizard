@@ -99,7 +99,7 @@ describe("fviii-mimetics chapter", () => {
       "FVIIIa Mimetic BsAbs: Approved and Emerging Agents for HA Prophylaxis",
     );
     expect(EMICIZUMAB.title).toBe("Emicizumab (FDA-approved)");
-    expect(DENECIMIG.title).toBe("Denecimig (Mim8): Investigational currently under FDA review");
+    expect(DENECIMIG.title).toBe("Denecimig (Mim8): Investigational; currently under FDA review");
     // The paren comes first in the string; the colon is the drawn break.
     expect(DENECIMIG.title.indexOf(" (")).toBeLessThan(DENECIMIG.title.indexOf(": "));
   });
@@ -373,7 +373,7 @@ describe("the Denecimig card", () => {
     await open(user);
 
     expect(card()).toHaveAccessibleName("Denecimig (Mim8)");
-    expect(DENECIMIG.title).toBe("Denecimig (Mim8): Investigational currently under FDA review");
+    expect(DENECIMIG.title).toBe("Denecimig (Mim8): Investigational; currently under FDA review");
   });
 
   /**

@@ -154,7 +154,7 @@ export const EDUCATION_TOPICS = {
    * copy edit, 2026-08-05 (CONTEXT.md §7.5). Not a typo to reconcile.
    */
   "denecimig-overview": {
-    title: "Denecimig (Mim8): Investigational currently under FDA review",
+    title: "Denecimig (Mim8): Investigational; currently under FDA review",
     body: [
       "FVIIIa mimetic BsAb: Binds to activated FIXa and FX, enhancing catalytic efficiency of FIXa in converting FX on activated platelets",
       "BLA submitted for use as routine prophylaxis in adult and pediatric patients with HA with or without inhibitors",
