@@ -55,8 +55,9 @@ export default function Wizard() {
           onChange={(id) => setAnswer("hasInhibitors", id === null ? null : id === "yes")}
         />
 
-        {/* Reset shares Submit's row from its left end; `/wizard/reason` has no
-            reset of its own (ADR 0003, amended 2026-08-25). */}
+        {/* Reset shares Submit's row — its left end from `sm`, under Submit in
+            the phone stack; `/wizard/reason` has no reset of its own (ADR 0003,
+            amended 2026-08-25). */}
         <WizardSubmit open={scenarioComplete}>
           <WizardReset />
         </WizardSubmit>

@@ -57,3 +57,10 @@ removed the same day on client direction; it is in the git history, not the tree
 `/wizard/reason` deliberately has no reset. Tests in `wizard.test.tsx`. Docs: styling §29 +
 item 57, ADR 0003 amended. Nothing tracks in GA4 — a `wizard_reset` event would need the console
 step in `docs/analytics.md`; not asked for.
+
+**2026-08-26 — phone stack flipped.** Below `sm` the row stacked Reset over Submit (its DOM order,
+left becoming top), which put the destructive twin first in reading order. `WizardSubmit` now
+renders Submit first in the DOM at every width — the stack reads Submit over Reset and the tab after
+the last radio lands on Submit — with the slot's `sm:order-first` keeping Reset-left/Submit-right
+from `sm`. Re-measured at 375/480/600/640/1440: every §29 number unchanged. Styling §29 + item 57,
+ADR 0003 touched.

@@ -4,8 +4,8 @@ import { useWizardAnswers } from "../state/wizardAnswers";
 import { WIZARD_BUTTON_SKIN } from "./wizardButton";
 
 /**
- * The "Reset inputs" control at the start of `/wizard`'s Submit row (client
- * ask, 2026-08-25). One click, no are-you-sure — the answers are three radio
+ * The "Reset inputs" control at the left end of `/wizard`'s Submit row, under
+ * Submit where the row stacks (client ask, 2026-08-25). One click, no are-you-sure — the answers are three radio
  * picks, cheap to redo (a prompt was built and removed the same day on client
  * direction). It clears all three answers, not the two on screen: a reason held
  * from an earlier run would otherwise survive a reset and re-open the leaf's

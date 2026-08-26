@@ -103,7 +103,8 @@ and the learner would have to walk back to `/wizard` to continue.
   artboard draws no such affordance, and per-group deselect already clears one answer at a
   time. Issue 08's "back/reset work" criterion is knowingly unmet pending a designed
   control.~~ **Amended 2026-08-25 (client ask):** `/wizard` carries a "Reset inputs"
-  control (`WizardReset`) at the start of its Submit row — the one caller of `reset()`,
+  control (`WizardReset`) at the left end of its Submit row, under Submit where the row
+  stacks (order flipped 2026-08-26, styling §29) — the one caller of `reset()`,
   and one click: an are-you-sure was built and removed the same day on client direction,
   the answers being three radio picks. It clears **all three** answers, the
   reason included: a reason surviving a reset would re-open the leaf's gate the moment the

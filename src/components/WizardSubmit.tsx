@@ -11,12 +11,17 @@ import { WIZARD_BUTTON_SKIN } from "./wizardButton";
  * re-arms per false→true flip of `open` on the current mount, so a page born
  * with its gate already open plays nothing.
  *
- * `children` share the row from its start — `/wizard`'s Reset. Below `sm` the
- * row is a stack instead: a one-column grid aligned to the pill grid's right
- * edge, so the two share one track sized by the wider label (the survey pair's
- * idiom, docs/styling.md §27). `justify-end` is what keeps the track at
- * max-content — a grid's auto track only stretches under `normal`. A row
- * without children is Submit alone, as before.
+ * `children` share the row — `/wizard`'s Reset. Submit is first in the DOM at
+ * every width, so the tab after the last radio lands on the primary action and
+ * the phone stack reads in DOM order, Submit over Reset (docs/styling.md §29 —
+ * it shipped the other way up, which put the destructive twin first). From `sm`
+ * the slot moves to the row's start (`sm:order-first sm:mr-auto`): Reset on the
+ * pill grid's left edge, Submit keeping its right. Below `sm` the row is a stack
+ * instead: a one-column grid aligned to the pill grid's right edge, so the two
+ * share one track sized by the wider label (the survey pair's idiom,
+ * docs/styling.md §27). `justify-end` is what keeps the track at max-content —
+ * a grid's auto track only stretches under `normal`. A row without children is
+ * Submit alone, as before.
  */
 export default function WizardSubmit({ open, children }: { open: boolean; children?: ReactNode }) {
   const prevOpen = useRef(open);
@@ -29,9 +34,6 @@ export default function WizardSubmit({ open, children }: { open: boolean; childr
 
   return (
     <div className="mx-auto mt-8 grid max-w-110 justify-end gap-4 sm:flex lg:max-w-225">
-      {/* `grid` so the button inside stretches to the stack's track; a bare
-          wrapper would hold its intrinsic width and the pair would not match. */}
-      {children && <div className="grid sm:mr-auto">{children}</div>}
       <Button
         type="submit"
         disabled={!open}
@@ -43,6 +45,9 @@ export default function WizardSubmit({ open, children }: { open: boolean; childr
       >
         Submit inputs
       </Button>
+      {/* `grid` so the button inside stretches to the stack's track; a bare
+          wrapper would hold its intrinsic width and the pair would not match. */}
+      {children && <div className="grid sm:order-first sm:mr-auto">{children}</div>}
     </div>
   );
 }

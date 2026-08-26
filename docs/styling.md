@@ -267,7 +267,7 @@ unblocks it (designer / browser / code), and where it bites.
 | 55 | ~~**`/resources` and the reworked `/references` have never been opened in a browser.**~~ **Closed 2026-08-07** — both were opened and checked after the ADR 0009 rework, including §24's `break-words` claim on `r8`'s URL. No widths recorded, so the residue is item 30's, not its own. | §24, §25 |
 | 56 | **§19's 0.875× down-rung is invented end to end** — no artboard draws 1260 × 700, and it puts 14px body text on exactly the institutional fleet (1366 × 768 / 1536 × 864) it serves. Shipped 2026-08-12, boundary-verified in Chromium; the same-day `text-lg` bullet bump on the two tallest chapters moved the gate 770 → 780 and the floor from 15 to 28px (≤653px viewports, the two tallest chapters; 1024–1279 wide scrolls at either factor). A second rung (81.25%) deliberately not taken. Designer to bless the trade — full-size type that scrolls v 0.875× that fits. | §19, §2 |
 | 58 | Closed 2026-08-26 — the full-bleed table card was opened on a real Android phone and a real iPhone by the user and "looks ok": the address-bar collapse (`dvh`) and the bottom bars were the concern. Still no `viewport-fit=cover`, so no safe-area inset is applied — and none was needed. | §12, §17 |
-| 57 | **`/wizard`'s Reset row is invented end to end** — no artboard (§29). Designer: a second form-button colour (Reset is lagoon; hierarchy by position only), and whether the phone stack should be full-width like the pills or label-width as shipped. Code: on click the button disables itself under focus, which falls to the body — a focus target for the cleared form is one line once someone says which. Browser-verified at six widths 2026-08-25. | §29, §14 |
+| 57 | **`/wizard`'s Reset row is invented end to end** — no artboard (§29). Designer: a second form-button colour (Reset is lagoon; hierarchy by position only — which is why the phone stack was flipped to Submit-on-top 2026-08-26), whether the phone stack should be full-width like the pills or label-width as shipped, and whether phone Reset should be `/explore`'s underlined text button rather than a second pill. Code: on click the button disables itself under focus, which falls to the body — a focus target for the cleared form is one line once someone says which. Browser-verified at six widths 2026-08-25, five again after the flip 2026-08-26. | §29, §14 |
 
 **Invention ledger (summary)** — shipped values that are not straight transcriptions:
 
@@ -1213,25 +1213,38 @@ Built 2026-08-25 on a client ask ("a reset input button too"). **No artboard exi
 value below is invented within the palette, each derived from something already drawn, and a
 later export overrules it wholesale.
 
-**The row.** `WizardSubmit` grew a leading slot: from `sm` Reset sits on the pill grid's left edge
-and Submit keeps its right (`sm:flex justify-end gap-4`, the slot `sm:mr-auto`), so the pair frames
-the grid the way the pills do — measured 246/1146 at 1440, 100/540 at 640. **Below `sm` the pair
-stacks, Reset over Submit, on one track** (client ask, same day — the survey pair's idiom, §27):
-the row is a one-column `grid justify-end`, which is what sizes the track to the wider label
-rather than the box — a grid's auto track stretches only under `justify-content: normal` — and
-`justify-items: stretch` then gives both buttons that width (170px at 375, 480 and 600). The slot
-wrapper is `grid` itself so the button inside it stretches too; a bare wrapper would hold its own
-intrinsic width and the pair would not match. Aligned to the right edge because that is Submit's
-edge at every other width, and to the pill grid's right edge rather than the column's — the row
-keeps the grid's `mx-auto max-w-110` box, which matters between ~490 and 639px, where the box is
-centred inside a wider column (measured: stack and grid both end at 520 at 600, 456 at 480,
-351 at 375). Reset wears **Submit's lagoon skin verbatim** — §27's rule, every form button in the
+**The row.** `WizardSubmit` grew a slot for Reset: from `sm` Reset sits on the pill grid's left edge
+and Submit keeps its right (`sm:flex justify-end gap-4`, the slot `sm:order-first sm:mr-auto`), so
+the pair frames the grid the way the pills do — measured 246/1146 at 1440, 100/540 at 640. **Below
+`sm` the pair stacks, Submit over Reset, on one track** (the stack a client ask, same day — the
+survey pair's idiom, §27; the order flipped 2026-08-26, next paragraph): the row is a one-column
+`grid justify-end`, which is what sizes the track to the wider label rather than the box — a grid's
+auto track stretches only under `justify-content: normal` — and `justify-items: stretch` then gives
+both buttons that width (170px at 375, 480 and 600). The slot wrapper is `grid` itself so the
+button inside it stretches too; a bare wrapper would hold its own intrinsic width and the pair
+would not match. Aligned to the right edge because that is Submit's edge at every other width, and
+to the pill grid's right edge rather than the column's — the row keeps the grid's
+`mx-auto max-w-110` box, which matters between ~490 and 639px, where the box is centred inside a
+wider column (measured: stack and grid both end at 520 at 600, 456 at 480, 351 at 375). Reset wears **Submit's lagoon skin verbatim** — §27's rule, every form button in the
 app on one string (`wizardButton.ts`, extracted from `WizardSubmit` and `Survey` the same day) —
 so position, not colour, carries the hierarchy: a second form-button colour is a designer call,
 and crimson, the only candidate, reads as _chosen_ on this screen (§14). Disabled until anything
 at all is answered (the package's `disabled:` dim), a hidden reason from an earlier run included —
 it is the thing a reset most needs to clear (ADR 0003, amended). `type="button"` is stated inside
 the form: a native `type="reset"` would clear the radios and not the state they mirror.
+
+**Which way up the stack goes (2026-08-26).** It shipped Reset over Submit — the row's DOM order,
+left becoming top — and that is exactly where position stops carrying the hierarchy: a row reads
+"secondary left, primary right", but a stack reads top-down, so the first pill after the last radio
+was the destructive twin, identical in skin and width to the one 16px under it. Now Submit is first
+in the DOM at every width and the stack reads in DOM order, Submit over Reset — the stacked-button
+convention (affirmative first, dismissive last), and the tab after the last radio lands on the
+primary action; the swap is on the row side, where left/right already carries the weight (the slot's
+`sm:order-first`, so the DOM never has to change between widths). Reset is the last thing on the
+page, which is the weight a reset earns. The other phone option — Reset as the underlined text
+button `/explore`'s filter panel uses on phones rather than a second lagoon pill — is a treatment
+change and stays with the designer (item 57). Re-measured after the flip: every number above holds
+(Submit t=598/Reset t=670 at 375, both 170 wide; tab order Submit → Reset at all five widths).
 
 **One click, no are-you-sure.** An "Are you sure?" prompt was built the same morning — a third
 dressing of `ModalLayer` (§13's card at a `min(36rem, 92vw)` step, no ✕, Cancel first for initial

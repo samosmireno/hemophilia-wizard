@@ -294,8 +294,9 @@ describe("wizard — the pages past the questions", () => {
 /**
  * The reset control (client ask, 2026-08-25): the one caller of the provider's
  * `reset()`, which ADR 0003 had left unwired pending a designed affordance.
- * It sits at the start of Submit's row and clears on one click — an
- * are-you-sure was built and removed the same day on client direction.
+ * It sits at the left end of Submit's row (under Submit in the phone stack)
+ * and clears on one click — an are-you-sure was built and removed the same
+ * day on client direction.
  */
 describe("wizard — the reset control", () => {
   const reset = () => screen.getByRole("button", { name: "Reset inputs" });
@@ -314,20 +315,26 @@ describe("wizard — the reset control", () => {
   });
 
   /**
-   * Below `sm` the pair stacks, Reset over Submit, on one grid track sized by
-   * the wider label (client ask, 2026-08-25 — the survey pair's idiom). Both
-   * halves are pinned: `justify-end` is what keeps a grid's auto track at
-   * max-content rather than stretching, and the wrapper must be `grid` itself
-   * or the button inside it keeps its own width and the pair stops matching.
+   * Below `sm` the pair stacks, Submit over Reset, on one grid track sized by
+   * the wider label (the stack a client ask, 2026-08-25 — the survey pair's
+   * idiom; the order flipped 2026-08-26, styling §29: a stack reads top-down,
+   * so the primary action goes first and the tab after the last radio lands
+   * on it). Submit is first in the DOM and the swap is on the row side — the
+   * slot's `sm:order-first` puts Reset at the row's left end from `sm`. Both
+   * halves of the stack are pinned: `justify-end` is what keeps a grid's auto
+   * track at max-content rather than stretching, and the wrapper must be
+   * `grid` itself or the button inside it keeps its own width and the pair
+   * stops matching.
    */
-  it("stacks over Submit on one shared track below sm", () => {
+  it("stacks under Submit on one shared track below sm, with Submit first in the DOM", () => {
     renderAt("/wizard");
     const row = submit().parentElement!;
     const wrapper = reset().parentElement!;
 
     expect(row).toHaveClass("grid", "justify-end", "gap-4", "sm:flex");
-    expect(wrapper.parentElement).toBe(row);
-    expect(wrapper).toHaveClass("grid", "sm:mr-auto");
+    expect(row.firstElementChild).toBe(submit());
+    expect(row.lastElementChild).toBe(wrapper);
+    expect(wrapper).toHaveClass("grid", "sm:order-first", "sm:mr-auto");
   });
 
   it("is disabled until anything at all is answered", async () => {
