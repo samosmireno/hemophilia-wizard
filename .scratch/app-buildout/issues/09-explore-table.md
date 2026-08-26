@@ -1,6 +1,6 @@
 # 09 — Explore comparison table
 
-Status: done — table built 2026-08-11; inhibitors filter corrected on client review 2026-08-25
+Status: done — table built 2026-08-11; inhibitors filter corrected on client review 2026-08-25, relabelled on client ask 2026-08-26; phone layout (filters toggle + full-bleed card) 2026-08-26
 Phase: 1
 
 ## Goal
@@ -118,6 +118,29 @@ patient filter whose band floors are the roster's own thresholds (0, 1, 6, 12, 1
 the verbatim `age` cells by `minAge()` in `explore.ts` (the parse CONTEXT §5.2 had preserved
 for this). Denecimig's "TBD (≥1 year)" counts as 1. No artboard draws it; band set and label
 picked, provisional. `content.test.ts` pins that every row's minimum age is a band floor.
+
+**2026-08-26** — client follow-up to the call, having reviewed the deployed table ("working
+well", the age filter "looks great"): **relabel the inhibitors dropdown** for clarity —
+"Indicated for use with or without inhibitors", options "Yes (for use with or without
+inhibitors)" and "No (for use without inhibitors only)". Wording verbatim; the option string is
+the filter value (as with class and age), so the predicate now compares against the
+`INHIBITOR_NO` constant instead of the bare word; behaviour unchanged (No → nine, Yes → five).
+The column header keeps "Indicated with inhibitors" — the ask named the filter alone. The
+explore test pins the three option strings and selects by them. Closes the "Patient has
+inhibitors" relabel left open on the 25th, with one residual for the client (CONTEXT §5.2):
+"for use without inhibitors only" read as a property of the agent would name the four `No`
+cells, not the nine rows shown.
+
+Same day, **the phone layout**, on the user's observation that at 375px the four stacked
+selects left one row of the table in view (265px of grid). Six layouts were prototyped from the
+real app and measured at 375×812 (docs/styling.md §17 has the numbers and the rejections); the
+user picked **C + F**: below `sm` the selects sit behind a full-width `Filters (n)` toggle
+(closed by default, a one-line recap of the active filters under it, a phone-only Clear link
+inside the open panel), and the card opts into `Popup`'s new `phoneFill` — full-bleed, with a
+column-flex body the table's frame fills with `flex-1` instead of `h-[75dvh]`. Table region at
+375×812: 265px → 625px. Nothing changes from 640px up (verified at 640/1024/1440). Tests pin the
+toggle wiring, the `sm` classes on both sides, the count + recap + Clear, and `phoneFill` at the
+call site and on `Popup`. Open: a real-iPhone check (styling item 58).
 
 **2026-08-10** — the eligibility engine was deleted as part of an architecture review
 (candidates 02 and 03). It had zero callers and zero tests since the first data pass, and the

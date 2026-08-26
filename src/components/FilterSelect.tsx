@@ -14,6 +14,15 @@ import { cn } from "../lib/cn";
  * `""` is the All sentinel — the one value that is not a cell string, so a
  * caller's predicate can read `value === ""` as "no filter" without a
  * reserved-word collision with the data.
+ *
+ * `max-w-full` caps the control at its bar: a native select's intrinsic width
+ * is its widest option, and the inhibitors dropdown's glossed options (client
+ * wording, 2026-08-26) measure ~330px — past a 375px phone's 318px card body,
+ * where the uncapped control ran under the card's edge. Capped, the wrapper
+ * stops at the bar and the column-flex stretch shrinks the select to match;
+ * the closed control then clips the last characters of its longest option on
+ * the narrowest phones, the OS picker showing the full text. Wider than that,
+ * the cap is inert and the control keeps its intrinsic width.
  */
 export default function FilterSelect({
   label,
@@ -32,7 +41,7 @@ export default function FilterSelect({
   const id = useId();
 
   return (
-    <div className={cn("flex flex-col gap-1", className)}>
+    <div className={cn("flex max-w-full flex-col gap-1", className)}>
       <label htmlFor={id} className="text-sm font-bold text-black">
         {label}
       </label>

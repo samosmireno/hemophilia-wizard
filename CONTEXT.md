@@ -438,15 +438,20 @@ Administration Route · Schedule · Monitoring & Safety`
 
 Three columns are dropdown **filters**: Treatment class, Hemophilia Type (A / B / A + B),
 Indicated with inhibitors (Yes / No). "A + B" means eligible for both. `[BUILD]` A fourth,
-Patient age, was added 2026-08-25 on the client's ask — no source draws it; [§5.2](#52-filter-logic-build).
+Patient age, was added 2026-08-25 on the client's ask — no source draws it — and the inhibitors
+dropdown was relabelled on the client's 2026-08-26 ask: "Indicated for use with or without
+inhibitors", options "Yes (for use with or without inhibitors)" / "No (for use without inhibitors
+only)". The column header keeps the drawn wording; [§5.2](#52-filter-logic-build).
 
 > **The table is a pop-up, not a page `[BUILD]`.** Issue 09 specified `/explore` as the table
 > itself; the `/explore` artboard makes that route the [§9](#9-references--resources) SDM
 > conclusion node and launches the table from a button on it. Rationale in
 > `docs/adr/0007-explore-is-the-sdm-conclusion.md`. **The card and its table are both built**
 > (2026-08-11) — three dropdown column filters over all nine S1 columns, scrolling horizontally
-> inside the wide `Popup` (docs/styling.md item 27, closed). The filter semantics are
-> [§5.2](#52-filter-logic-build)'s. The table's agent cells deliberately open nothing — the
+> inside the wide `Popup` (docs/styling.md item 27, closed). On phones (2026-08-26) the filters
+> sit behind a `Filters (n)` toggle and the card fills the screen — four stacked selects had left
+> one row of the table in view at 375px; the six measured alternatives are in docs/styling.md
+> §17. The filter semantics are [§5.2](#52-filter-logic-build)'s. The table's agent cells deliberately open nothing — the
 > sheets are indexed on the page beneath, and SHL/EHL have no sheet to open.
 >
 > **The same page indexes the [§6](#6-drug-information-sheets) sheets by class `[BUILD]`.** Below
@@ -583,9 +588,16 @@ each defaulting to All, resetting when the card closes; a fourth, Patient age, j
   agents). The sheet has no "indicated without inhibitors" column because that answer is Yes on
   every row. So: **"No" shows all nine rows, "Yes" the five whose cell says `Yes`** — the same
   "serves this patient" reading the type dropdown got on 2026-08-11, now applied to both. The
-  cells still carry Yes / No verbatim. The dropdown keeps the drawn label "Indicated with
-  inhibitors"; a "Patient has inhibitors" relabel would make the semantics self-describing and is
-  open for the client.
+  cells still carry Yes / No verbatim. **Relabelled by the client, 2026-08-26**, after reviewing
+  the deployed table with this behaviour and calling it "working well": the dropdown reads
+  "Indicated for use with or without inhibitors", its options "Yes (for use with or without
+  inhibitors)" and "No (for use without inhibitors only)" — wording verbatim, behaviour unchanged
+  (No → all nine, Yes → the five `Yes` cells). The column header keeps the drawn "Indicated with
+  inhibitors"; the ask named the filter alone. One residual to confirm with the client: read as
+  a property of the agent, "for use without inhibitors only" describes the four `No` cells, not
+  the nine rows the option shows — the exact-cell reading rejected the day before — so the gloss
+  is taken as describing the patient's use case ("I will only use it without inhibitors"),
+  provisional.
 - An impossible combination (e.g. Gene therapy + Type A) shows an empty state — "No treatments
   match the selected filters." with a Clear-filters recovery — not per-row explanations.
 - **Patient age — built 2026-08-25 on the client's ask ("is it possible to add an additional

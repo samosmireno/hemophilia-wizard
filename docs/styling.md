@@ -266,6 +266,7 @@ unblocks it (designer / browser / code), and where it bites.
 | 54 | **`src/data/` was transcribed from a text extraction, which carries no font style.** ADR 0009 found the two bibliographies shipping without the italic journal runs the board draws — 29 runs across 47 entries, missed because `out_raw.txt` cannot show them. The same dump is the source for the education chapters, the drug sheets, the glossary and the acronyms, and ADR 0004 already records `F8`/`F9` shipping upright where §7.2/§7.3 set them italic. **The bibliographies are fixed; nothing else has been checked.** `pdftohtml -xml` exposes the font subset per run (`BAAAAA+` = NotoSans-Italic), so this is a sweep, not an investigation. Code. | §24, §25, ADR 0009 |
 | 55 | ~~**`/resources` and the reworked `/references` have never been opened in a browser.**~~ **Closed 2026-08-07** — both were opened and checked after the ADR 0009 rework, including §24's `break-words` claim on `r8`'s URL. No widths recorded, so the residue is item 30's, not its own. | §24, §25 |
 | 56 | **§19's 0.875× down-rung is invented end to end** — no artboard draws 1260 × 700, and it puts 14px body text on exactly the institutional fleet (1366 × 768 / 1536 × 864) it serves. Shipped 2026-08-12, boundary-verified in Chromium; the same-day `text-lg` bullet bump on the two tallest chapters moved the gate 770 → 780 and the floor from 15 to 28px (≤653px viewports, the two tallest chapters; 1024–1279 wide scrolls at either factor). A second rung (81.25%) deliberately not taken. Designer to bless the trade — full-size type that scrolls v 0.875× that fits. | §19, §2 |
+| 58 | **The full-bleed table card has not been opened on a real phone.** What a desktop Chromium at 375 cannot show: the viewport meta has no `viewport-fit=cover`, so no home-indicator inset is applied, and Safari's address-bar collapse changes `dvh` mid-scroll. Device. | §12, §17 |
 | 57 | **`/wizard`'s Reset row is invented end to end** — no artboard (§29). Designer: a second form-button colour (Reset is lagoon; hierarchy by position only), and whether the phone stack should be full-width like the pills or label-width as shipped. Code: on click the button disables itself under focus, which falls to the body — a focus target for the cleared form is one line once someone says which. Browser-verified at six widths 2026-08-25. | §29, §14 |
 
 **Invention ledger (summary)** — shipped values that are not straight transcriptions:
@@ -466,6 +467,14 @@ outer stops `sand-0`/`teal-25` exact (live `var()` refs), the middle stop is the
 midpoint and is dropped, the export's 12.9° rotation is dropped (CSS cannot rotate a radial
 ellipse). **The scrim is inferred** (item 12). **Height floor: removed** — content height under
 `max-h-[95dvh]`; any future floor must be `min(x, 95dvh)` (`min-height` beats `max-height`).
+**Phone fill (`PopupCard.phoneFill`, 2026-08-26)**: a card that opts in fills the viewport below
+`sm` — `max-sm:h-dvh max-sm:max-h-dvh max-sm:w-full`, no radius, no border, the band at the top
+edge — and its body becomes a column flex (`max-sm:flex max-sm:flex-col`) so the content can
+claim the leftover height with `min-h-0 flex-1`. Only the §17 table card asks (`/explore`); a
+short card would gain empty ground, so the default is the drawn card at every width. Measured at
+375×812 it is +106px of table over the same layout inside the card (border, radius, the 14px
+gutters and the 95dvh cap together). No safe-area inset: the viewport meta carries no
+`viewport-fit=cover`, so `env()` is 0 — item 58.
 
 **Figures.** The cascade card is **composed, not photographed** (diagram crop, self-labelling
 thumb, transcribed notes as markup); it takes `surface="white"` — an opt-in, the gradient would
@@ -622,7 +631,9 @@ item floors its basis); `xl:px-0`.
 **The table card** (issue 09, built 2026-08-11 — **no artboard**, every number below is picked, the
 designer may overrule any of them): the wide `Popup`'s body is a filter bar (four `FilterSelect`s, the
 age one added 2026-08-25 —
-native `<select>`s by decision; the open list is OS-drawn and deliberately unstyled) over the
+native `<select>`s by decision; the open list is OS-drawn and deliberately unstyled; each capped
+`max-w-full` since 2026-08-26, when the inhibitors dropdown's client-worded options made its
+intrinsic width overrun a 375px phone's card body) over the
 nine-column grid. The grid **scrolls rather than reflows** (`overflow-auto` + `min-w-240`,
 closing item 27): the floor is arithmetic — nine columns at Table 1's ~107px/column reading floor,
 item 36's weakness inherited knowingly. **The columns are `table-fixed` over a colgroup of
@@ -647,7 +658,23 @@ the row set's cause — `backdrop-blur` is what lets the band keep its drawn `bg
 translucency while floating, smearing the rows that pass beneath instead of ghosting them
 through; a shadow under the floating band was considered and left off to keep the resting look
 unchanged. Inert in `ClassTablePopup`, whose `overflow-x-auto` wrapper is the sticky containing
-block and never scrolls vertically. The selects keep their `black/30` hairline. `whitespace-pre-line` on the cells
+block and never scrolls vertically. **On phones the filters collapse and the card fills the
+screen** (2026-08-26 — the user's pick from six layouts rendered and measured at 375×812: an
+un-pinned bar gave ≈660px once scrolled but the bar and the sticky header both leave; two-up
+selects 399px with the glossed inhibitors options clipping; a toggle 495px; a bottom sheet with
+chips 523px but a modal in a modal; cards per treatment 495px and a reversal of item 27, parked
+for the client; full-bleed +106px on any of them): below `sm` the four selects sit behind a
+full-width `Filters (n)` control in the selects' own hairline skin (bold, a funnel, and
+`NoteDisclosure`'s chevron path turned when open; `aria-expanded` / `aria-controls`), closed by
+default, with a one-line recap of the active filters under it while closed (`Type: A · Age: 6–11`
+— the glossed inhibitors option shortens to `Inhibitors: Yes`) and a phone-only Clear link inside
+the open panel; open, the selects stack full-width (`max-sm:flex-col`). The frame is `flex-1` of
+the `phoneFill` card's column body instead of `h-[75dvh]` (`sm:h-[75dvh]` — one class list,
+`flex-1` being inert in the block body a desktop card has). Measured: the table region at
+375×812 went **265px → 625px** closed (597 with the recap line; 285 with the panel open — the
+panel is a mode, not a companion), 320×568 381px, 430×932 745px; at 640 the toggle is
+`display:none` and the drawn bar and card are back; 1024 and 1440 did not move (477/487px, one
+bar row). The selects keep their `black/30` hairline. `whitespace-pre-line` on the cells
 carries the two MOA cells' transcribed newline.
 
 **Responsive pass 2026-08-05** (the second measured pass): `<h1>` ramps three steps 24/30/36;

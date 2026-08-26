@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "mlg-components";
 
 import { EXPLORE_AGE_FILTERS, EXPLORE_CLASS_FILTERS, minAge } from "../data/explore";
@@ -47,7 +47,19 @@ const COLUMNS: readonly { header: string; width: string; cell: (t: Treatment) =>
  * the departure from the drawn three-value set is theirs to overrule.
  */
 const TYPE_OPTIONS = ["A", "B"];
-const INHIBITOR_OPTIONS = ["Yes", "No"];
+
+/**
+ * The inhibitors dropdown's two options, each glossed with the use it admits
+ * (client relabel, 2026-08-26, alongside the dropdown's own "Indicated for use
+ * with or without inhibitors" label): under the serves-this-patient semantics
+ * ruled the day before, a bare "No" read as "hide the inhibitor-indicated
+ * rows" where it in fact shows every row. As with the class and age dropdowns
+ * the option string IS the filter value, so the predicate compares against
+ * these constants, never the bare cell words. Wording verbatim from the client.
+ */
+const INHIBITOR_YES = "Yes (for use with or without inhibitors)";
+const INHIBITOR_NO = "No (for use without inhibitors only)";
+const INHIBITOR_OPTIONS = [INHIBITOR_YES, INHIBITOR_NO];
 
 /**
  * The §5 filterable comparison table — the body of `/explore`'s wide `Popup`
@@ -59,20 +71,25 @@ const INHIBITOR_OPTIONS = ["Yes", "No"];
  * indicated with inhibitors), and all nine agents serve a patient without
  * them, so only "Yes" narrows — to the five `Yes` cells (client correction,
  * 2026-08-25; the exact-cell reading had hidden the mimetics and rebalancing
- * agents from an inhibitor-free patient). Age is a band of patient ages
+ * agents from an inhibitor-free patient; the dropdown and both options were
+ * relabelled to spell the semantics out, 2026-08-26 — `INHIBITOR_OPTIONS`).
+ * Age is a band of patient ages
  * (`EXPLORE_AGE_FILTERS`, added 2026-08-25 on the client's ask): a row is in
  * when its `minAge()` is at or under the band's floor. CONTEXT.md §5.2 holds
  * all three rulings. The class dropdown matches through
  * `EXPLORE_CLASS_FILTERS`' drawn-label buckets.
  *
  * Filter state lives here so it resets on close for free: the card's content is
- * `null` while closed, so reopening mounts a fresh instance.
+ * `null` while closed, so reopening mounts a fresh instance — and so does the
+ * phone toggle's open/closed state, which is the same kind of thing.
  */
 export default function ExploreTable() {
   const [classLabel, setClassLabel] = useState("");
   const [type, setType] = useState("");
   const [inhibitors, setInhibitors] = useState("");
   const [age, setAge] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const panelId = useId();
 
   const bucket = EXPLORE_CLASS_FILTERS.find((filter) => filter.label === classLabel);
   const band = EXPLORE_AGE_FILTERS.find((filter) => filter.label === age);
@@ -80,7 +97,7 @@ export default function ExploreTable() {
     (t) =>
       (!bucket || bucket.classes.includes(t.treatmentClass)) &&
       (type === "" || t.hemophiliaType === type || t.hemophiliaType === "A + B") &&
-      (inhibitors === "" || inhibitors === "No" || t.inhibitors === "Yes") &&
+      (inhibitors === "" || inhibitors === INHIBITOR_NO || t.inhibitors === "Yes") &&
       (!band || minAge(t.age) <= band.floor),
   );
 
@@ -91,6 +108,19 @@ export default function ExploreTable() {
     setAge("");
   };
 
+  /**
+   * The active filters as the phone summary line reads them — "Type: A ·
+   * Age: 6–11" — and, counted, the toggle's badge. The inhibitors entry
+   * shortens the glossed option to its first word; the gloss is for the open
+   * list, not a one-line recap.
+   */
+  const active = [
+    classLabel && `Class: ${classLabel}`,
+    type && `Type: ${type}`,
+    inhibitors && `Inhibitors: ${inhibitors === INHIBITOR_YES ? "Yes" : "No"}`,
+    age && `Age: ${age}`,
+  ].filter((entry): entry is string => Boolean(entry));
+
   return (
     // The height is the CARD's, not the content's (user direction 2026-08-11):
     // sized by its rows, the dialog collapsed and regrew as filters cut nine
@@ -98,8 +128,32 @@ export default function ExploreTable() {
     // frame. 75dvh + `Popup`'s header stays under its `max-h-[95dvh]` cap at
     // every viewport, so the card's own scroll never engages — the grid region
     // below scrolls instead, which also keeps the filter bar in view.
-    <div className="flex h-[75dvh] flex-col py-4">
-      <div className="flex flex-wrap gap-x-6 gap-y-3">
+    //
+    // Below `sm` the frame is instead `flex-1` of the card: `/explore` opens
+    // this card with `Popup`'s `phoneFill`, whose body is then a column flex
+    // filling the screen, and the leftover height is the table's (2026-08-26).
+    // `flex-1` is inert in the block body a desktop card has, so one class list
+    // serves both. Without `phoneFill` the phone frame would size to its rows
+    // and the card would scroll — degraded, not broken.
+    <div className="flex min-h-0 flex-1 flex-col py-4 sm:h-[75dvh]">
+      <FiltersToggle
+        open={filtersOpen}
+        count={active.length}
+        controls={panelId}
+        onToggle={() => setFiltersOpen((open) => !open)}
+      />
+      {/* The bar. On phones it is the toggle's panel: `hidden` until opened,
+          stacked full-width (`max-sm:flex-col`) rather than wrapped, so the
+          four selects read as one form under the control. From `sm` up the
+          toggle is gone and the panel is always the drawn wrapping bar —
+          `sm:flex` restores it whatever the phone state says. */}
+      <div
+        id={panelId}
+        className={cn(
+          "flex-wrap gap-x-6 gap-y-3 max-sm:mt-3 max-sm:flex-col",
+          filtersOpen ? "flex" : "hidden sm:flex",
+        )}
+      >
         <FilterSelect
           label="Treatment class"
           value={classLabel}
@@ -113,7 +167,7 @@ export default function ExploreTable() {
           onChange={setType}
         />
         <FilterSelect
-          label="Indicated with inhibitors"
+          label="Indicated for use with or without inhibitors"
           value={inhibitors}
           options={INHIBITOR_OPTIONS}
           onChange={setInhibitors}
@@ -124,7 +178,28 @@ export default function ExploreTable() {
           options={EXPLORE_AGE_FILTERS.map((filter) => filter.label)}
           onChange={setAge}
         />
+        {/* Phone-only: with the panel open over a table that is mostly out of
+            sight, resetting select by select is blind work. The desktop bar
+            keeps the empty state's button as the only reset (issue 09) — and
+            this one is gated on the panel being OPEN, not merely on filters
+            being set: the panel is CSS-hidden, so an ungated link would sit in
+            the DOM beside the empty state's button on every viewport. */}
+        {filtersOpen && active.length > 0 && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="self-start text-sm text-black underline sm:hidden"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
+      {/* Closed with filters set, the phone says what they are — the toggle's
+          count alone would leave the row set's cause off screen, which is the
+          argument that pins the desktop bar. */}
+      {!filtersOpen && active.length > 0 && (
+        <p className="mt-2 text-sm text-black/70 sm:hidden">{active.join(" · ")}</p>
+      )}
 
       {rows.length === 0 ? (
         // The bar above stays, so the cause of the emptiness is on screen; the
@@ -147,6 +222,73 @@ export default function ExploreTable() {
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * The phone-only control the filters sit behind (2026-08-26, the user's pick
+ * from six measured phone layouts — docs/styling.md §17): on a 375px phone the
+ * four stacked selects took ~310px of a 75dvh frame and left one row of the
+ * table in view. Full width in the selects' own skin (`FilterSelect`'s
+ * hairline box, bold), a funnel so it reads as filters before it is read, the
+ * count in the name so a closed control still says something is set, and
+ * `NoteDisclosure`'s chevron path, turned when open. `sm:hidden`: from the
+ * tablet up the drawn bar is always shown and there is nothing to toggle.
+ */
+function FiltersToggle({
+  open,
+  count,
+  controls,
+  onToggle,
+}: {
+  open: boolean;
+  count: number;
+  /** The panel's id, for `aria-controls`. */
+  controls: string;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-expanded={open}
+      aria-controls={controls}
+      onClick={onToggle}
+      className={cn(
+        "flex w-full items-center justify-between rounded-lg border border-black/30 bg-white px-3 py-2 text-base font-bold text-black sm:hidden",
+        "focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-ui-btn-ring",
+      )}
+    >
+      <span className="flex items-center gap-2">
+        <svg
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          strokeLinejoin="round"
+          aria-hidden="true"
+          className="size-5"
+        >
+          <path d="M3 4h14l-5.5 6.5V16l-3-1.5V10.5L3 4z" />
+        </svg>
+        Filters{count > 0 ? ` (${count})` : ""}
+      </span>
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        data-testid="filters-chevron"
+        className={cn(
+          "size-5 transition-transform duration-120 ease-out motion-reduce:transition-none",
+          open && "rotate-180",
+        )}
+      >
+        <path d="M6 9.5L12 15.5L18 9.5" />
+      </svg>
+    </button>
   );
 }
 

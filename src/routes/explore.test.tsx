@@ -350,16 +350,32 @@ describe("explore — the table's filters", () => {
    * inhibitor-free HA patient the three factor rows alone, hiding the
    * mimetics and rebalancing agents the wizard's own scenario boxes list for
    * that patient. The `Yes` rows being IN under "No" is the assertion.
+   *
+   * The dropdown and its two options carry the client's 2026-08-26 wording —
+   * the label names the question and each option glosses the use it admits —
+   * so the test selects by those full strings, pinning the copy along with
+   * the semantics.
    */
-  it("filters Indicated with inhibitors by the patients a row serves", async () => {
+  it("filters Indicated for use with or without inhibitors by the patients a row serves", async () => {
     const user = userEvent.setup();
     const dialog = await openTable(user);
-    const select = within(dialog).getByRole("combobox", { name: "Indicated with inhibitors" });
+    const select = within(dialog).getByRole("combobox", {
+      name: "Indicated for use with or without inhibitors",
+    });
+    expect(
+      within(select)
+        .getAllByRole("option")
+        .map((o) => o.textContent),
+    ).toEqual([
+      "All",
+      "Yes (for use with or without inhibitors)",
+      "No (for use without inhibitors only)",
+    ]);
 
-    await user.selectOptions(select, "No");
+    await user.selectOptions(select, "No (for use without inhibitors only)");
     expect(agentsShown(dialog)).toEqual(TREATMENTS.map((t) => t.agent));
 
-    await user.selectOptions(select, "Yes");
+    await user.selectOptions(select, "Yes (for use with or without inhibitors)");
     expect(agentsShown(dialog)).toEqual(
       TREATMENTS.filter((t) => t.inhibitors === "Yes").map((t) => t.agent),
     );
@@ -478,8 +494,10 @@ describe("explore — the table's filters", () => {
       "A",
     );
     await user.selectOptions(
-      within(dialog).getByRole("combobox", { name: "Indicated with inhibitors" }),
-      "Yes",
+      within(dialog).getByRole("combobox", {
+        name: "Indicated for use with or without inhibitors",
+      }),
+      "Yes (for use with or without inhibitors)",
     );
 
     // Serves-A ∩ inhibitors-Yes: the two mimetics and the three rebalancing agents.
@@ -490,6 +508,93 @@ describe("explore — the table's filters", () => {
       "Marstacimab",
       "Fitusiran",
     ]);
+  });
+
+  /**
+   * The phone layout (2026-08-26, the user's pick from six measured layouts —
+   * docs/styling.md §17): below `sm` the four selects sit behind a `Filters`
+   * toggle, closed by default. jsdom applies no Tailwind, so what a test here
+   * can hold is the wiring — `aria-expanded`, `aria-controls` to the panel —
+   * and the classes that do the showing and hiding on each side of `sm`: the
+   * panel `hidden sm:flex` closed and `flex` open, the toggle `sm:hidden`, so
+   * a phone state can never take the drawn desktop bar with it.
+   */
+  it("collapses the filters behind a toggle on phones, and never on desktop", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+    const toggle = within(dialog).getByRole("button", { name: "Filters" });
+    const panel = document.getElementById(toggle.getAttribute("aria-controls")!)!;
+
+    expect(toggle).toHaveClass("sm:hidden");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(panel).toHaveClass("hidden", "sm:flex");
+    expect(within(panel).getAllByRole("combobox")).toHaveLength(4);
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(panel).toHaveClass("flex");
+    expect(panel).not.toHaveClass("hidden");
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(panel).toHaveClass("hidden", "sm:flex");
+  });
+
+  /**
+   * Closed with filters set, the toggle counts them and a summary line names
+   * them — the row set's cause stays on screen, the argument that pins the
+   * desktop bar. The glossed inhibitors option shortens to its first word in
+   * the recap. The open panel carries a phone-only Clear link: resetting four
+   * selects over a table that is out of sight is blind work.
+   */
+  it("counts and summarises the active filters while the toggle is closed", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+    const toggle = within(dialog).getByRole("button", { name: "Filters" });
+
+    await user.click(toggle);
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Hemophilia Type" }),
+      "A",
+    );
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", {
+        name: "Indicated for use with or without inhibitors",
+      }),
+      "Yes (for use with or without inhibitors)",
+    );
+    await user.selectOptions(
+      within(dialog).getByRole("combobox", { name: "Patient age (years)" }),
+      "6–11",
+    );
+    expect(toggle).toHaveAccessibleName("Filters (3)");
+    // Open, the selects say it themselves — no recap under them.
+    expect(within(dialog).queryByText(/^Type: A/)).not.toBeInTheDocument();
+
+    await user.click(toggle);
+    expect(within(dialog).getByText("Type: A · Inhibitors: Yes · Age: 6–11")).toHaveClass(
+      "sm:hidden",
+    );
+
+    await user.click(toggle);
+    const clear = within(dialog).getByRole("button", { name: "Clear filters" });
+    expect(clear).toHaveClass("sm:hidden");
+    await user.click(clear);
+    expect(toggle).toHaveAccessibleName("Filters");
+    expect(agentsShown(dialog)).toEqual(TREATMENTS.map((t) => t.agent));
+  });
+
+  /**
+   * The card fills a phone's screen (`Popup`'s `phoneFill`): its chrome and
+   * 95dvh cap were ~106px of a table that was down to one row at 375px.
+   * Pinned here because the flag lives at the call site, and the table's
+   * `flex-1` frame relies on the column-flex body the flag brings.
+   */
+  it("fills the phone screen", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+
+    expect(dialog.firstElementChild).toHaveClass("max-sm:h-dvh", "max-sm:rounded-none");
   });
 
   /**
@@ -582,13 +687,16 @@ describe("explore — the table's filters", () => {
    * no layout, so what is pinned is the construction — the fixed-height frame,
    * on the root through every filter state including empty, and the grid region
    * bounded to it (`min-h-0 flex-1`) so the rows scroll under a bar that stays.
+   * From `sm` up the frame is `75dvh`; below it (2026-08-26) it is `flex-1` of
+   * the `phoneFill` card's column body, which is the same fixed frame by
+   * another route — both halves are on the one element.
    */
   it("holds the card's size through filtering, down to the empty state", async () => {
     const user = userEvent.setup();
     const dialog = await openTable(user);
 
-    const frame = dialog.querySelector<HTMLElement>(".h-\\[75dvh\\]")!;
-    expect(frame).toHaveClass("flex", "flex-col");
+    const frame = dialog.querySelector<HTMLElement>(".sm\\:h-\\[75dvh\\]")!;
+    expect(frame).toHaveClass("flex", "flex-col", "min-h-0", "flex-1");
     expect(frame.querySelector(".overflow-auto")).toHaveClass("min-h-0", "flex-1");
 
     await user.selectOptions(
@@ -602,7 +710,7 @@ describe("explore — the table's filters", () => {
 
     expect(within(dialog).queryByRole("table")).not.toBeInTheDocument();
     // The empty state fills the same frame rather than shrinking it.
-    expect(dialog.querySelector(".h-\\[75dvh\\]")).toBe(frame);
+    expect(dialog.querySelector(".sm\\:h-\\[75dvh\\]")).toBe(frame);
     expect(
       within(frame).getByText("No treatments match the selected filters.").parentElement,
     ).toHaveClass("flex-1");

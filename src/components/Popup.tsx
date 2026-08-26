@@ -42,6 +42,18 @@ export interface PopupCard {
   title: string;
   subtitle?: string;
   width?: PopupWidth;
+  /**
+   * Below `sm` the card fills the viewport — `h-dvh`, full width, no radius or
+   * border, the band at the top edge — and its body becomes a column flex
+   * container, so content that wants the leftover height can claim it with
+   * `min-h-0 flex-1`. Opt-in per card (2026-08-26, for the §5 table: on a
+   * 375px phone the card's chrome and 95dvh cap were costing ~106px of a
+   * table already down to one row); a short card would only gain empty
+   * ground, so it stays off by default. No safe-area inset on purpose: the
+   * viewport meta carries no `viewport-fit=cover`, so `env()` resolves to 0 —
+   * a real-iPhone check is styling open item 58.
+   */
+  phoneFill?: boolean;
   /** Required: a card with nothing in it is `null`, not an empty card. */
   content: ReactNode;
 }
@@ -75,6 +87,8 @@ export default function Popup({
           className={cn(
             "flex max-h-[95dvh] flex-col overflow-hidden rounded-[2.5rem] border-[0.3125rem] border-brand-crimson-50 shadow-popup",
             CARD_WIDTH[shown.width ?? "default"],
+            shown.phoneFill &&
+              "max-sm:h-dvh max-sm:max-h-dvh max-sm:w-full max-sm:rounded-none max-sm:border-0",
             surface === "white" ? "bg-white" : "bg-popup",
           )}
         >
@@ -119,7 +133,14 @@ export default function Popup({
 
           {/* `min-h-0` is load-bearing: without it the card grows past
               `max-h-[95dvh]` and this never scrolls. */}
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2 sm:px-8 lg:px-16">
+          <div
+            className={cn(
+              "min-h-0 flex-1 overflow-y-auto px-4 py-2 sm:px-8 lg:px-16",
+              // The column flex is what lets a `phoneFill` card's content take
+              // the height the chrome gave back; see `PopupCard.phoneFill`.
+              shown.phoneFill && "max-sm:flex max-sm:flex-col",
+            )}
+          >
             {shown.content}
           </div>
         </div>

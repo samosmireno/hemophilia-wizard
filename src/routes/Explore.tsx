@@ -69,6 +69,7 @@ export default function Explore() {
             ? {
                 title: EXPLORE_TABLE_TITLE,
                 width: "wide",
+                phoneFill: true,
                 // `null` while closed is also the filter reset: once the exit
                 // fade's `MODAL_EXIT_MS` hold releases the card, the table
                 // unmounts, so the next open mounts a fresh one.

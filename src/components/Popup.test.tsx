@@ -386,4 +386,39 @@ describe("Popup", () => {
     fireEvent.click(screen.getByRole("button", { name: "toggle" }));
     expect(document.body.style.overflow).toBe("scroll");
   });
+  /**
+   * `phoneFill` (2026-08-26): below `sm` the card fills the viewport and its
+   * body becomes a column flex — the §17 table card asks for it, nothing else
+   * does. Classes, for the width tests' reason; the `max-sm:` prefix on every
+   * one is the assertion that matters, since an unprefixed `h-dvh` would fill
+   * the desktop too.
+   */
+  describe("phoneFill", () => {
+    const shell = () => dialog().firstElementChild!;
+    const body = () => shell().lastElementChild!;
+
+    it("fills the phone screen and lets the body flex, when asked", () => {
+      render(
+        <Popup card={{ title: TITLE, phoneFill: true, content: <p>body</p> }} onClose={vi.fn()} />,
+      );
+
+      expect(shell()).toHaveClass(
+        "max-sm:h-dvh",
+        "max-sm:max-h-dvh",
+        "max-sm:w-full",
+        "max-sm:rounded-none",
+        "max-sm:border-0",
+      );
+      // The desktop card is untouched by the phone rules.
+      expect(shell()).toHaveClass("max-h-[95dvh]", "rounded-[2.5rem]");
+      expect(body()).toHaveClass("max-sm:flex", "max-sm:flex-col");
+    });
+
+    it("keeps the drawn card on phones by default", () => {
+      render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={vi.fn()} />);
+
+      expect(shell().className).not.toMatch(/max-sm:/);
+      expect(body().className).not.toMatch(/max-sm:/);
+    });
+  });
 });
