@@ -140,7 +140,7 @@ inside the open panel), and the card opts into `Popup`'s new `phoneFill` — ful
 column-flex body the table's frame fills with `flex-1` instead of `h-[75dvh]`. Table region at
 375×812: 265px → 625px. Nothing changes from 640px up (verified at 640/1024/1440). Tests pin the
 toggle wiring, the `sm` classes on both sides, the count + recap + Clear, and `phoneFill` at the
-call site and on `Popup`. Open: a real-iPhone check (styling item 58).
+call site and on `Popup`. Checked on a real Android phone and iPhone the same day (styling item 58, closed).
 
 **2026-08-10** — the eligibility engine was deleted as part of an architecture review
 (candidates 02 and 03). It had zero callers and zero tests since the first data pass, and the

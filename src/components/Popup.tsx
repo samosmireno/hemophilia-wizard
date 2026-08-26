@@ -51,7 +51,7 @@ export interface PopupCard {
    * table already down to one row); a short card would only gain empty
    * ground, so it stays off by default. No safe-area inset on purpose: the
    * viewport meta carries no `viewport-fit=cover`, so `env()` resolves to 0 —
-   * a real-iPhone check is styling open item 58.
+   * checked on a real Android phone and iPhone the same day (styling item 58, closed).
    */
   phoneFill?: boolean;
   /** Required: a card with nothing in it is `null`, not an empty card. */
