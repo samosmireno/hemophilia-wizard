@@ -114,7 +114,12 @@ themselves are trusted, so a tool configured to write a per-recipient value into
 `utm_content` would pass. Campaign authors own that — keep utm values to channel, wave
 and placement.
 
-## GA4 console checklist (one-time, property `G-JE497010X0`)
+## GA4 console checklist (one-time, property `G-C1HHCMQZNG`)
+
+`G-C1HHCMQZNG` is the Impetus-owned property the site reports to (2026-08-28); it replaced
+`G-JE497010X0`. A GA4 property starts empty and nothing below carries over, so every step
+is per property — a future switch means redoing all of them, and the old property's data
+stays where it is.
 
 1. **Vercel**: set `VITE_GA_MEASUREMENT_ID` in the project's environment variables —
    without it, production deploys ship with analytics off.
