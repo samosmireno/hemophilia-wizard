@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { nextOf } from "../../data/sectionOrder";
 import {
@@ -10,8 +10,14 @@ import {
   WIZARD_QUESTIONS,
   type SwitchReason,
 } from "../../data/wizard";
+import { trackWizardSubmit } from "../../lib/analytics";
+import { currentWizardRun } from "../../lib/wizardRun";
 import { seedWizardAnswers } from "../../test/setup";
 import { routes } from "../router";
+
+/** Tracking is a no-op outside production builds, so the wiring to it is all a
+ *  route test can pin — never the wire (`analytics.wire.test.ts` does that). */
+vi.mock("../../lib/analytics");
 
 /**
  * Mounted through the app's `routes`, like `wizard.test.tsx`: the page sits
@@ -140,6 +146,34 @@ describe("wizard — the reason question", () => {
       await user.click(submit());
 
       expect(at(router)).toBe(nextOf("/wizard/reason"));
+    });
+
+    /**
+     * Every Submit here is a wizard run, tagged with its ordinal within the tab
+     * session — coming back and resubmitting is run n+1, not a duplicate of run
+     * n. That is analytics' "used the wizard again" signal (docs/analytics.md →
+     * Repeat runs). Relative to the counter, not literal: other tests in this
+     * file submit too, and the counter is module state.
+     */
+    it("tags each submit with the next run ordinal", async () => {
+      const user = userEvent.setup();
+      const router = renderReason();
+      const before = currentWizardRun();
+      vi.mocked(trackWizardSubmit).mockClear();
+
+      await user.click(radio("Increase adherence"));
+      await user.click(submit());
+      expect(trackWizardSubmit).toHaveBeenCalledExactlyOnceWith(
+        { type: "A", hasInhibitors: false, reason: "adherence" },
+        before + 1,
+      );
+
+      await act(() => router.navigate("/wizard/reason"));
+      await user.click(submit());
+      expect(trackWizardSubmit).toHaveBeenLastCalledWith(
+        { type: "A", hasInhibitors: false, reason: "adherence" },
+        before + 2,
+      );
     });
   });
 

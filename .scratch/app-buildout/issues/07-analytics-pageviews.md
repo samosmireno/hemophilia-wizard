@@ -46,3 +46,17 @@ Found while verifying the above in Chromium: `ReactGA.event` rewrites the `page`
 `analytics.wire.test.ts` runs real react-ga4 against jsdom's `dataLayer` so a mock can't hide
 this again. If the client already registered the dimension on `page`, it starts filling on
 the next deploy — nothing to change in the console.
+
+2026-08-28 — client (via the PM) asked whether visitors use the wizard more than once per
+session. The Sheet behind the reporting is fed by the GA4 Data API, which has no segments,
+so "sessions with ≥ 2 `wizard_submit`" can't be asked there. Instead `wizard_submit` and
+`recommendation_reached` now carry `run`, the run's ordinal within the tab session
+(`src/lib/wizardRun.ts`; `sessionStorage`, lifetime = the answers'): sessions that ran the
+wizard again = `wizard_submit` where `run` = 2, distribution = event count by Wizard run.
+Back → change → resubmit is a new run; Reset doesn't touch the counter; a reload of the
+leaf re-fires with the same run; a second tab restarts at 1 (accepted noise inside one GA4
+session). Cross-session repeats are GA4's own New vs. returning. Console: one new custom
+dimension, "Wizard run" on `run`, to register by hand in the property the deploy reports
+to. Docs: `docs/analytics.md` (Repeat runs, checklist step 3, DebugView), ADR 0010
+amendment. The client snapshot `export/hemophilia-wizard-analytics-2026-08-25.xlsx` was
+not regenerated.

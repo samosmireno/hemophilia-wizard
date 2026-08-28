@@ -66,3 +66,11 @@ URL to keep only the `utm_*` campaign params, so a token is gone before the rout
 browser history or any outbound referrer can carry it. An allowlist, not a blocklist, so
 the tool never matters. The line holds: campaign attribution (aggregate, channel-level)
 in; anything per person out.
+
+## Amendment 2026-08-28: the `run` ordinal
+
+`wizard_submit` and `recommendation_reached` also carry `run` — the ordinal of that wizard
+run within the tab session, 1 = first (`src/lib/wizardRun.ts`) — so the segment-less Data
+API behind the client's Sheet can count sessions that used the wizard more than once. It
+clears the bar the Consequences set: a small integer from a closed vocabulary, attached to
+nothing per person, never URL-carried.

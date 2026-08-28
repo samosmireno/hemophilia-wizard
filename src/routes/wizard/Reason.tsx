@@ -11,6 +11,7 @@ import {
   type SwitchReason,
 } from "../../data/wizard";
 import { trackWizardSubmit } from "../../lib/analytics";
+import { nextWizardRun } from "../../lib/wizardRun";
 import { isComplete, useWizardAnswers } from "../../state/wizardAnswers";
 
 /**
@@ -34,7 +35,8 @@ export default function Reason() {
           event.preventDefault();
           // The type guard, not `complete` — the tracker needs the narrowing.
           if (!isComplete(answers)) return;
-          trackWizardSubmit(answers);
+          // A submit is a run: the counter advances here and nowhere else.
+          trackWizardSubmit(answers, nextWizardRun());
           void navigate(next);
         }}
       >

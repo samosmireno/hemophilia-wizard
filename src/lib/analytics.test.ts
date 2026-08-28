@@ -48,8 +48,8 @@ describe("tracking before init", () => {
   it("is a no-op across every tracker", async () => {
     const analytics = await loadAnalytics();
     analytics.trackPageview("/wizard");
-    analytics.trackWizardSubmit(ANSWERS);
-    analytics.trackRecommendationReached(ANSWERS);
+    analytics.trackWizardSubmit(ANSWERS, 1);
+    analytics.trackRecommendationReached(ANSWERS, 1);
     analytics.trackDrugSheetOpen("Fitusiran", "/explore");
     analytics.trackSurveySubmit();
     analytics.trackStepDuration("/wizard", 12);
@@ -71,22 +71,24 @@ describe("tracking after init", () => {
     expect(send).toHaveBeenCalledExactlyOnceWith({ hitType: "pageview", page: "/wizard" });
   });
 
-  it("maps the wizard answers onto three separate params", async () => {
+  it("maps the wizard answers onto three separate params, plus the run ordinal", async () => {
     const analytics = await loadInitialized();
-    analytics.trackWizardSubmit({ type: "B", hasInhibitors: true, reason: "monitoring" });
+    analytics.trackWizardSubmit({ type: "B", hasInhibitors: true, reason: "monitoring" }, 2);
     expect(gtag).toHaveBeenCalledExactlyOnceWith("event", "wizard_submit", {
       hemophilia_type: "B",
       has_inhibitors: "yes",
       switch_reason: "monitoring",
+      run: 2,
     });
   });
 
-  it("derives the scenario for a recommendation, without agent names", async () => {
+  it("derives the scenario for a recommendation, without agent names, with the run", async () => {
     const analytics = await loadInitialized();
-    analytics.trackRecommendationReached(ANSWERS);
+    analytics.trackRecommendationReached(ANSWERS, 1);
     expect(gtag).toHaveBeenCalledExactlyOnceWith("event", "recommendation_reached", {
       scenario: "A-without-inhibitors",
       switch_reason: "adherence",
+      run: 1,
     });
   });
 

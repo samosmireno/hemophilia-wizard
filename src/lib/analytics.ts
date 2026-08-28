@@ -35,23 +35,29 @@ export function trackPageview(pathname: string) {
  * The three answers ride as three separate event params — a deliberate,
  * ADR-recorded exception to ADR 0003's "never URL-encode the patient shape"
  * (see docs/adr/0010): event params are aggregate, anonymous and never appear
- * in a URL.
+ * in a URL. `run` is this run's ordinal within the tab session, 1 = first
+ * (`wizardRun.ts`) — the one way a segment-less Data API report can count
+ * sessions that used the wizard more than once: they are the events at run 2.
  */
-export function trackWizardSubmit(answers: CompleteWizardAnswers) {
+export function trackWizardSubmit(answers: CompleteWizardAnswers, run: number) {
   sendEvent("wizard_submit", {
     hemophilia_type: answers.type,
     has_inhibitors: answers.hasInhibitors ? "yes" : "no",
     switch_reason: answers.reason,
+    run,
   });
 }
 
 /** Fires when `/wizard/therapies` shows a leaf. The recommended agents are NOT
  *  sent — they are a pure function of these two params (`leafFor`), so reports
- *  join them offline from `src/data/wizard.ts` instead of trusting a copy. */
-export function trackRecommendationReached(answers: CompleteWizardAnswers) {
+ *  join them offline from `src/data/wizard.ts` instead of trusting a copy.
+ *  `run` is the ordinal of the submit that produced the leaf, so a reload of
+ *  the page re-fires with the same value. */
+export function trackRecommendationReached(answers: CompleteWizardAnswers, run: number) {
   sendEvent("recommendation_reached", {
     scenario: `${answers.type}-${answers.hasInhibitors ? "with" : "without"}-inhibitors`,
     switch_reason: answers.reason,
+    run,
   });
 }
 

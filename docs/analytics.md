@@ -42,19 +42,36 @@ with _Show elapsed time_ needs no code.
 
 **Events** (all fired through typed helpers in `src/lib/analytics.ts`):
 
-| Event                    | Fires when                                            | Params                                                                                                          |
-| ------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `wizard_submit`          | Submit on `/wizard/reason` with all three answers     | `hemophilia_type` (`A`/`B`), `has_inhibitors` (`yes`/`no`), `switch_reason`                                     |
-| `recommendation_reached` | `/wizard/therapies` renders a leaf                    | `scenario` (e.g. `A-without-inhibitors`), `switch_reason`                                                       |
-| `drug_sheet_open`        | Any agent drug sheet opens, except the `/how-to` demo | `agent`, `page`                                                                                                 |
-| `survey_submit`          | The outcomes survey validates and submits             | — (the Google Form owns answer content; GA is the only success signal, since the Form POST is opaque `no-cors`) |
-| `step_duration`          | Leaving a route, the tab being hidden, or unload      | `page`, `seconds` (whole foreground seconds on that route since the last report, capped at 1800)                |
+| Event                    | Fires when                                            | Params                                                                                                                                    |
+| ------------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `wizard_submit`          | Submit on `/wizard/reason` with all three answers     | `hemophilia_type` (`A`/`B`), `has_inhibitors` (`yes`/`no`), `switch_reason`, `run` (this run's ordinal within the tab session, 1 = first) |
+| `recommendation_reached` | `/wizard/therapies` renders a leaf                    | `scenario` (e.g. `A-without-inhibitors`), `switch_reason`, `run` (the same ordinal as the submit that produced the leaf)                  |
+| `drug_sheet_open`        | Any agent drug sheet opens, except the `/how-to` demo | `agent`, `page`                                                                                                                           |
+| `survey_submit`          | The outcomes survey validates and submits             | — (the Google Form owns answer content; GA is the only success signal, since the Form POST is opaque `no-cors`)                           |
+| `step_duration`          | Leaving a route, the tab being hidden, or unload      | `page`, `seconds` (whole foreground seconds on that route since the last report, capped at 1800)                                          |
 
 Params reach gtag exactly as written: `sendEvent` calls `ReactGA.gtag` raw, because
 `ReactGA.event` rewrites `page` to `page_path` on the way through (its Universal-Analytics
 field map). That silently emptied the `page` dimension until 2026-08-25;
 `src/lib/analytics.wire.test.ts` now runs real react-ga4 against jsdom's `dataLayer` to
 guard the wire format.
+
+**Repeat runs** — `run` on the two wizard events is that run's ordinal within the tab
+session (`src/lib/wizardRun.ts`). A run is one `wizard_submit`, so Back → change an answer
+→ resubmit is run 2 (that _is_ using the wizard again; the submitted combination is the
+datum, ADR 0010); "Reset inputs" then submit is the next run — a reset is how a run starts
+and does not touch the counter; a reload of `/wizard/therapies` re-fires
+`recommendation_reached` with the same `run` as the submit that produced the leaf. The
+param exists because the client's Sheet is fed by the GA4 Data API, which has no segments:
+"sessions with ≥ 2 `wizard_submit`" cannot be asked there, but "`wizard_submit` where
+`run` = 2" can, and every session that used the wizard again passes through run 2 exactly
+once. Reports: **sessions that ran the wizard more than once** = Event count of
+`wizard_submit` with _Wizard run_ = 2; **run distribution** = Event count of
+`wizard_submit` by _Wizard run_. The counter lives where the answers live —
+`sessionStorage`, one tab, gone with it (ADR 0003) — while a GA4 session is 30 minutes of
+inactivity across tabs, so a learner who opens the app in a second tab restarts at run 1
+inside the same GA4 session: accepted noise. Repeats _across_ sessions need no code —
+GA4's _New vs. returning_ covers them.
 
 **Deliberately not collected**: recommended agent lists (derivable offline from
 `scenario` + `switch_reason` via `src/data/wizard.ts`), per-radio-click answer changes,
@@ -117,11 +134,15 @@ and placement.
    | Scenario         | Event | Type + inhibitor status on `recommendation_reached`, e.g. `A-without-inhibitors`                                            | `scenario`        |
    | Drug sheet agent | Event | Which agent's drug sheet was opened                                                                                         | `agent`           |
    | App route        | Event | Route an event belongs to: where a drug sheet was opened from, the route timed by `step_duration`, e.g. `/wizard/therapies` | `page`            |
+   | Wizard run       | Event | Ordinal of this wizard run within the tab session, 1 = first                                                                | `run`             |
 
    The display names are deliberate: bare "Page" or "Agent" would sit confusingly next to
    GA4's built-in Page/User dimensions in report pickers. `page` was "Drug sheet page"
    until `step_duration` started sharing it (2026-08-25) — if it is already registered,
-   edit the display name; the parameter binding is what matters.
+   edit the display name; the parameter binding is what matters. _Wizard run_ arrived
+   after the first registration pass (2026-08-28) and has to be added on its own, in the
+   property the deployed measurement ID points at — a dimension fills from the moment it
+   is registered, never retroactively.
 
 4. **Admin → Custom definitions → Custom metrics → Create custom metric**: _Step
    seconds_, scope Event, event parameter `seconds`, unit of measurement **Seconds**.
@@ -185,19 +206,23 @@ npm run preview` (the local `.env` supplies the ID; the dev server never sends).
 - [ ] On `/wizard/reason` with no reason picked, Submit is disabled — nothing fires.
 - [ ] Pick a reason, Submit: one `wizard_submit`; expand it and check
       `hemophilia_type`, `has_inhibitors` (`yes`/`no`), `switch_reason` match exactly
-      what was clicked across both screens.
+      what was clicked across both screens, and `run` is `1` (fresh tab).
 - [ ] Go Back, change an answer on either screen, resubmit the reason step: a second
-      event with the updated values (expected — the once-per-session counting method
-      absorbs this in reports).
+      event with the updated values and `run` = `2` — a resubmit is a new run, which is
+      exactly the "used the wizard again" signal (see Repeat runs above).
+- [ ] Reset inputs on a wizard screen, answer all three again, Submit: `run` = `3` — a
+      reset starts a run, it does not restart the count.
+- [ ] Open the app in a **new tab** and submit once: `run` is `1` again — the counter is
+      per tab, so this is the accepted noise inside one GA4 session.
 - [ ] If key events are already registered: the event row carries the key-event flag.
 
 ### `recommendation_reached`
 
 - [ ] Front arrow from `/wizard/reason` to `/wizard/therapies`: one event;
       `scenario` is `A|B-with|without-inhibitors` and matches the answers,
-      `switch_reason` rides along.
-- [ ] Reload `/wizard/therapies`: fires again alongside the `page_view` — each viewing
-      counts, by design.
+      `switch_reason` rides along, and `run` equals the submit's.
+- [ ] Reload `/wizard/therapies`: fires again alongside the `page_view`, with the
+      **same** `run` — each viewing counts, by design; only a submit advances the run.
 - [ ] The agents on screen match what `scenario` + `switch_reason` imply — the event
       deliberately carries no agent list.
 

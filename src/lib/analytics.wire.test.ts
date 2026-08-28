@@ -57,12 +57,13 @@ describe("analytics on the wire", () => {
 
   it("keeps the wizard params and the numeric metric intact", async () => {
     const analytics = await loadInitialized();
-    analytics.trackWizardSubmit({ type: "B", hasInhibitors: true, reason: "monitoring" });
+    analytics.trackWizardSubmit({ type: "B", hasInhibitors: true, reason: "monitoring" }, 2);
     const [, , params] = events().find(([, name]) => name === "wizard_submit")!;
     expect(params).toEqual({
       hemophilia_type: "B",
       has_inhibitors: "yes",
       switch_reason: "monitoring",
+      run: 2,
     });
     analytics.trackStepDuration("/education/disease-background", 42);
     const [, , step] = events().find(([, name]) => name === "step_duration")! as [
@@ -71,5 +72,22 @@ describe("analytics on the wire", () => {
       { seconds: unknown },
     ];
     expect(typeof step.seconds).toBe("number");
+  });
+
+  it("delivers `run` on both wizard events as the number it was given", async () => {
+    const analytics = await loadInitialized();
+    const answers = { type: "A", hasInhibitors: false, reason: "adherence" } as const;
+    analytics.trackWizardSubmit(answers, 3);
+    analytics.trackRecommendationReached(answers, 3);
+    expect(events()).toContainEqual([
+      "event",
+      "wizard_submit",
+      { hemophilia_type: "A", has_inhibitors: "no", switch_reason: "adherence", run: 3 },
+    ]);
+    expect(events()).toContainEqual([
+      "event",
+      "recommendation_reached",
+      { scenario: "A-without-inhibitors", switch_reason: "adherence", run: 3 },
+    ]);
   });
 });

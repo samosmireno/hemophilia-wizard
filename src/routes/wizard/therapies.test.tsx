@@ -11,8 +11,14 @@ import {
   type SwitchReason,
   type WizardHemophiliaType,
 } from "../../data/wizard";
+import { trackRecommendationReached } from "../../lib/analytics";
+import { nextWizardRun } from "../../lib/wizardRun";
 import { seedWizardAnswers, setReducedMotion } from "../../test/setup";
 import { routes } from "../router";
+
+/** Tracking is a no-op outside production builds, so the wiring to it is all a
+ *  route test can pin — never the wire (`analytics.wire.test.ts` does that). */
+vi.mock("../../lib/analytics");
 
 /**
  * Mounted through the app's own `routes` for the reason `scenario.test.tsx`
@@ -590,5 +596,24 @@ describe("wizard therapies — the responsive pass", () => {
       }
       expect(caption.parentElement).toHaveClass("w-40", "shrink-0", "xl:shrink");
     }
+  });
+});
+
+describe("wizard therapies — the recommendation event", () => {
+  /**
+   * The leaf showing IS the recommendation, and it carries the run that produced
+   * it: the ordinal the last `wizard_submit` was tagged with, read back rather
+   * than advanced, so a reload of this page reports the same run again.
+   */
+  it("reports the leaf with the run the last submit produced", () => {
+    const run = nextWizardRun();
+    vi.mocked(trackRecommendationReached).mockClear();
+
+    renderTherapies("B", true, "monitoring");
+
+    expect(trackRecommendationReached).toHaveBeenCalledExactlyOnceWith(
+      { type: "B", hasInhibitors: true, reason: "monitoring" },
+      run,
+    );
   });
 });

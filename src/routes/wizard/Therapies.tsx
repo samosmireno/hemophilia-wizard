@@ -9,6 +9,7 @@ import PageSection from "../../components/PageSection";
 import { leafFor, type NoteBlock } from "../../data/wizard";
 import { trackRecommendationReached } from "../../lib/analytics";
 import { cn } from "../../lib/cn";
+import { currentWizardRun } from "../../lib/wizardRun";
 import { useCompleteWizardAnswers } from "../../state/wizardAnswers";
 
 type BlockId = "considerations" | "strategies";
@@ -18,8 +19,10 @@ export default function Therapies() {
   const leaf = leafFor({ type, hasInhibitors, reason });
 
   // The funnel's terminal event: this page showing a leaf IS the recommendation.
+  // Tagged with the run the submit produced — read, not advanced, so a reload
+  // reports the same run again.
   useEffect(() => {
-    trackRecommendationReached({ type, hasInhibitors, reason });
+    trackRecommendationReached({ type, hasInhibitors, reason }, currentWizardRun());
   }, [type, hasInhibitors, reason]);
 
   const [open, setOpen] = useState<BlockId>("considerations");
