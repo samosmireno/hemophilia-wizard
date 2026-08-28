@@ -56,7 +56,7 @@ wizard again = `wizard_submit` where `run` = 2, distribution = event count by Wi
 Back → change → resubmit is a new run; Reset doesn't touch the counter; a reload of the
 leaf re-fires with the same run; a second tab restarts at 1 (accepted noise inside one GA4
 session). Cross-session repeats are GA4's own New vs. returning. Console: one new custom
-dimension, "Wizard run" on `run`, to register by hand in the property the deploy reports
-to. Docs: `docs/analytics.md` (Repeat runs, checklist step 3, DebugView), ADR 0010
+dimension, "Wizard run" on `run` — registered by hand 2026-08-28; it fills once a deploy
+carrying `run` is live. Docs: `docs/analytics.md` (Repeat runs, checklist step 3, DebugView), ADR 0010
 amendment. The client snapshot `export/hemophilia-wizard-analytics-2026-08-25.xlsx` was
 not regenerated.
