@@ -185,6 +185,18 @@ describe("leafFor — the recommendation matrix", () => {
     }
   });
 
+  /** CONTEXT.md §4.1: the same reason narrows hemophilia B to marstacimab alone. */
+  it("recommends marstacimab alone when hemophilia B asks for reduced monitoring", () => {
+    for (const hasInhibitors of [false, true]) {
+      const agents = leafFor({
+        type: "B",
+        hasInhibitors,
+        reason: "monitoring",
+      }).recommendations.map((t) => t.agent);
+      expect(agents).toEqual([AGENT_NAMES.marstacimab]);
+    }
+  });
+
   /** Gene therapy is hemophilia B's, and only where there are no inhibitors. */
   it("offers etranacogene only to hemophilia B without inhibitors", () => {
     for (const scenario of ALL_SCENARIOS) {

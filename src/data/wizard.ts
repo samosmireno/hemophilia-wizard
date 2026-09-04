@@ -124,7 +124,9 @@ const RECOMMENDATIONS: Record<ScenarioKey, Record<SwitchReason, AgentName[]>> = 
     "bleeding-control": [...MIMETICS, ...REBALANCING],
     adherence: [...MIMETICS, ...REBALANCING],
     "treatment-burden": [...MIMETICS, ...REBALANCING],
-    monitoring: [...MIMETICS], // reduced monitoring → mimetics only
+    // reduced monitoring → mimetics only; hemophilia B narrows to marstacimab
+    // alone on the same reason (client cut, 2026-09-04).
+    monitoring: [...MIMETICS],
   },
   "A-with": {
     "bleeding-control": [...MIMETICS, ...REBALANCING],
@@ -136,13 +138,13 @@ const RECOMMENDATIONS: Record<ScenarioKey, Record<SwitchReason, AgentName[]>> = 
     "bleeding-control": [...REBALANCING],
     adherence: [...REBALANCING, ...GENE],
     "treatment-burden": [...REBALANCING, ...GENE],
-    monitoring: [...REBALANCING],
+    monitoring: [AGENTS.marstacimab], // client cut, 2026-09-04 — see "A-without"
   },
   "B-with": {
     "bleeding-control": [...REBALANCING],
     adherence: [...REBALANCING],
     "treatment-burden": [...REBALANCING],
-    monitoring: [...REBALANCING],
+    monitoring: [AGENTS.marstacimab],
   },
 };
 

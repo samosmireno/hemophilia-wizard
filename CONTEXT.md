@@ -335,7 +335,7 @@ intentionally not derivable by filtering.
 | **Improving bleeding control**     | Emi, Dene, Conci, Mars, Fitu | Emi, Dene, Conci, Mars, Fitu | Conci, Mars, Fitu           | Conci, Mars, Fitu |
 | **Increased adherence**            | Emi, Dene, Conci, Mars, Fitu | Emi, Dene, Conci, Mars, Fitu | Conci, Mars, Fitu, **Gene** | Conci, Mars, Fitu |
 | **Reduced treatment burden**       | Emi, Dene, Conci, Mars, Fitu | Emi, Dene, Conci, Mars, Fitu | Conci, Mars, Fitu, **Gene** | Conci, Mars, Fitu |
-| **Reduced monitoring requirement** | Emi, Dene                    | Emi, Dene                    | Conci, Mars, Fitu           | Conci, Mars, Fitu |
+| **Reduced monitoring requirement** | Emi, Dene                    | Emi, Dene                    | **Mars**                    | **Mars**          |
 
 Abbreviations: Emi = Emicizumab, Dene = Denecimig, Conci = Concizumab, Mars = Marstacimab,
 Fitu = Fitusiran, Gene = Etranacogene dezaparvovec-drlb (gene therapy).
@@ -344,6 +344,9 @@ Fitu = Fitusiran, Gene = Etranacogene dezaparvovec-drlb (gene therapy).
 
 - Hemophilia A + _reduced monitoring_ → **only the two FVIII mimetics** (rebalancing agents
   need AT/plasma monitoring).
+- Hemophilia B + _reduced monitoring_ → **marstacimab alone**, with or without inhibitors
+  (`[CLIENT]` 2026-09-04: concizumab and fitusiran struck from both leaves; the other three
+  reasons keep all three rebalancing agents).
 - **Gene therapy** appears **only** for Hemophilia B _without_ inhibitors, under adherence &
   treatment burden (Etranacogene is HB, no-inhibitor, adults only).
 - FVIII mimetics (Emi, Dene) never appear in Hemophilia B branches (they are HA-only).
