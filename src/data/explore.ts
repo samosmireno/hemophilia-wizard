@@ -16,10 +16,12 @@ export const SDM_POINTS: readonly string[] = [
 
 export interface ExploreColumn {
   /**
-   * Verbatim from the artboard, and the app's only class vocabulary. `treatments.ts`
+   * The artboard's wording, and the app's only class vocabulary. `treatments.ts`
    * once carried a canonical four-class enum that three of these four disagreed
    * with; it went with the unbuilt filter engine (ADR 0007). Transcribed, never
-   * derived — `content.test.ts` pins the four.
+   * derived — `content.test.ts` pins the four. The one departure from the drawn
+   * text is the factor label, which lost its "UHL " prefix at the client's
+   * direction (2026-09-04).
    */
   label: string;
   /** The join key `sheetFor()` looks a sheet up by. */
@@ -49,7 +51,7 @@ export const EXPLORE_SEGMENTS: readonly ExploreSegment[] = [
   {
     width: 353,
     columns: [
-      { label: "UHL clotting factor replacement", agents: [AGENT_NAMES.efanesoctocog] },
+      { label: "Clotting factor replacement", agents: [AGENT_NAMES.efanesoctocog] },
       { label: "Gene therapy", agents: [AGENT_NAMES.etranacogene] },
     ],
   },
@@ -72,10 +74,12 @@ export interface ExploreClassFilter {
  * (decided 2026-08-11; CONTEXT.md §5.2). The labels are `EXPLORE_SEGMENTS`' four,
  * in drawn order — `content.test.ts` pins the correspondence. The mapping is here
  * rather than in the component because it encodes a content ruling, not a
- * rendering choice: "UHL clotting factor replacement" covers ALL THREE factor
+ * rendering choice: "Clotting factor replacement" covers ALL THREE factor
  * rows — SHL and EHL included, though the drawn index above deliberately omits
- * them — reproducing the client's own S4 saved view ("Clotting factor
- * replacement"), which keeps every roster row reachable through some option.
+ * them — reproducing the client's own S4 saved view, which keeps every roster
+ * row reachable through some option. The option was drawn and shipped as "UHL
+ * clotting factor replacement"; the client dropped the prefix 2026-09-04,
+ * leaving the label identical to the S1 class cell it covers.
  */
 export const EXPLORE_CLASS_FILTERS: readonly ExploreClassFilter[] = [
   {
@@ -83,7 +87,7 @@ export const EXPLORE_CLASS_FILTERS: readonly ExploreClassFilter[] = [
     classes: ["FVIIIa mimetic", "FVIIIa mimetic (emerging / investigational)"],
   },
   { label: "Hemostatic rebalancing agents", classes: ["Hemostatic rebalancing agent"] },
-  { label: "UHL clotting factor replacement", classes: ["Clotting factor replacement"] },
+  { label: "Clotting factor replacement", classes: ["Clotting factor replacement"] },
   { label: "Gene therapy", classes: ["Gene therapy"] },
 ];
 
@@ -137,13 +141,13 @@ export function minAge(age: string): number {
  * §5 comparison table pre-filtered to their class (ruled 2026-08-12), so this
  * map is the ruling: two mimetic wordings (the tree's plural, `A-with`'s
  * singular) share the FVIII bucket, and both factor-replacement labels share
- * the UHL bucket —
- * which covers all three factor rows, FIX products included, so the
- * "FIX prophylaxis" box is not a dead end. `content.test.ts` pins coverage.
+ * the "Clotting factor replacement" bucket — which covers all three factor
+ * rows, FIX products included, so the "FIX prophylaxis" box is not a dead end.
+ * `content.test.ts` pins coverage.
  */
 const CLASS_BOX_FILTERS: ReadonlyMap<string, string> = new Map([
-  ["FVIII concentrates", "UHL clotting factor replacement"],
-  ["FIX prophylaxis", "UHL clotting factor replacement"],
+  ["FVIII concentrates", "Clotting factor replacement"],
+  ["FIX prophylaxis", "Clotting factor replacement"],
   ["FVIIIa mimetics", "FVIII mimetics"],
   ["FVIIIa mimetic", "FVIII mimetics"],
   ["Hemostatic rebalancing agents", "Hemostatic rebalancing agents"],

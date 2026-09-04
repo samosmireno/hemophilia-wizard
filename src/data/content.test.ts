@@ -177,17 +177,18 @@ describe("explore segments", () => {
   /**
    * The labels are the artboard's, and they are the app's only class vocabulary:
    * `treatments.ts` once carried a canonical four-class enum, and three of these
-   * four disagreed with it — plural where it was singular, and "UHL clotting factor
-   * replacement" naming a half-life it had no term for. The enum went with the
-   * unbuilt filter engine (ADR 0007); these stayed, because they are drawn. This is
-   * the test that objects if someone canonicalises them.
+   * four disagreed with it — plural where it was singular, and the factor label
+   * naming a half-life ("UHL clotting factor replacement") it had no term for. The
+   * enum went with the unbuilt filter engine (ADR 0007); these stayed, because they
+   * are drawn — and the factor one lost its "UHL " prefix at the client's direction
+   * (2026-09-04). This is the test that objects if someone canonicalises them.
    */
   it("label columns in the artboard's wording", () => {
     const labels = EXPLORE_SEGMENTS.flatMap((s) => s.columns.map((c) => c.label));
     expect(labels).toEqual([
       "FVIII mimetics",
       "Hemostatic rebalancing agents",
-      "UHL clotting factor replacement",
+      "Clotting factor replacement",
       "Gene therapy",
     ]);
   });
@@ -205,7 +206,8 @@ describe("explore class filters", () => {
 
   /*
     Exactly one: zero would strand a row no option can reach (the SHL/EHL trap
-    the UHL bucket exists to avoid), and two would make the options overlap,
+    the factor-replacement bucket exists to avoid), and two would make the
+    options overlap,
     which the 2026-08-11 exact-match ruling says they must not.
   */
   it("cover every roster row in exactly one bucket", () => {

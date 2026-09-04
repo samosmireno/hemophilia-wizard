@@ -35,8 +35,8 @@ file it came from** so it can be re-verified and updated.
   question into the **patient-type ("serves") ruling with no "A + B" dropdown option**
   (provisional, **flagged for the client gate**; it reversed an exact-cell-match first ruling
   the same day, on the domain ground that no patient has both types) and records the class
-  dropdown's four drawn-label buckets, with "UHL clotting factor replacement"
-  covering SHL/EHL per the client's own S4 saved view (`EXPLORE_CLASS_FILTERS`,
+  dropdown's four drawn-label buckets, with the factor bucket covering SHL/EHL per the
+  client's own S4 saved view (`EXPLORE_CLASS_FILTERS`,
   `src/data/explore.ts`); the table's agent cells deliberately open no sheet); previously
   2026-08-10 (the unbuilt eligibility engine deleted from `treatments.ts` — it had
   zero callers and zero tests since the first data pass and modelled patient eligibility where the
@@ -318,8 +318,8 @@ account of why it went).
 > already chose the class, and the other two filters would let the fixed view contradict its
 > own title — the full filterable table stays `/explore`'s. The join's non-obvious half:
 > both factor-replacement labels ("FVIII concentrates", "FIX prophylaxis") share
-> the UHL bucket, whose three rows include the FIX products, and both mimetic wordings share
-> the FVIII bucket. `content.test.ts` pins that every label `classesFor` lists resolves.
+> the "Clotting factor replacement" bucket, whose three rows include the FIX products, and
+> both mimetic wordings share the FVIII bucket. `content.test.ts` pins that every label `classesFor` lists resolves.
 
 `[BUILD]` **Known drift:** `treatment-wizard-demo.html` mirrors `CLASSES_TO_CONSIDER` and still
 carries the singular "Hemostatic rebalancing agent", plus none of the three new fields. The demo
@@ -461,7 +461,8 @@ only)". The column header keeps the drawn wording; [§5.2](#52-filter-logic-buil
 > the SDM copy the artboard draws three arched segments holding all seven agents that have a
 > sheet, under four verbatim class labels — "FVIII mimetics" (drawn "FVIIIa mimetics"; the `a`
 > was dropped 2026-08-05) · "Hemostatic rebalancing agents" ·
-> "UHL clotting factor replacement" · "Gene therapy". Three of the four disagreed with the
+> "Clotting factor replacement" (drawn "UHL clotting factor replacement"; the prefix
+> was dropped 2026-09-04) · "Gene therapy". Three of the four disagreed with the
 > canonical `TreatmentClass` enum `treatments.ts` carried until 2026-08-10 (plural where it was
 > singular; "UHL" is a half-life it had no term for), so they are transcribed rather than derived —
 > the same call `CLASSES_TO_CONSIDER` records. **They are now the app's only class vocabulary**,
@@ -575,10 +576,12 @@ each defaulting to All, resetting when the card closes; a fourth, Patient age, j
   one session: it read the dropdown as a column filter where a clinician reads it as their
   patient. Either way back is a small predicate-and-options swap if the client overrules.
 - **The class dropdown's options are the four drawn labels** (`EXPLORE_CLASS_FILTERS`,
-  `src/data/explore.ts`), each bucketing the S1 class cells it covers — with **"UHL clotting
+  `src/data/explore.ts`), each bucketing the S1 class cells it covers — with **"Clotting
   factor replacement" covering all three factor rows**, SHL and EHL included, though the drawn
-  sheet index omits them. That reproduces the client's own S4 saved view and keeps every row
-  reachable; per-class filtering reproducing the S2–S5 tabs is what those sheets are.
+  sheet index omits them. (That option was drawn and shipped as "UHL clotting factor
+  replacement"; the client dropped the prefix 2026-09-04, leaving the label identical to the
+  S1 class cell it covers. Coverage unchanged.) That reproduces the client's own S4 saved
+  view and keeps every row reachable; per-class filtering reproducing the S2–S5 tabs is what those sheets are.
 - **Indicated with inhibitors is a COLUMN filter — the client's third and final ruling,
   2026-09-04, reinstating the first.** The dropdown matches the S1 cell exactly: **"Yes" shows
   the five `Yes` rows, "No" the four `No` ones** — SHL, EHL, Efanesoctocog and Etranacogene.
@@ -1139,12 +1142,12 @@ the page deliberately does not repair:
 a defect in the transcription. The page cannot answer it without authoring CME copy, so it ships
 without them:
 
-| Abbr              | Where it is on screen                                                                                                                |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `SDM`             | `/explore`'s `<h1>`, `SDM_LEAD`, its bullets, and all four scenarios' wizard notes                                                   |
-| `SHL` `EHL` `UHL` | agent names in the [§5.1](#51-treatment-roster-9-rows-s1-verbatim) roster; `/explore`'s "UHL clotting factor replacement" arch label |
-| `VHH`             | the Inno8 card — "VHH-based FVIII mimetic"                                                                                           |
-| `IgG4`            | the emicizumab chapter bullet                                                                                                        |
+| Abbr              | Where it is on screen                                                                                                               |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `SDM`             | `/explore`'s `<h1>`, `SDM_LEAD`, its bullets, and all four scenarios' wizard notes                                                  |
+| `SHL` `EHL` `UHL` | agent names in the [§5.1](#51-treatment-roster-9-rows-s1-verbatim) roster; the §7.3 "SHL, EHL, and UHL FVIII/FIX products" subtitle |
+| `VHH`             | the Inno8 card — "VHH-based FVIII mimetic"                                                                                          |
+| `IgG4`            | the emicizumab chapter bullet                                                                                                       |
 
 ---
 

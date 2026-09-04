@@ -246,7 +246,7 @@ describe("explore — the comparison table", () => {
  * Issue 09's table: three AND-combined filters over the nine-row roster. The
  * semantics under test are the 2026-08-11 decisions (CONTEXT.md §5.2): the
  * type dropdown is a PATIENT-type filter with no "A + B" option (provisional,
- * flagged for the client gate), and the UHL bucket covers SHL/EHL.
+ * flagged for the client gate), and the factor-replacement bucket covers SHL/EHL.
  */
 describe("explore — the table's filters", () => {
   const S1_HEADERS = [
@@ -475,18 +475,18 @@ describe("explore — the table's filters", () => {
   });
 
   /**
-   * The UHL bucket covers all three factor rows — SHL and EHL included, though
+   * The factor bucket covers all three factor rows — SHL and EHL included, though
    * the drawn class index on the page beneath deliberately omits them. This is
    * the S4 saved-view precedent, and the one place the class filter is not an
    * exact label match.
    */
-  it("buckets SHL and EHL under UHL clotting factor replacement", async () => {
+  it("buckets SHL and EHL under Clotting factor replacement", async () => {
     const user = userEvent.setup();
     const dialog = await openTable(user);
 
     await user.selectOptions(
       within(dialog).getByRole("combobox", { name: "Treatment class" }),
-      "UHL clotting factor replacement",
+      "Clotting factor replacement",
     );
 
     expect(agentsShown(dialog)).toEqual(["SHL", "EHL", "Efanesoctocog alfa"]);
