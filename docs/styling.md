@@ -1180,9 +1180,10 @@ thank-you asserts handoff, not delivery. The flag lives in `sessionStorage`: a r
 keeps the thank-you, a new tab gets a fresh survey — deliberately unlike the wizard answers'
 in-memory scope (ADR 0003), so a reload cannot double-count a response.
 
-## 28. Buttons are not copy — the `user-select` base rule
+## 28. Controls are not copy — the `user-select` base rules
 
-One element rule at the end of `tokens.css`, in `@layer base`:
+The first of two element rules at the end of `tokens.css`, in `@layer base` — the second, on
+`img`, arrived with the 2026-09-04 amendment below:
 
 ```css
 @layer base {
@@ -1207,6 +1208,51 @@ sidebar jump items, §24's references) stay selectable: they are content, not co
 
 Both declarations are what Tailwind's own `select-none` utility emits; the `-webkit-` form is
 still required by Safari.
+
+**Amended 2026-09-04 (review report).** A reviewer dragged across
+`/education/treatment-landscape`, the page filled with blue, and she screenshotted it: the
+FVIII figure came back a **solid blue rectangle**, because the chapter art is transparent
+WebP and the selection wash fills the whole box rather than tinting an illustration. Three
+additions, each staying inside the rule above rather than blanketing the page — controls are
+not copy, and content still is.
+
+**Figures.** A second element rule beside the first, on `img`. An element rule and not
+call-site classes this time for a different reason than §21's: an `<img>` has no selectable
+text to lose, so the rule cannot cost anything, and it is the only form that also covers art
+added later. It reaches the six figures that are not already inside a `<button>` —
+`TreatmentLandscape`'s row figure and its card figure, `PopupFigure` (so every popup),
+`BrandLoop`'s poster, `ProphylaxisGuidance`'s and `ClottingCascadeFigure`'s. Dragging the
+file out of the page is a separate property and stays where 86dcc2e put it: `draggable={false}`
+at the call site.
+
+**A `PopupButton`'s evicted label.** The circle is only big enough for a `+`, so its label is
+painted as a `<p>` beside it — the same string handed to the button in `DisclosureBand.tsx`,
+`TreatmentLandscape.tsx` and `RebalancingAgents.tsx` (`MECHANISMS_LABEL`), and a caption for a
+row of controls in `RebalancingAgents.tsx` (`BOXES_CAPTION`) and `wizard/Scenario.tsx`. It is
+outside the `<button>` for layout alone, so the rule above already covers it in spirit; all
+five carry `select-none` at the call site.
+
+**The wizard `<legend>`.** "DISEASE TYPE" / "DOES THE PATIENT HAVE INHIBITORS?" is the prompt
+for a button group — part of the control, like the pills it labels (§14). `select-none` at the
+call site, next to theirs.
+
+**Not the CSS hook**: `.text-popup-caption` is a _colour_ token, and it spans three unrelated
+roles — the evicted labels above, `/how-to`'s demo-card captions, and `/fviii-mimetics`' agent
+and panel captions. Hanging selection behaviour off it would couple the two and break the
+moment the colour moved.
+
+**Deliberately still selectable**: body prose, bullets, `<h2>` headings, the treatment-options
+matrix, glossary, acronyms and references — that is the reason anyone selects here, a reader
+copying a drug name or a citation, and a blanket `user-select: none` on `body` would take it
+away along with find-on-page feedback. Also left alone: `/how-to`'s demo-card captions
+(instructional prose, not a label), `/fviii-mimetics`' agent captions (an agent's name and
+regulatory status is exactly what someone would copy), and `/survey`'s `<legend>` (§27) — a
+native radio form, where selection reads as ordinary form behaviour rather than a painted
+control coming apart. Headings therefore still wash blue under a drag; that is the line.
+
+Verified in Chromium at 1440×900: the same drag over the landscape figure now leaves the
+artwork untinted and its caption crimson, while the prose in range still highlights and still
+copies (462 characters of it).
 
 ## 29. `/wizard`'s Reset
 

@@ -131,7 +131,8 @@ export default function TreatmentLandscape() {
                 aria-haspopup={row.content ? "dialog" : undefined}
                 onClick={(next) => setOpenIndex(next ? index : null)}
               />
-              <p className="mt-4 text-center text-xl font-bold text-popup-caption lg:text-2xl">
+              {/* The button's label again, evicted from the circle by layout (§28). */}
+              <p className="mt-4 text-center text-xl font-bold text-popup-caption select-none lg:text-2xl">
                 {row.label}
               </p>
             </div>

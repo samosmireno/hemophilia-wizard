@@ -120,7 +120,9 @@ export default function RebalancingAgents() {
             ))}
           </div>
 
-          <p className="mt-4 text-center text-xl font-bold text-popup-caption uppercase lg:text-2xl">
+          {/* Captions the box row rather than one button, but reads as part of the
+              control group all the same — §28. */}
+          <p className="mt-4 text-center text-xl font-bold text-popup-caption uppercase select-none lg:text-2xl">
             {BOXES_CAPTION}
           </p>
         </div>
@@ -134,7 +136,8 @@ export default function RebalancingAgents() {
             "sm:flex-row sm:flex-wrap sm:items-start sm:gap-x-6",
           )}
         >
-          <p className="max-w-135 text-center text-xl font-bold text-popup-caption sm:text-left lg:text-2xl">
+          {/* `MECHANISMS_LABEL` is the button's own label too (§28). */}
+          <p className="max-w-135 text-center text-xl font-bold text-popup-caption select-none sm:text-left lg:text-2xl">
             {MECHANISMS_LABEL}
           </p>
 

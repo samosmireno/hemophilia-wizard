@@ -29,7 +29,9 @@ export default function DisclosureBand({
               aria-haspopup={disclosure.content ? "dialog" : undefined}
               onClick={(next) => setOpenIndex(next ? index : null)}
             />
-            <p className="mt-4 flex max-w-68 flex-1 items-center text-center text-xl font-bold text-popup-caption lg:text-2xl">
+            {/* The button's own label, outside it only because the circle holds a `+`
+                and nothing else — §28 keeps a control's label unselectable. */}
+            <p className="mt-4 flex max-w-68 flex-1 items-center text-center text-xl font-bold text-popup-caption select-none lg:text-2xl">
               {disclosure.label}
             </p>
           </li>

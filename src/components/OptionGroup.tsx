@@ -32,7 +32,9 @@ export default function OptionGroup<T extends string>({
     // `min-w-0`: a `<fieldset>` carries `min-inline-size: min-content` in the UA
     // stylesheet — without it the page scrolls sideways on a phone.
     <fieldset className={cn("mx-auto max-w-110 min-w-0 lg:max-w-225", className)}>
-      <legend className="mx-auto mb-2.5 w-full max-w-175 text-center font-sans text-xl font-bold text-brand-crimson-50 uppercase lg:text-3xl">
+      {/* `select-none`: the legend is the group's prompt, part of the control and
+          not copy — the pills below carry the same for the same reason (§28). */}
+      <legend className="mx-auto mb-2.5 w-full max-w-175 text-center font-sans text-xl font-bold text-brand-crimson-50 uppercase select-none lg:text-3xl">
         {legend}
       </legend>
 

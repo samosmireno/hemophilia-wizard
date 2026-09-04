@@ -374,3 +374,19 @@
     user-select: none;
   }
 }
+
+/* Figures are not copy either (docs/styling.md §28). A drag across the page washes every
+   `<img>` in its range blue — and because the chapter art is transparent WebP, the wash
+   fills the whole box, so a figure reads as a solid blue rectangle rather than a tinted
+   illustration. An element rule rather than call-site classes: an `<img>` has no selectable
+   text to lose, so this can cost nothing, and it is the only form that also covers art
+   added later. Buttons' own images were already inside the rule above; this reaches the
+   six that are not — the two `TreatmentLandscape` figures, `PopupFigure`, `BrandLoop`'s
+   poster, `ProphylaxisGuidance`'s and `ClottingCascadeFigure`'s. Dragging the file out is
+   a separate property and stays where 86dcc2e put it: `draggable={false}` at the call site. */
+@layer base {
+  img {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}

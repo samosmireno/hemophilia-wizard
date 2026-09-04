@@ -47,8 +47,10 @@ export default function Scenario() {
 
   const [openClass, setOpenClass] = useState<string | null>(null);
 
+  // `select-none`: this captions the class boxes — chrome for the controls under
+  // it, not copy (§28).
   const caption = (
-    <p className="text-center text-xl font-bold text-popup-caption uppercase lg:text-2xl">
+    <p className="text-center text-xl font-bold text-popup-caption uppercase select-none lg:text-2xl">
       {screen.caption}
     </p>
   );
