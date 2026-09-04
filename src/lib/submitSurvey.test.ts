@@ -7,7 +7,7 @@ afterEach(() => {
 });
 
 describe("submitSurvey", () => {
-  it("posts each answer under its Form entry id, opaquely", async () => {
+  it("posts each answer under its question id to the survey endpoint, opaquely", async () => {
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
       .mockResolvedValue(new Response(null, { status: 200 }));
@@ -21,7 +21,7 @@ describe("submitSurvey", () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     const [url, init] = fetchSpy.mock.calls[0];
     expect(url).toBe(
-      "https://docs.google.com/forms/d/e/1FAIpQLSdu_UpSaNkYniW-5CqcfhReX-bIUh_GID7Sh1UC6cowrYru6Q/formResponse",
+      "https://script.google.com/macros/s/AKfycbwIIJj6Mv8naCMDhwVro31FcbhDIB1CiLEiAZGx3PoLHfCGdIg17VDk6Sxveg68XB8/exec",
     );
     // `no-cors` is load-bearing: with CORS the browser would block the response
     // and reject, and the submission semantics (opaque handoff) are the seam's
@@ -30,9 +30,9 @@ describe("submitSurvey", () => {
     expect(init?.method).toBe("POST");
 
     const body = init?.body as URLSearchParams;
-    expect(body.get("entry.1950198496")).toBe("Strongly agree");
-    expect(body.get("entry.2071602327")).toBe("Neutral");
-    expect(body.get("entry.561719209")).toBe("For general education");
+    expect(body.get("q1")).toBe("Strongly agree");
+    expect(body.get("q2")).toBe("Neutral");
+    expect(body.get("q3")).toBe("For general education");
     expect([...body.keys()]).toHaveLength(3);
   });
 });

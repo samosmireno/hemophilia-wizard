@@ -36,3 +36,19 @@ Sheet (also proves "collect email addresses" is off). No test submission has bee
 
 ~~Option-case mismatch~~ — fixed on the Form 2026-08-11 ("Strongly disagree" now lowercase on
 both Likert questions; re-verified against the live form, entry ids unchanged).
+
+## Re-pointed (2026-09-04): Google Form → Apps Script endpoint
+
+The Form is retired. `submitSurvey.ts` now POSTs `q1`/`q2`/`q3` to a standalone Apps Script
+web app (`scripts/survey-endpoint.gs`, deployed from the account that runs the GA4 → Sheet feed)
+which appends one timestamped row per response to a "Survey responses" tab of the client-facing
+1737 Sheet — the same Sheet `scripts/ga4-to-sheet.gs` fills with the analytics. Why the
+2026-08-11 rejection of Apps Script no longer holds: the client wants one Sheet for analytics
+and survey with no per-person access to manage (program manager, 2026-08-28), and the Sheet feed
+is already an Apps Script the same account owns, so the "deployment to own" cost is paid once
+either way. Trade: the Forms distribution charts are gone (raw rows only, which is what the
+client asked for). Still load-bearing: the endpoint whitelists answers against
+`SURVEY_QUESTIONS` verbatim, so an option-text edit must be mirrored there and redeployed
+(Deploy → Manage deployments → new version; the URL is stable) or every response is dropped.
+The Form's entry-id coupling is gone with it. Body stays URL-encoded and `no-cors`; the
+confirmation stays optimistic (issue 13).

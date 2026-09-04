@@ -68,9 +68,10 @@ export function trackDrugSheetOpen(agent: string, pathname: string) {
   sendEvent("drug_sheet_open", { agent, page: pathname });
 }
 
-/** No answer params on purpose: the Google Form is the system of record for
+/** No answer params on purpose: the survey endpoint (a row per response in
+ *  the client Sheet, `scripts/survey-endpoint.gs`) is the system of record for
  *  survey content; GA records only that a submission happened — the one place
- *  that signal exists at all, since the Form POST is opaque (`no-cors`). */
+ *  that signal exists at all, since that POST is opaque (`no-cors`). */
 export function trackSurveySubmit() {
   sendEvent("survey_submit", {});
 }

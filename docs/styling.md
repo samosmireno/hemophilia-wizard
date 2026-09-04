@@ -1173,8 +1173,9 @@ home" and "Back to wizard" included, all three share one `BUTTON_SKIN` string �
 screen's own. Right-aligned at the end of the column, where the wizard also puts its submit.
 
 **The confirmation is optimistic, and the submitted flag is per-tab.** `submitSurvey`
-(`src/lib/submitSurvey.ts`, issue 06's seam — wired 2026-08-11 to the live Google Form, whose
-linked Sheet the client reads) POSTs `no-cors`, so success is unreadable by design and the inline
+(`src/lib/submitSurvey.ts`, issue 06's seam — wired 2026-09-04 to the survey endpoint,
+`scripts/survey-endpoint.gs`, which appends a row to the client Sheet; a Google Form before
+that) POSTs `no-cors`, so success is unreadable by design and the inline
 thank-you asserts handoff, not delivery. The flag lives in `sessionStorage`: a refresh in the tab
 keeps the thank-you, a new tab gets a fresh survey — deliberately unlike the wizard answers'
 in-memory scope (ADR 0003), so a reload cannot double-count a response.

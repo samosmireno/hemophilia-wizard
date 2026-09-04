@@ -42,13 +42,13 @@ with _Show elapsed time_ needs no code.
 
 **Events** (all fired through typed helpers in `src/lib/analytics.ts`):
 
-| Event                    | Fires when                                            | Params                                                                                                                                    |
-| ------------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `wizard_submit`          | Submit on `/wizard/reason` with all three answers     | `hemophilia_type` (`A`/`B`), `has_inhibitors` (`yes`/`no`), `switch_reason`, `run` (this run's ordinal within the tab session, 1 = first) |
-| `recommendation_reached` | `/wizard/therapies` renders a leaf                    | `scenario` (e.g. `A-without-inhibitors`), `switch_reason`, `run` (the same ordinal as the submit that produced the leaf)                  |
-| `drug_sheet_open`        | Any agent drug sheet opens, except the `/how-to` demo | `agent`, `page`                                                                                                                           |
-| `survey_submit`          | The outcomes survey validates and submits             | — (the Google Form owns answer content; GA is the only success signal, since the Form POST is opaque `no-cors`)                           |
-| `step_duration`          | Leaving a route, the tab being hidden, or unload      | `page`, `seconds` (whole foreground seconds on that route since the last report, capped at 1800)                                          |
+| Event                    | Fires when                                            | Params                                                                                                                                                                     |
+| ------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `wizard_submit`          | Submit on `/wizard/reason` with all three answers     | `hemophilia_type` (`A`/`B`), `has_inhibitors` (`yes`/`no`), `switch_reason`, `run` (this run's ordinal within the tab session, 1 = first)                                  |
+| `recommendation_reached` | `/wizard/therapies` renders a leaf                    | `scenario` (e.g. `A-without-inhibitors`), `switch_reason`, `run` (the same ordinal as the submit that produced the leaf)                                                   |
+| `drug_sheet_open`        | Any agent drug sheet opens, except the `/how-to` demo | `agent`, `page`                                                                                                                                                            |
+| `survey_submit`          | The outcomes survey validates and submits             | — (the survey endpoint, `scripts/survey-endpoint.gs`, owns answer content as rows in the client Sheet; GA is the only success signal, since that POST is opaque `no-cors`) |
+| `step_duration`          | Leaving a route, the tab being hidden, or unload      | `page`, `seconds` (whole foreground seconds on that route since the last report, capped at 1800)                                                                           |
 
 Params reach gtag exactly as written: `sendEvent` calls `ReactGA.gtag` raw, because
 `ReactGA.event` rewrites `page` to `page_path` on the way through (its Universal-Analytics
@@ -62,7 +62,8 @@ session (`src/lib/wizardRun.ts`). A run is one `wizard_submit`, so Back → chan
 datum, ADR 0010); "Reset inputs" then submit is the next run — a reset is how a run starts
 and does not touch the counter; a reload of `/wizard/therapies` re-fires
 `recommendation_reached` with the same `run` as the submit that produced the leaf. The
-param exists because the client's Sheet is fed by the GA4 Data API, which has no segments:
+param exists because the client's Sheet is fed by the GA4 Data API
+(`scripts/ga4-to-sheet.gs`), which has no segments:
 "sessions with ≥ 2 `wizard_submit`" cannot be asked there, but "`wizard_submit` where
 `run` = 2" can, and every session that used the wizard again passes through run 2 exactly
 once. Reports: **sessions that ran the wizard more than once** = Event count of
