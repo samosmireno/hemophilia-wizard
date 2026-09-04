@@ -17,6 +17,7 @@ import {
   TREATMENT_OPTIONS_MATRIX,
   EDUCATION_TOPICS,
 } from "../../data/education";
+import { bindUnits } from "../../lib/bindUnits";
 import { cn } from "../../lib/cn";
 import { usePreloadImages } from "../../lib/preloadImage";
 
@@ -199,7 +200,8 @@ const MATRIX_RULE = "border-black/30";
  * `↑`/`↓` read as a prefix on the term that follows, so the narrow cells may not
  * wrap between the two. Glued here rather than in the data: which space is
  * breakable is typesetting, and the copy stays a plain sentence to transcribe
- * against.
+ * against. `bindUnits` makes the same call for `2 IU/dL`, the other pair these
+ * cells may not split — the two compose at the one cell that needs both.
  */
 const bindArrows = (text: string) => text.replace(/([↑↓])\s+/g, "$1\u00a0");
 
@@ -238,7 +240,7 @@ function TreatmentOptionsTable() {
                     {row.footnote && <sup>{row.footnote}</sup>}
                   </th>
                   <td className={cn(MATRIX_CELL, MATRIX_PROSE, column, rule)}>
-                    {bindArrows(row.moa)}
+                    {bindUnits(bindArrows(row.moa))}
                   </td>
                   <td className={cn(MATRIX_CELL, MATRIX_PROSE, "italic", column, rule)}>
                     {row.population}

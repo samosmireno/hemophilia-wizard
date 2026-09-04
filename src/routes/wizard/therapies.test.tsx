@@ -234,7 +234,10 @@ describe("wizard therapies — the one-open accordion", () => {
         [...li.childNodes]
           .filter((n) => n.nodeType === Node.TEXT_NODE)
           .map((n) => n.textContent)
-          .join(""),
+          .join("")
+          // The NBSPs `BulletList` glues into a measurement (`bindUnits`) are
+          // typesetting; the copy is what is asserted here.
+          .replaceAll("\u00a0", " "),
       );
 
     expect(items).toEqual(flatten(leaf.considerations.points));

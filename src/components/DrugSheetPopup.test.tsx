@@ -24,6 +24,13 @@ function sections(sheet: DrugSheet): [heading: string, items: string[]][] {
   ];
 }
 
+/**
+ * The card's copy, read back with the NBSPs `BulletList` glues into it (`bindUnits`)
+ * spoken as the spaces they stand in for: gluing is typesetting, and these
+ * assertions are about the transcription.
+ */
+const spoken = (text: string | null) => text?.replaceAll("\u00a0", " ");
+
 /** The open card, queried as what it is: a modal dialog in the top layer. */
 function openCard(agent: string) {
   render(<DrugSheetPopup agent={agent} onClose={() => {}} />);
@@ -68,7 +75,7 @@ describe("DrugSheetPopup — all seven sheets", () => {
       expect(
         within(list)
           .getAllByRole("listitem")
-          .map((li) => li.textContent),
+          .map((li) => spoken(li.textContent)),
       ).toEqual(items);
     }
   });
@@ -126,7 +133,7 @@ describe("DrugSheetPopup — clinical trials", () => {
     const h3 = within(card).getByRole("heading", { level: 3, name: "Clinical Trials:" });
     const items = within(h3.nextElementSibling as HTMLElement)
       .getAllByRole("listitem")
-      .map((li) => li.textContent);
+      .map((li) => spoken(li.textContent));
 
     /*
       The four tails this sheet alone carried ("See Mancuso NEJM 2026" and its
