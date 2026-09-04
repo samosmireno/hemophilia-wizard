@@ -142,6 +142,24 @@ column-flex body the table's frame fills with `flex-1` instead of `h-[75dvh]`. T
 toggle wiring, the `sm` classes on both sides, the count + recap + Clear, and `phoneFill` at the
 call site and on `Popup`. Checked on a real Android phone and iPhone the same day (styling item 58, closed).
 
+**2026-09-04** — client review, third and final ruling on the inhibitors dropdown: **back to the
+exact cell match.** "No (for use without inhibitors only)" must show the four `No` rows and no
+others; the report spelled out all three cases (all types → SHL, EHL, Efanesoctocog,
+Etranacogene; HB → SHL, EHL, Etranacogene; HA → SHL, EHL, Efanesoctocog), naming the `Yes` rows
+still appearing as the defect. This resolves the residual left open on the 26th — the relabel's
+own wording describes the **agent**, so the option names cells — and reverses the 2026-08-25
+patient-status reading, which the same client had asked for and signed off on. Nothing was ever
+wrong with the XLSX transcription; the column simply states a property whose subject the two
+readings disagree about. One-clause predicate swap again
+(`t.inhibitors === (inhibitors === INHIBITOR_YES ? "Yes" : "No")`), the serves-semantics test
+re-pointed at the four `No` rows, and a new test pinning the client's three sets as **literal
+name lists** rather than a `TREATMENTS` filter, so a fourth swing back fails against the report
+instead of against a restatement of whatever the predicate currently says. CONTEXT §5.2 carries
+the full three-swing history and the accepted cost: "Type A / No" is the three factor rows the
+25th's correction rejected, so an inhibitor-free HA patient does not reach the mimetics or
+rebalancing agents through this dropdown — the wizard is where that patient's options are
+answered. The AND-combination test, already on "Yes", is untouched.
+
 **2026-08-10** — the eligibility engine was deleted as part of an architecture review
 (candidates 02 and 03). It had zero callers and zero tests since the first data pass, and the
 review found it modelled patient eligibility where this issue needs column filters. The

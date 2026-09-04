@@ -579,28 +579,48 @@ each defaulting to All, resetting when the card closes; a fourth, Patient age, j
   factor replacement" covering all three factor rows**, SHL and EHL included, though the drawn
   sheet index omits them. That reproduces the client's own S4 saved view and keeps every row
   reachable; per-class filtering reproducing the S2–S5 tabs is what those sheets are.
-- **Indicated with inhibitors is a patient-status filter too — client correction, 2026-08-25.**
-  Built 2026-08-11 as an exact cell match (Yes / No), it partitioned the roster 5/4, and the
-  client's review found "Hemophilia A / No inhibitors" showing the three factor rows alone where
-  the FVIIIa mimetics and rebalancing agents "should also come up" (and HB / No missing the
-  rebalancing agents). The XLSX was transcribed correctly; the column was read wrong. S1's
-  "Indicated for use with inhibitors" is a **capability** flag — `Yes` means the agent is _also_
-  indicated for a patient with inhibitors, not _only_ for one — and every one of the nine serves
-  a patient without them (§6's sheets: Emicizumab "HA ±inhibitors", the three rebalancing agents
-  "HA/HB ±inhibitors"; the wizard's own HA-without scenario boxes list mimetics and rebalancing
-  agents). The sheet has no "indicated without inhibitors" column because that answer is Yes on
-  every row. So: **"No" shows all nine rows, "Yes" the five whose cell says `Yes`** — the same
-  "serves this patient" reading the type dropdown got on 2026-08-11, now applied to both. The
-  cells still carry Yes / No verbatim. **Relabelled by the client, 2026-08-26**, after reviewing
-  the deployed table with this behaviour and calling it "working well": the dropdown reads
-  "Indicated for use with or without inhibitors", its options "Yes (for use with or without
-  inhibitors)" and "No (for use without inhibitors only)" — wording verbatim, behaviour unchanged
-  (No → all nine, Yes → the five `Yes` cells). The column header keeps the drawn "Indicated with
-  inhibitors"; the ask named the filter alone. One residual to confirm with the client: read as
-  a property of the agent, "for use without inhibitors only" describes the four `No` cells, not
-  the nine rows the option shows — the exact-cell reading rejected the day before — so the gloss
-  is taken as describing the patient's use case ("I will only use it without inhibitors"),
-  provisional.
+- **Indicated with inhibitors is a COLUMN filter — the client's third and final ruling,
+  2026-09-04, reinstating the first.** The dropdown matches the S1 cell exactly: **"Yes" shows
+  the five `Yes` rows, "No" the four `No` ones** — SHL, EHL, Efanesoctocog and Etranacogene.
+  It is the only one of the four filters that reads a cell rather than a patient, because its
+  two option strings (the client's own, below) describe the **agent**, and the roster's `No`
+  cell is exactly "this agent is for use without inhibitors only".
+
+  The dropdown swung three times, and none of the swings was a transcription error — S1 was
+  read correctly every time. What moved was **whose property the column states**:
+
+  1. **2026-08-11, exact cell match.** A 5/4 partition, the column read as a column.
+  2. **2026-08-25, patient status — client correction.** Their review found "Hemophilia A /
+     No inhibitors" showing the three factor rows alone where the FVIIIa mimetics and
+     rebalancing agents "should also come up" (and HB / No missing the rebalancing agents).
+     The reasoning: S1's "Indicated for use with inhibitors" is a **capability** flag — `Yes`
+     means the agent is _also_ indicated with inhibitors, not _only_ — and every one of the
+     nine serves a patient without them (§6's sheets: Emicizumab "HA ±inhibitors", the three
+     rebalancing agents "HA/HB ±inhibitors"). The sheet has no "indicated without inhibitors"
+     column because that answer is Yes on every row. So "No" showed all nine and only "Yes"
+     narrowed.
+  3. **2026-08-26, the client relabelled both options** after calling the deployed behaviour
+     "working well": the dropdown reads "Indicated for use with or without inhibitors", its
+     options "Yes (for use with or without inhibitors)" and "No (for use without inhibitors
+     only)" — wording verbatim, behaviour left unchanged. §5.2 flagged the residual that
+     wording opened: **read as a property of the agent, "for use without inhibitors only"
+     describes the four `No` cells, not the nine rows the option was showing.** It was taken,
+     provisionally, as describing the patient's use case instead.
+  4. **2026-09-04 resolves that residual the other way.** The client reported the three sets
+     "No" must show — all types → the four `No` rows; HB → SHL, EHL, Etranacogene; HA → SHL,
+     EHL, Efanesoctocog — which is (1) again, now with labels that say so.
+
+  **The cost, accepted in ruling this way:** "Type A / No" is the three factor rows once more —
+  the exact set the 2026-08-25 correction rejected — so an inhibitor-free HA patient does not
+  meet the mimetics or rebalancing agents through this dropdown, though they are indicated for
+  them and `/wizard`'s own HA-without scenario boxes list them. The two readings cannot both
+  hold in one dropdown; the client has now seen both deployed and picked this one. §5's table
+  is a spec sheet the clinician reads by column, and the **wizard** is the path that answers
+  "what are this patient's options" — that division is what makes the loss affordable. The
+  cells still carry Yes / No verbatim, and the column header keeps the drawn "Indicated with
+  inhibitors". `explore.test.tsx` pins the client's three sets as literal name lists, so a
+  drift back to (2) fails a test that is the report rather than a restatement of the predicate.
+
 - An impossible combination (e.g. Gene therapy + Type A) shows an empty state — "No treatments
   match the selected filters." with a Clear-filters recovery — not per-row explanations.
 - **Patient age — built 2026-08-25 on the client's ask ("is it possible to add an additional

@@ -51,11 +51,12 @@ const TYPE_OPTIONS = ["A", "B"];
 /**
  * The inhibitors dropdown's two options, each glossed with the use it admits
  * (client relabel, 2026-08-26, alongside the dropdown's own "Indicated for use
- * with or without inhibitors" label): under the serves-this-patient semantics
- * ruled the day before, a bare "No" read as "hide the inhibitor-indicated
- * rows" where it in fact shows every row. As with the class and age dropdowns
- * the option string IS the filter value, so the predicate compares against
- * these constants, never the bare cell words. Wording verbatim from the client.
+ * with or without inhibitors" label; wording verbatim from the client). Each
+ * gloss names the S1 cell it selects, and the 2026-09-04 ruling made the
+ * predicate say so: `Yes (for use with or without inhibitors)` is the `Yes`
+ * cell, `No (for use without inhibitors only)` the `No` one. As with the class
+ * and age dropdowns the option string IS the filter value, so the predicate
+ * compares against these constants, never the bare cell words.
  */
 const INHIBITOR_YES = "Yes (for use with or without inhibitors)";
 const INHIBITOR_NO = "No (for use without inhibitors only)";
@@ -63,21 +64,30 @@ const INHIBITOR_OPTIONS = [INHIBITOR_YES, INHIBITOR_NO];
 
 /**
  * The §5 filterable comparison table — the body of `/explore`'s wide `Popup`
- * (issue 09). Four AND-combined filters over the nine-row roster. Type,
- * Inhibitors and Age are PATIENT filters, not column filters. Type "A" shows
- * the eight rows that serve an A patient — cells `A` and `A + B` alike — not
- * the three whose cell reads `A` exactly (ruled 2026-08-11). Inhibitors "No"
- * shows every row: the S1 column is a capability flag (`Yes` = *also*
- * indicated with inhibitors), and all nine agents serve a patient without
- * them, so only "Yes" narrows — to the five `Yes` cells (client correction,
- * 2026-08-25; the exact-cell reading had hidden the mimetics and rebalancing
- * agents from an inhibitor-free patient; the dropdown and both options were
- * relabelled to spell the semantics out, 2026-08-26 — `INHIBITOR_OPTIONS`).
- * Age is a band of patient ages
- * (`EXPLORE_AGE_FILTERS`, added 2026-08-25 on the client's ask): a row is in
- * when its `minAge()` is at or under the band's floor. CONTEXT.md §5.2 holds
- * all three rulings. The class dropdown matches through
- * `EXPLORE_CLASS_FILTERS`' drawn-label buckets.
+ * (issue 09). Four AND-combined filters over the nine-row roster. Type and Age
+ * are PATIENT filters, not column filters; Inhibitors is a COLUMN filter.
+ * Type "A" shows the eight rows that serve an A patient — cells `A` and
+ * `A + B` alike — not the three whose cell reads `A` exactly (ruled
+ * 2026-08-11). Age is a band of patient ages (`EXPLORE_AGE_FILTERS`, added
+ * 2026-08-25 on the client's ask): a row is in when its `minAge()` is at or
+ * under the band's floor.
+ *
+ * Inhibitors matches the S1 cell exactly — "Yes" the five `Yes` rows, "No" the
+ * four `No` ones — which is a property of the AGENT, the reading its two
+ * glossed option strings carry (`INHIBITOR_OPTIONS`). This is the third and
+ * final ruling on that one dropdown (client, 2026-09-04) and it reinstates the
+ * first: built as an exact cell match 2026-08-11, it was reread as a patient
+ * filter on the client's 2026-08-25 correction ("No" → all nine, since every
+ * agent serves a patient without inhibitors), then the client relabelled both
+ * options 2026-08-26 in wording that describes the agent instead — a residual
+ * §5.2 flagged that day and this ruling resolves. The cost the client accepted
+ * in resolving it: "Type A + No" is the three factor rows again, the very set
+ * the 2026-08-25 correction rejected, so an inhibitor-free HA patient does NOT
+ * see the mimetics and rebalancing agents here that `/wizard`'s own HA-without
+ * scenario boxes list for them. The wizard, not this dropdown, is where that
+ * patient's options are answered. CONTEXT.md §5.2 holds all three rulings.
+ * The class dropdown matches through `EXPLORE_CLASS_FILTERS`' drawn-label
+ * buckets.
  *
  * Filter state lives here so it resets on close for free: the card's content is
  * `null` while closed, so reopening mounts a fresh instance — and so does the
@@ -97,7 +107,7 @@ export default function ExploreTable() {
     (t) =>
       (!bucket || bucket.classes.includes(t.treatmentClass)) &&
       (type === "" || t.hemophiliaType === type || t.hemophiliaType === "A + B") &&
-      (inhibitors === "" || inhibitors === INHIBITOR_NO || t.inhibitors === "Yes") &&
+      (inhibitors === "" || t.inhibitors === (inhibitors === INHIBITOR_YES ? "Yes" : "No")) &&
       (!band || minAge(t.age) <= band.floor),
   );
 

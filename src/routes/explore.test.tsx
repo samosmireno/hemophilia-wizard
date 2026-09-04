@@ -342,21 +342,21 @@ describe("explore — the table's filters", () => {
   });
 
   /**
-   * The inhibitors dropdown filters by PATIENT status too. S1's column is a
-   * capability flag — `Yes` means the agent is *also* indicated with
-   * inhibitors — and every one of the nine serves a patient without them, so
-   * "No" is all nine rows and only "Yes" narrows, to the five `Yes` cells.
-   * The client's 2026-08-25 correction: the exact-cell reading had shown an
-   * inhibitor-free HA patient the three factor rows alone, hiding the
-   * mimetics and rebalancing agents the wizard's own scenario boxes list for
-   * that patient. The `Yes` rows being IN under "No" is the assertion.
+   * The inhibitors dropdown is the one COLUMN filter: it matches the S1 cell
+   * exactly, "Yes" to the five `Yes` rows and "No" to the four `No` ones —
+   * SHL, EHL, Efanesoctocog and Etranacogene. That is the agent-property
+   * reading its two glossed options describe, ruled by the client 2026-09-04
+   * after the 2026-08-25 patient-status reading had shown every one of the
+   * nine rows under "No". The `Yes` rows being OUT under "No" is the
+   * assertion, and it is the exact assertion the 2026-08-25 correction
+   * reversed — §5.2 carries why the client came back to it.
    *
    * The dropdown and its two options carry the client's 2026-08-26 wording —
    * the label names the question and each option glosses the use it admits —
    * so the test selects by those full strings, pinning the copy along with
    * the semantics.
    */
-  it("filters Indicated for use with or without inhibitors by the patients a row serves", async () => {
+  it("filters Indicated for use with or without inhibitors by the S1 cell", async () => {
     const user = userEvent.setup();
     const dialog = await openTable(user);
     const select = within(dialog).getByRole("combobox", {
@@ -373,12 +373,45 @@ describe("explore — the table's filters", () => {
     ]);
 
     await user.selectOptions(select, "No (for use without inhibitors only)");
-    expect(agentsShown(dialog)).toEqual(TREATMENTS.map((t) => t.agent));
+    expect(agentsShown(dialog)).toEqual(
+      TREATMENTS.filter((t) => t.inhibitors === "No").map((t) => t.agent),
+    );
 
     await user.selectOptions(select, "Yes (for use with or without inhibitors)");
     expect(agentsShown(dialog)).toEqual(
       TREATMENTS.filter((t) => t.inhibitors === "Yes").map((t) => t.agent),
     );
+  });
+
+  /**
+   * The client's 2026-09-04 report, transcribed: the three row sets "No (for
+   * use without inhibitors only)" must show, alone and crossed with each type.
+   * Spelled as literal names rather than derived from `TREATMENTS`, because
+   * the report is the specification here — a predicate that drifted back to
+   * the patient-status reading would still satisfy a derived expectation
+   * written in its own terms.
+   */
+  it("shows the client's row sets for No, alone and crossed with each type", async () => {
+    const user = userEvent.setup();
+    const dialog = await openTable(user);
+    const inhibitorSelect = within(dialog).getByRole("combobox", {
+      name: "Indicated for use with or without inhibitors",
+    });
+    const typeSelect = within(dialog).getByRole("combobox", { name: "Hemophilia Type" });
+
+    await user.selectOptions(inhibitorSelect, "No (for use without inhibitors only)");
+    expect(agentsShown(dialog)).toEqual([
+      "SHL",
+      "EHL",
+      "Efanesoctocog alfa",
+      "Etranacogene dezaparvovec-drlb",
+    ]);
+
+    await user.selectOptions(typeSelect, "A");
+    expect(agentsShown(dialog)).toEqual(["SHL", "EHL", "Efanesoctocog alfa"]);
+
+    await user.selectOptions(typeSelect, "B");
+    expect(agentsShown(dialog)).toEqual(["SHL", "EHL", "Etranacogene dezaparvovec-drlb"]);
   });
 
   /**
