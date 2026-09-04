@@ -67,9 +67,9 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
     monitoring: [
       "Mild to moderate injection site reactions",
       "Lab coagulation test interference: Do not use intrinsic pathway clotting-based coagulation lab tests to monitor for FVIII inhibitor titers, including ACT, Bethesda assays, and assays based on aPTT",
-      "Thrombotic microangiopathy, thrombotic events",
+      "Thrombotic microangiopathy, thrombotic events associated with aPCC use",
       "Drug interaction with aPCC",
-      "ADAs",
+      "ADAs; assess if loss of efficacy is suspected",
     ],
     trials: [
       { name: "HAVEN 3", id: "NCT02847637" },
@@ -133,11 +133,15 @@ export const DRUG_SHEETS: readonly DrugSheet[] = [
     // `≥`, not the source's bare `>` — see Denecimig. Client direction of
     // 2026-08-06 extends that to the dosing bullet's weight threshold too.
     indication: ["Routine prophylaxis, patients ≥6 years with HA/HB +/- FVIII/FIX inhibitors"],
+    /* Split by age band on client direction (2026-09-04), which replaces the
+       three single-band dose bullets the PDF carried; their wording ("/week",
+       not the sheet's usual "/wk") is the client's, transcribed as given. The
+       route bullet is untouched — the rewrite covers doses only. */
     dosing: [
       "SC injection (prefilled pen or syringe)",
-      "Loading dose: 300 mg (two 150-mg injections)",
-      "Maintenance dose: 150 mg/wk (start 1 week after the loading dose)",
-      "Consider increasing dose to 300 mg/wk in patients weighing ≥50 kg",
+      "For patients aged ≥12 years: Loading dose: 300 mg (two 150-mg injections) → maintenance dose: 150 mg/week",
+      "For patients aged ≥12 years weighing ≥50 kg: Consider increasing maintenance dose to 300 mg/week",
+      "For patients aged 6–11 years: Loading dose: 150 mg → maintenance dose: 75 mg/week",
     ],
     monitoring: [
       "Hypersensitivity reactions",

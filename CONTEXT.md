@@ -717,6 +717,18 @@ phase 3 clinical trial data"_ is deleted, so the sheet is headed plain _"Monitor
 other six; the Indication's own _"TBD based on FDA approval"_ was not part of the direction and
 stands.
 
+**Marstacimab's dosing split by age band, two Emicizumab monitoring bullets extended,
+2026-09-04 `[CLIENT]`.** Marstacimab's three dose bullets become three age-banded ones: ≥12 yrs,
+load 300 mg (two 150-mg) → maintenance 150 mg/week; ≥12 yrs and ≥50 kg, consider raising
+maintenance to 300 mg/week; and **6–11 yrs, load 150 mg → maintenance 75 mg/week** — a band the
+source sheet did not carry, though the sheet's own BASIS KIDS trial and its ≥6 yrs Indication
+both already reached under 12. The route bullet is untouched, the direction's "/week" is kept
+over the sheet's usual "/wk", and the source's _"(start 1 wk after load)"_ is not in the new
+wording, so it is dropped. On Emicizumab, _"thrombotic microangiopathy, thrombotic events"_ gains
+_"associated with aPCC use"_ and _"ADAs"_ gains _"; assess if loss of efficacy is suspected"_ —
+both narrowing a bare risk to when it applies. The blocks below carry the new wording; the
+source's is in `documents/out_raw.txt`.
+
 Etranacogene's dose is stored `"2 × 10¹³ genome copies/kg body weight"` in Unicode — the earlier
 `10^13` renders literally, and a dose reading as ten-thousand-and-thirteen is a hazard rather than
 a typo.
@@ -731,8 +743,8 @@ perioperative management. _Dosage:_ IV, 50 IU/kg once weekly; optimize via plasm
 newborn & older. _Dosage:_ SC (vial & syringe); load 3 mg/kg weekly ×4 wks; maintenance
 1.5 mg/kg weekly, 3 mg/kg q2wks, or 6 mg/kg monthly. _Monitoring:_ injection-site reactions;
 lab coagulation test interference (don't use intrinsic-pathway clotting tests — ACT, Bethesda,
-aPTT-based — for FVIII inhibitor titers); thrombotic microangiopathy/thrombotic events; aPCC
-interaction; ADAs. _Trials:_ HAVEN 3 (NCT02847637), HAVEN 4 (NCT03020160), HAVEN 2 (NCT02795767).
+aPTT-based — for FVIII inhibitor titers); thrombotic microangiopathy/thrombotic events
+associated with aPCC use; aPCC interaction; ADAs (assess if loss of efficacy is suspected). _Trials:_ HAVEN 3 (NCT02847637), HAVEN 4 (NCT03020160), HAVEN 2 (NCT02795767).
 
 **Denecimig (emerging/investigational)** — _Class/Target:_ FVIIIa mimetic BsAb, FIXa×FX.
 _Indication:_ TBD (FDA); trials in HA ±inhibitors, patients ≥1 yr. _Dosage:_ SC prefilled pen
@@ -753,11 +765,11 @@ thromboembolic events; ↑ fibrin D-dimer & prothrombin fragment; ADAs. _Trials:
 (NCT04083781), Explorer8 (NCT04082429).
 
 **Marstacimab** — _Class/Target:_ hemostatic rebalancing agent, TFPI mAB. _Indication:_ routine
-prophylaxis, ≥6 yrs, HA/HB ±inhibitors. _Dosage:_ SC (prefilled pen or syringe); load 300 mg
-(two 150 mg); maintenance 150 mg weekly (start 1 wk after load); consider 300 mg weekly if
-
-> 50 kg. _Monitoring:_ hypersensitivity; thromboembolic events; ↑ fibrin D-dimer & prothrombin
-> fragment; ADAs. _Trials:_ BASIS (NCT03938792), BASIS KIDS (NCT05611801).
+prophylaxis, ≥6 yrs, HA/HB ±inhibitors. _Dosage:_ SC (prefilled pen or syringe); ≥12 yrs, load
+300 mg (two 150 mg) → maintenance 150 mg/week; ≥12 yrs and ≥50 kg, consider raising maintenance to
+300 mg/week; 6–11 yrs, load 150 mg → maintenance 75 mg/week. _Monitoring:_ hypersensitivity;
+thromboembolic events; ↑ fibrin D-dimer & prothrombin fragment; ADAs. _Trials:_ BASIS
+(NCT03938792), BASIS KIDS (NCT05611801).
 
 **Fitusiran** — _Class/Target:_ hemostatic rebalancing agent, AT-directed siRNA. _Indication:_
 routine prophylaxis, ≥12 yrs, HA/HB ±inhibitors. _Dosage:_ SC (prefilled pen, or syringe & vial
@@ -923,8 +935,9 @@ on the same direction; the §7.7 wizard notes and the other six sheets keep the 
   option for HA; emerging agents (denecimig/Mim8) aim to further optimize hemostatic activity and
   dosing convenience.
 - **Emicizumab (FDA-approved).** Recombinant humanized BsAb; **IgG4** immunoglobulin combining two
-  binding fragments for FIXa and FX. FDA-approved for prophylaxis of HA ±inhibitors in newborns or
-  older; SC monthly/bimonthly/weekly. MOA: binds activated FIXa and FX, enhancing catalytic
+  binding fragments for FIXa and FX. FDA-approved for prophylaxis of HA ±inhibitors in newborns and
+  older (`[CLIENT]` 2026-09-04; the artboard and `[PDF-V]` write "newborns or older");
+  SC monthly/bimonthly/weekly. MOA: binds activated FIXa and FX, enhancing catalytic
   efficiency of FIXa in converting FX on activated platelets. `[BUILD]` the MOA sentence is
   modelled as its own topic (`emicizumab-moa`, titled with the figure caption below), because the
   card draws the other three bullets beside the diagram and this one under it — the same split as

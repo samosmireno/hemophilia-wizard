@@ -138,7 +138,7 @@ export const EDUCATION_TOPICS = {
     title: "Emicizumab (FDA-approved)",
     body: [
       "Recombinant, humanized BsAb; IgG4 immunoglobulin combines two binding fragments for FIXa and FX",
-      "FDA-approved for prophylaxis of HA, with or without inhibitors in newborns or older patients",
+      "FDA-approved for prophylaxis of HA, with or without inhibitors in newborns and older patients",
       "Administered subcutaneously on a monthly, bimonthly, or weekly schedule",
     ],
     figures: ["Emicizumab MOA: Interactions with FIX/FIXa and FX/FXa"],
