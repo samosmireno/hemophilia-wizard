@@ -115,6 +115,18 @@ themselves are trusted, so a tool configured to write a per-recipient value into
 `utm_content` would pass. Campaign authors own that — keep utm values to channel, wave
 and placement.
 
+**Untagged arrivals are GA4's guess, not ours.** Anything without UTMs is classified by GA4
+from the referrer, and the client Sheet's "How visitors arrived" block renders that guess
+through `channelLabel` (`scripts/ga4-to-sheet.gs`). Two cases are worth knowing. A link
+clicked inside an AI assistant arrives as a referral from the assistant's host — GA4 files
+some of those as a plain `referral` and some under its own `ai-assistant` medium, which would
+scatter one arrival path over two rows, so `AI_HOSTS` folds both into `AI assistant (<host>)`;
+add a host there when a new assistant shows up in the raw tab. And a campaign GA4 supplies
+itself is parenthesised (`(direct)`, `(referral)`, `(ai-assistant)`, `(not set)`) where our
+waves never are, so `campaignLabel` renders every one of them as "—": untagged. The
+assistants' desktop apps send no referrer at all, so those clicks are indistinguishable from
+a QR scan and count as direct — one more reason the tagged links matter.
+
 ## GA4 console checklist (one-time, property `G-C1HHCMQZNG`)
 
 `G-C1HHCMQZNG` is the Impetus-owned property the site reports to (2026-08-28); it replaced

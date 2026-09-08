@@ -163,13 +163,43 @@ const SCENARIO_ORDER = [
   "B-with-inhibitors",
 ];
 
+/**
+ * Hosts GA4 reports as the referrer when a link is clicked inside an AI assistant. GA4 files
+ * some of them as a plain `referral` and some under its own `ai-assistant` medium, so matching
+ * the host as well as the medium is what keeps one arrival path in one row.
+ */
+const AI_HOSTS = new Set([
+  "chatgpt.com",
+  "chat.openai.com",
+  "openai.com",
+  "claude.ai",
+  "gemini.google.com",
+  "copilot.microsoft.com",
+  "perplexity.ai",
+  "www.perplexity.ai",
+  "grok.com",
+  "deepseek.com",
+  "poe.com",
+  "you.com",
+]);
+
 /** Distribution channel from the UTM pair — see docs/analytics.md → Campaign links. */
 function channelLabel(source, medium) {
   if (source === "qr" || medium === "print") return "Printed QR code";
   if (medium === "email") return "Email";
+  if (medium === "ai-assistant" || AI_HOSTS.has(source)) return `AI assistant (${source})`;
   if (medium === "referral") return `Website link (${source})`;
   if (source === "(direct)" || medium === "(none)") return "Direct / untagged link";
   return `${source} / ${medium}`;
+}
+
+/**
+ * GA4 fills the campaign with a parenthesised placeholder — `(direct)`, `(referral)`,
+ * `(ai-assistant)`, `(not set)` — whenever no `utm_campaign` arrived. Our own waves are never
+ * written that way, so anything parenthesised means untagged.
+ */
+function campaignLabel(campaign) {
+  return campaign.startsWith("(") && campaign.endsWith(")") ? "—" : campaign;
 }
 
 // ---------------------------------------------------------------------------------------
@@ -492,12 +522,18 @@ function buildAudience(ss, raw) {
   const deviceRows = raw.devices
     .map(([d, u, s]) => [labelOf(LABELS.device, d), u, s, share(s)])
     .sort((a, b) => b[2] - a[2]);
-  const channels = group(raw.channels, (r) => `${channelLabel(r[0], r[1])}|${r[2]}`, [3, 4]);
+  // Sessions add up across the grouped rows; users do not — a person GA4 split over two
+  // source/medium pairs is counted once in each, as in the country block above.
+  const channels = group(
+    raw.channels,
+    (r) => `${channelLabel(r[0], r[1])}|${campaignLabel(r[2])}`,
+    [3, 4],
+  );
   const channelRows = [...channels.entries()]
     .sort((a, b) => b[1][0] - a[1][0])
     .map(([k, [s, u]]) => {
       const [channel, campaign] = k.split("|");
-      return [channel, campaign === "(not set)" ? "—" : campaign, s, u, share(s)];
+      return [channel, campaign, s, u, share(s)];
     });
 
   const sh = freshTab(ss, "Audience");
@@ -538,7 +574,7 @@ function buildAudience(ss, raw) {
     sh,
     right,
     7,
-    "Channels come from the tagged links: printed QR code, the client website and email each carry their own tag. Untagged visits show as direct.",
+    "Channels come from the tagged links: printed QR code, the client website and email each carry their own tag. Untagged visits show as direct. A link clicked inside an AI assistant (ChatGPT, Claude, …) is grouped as AI assistant; the assistants' desktop apps send nothing to identify them, so those clicks land in direct too.",
   );
   sh.autoResizeColumns(1, 11);
 }
