@@ -292,6 +292,7 @@ function buildOverview(ss, raw) {
   ];
 
   const sh = freshTab(ss, "Overview");
+  setWidths(sh, [300, 110, 620]); // metric · value · meaning
   sh.getRange(1, 1).setValue(`${APP_NAME} — usage report`).setFontSize(14).setFontWeight("bold");
   sh.getRange(2, 1)
     .setValue(
@@ -318,11 +319,11 @@ function buildOverview(ss, raw) {
     "Analytics figures exclude visitors whose browsers block analytics; the Survey responses tab is unaffected by that.",
     "The hidden 'Raw - …' tabs at the end hold the unformatted exports behind every table (View → Hidden sheets).",
   ];
-  for (const n of notes) sh.getRange(row++, 1, 1, 3).merge().setValue(`• ${n}`).setWrap(true);
+  for (const n of notes) {
+    sh.getRange(row, 1, 1, 3).merge().setValue(`• ${n}`).setWrap(true);
+    fitRowHeight(sh, row++, 1, 3, `• ${n}`);
+  }
 
-  sh.setColumnWidth(1, 300);
-  sh.setColumnWidth(2, 110);
-  sh.setColumnWidth(3, 620);
   sh.getRange(6, 3, kpis.length, 1).setWrap(true);
 }
 
@@ -340,6 +341,8 @@ function buildScreens(ss, raw) {
   });
 
   const sh = freshTab(ss, "Screens");
+  // screen · route · views · sessions · avg seconds, then a gutter before the chart at G.
+  setWidths(sh, [240, 210, 70, 90, 160, 40]);
   const row = block(
     sh,
     1,
@@ -356,7 +359,6 @@ function buildScreens(ss, raw) {
     "Avg seconds = total foreground seconds ÷ views. Screens after the survey are reached from the side menu and sit outside the main sequence; anything below those is a redirect or a mistyped address.",
   );
   sh.setFrozenRows(2);
-  sh.autoResizeColumns(1, 5);
   chartOnce(
     sh,
     [sh.getRange(2, 1, SPINE.length + 1, 1), sh.getRange(2, 3, SPINE.length + 1, 1)],
@@ -378,6 +380,9 @@ function buildWizard(ss, raw) {
   const fmt = [null, "0", "0%"];
 
   const sh = freshTab(ss, "Wizard");
+  // A-C, E-G and I-K are the three answer blocks; A-F is the recommendations grid beneath
+  // them, so D carries a reason label and only H is a true gutter.
+  setWidths(sh, [240, 190, 210, 150, 190, 110, 60, 20, 210, 110, 60]);
   block(
     sh,
     1,
@@ -465,14 +470,10 @@ function buildWizard(ss, raw) {
     "A run is one submission of all three answers; going back to change an answer and resubmitting is a second run. Counted per browser tab.",
   );
 
-  chartOnce(
-    sh,
-    [sh.getRange(2, 9, REASON_ORDER.length + 1, 2)],
-    Charts.ChartType.BAR,
-    "Reason for switching",
-    1,
-    13,
-  );
+  // Both charts below the tables, side by side: anchored at A and D, a default 600 px
+  // chart each, they sit inside the first ~1240 px instead of the reason chart hiding out
+  // at M1, past 1600 px of table. chartOnce skips a title that already exists, so an
+  // installed Sheet keeps the old placement until that chart is deleted.
   chartOnce(
     sh,
     [sh.getRange(runsHeaderRow, 1, runRows.length + 1, 2)],
@@ -481,7 +482,14 @@ function buildWizard(ss, raw) {
     row + 2,
     1,
   );
-  sh.autoResizeColumns(1, 11);
+  chartOnce(
+    sh,
+    [sh.getRange(2, 9, REASON_ORDER.length + 1, 2)],
+    Charts.ChartType.BAR,
+    "Reason for switching",
+    row + 2,
+    4,
+  );
 }
 
 function buildEngagement(ss, raw) {
@@ -493,6 +501,8 @@ function buildEngagement(ss, raw) {
     .map(([agent, total]) => [agent, ...pages.map((p) => cell.get(`${agent}|${p}`) || 0), total]);
 
   const sh = freshTab(ss, "Engagement");
+  // Agent, one column per screen the sheet was opened from, then Total.
+  setWidths(sh, [280, ...pages.map(() => 240), 90]);
   let row = block(
     sh,
     1,
@@ -507,7 +517,6 @@ function buildEngagement(ss, raw) {
     null,
     "0",
   ]);
-  sh.autoResizeColumns(1, Math.max(3, pages.length + 2));
 }
 
 function buildAudience(ss, raw) {
@@ -537,6 +546,9 @@ function buildAudience(ss, raw) {
     });
 
   const sh = freshTab(ss, "Audience");
+  // A-D countries and regions, E-F gutter, G-K devices above channels. G holds the longest
+  // string on the tab — "AI assistant (copilot.microsoft.com)".
+  setWidths(sh, [130, 130, 90, 110, 20, 20, 270, 110, 90, 110, 110]);
   let left = block(
     sh,
     1,
@@ -576,7 +588,6 @@ function buildAudience(ss, raw) {
     7,
     "Channels come from the tagged links: printed QR code, the client website and email each carry their own tag. Untagged visits show as direct. A link clicked inside an AI assistant (ChatGPT, Claude, …) is grouped as AI assistant; the assistants' desktop apps send nothing to identify them, so those clicks land in direct too.",
   );
-  sh.autoResizeColumns(1, 11);
 }
 
 // ---------------------------------------------------------------------------------------
@@ -616,6 +627,30 @@ function block(sh, row, col, title, header, rows, formats) {
   return row + 1;
 }
 
+/**
+ * Column widths in pixels, left to right from `col`. Explicit rather than
+ * `autoResizeColumns`, which sizes a column to every cell in it: one merged note row or a
+ * long block title stretched the first column past 800 px (the Audience note reached
+ * 1140 px) and pushed the table off screen. Widths must be set before any note, which
+ * measures them. `freshTab` clears content but not widths, so these are re-applied per run.
+ */
+function setWidths(sh, widths, col) {
+  widths.forEach((w, i) => sh.setColumnWidth((col || 1) + i, w));
+}
+
+/**
+ * Row height for wrapped text in a merged range. Sheets grows a merged row only
+ * sometimes, so a long note renders clipped — and always does once exported to xlsx.
+ * Estimated from the merged width at 6 px per character of 10 pt Arial — deliberately
+ * pessimistic, since a row one line too tall is invisible and one line too short clips.
+ */
+function fitRowHeight(sh, row, col, span, text) {
+  let width = 0;
+  for (let c = col; c < col + span; c++) width += sh.getColumnWidth(c);
+  const perLine = Math.max(20, Math.floor((width - 16) / 6));
+  sh.setRowHeight(row, 10 + 17 * Math.ceil(String(text).length / perLine));
+}
+
 function note(sh, row, col, text) {
   sh.getRange(row, col, 1, 5)
     .merge()
@@ -623,6 +658,7 @@ function note(sh, row, col, text) {
     .setFontStyle("italic")
     .setFontColor("#666666")
     .setWrap(true);
+  fitRowHeight(sh, row, col, 5, text);
 }
 
 /** Insert a chart unless one with this title exists, so charts survive the daily rebuild. */
