@@ -1,41 +1,60 @@
 #!/usr/bin/env node
 /**
- * Export the whole app as a PDF slide deck — one 1440×800 slide per screen,
- * in walkthrough order, every overlay opened once, every wizard branch walked.
+ * The client review deck of the whole app, in this app's own walk: one 1440 × 800 slide per
+ * screen in spine order, every switchable state and every sheet beside the page that shows
+ * it, the wizard walked branch by branch through the real radios, and the review map in
+ * front — the overview, then a page per branch, every thumbnail a link to its page. The deck
+ * is mlg-review-deck's standard (its docs/format.md) drawn by its core; the walk is planned
+ * here, because the generic crawl cannot read this app's shape (2026-09-09).
  *
- *   npm run export:pdf                 # build → preview → capture → PDF
- *   npm run export:pdf -- --scale 1    # ~20 MB, emailable
- *   npm run export:pdf -- --skip-build # reuse the dist/ already on disk
+ *   npm run export:pdf                  # build → preview → capture → PDF
+ *   npm run export:pdf -- --scale 1     # mail-sized copy
+ *   npm run export:pdf -- --skip-build  # reuse the dist/ already on disk
  *
  * Flags: --out <file.pdf>  --scale 1|2 (default 2)  --quality 1..100 (default 90)
  *        --port <n> (default 4178)  --skip-build
+ *        --pages map|slides|both (default both): the map and its branch pages alone (the
+ *        file suffixed -map, its thumbnails unlinked), the slides alone (-slides), or the deck
  *
- * What it guarantees
- * - The build runs with VITE_GA_MEASUREMENT_ID forced empty, and the browser
- *   context aborts every non-localhost request, so no analytics hit and no
- *   survey POST can leave this machine. Blocked attempts are listed in the
- *   manifest; a non-empty list means the build guard failed and is reported.
- * - The viewport is exactly 1440×800 (the app's 1.00× reference board —
- *   docs/styling.md §19). Pages taller than 800 px are captured as successive
- *   800 px scroll windows, each its own slide.
- * - Every <video> is paused at t=0 before a shot; fonts, images and running
- *   CSS transitions are waited out.
- * - Overlays (native <dialog>) are opened on their first occurrence only. The
- *   ledger key is the dialog's title (plural-insensitive) plus a hash of its
- *   body, so the same drug sheet reached from three pages, or the same class
- *   table under "mimetic"/"mimetics", appears once. Wizard slides are never
+ * The walk
+ * - The spine in src/data/sectionOrder.ts order: the landing, the five education pages, the
+ *   wizard intro, the wizard, Explore (the table as it loads — its filters are not walked),
+ *   Resources, Survey (the form, then the thank-you as its state). Then the rail's off-spine
+ *   pages: How to Use (its demo popups and drawers deliberately not opened), Glossary,
+ *   Acronyms, References. A page taller than 800 px is one taller slide.
+ * - A page, then what it can switch to or open, then the flow goes on. First every other
+ *   position of a switchable — an accordion drawer, a tab — each a state beside the page,
+ *   never a state of another position; then every sheet the page opens, and the lightboxes
+ *   and "View mechanism" steps inside a sheet, one level down.
+ * - A sheet seen again is not re-shot: it is keyed by its title plus a hash of its body, so
+ *   the same drug sheet reached from three pages appears once. A switchable's positions are
+ *   the page's own content and are always shot — every leaf shows its Strategies drawer.
+ * - The wizard, depth-first: the input screen empty once; per disease type, the screen with
+ *   the type picked; per inhibitors answer, the screen with both picked, Submit, the scenario
+ *   page and its class sheets, Next; per reason, the question with the reason picked (the
+ *   blank question is not a slide — the standard's rule 3), Submit, the leaf with
+ *   Considerations open, then Strategies open, then its drug sheets. Wizard screens are never
  *   de-duplicated.
+ * - Never a GA hit or a survey POST: the build runs with VITE_GA_MEASUREMENT_ID forced empty
+ *   and the browser context aborts every non-localhost request. Attempts are listed in
+ *   report.json and reported.
  *
- * Outputs: export/hemophilia-wizard-<date>.pdf, export/frames/NNN.png (lossless
- * masters at the capture scale) and export/manifest.json (one entry per slide).
+ * Output (the standard's §8): documents/export/<name>-<date>-<sha7>.pdf, a folder of the same
+ * name beside it with the page images (NNN-<slide>--<crumbs>.jpg), deck.json (the manifest
+ * the core drew from) and report.json (the ledger, the skipped re-openings, blocked requests,
+ * warnings).
+ *
+ * The core is imported from a checkout of mlg-review-deck beside this repo (or
+ * REVIEW_DECK_DIR): its git-pinned package ships only the crawl's bin, not the core.
  */
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, PDFName } from "pdf-lib";
 import { chromium } from "playwright";
 
 // ---------------------------------------------------------------------------
@@ -48,6 +67,7 @@ const { values: flags } = parseArgs({
     quality: { type: "string", default: "90" },
     port: { type: "string", default: "4178" },
     "skip-build": { type: "boolean", default: false },
+    pages: { type: "string", default: "both" },
   },
 });
 
@@ -56,14 +76,49 @@ const QUALITY = Number(flags.quality);
 const PORT = Number(flags.port);
 if (![1, 2].includes(SCALE)) fail("--scale must be 1 or 2");
 if (!(QUALITY >= 1 && QUALITY <= 100)) fail("--quality must be 1..100");
+/** What the PDF holds: the map pages, the slides, or both. */
+const PAGES = flags.pages;
+if (!["map", "slides", "both"].includes(PAGES)) fail("--pages must be map, slides or both");
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const EXPORT_DIR = path.join(ROOT, "export");
-const FRAMES_DIR = path.join(EXPORT_DIR, "frames");
 const BASE_URL = `http://localhost:${PORT}`;
 const VIEWPORT = { width: 1440, height: 800 };
-const TODAY = new Date().toISOString().slice(0, 10);
-const OUT_PDF = path.resolve(flags.out ?? path.join(EXPORT_DIR, `hemophilia-wizard-${TODAY}.pdf`));
+
+const CORE_DIR = process.env.REVIEW_DECK_DIR ?? path.resolve(ROOT, "..", "mlg-review-deck");
+const CORE_ENTRY = path.join(CORE_DIR, "core", "src", "index.ts");
+if (!existsSync(CORE_ENTRY)) {
+  fail(
+    `mlg-review-deck's core not found at ${CORE_ENTRY} — clone mlg-review-deck beside this repo (and npm install it), or point REVIEW_DECK_DIR at a checkout`,
+  );
+}
+const { ReviewPdf, validateManifest, slideFileName, deckFileName, normaliseHeading, logLine } =
+  await import(pathToFileURL(CORE_ENTRY).href);
+
+const PKG = JSON.parse(readFileSync(path.join(ROOT, "package.json"), "utf8"));
+const SHA = spawnSync("git", ["rev-parse", "--short=7", "HEAD"], {
+  cwd: ROOT,
+  encoding: "utf8",
+}).stdout?.trim();
+/** The manifest's head — the standard's name, date and sha name the file. */
+const META = {
+  name: PKG.name,
+  date: new Date().toISOString().slice(0, 10),
+  ...(SHA ? { sha: SHA } : {}),
+  source: BASE_URL,
+  creator: `${PKG.name}/scripts/export-pdf.mjs`,
+  scale: SCALE,
+  title: "Hemophilia Treatment Wizard",
+};
+const OUT_PDF = flags.out
+  ? path.resolve(flags.out)
+  : path.join(
+      ROOT,
+      "documents",
+      "export",
+      `${deckFileName(META)}${PAGES === "both" ? "" : `-${PAGES}`}.pdf`,
+    );
+/** The page images, deck.json and report.json: one folder per deck, whatever --pages holds. */
+const OUT_DIR = path.join(ROOT, "documents", "export", deckFileName(META));
 
 /** Spine order (src/data/sectionOrder.ts), with the wizard expanded in place. */
 const SPINE_BEFORE_WIZARD = [
@@ -75,8 +130,9 @@ const SPINE_BEFORE_WIZARD = [
   "/education/prophylaxis-guidance",
   "/wizard-intro",
 ];
-const SPINE_AFTER_WIZARD = ["/explore", "/resources"]; // then /survey (two states)
-const APPENDIX = ["/glossary", "/acronyms", "/references"]; // after /how-to (page only)
+const SPINE_AFTER_WIZARD = ["/explore", "/resources"]; // then /survey (form + thank-you)
+/** The rail's off-spine pages, after the survey: How to Use (page only), then the references. */
+const RAIL = ["/how-to", "/glossary", "/acronyms", "/references"];
 
 const TYPES = ["A", "B"];
 const INHIBITORS = ["yes", "no"];
@@ -84,17 +140,25 @@ const REASONS = ["bleeding-control", "monitoring", "adherence", "treatment-burde
 
 const SURVEY_SUBMITTED_KEY = "survey-submitted";
 
+/** A switchable's other positions (closed drawers, unselected tabs) and its position at load. */
+const SWITCH_CLOSED = '[aria-expanded="false"][aria-controls], [role="tab"][aria-selected="false"]';
+const SWITCH_OPEN = '[aria-expanded="true"][aria-controls], [role="tab"][aria-selected="true"]';
+
 // ---------------------------------------------------------------------------
 // State
 
-/** @type {{index:number,file:string,route:string,state:string,overlay:string|null,scrollY:number}[]} */
-const frames = [];
-/** @type {Buffer[]} */
-const jpegs = [];
-/** @type {Map<string,{title:string,firstSeen:number}>} */
+/** The manifest's slides, in deck order. @type {object[]} */
+const slides = [];
+/** One JPEG per slide. @type {Buffer[]} */
+const images = [];
+/** With --pages map: a 720 px copy of each shot, all the map-only deck's slides need. @type {Buffer[]} */
+const thumbs = [];
+/** The map draws a slide at 180 pt; 720 px keeps it crisp when zoomed. */
+const THUMB_WIDTH = 720;
+/** A state's key (title + body hash) → the slide that shows it. @type {Map<string,{title:string,page:number}>} */
 const ledger = new Map();
-/** @type {string[]} */
-const skippedOverlays = [];
+/** @type {{what:string,host:string,at:number}[]} */
+const skipped = [];
 /** @type {string[]} */
 const blockedRequests = [];
 /** @type {string[]} */
@@ -232,6 +296,13 @@ async function neutralise(page) {
   });
 }
 
+/** A click, then the page at rest. */
+async function click(page, locator) {
+  await locator.click();
+  await neutralise(page);
+  await settle(page);
+}
+
 async function assertPath(page, expected) {
   const actual = new URL(page.url()).pathname;
   if (actual !== expected) {
@@ -247,40 +318,204 @@ async function goto(page, route) {
   await settle(page);
 }
 
-/** Take one slide: PNG master to disk, JPEG kept for the PDF, manifest entry. */
-async function shoot(page, { route, state, overlay = null, scrollY = 0 }) {
-  const index = frames.length + 1;
-  const file = `${String(index).padStart(3, "0")}.png`;
-  await page.screenshot({ path: path.join(FRAMES_DIR, file), type: "png" });
-  jpegs.push(await page.screenshot({ type: "jpeg", quality: QUALITY }));
-  frames.push({ index, file, route, state, overlay, scrollY });
-  const label = [route, state, overlay && `⧉ ${overlay}`, scrollY ? `↓${scrollY}` : null]
-    .filter(Boolean)
-    .join("  ·  ");
-  console.log(`  ${String(index).padStart(3, " ")}  ${label}`);
+/** The slide's name: the page heading (its accessible name where the markup garbles the text). */
+async function headingOf(page) {
+  const raw = await page.evaluate(() => {
+    const el =
+      document.querySelector('[data-review="title"]') ??
+      document.querySelector("main h1") ??
+      document.querySelector("h1");
+    return el ? (el.getAttribute("aria-label") ?? el.textContent ?? "") : "";
+  });
+  if (!raw.trim()) throw new Error(`no heading on ${page.url()}`);
+  return normaliseHeading(raw);
 }
 
-/** Shoot the viewport, then each further 800 px window if the page scrolls. */
-async function shootWindows(page, meta) {
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await settle(page);
-  await shoot(page, { ...meta, scrollY: 0 });
-  let previous = 0;
-  for (;;) {
-    const y = await page.evaluate((h) => {
-      window.scrollTo(0, window.scrollY + h);
-      return window.scrollY;
-    }, VIEWPORT.height);
-    if (y <= previous) break;
-    previous = y;
-    await settle(page);
-    await shoot(page, { ...meta, scrollY: y });
+/** External anchors on the page, their rectangles from the page's top-left — the standard's 6. */
+async function externalLinks(page, size) {
+  const raw = await page.evaluate((origin) => {
+    return Array.from(document.querySelectorAll("a[href]"))
+      .filter((a) => {
+        try {
+          return new URL(a.href).origin !== origin;
+        } catch {
+          return false;
+        }
+      })
+      .map((a) => {
+        const r = a.getBoundingClientRect();
+        return {
+          url: a.href,
+          rect: { x: r.left + window.scrollX, y: r.top + window.scrollY, w: r.width, h: r.height },
+        };
+      });
+  }, new URL(BASE_URL).origin);
+  const links = [];
+  for (const { url, rect } of raw) {
+    const x1 = Math.max(0, rect.x);
+    const y1 = Math.max(0, rect.y);
+    const x2 = Math.min(size.w, rect.x + rect.w);
+    const y2 = Math.min(size.h, rect.y + rect.h);
+    if (x2 - x1 > 0 && y2 - y1 > 0)
+      links.push({ url, rect: { x: x1, y: y1, w: x2 - x1, h: y2 - y1 } });
   }
-  if (previous > 0) await page.evaluate(() => window.scrollTo(0, 0));
+  return links;
+}
+
+/**
+ * One slide: the viewport, or the whole document when the page is taller than it (a dialog
+ * is always a viewport shot — it sits in the top layer). The manifest entry follows the
+ * standard's naming; `crumbs` is the outline path the slide nests under.
+ */
+async function shoot(page, { name, path: crumbs, kind }) {
+  const n = slides.length + 1;
+  const dialogOpen = (await page.locator("dialog[open]").count()) > 0;
+  const height = dialogOpen
+    ? VIEWPORT.height
+    : Math.max(VIEWPORT.height, await page.evaluate(() => document.documentElement.scrollHeight));
+  const size = { w: VIEWPORT.width, h: height };
+  if (!dialogOpen) await page.evaluate(() => window.scrollTo(0, 0));
+  const tall = height > VIEWPORT.height;
+  if (tall) await extendFixedBackdrops(page, height);
+  const bytes = await page.screenshot({ type: "jpeg", quality: QUALITY, fullPage: tall });
+  if (tall) await restoreFixedBackdrops(page);
+  const links = dialogOpen ? [] : await externalLinks(page, size);
+  slides.push({
+    page: n,
+    name,
+    path: [...crumbs],
+    image: `${slideFileName(n, name, crumbs)}.jpg`,
+    size,
+    links,
+    kind,
+  });
+  images.push(bytes);
+  if (PAGES === "map") thumbs.push(await thumbnail(page, bytes));
+  console.log(`  ${logLine(n, name, crumbs, links.length)}`);
+}
+
+/**
+ * A full-page shot paints a viewport-fixed layer once, over the first 800 px — the app's page
+ * background (`fixed inset-0 -z-10 bg-page` in AppShell) would leave the rest white. For the
+ * shot, every fixed layer that sits behind the content becomes document-tall; the chrome
+ * that sits in front (the top rule, the rail) is left as it is.
+ */
+async function extendFixedBackdrops(page, height) {
+  await page.evaluate((h) => {
+    for (const el of document.body.querySelectorAll("*")) {
+      const cs = getComputedStyle(el);
+      if (cs.position !== "fixed" || !(Number(cs.zIndex) < 0)) continue;
+      el.dataset.exportFixed = el.getAttribute("style") ?? "";
+      el.style.position = "absolute";
+      el.style.top = "0";
+      el.style.bottom = "auto";
+      el.style.height = `${h}px`;
+    }
+  }, height);
+}
+
+async function restoreFixedBackdrops(page) {
+  await page.evaluate(() => {
+    for (const el of document.querySelectorAll("[data-export-fixed]")) {
+      el.setAttribute("style", el.dataset.exportFixed);
+      delete el.dataset.exportFixed;
+    }
+  });
+}
+
+/** A THUMB_WIDTH-wide copy of a shot, drawn on a canvas in the page. */
+async function thumbnail(page, bytes) {
+  const dataUrl = await page.evaluate(
+    async ({ src, width }) => {
+      const img = new Image();
+      img.src = src;
+      await img.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = Math.round((img.naturalHeight * width) / img.naturalWidth);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL("image/jpeg", 0.8);
+    },
+    { src: `data:image/jpeg;base64,${bytes.toString("base64")}`, width: THUMB_WIDTH },
+  );
+  // A copy of its own: pdf-lib reads a buffer from the start of its underlying memory, and
+  // Node decodes a small base64 string into a slice of a shared pool.
+  const out = new Uint8Array(Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64"));
+  if (out[0] === 0xff && out[1] === 0xd8) return out;
+  // Not a JPEG (the canvas gave "data:," or a PNG): say so, and take a 1× shot instead.
+  warn(
+    `slide ${slides.length + 1}: thumbnail came back as "${dataUrl.slice(0, 24)}" (${out.length} bytes) — using a 1× screenshot`,
+  );
+  const dialogOpen = (await page.locator("dialog[open]").count()) > 0;
+  return page.screenshot({
+    type: "jpeg",
+    quality: 80,
+    scale: "css",
+    fullPage:
+      !dialogOpen &&
+      (await page.evaluate(() => document.documentElement.scrollHeight)) > VIEWPORT.height,
+  });
+}
+
+/** Ledger key: a title (normalised: case, trailing plural "s") plus a hash of the body. */
+function keyOf(title, body) {
+  const t = title.toLowerCase().replace(/s\b/g, "");
+  return createHash("sha1").update(`${t}\n${body}`).digest("hex").slice(0, 12);
+}
+
+/** True when the state is new — recorded as shot at the next slide; else listed as skipped. */
+function firstSighting(title, body, host) {
+  const key = keyOf(title, body);
+  const seen = ledger.get(key);
+  if (seen) {
+    skipped.push({ what: title, host: host.join(" › "), at: seen.page });
+    return false;
+  }
+  ledger.set(key, { title, page: slides.length + 1 });
+  return true;
 }
 
 // ---------------------------------------------------------------------------
-// Overlays
+// Switchables — an accordion's drawers, a tab strip: every other position, beside the page
+
+/** Labels of the switchables in `state` position on the page itself (not in a dialog, not in a skip region). */
+async function switchLabels(page, selector) {
+  return page.evaluate(
+    (sel) =>
+      Array.from(document.querySelectorAll(sel))
+        .filter((el) => !el.closest("dialog") && !el.closest('[data-review="skip"]'))
+        .map((el) => (el.getAttribute("aria-label") ?? el.textContent ?? "").trim())
+        .filter(Boolean),
+    selector,
+  );
+}
+
+const switchButton = (page, selector, label) =>
+  page.locator(selector).filter({ hasText: label }).first();
+
+/**
+ * Every other position of the page's switchables, each shot from the page as loaded and the
+ * page put back before the next — a position is a state of the page, never of another
+ * position. `host` is the page's outline path (its own name last).
+ */
+async function captureSwitchables(page, host) {
+  const atLoad = await switchLabels(page, SWITCH_OPEN);
+  const others = await switchLabels(page, SWITCH_CLOSED);
+  for (const label of others) {
+    await click(page, switchButton(page, SWITCH_CLOSED, label));
+    // Every position is shot: a drawer is its page's own content, so a leaf whose Strategies
+    // text repeats another's still shows it (unlike a sheet, kept once by the ledger).
+    await shoot(page, { name: normaliseHeading(label), path: host, kind: "state" });
+    // back to the position at load — an accordion closes the drawer we opened by itself
+    for (const original of atLoad) {
+      const button = switchButton(page, SWITCH_CLOSED, original);
+      if (await button.count()) await click(page, button);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Overlays — the sheets a page opens, and what stacks over them
 
 /**
  * Identity of the top-most open dialog: its accessible title (for humans) and
@@ -293,36 +528,25 @@ async function topDialogIdentity(page) {
     if (open.length === 0) return null;
     const top = open[open.length - 1];
     const nameFrom = (el) => el.getAttribute("aria-label") ?? el.textContent ?? "";
+    // The name is the first labelling element alone — a sheet's subtitle is in the body
+    // hash, and " — " in a name would read as an option label to the map.
     let title = top.getAttribute("aria-label") ?? "";
     const labelledBy = top.getAttribute("aria-labelledby");
     if (labelledBy) {
-      title = labelledBy
+      const first = labelledBy
         .split(/\s+/)
         .map((id) => document.getElementById(id))
-        .filter(Boolean)
-        .map(nameFrom)
-        .join(" — ");
+        .find(Boolean);
+      if (first) title = nameFrom(first);
     }
     const clone = top.cloneNode(true);
     clone.querySelectorAll("header").forEach((h) => h.remove());
     const text = (clone.textContent ?? "").replace(/\s+/g, " ").trim();
-    const images = Array.from(clone.querySelectorAll("img"))
+    const imgs = Array.from(clone.querySelectorAll("img"))
       .map((img) => img.getAttribute("src"))
       .join("|");
-    return { title: title.trim(), body: `${text}\n${images}`, depth: open.length };
+    return { title: title.trim(), body: `${text}\n${imgs}` };
   });
-}
-
-/**
- * Ledger key: title + body. The title is normalised (case, trailing plural
- * "s") so "Factor VIII mimetic" and "Factor VIII mimetics" — the same class
- * table under the two wordings the tree uses — count once, while "FIX
- * prophylaxis" and "Recombinant FVIII concentrates" (same rows, different
- * class) stay distinct.
- */
-function keyOf(identity) {
-  const title = identity.title.toLowerCase().replace(/s\b/g, "");
-  return createHash("sha1").update(`${title}\n${identity.body}`).digest("hex").slice(0, 12);
 }
 
 /** Close the top-most dialog via its ✕ (a mouse close leaves no focus ring). */
@@ -342,14 +566,11 @@ async function closeAllDialogs(page) {
   if (await page.locator("dialog[open]").count()) throw new Error("a dialog refused to close");
 }
 
-/**
- * Indices (into `button[aria-haspopup="dialog"]`) of the triggers that sit on
- * the page itself — not inside any dialog.
- */
+/** Indices (into `button[aria-haspopup="dialog"]`) of the triggers on the page itself. */
 async function pageTriggerIndices(page) {
   return page.evaluate(() =>
     Array.from(document.querySelectorAll('button[aria-haspopup="dialog"]'))
-      .map((b, i) => (b.closest("dialog") ? -1 : i))
+      .map((b, i) => (b.closest("dialog") || b.closest('[data-review="skip"]') ? -1 : i))
       .filter((i) => i >= 0),
   );
 }
@@ -376,53 +597,40 @@ async function nestedTriggerLabels(page) {
   });
 }
 
-/** Capture the current top dialog if its content hasn't been seen; returns true if shot. */
-async function captureTopDialogOnce(page, route, state) {
+/** Shoot the top dialog as a state under `host` if its content is new; returns its title when shot. */
+async function captureTopDialogOnce(page, host) {
   const identity = await topDialogIdentity(page);
-  if (!identity) return false;
-  const key = keyOf(identity);
-  if (ledger.has(key)) {
-    skippedOverlays.push(
-      `${route} (${state}) → "${identity.title}" already shown as slide ${ledger.get(key).firstSeen}`,
-    );
-    return false;
-  }
-  await shoot(page, { route, state, overlay: identity.title });
-  ledger.set(key, { title: identity.title, firstSeen: frames.length });
-  return true;
+  if (!identity) return null;
+  if (!firstSighting(identity.title, identity.body, host)) return null;
+  const name = normaliseHeading(identity.title);
+  await shoot(page, { name, path: host, kind: "state" });
+  return name;
 }
 
-/** Open every overlay reachable from the page (one level of nesting), first occurrence only. */
-async function captureOverlays(page, route, state) {
+/** Every sheet the page opens (one level of nesting inside each), first occurrence only. */
+async function captureOverlays(page, host) {
   const indices = await pageTriggerIndices(page);
   for (const i of indices) {
-    const trigger = page.locator('button[aria-haspopup="dialog"]').nth(i);
-    await trigger.click();
-    await settle(page);
-    await neutralise(page);
-    await settle(page);
+    await click(page, page.locator('button[aria-haspopup="dialog"]').nth(i));
     if ((await page.locator("dialog[open]").count()) === 0) {
-      warn(`${route}: trigger #${i} opened no dialog`);
+      warn(`${host.join(" › ")}: trigger #${i} opened no dialog`);
       continue;
     }
-    const shot = await captureTopDialogOnce(page, route, state);
+    const shot = await captureTopDialogOnce(page, host);
 
     if (shot) {
       // One level of nesting: lightboxes over a card, and in-place steps.
-      const nested = await nestedTriggerLabels(page);
-      for (const { kind, label } of nested) {
+      const inner = [...host, shot];
+      for (const { kind, label } of await nestedTriggerLabels(page)) {
         const top = page.locator("dialog[open]").last();
-        const inner =
+        const trigger =
           kind === "dialog"
             ? top.locator(`button[aria-label="${label}"]`).first()
             : top.getByRole("button", { name: label, exact: true }).first();
-        if ((await inner.count()) === 0) continue;
+        if ((await trigger.count()) === 0) continue;
         const depthBefore = await page.locator("dialog[open]").count();
-        await inner.click();
-        await settle(page);
-        await neutralise(page);
-        await settle(page);
-        await captureTopDialogOnce(page, route, state);
+        await click(page, trigger);
+        await captureTopDialogOnce(page, inner);
         const depthAfter = await page.locator("dialog[open]").count();
         if (depthAfter > depthBefore) {
           await closeTopDialog(page);
@@ -432,11 +640,7 @@ async function captureOverlays(page, route, state) {
             .locator("dialog[open]")
             .last()
             .locator('button[aria-label^="Back to "]');
-          if (await back.count()) {
-            await back.first().click();
-            await settle(page);
-            await neutralise(page);
-          }
+          if (await back.count()) await click(page, back.first());
         }
       }
     }
@@ -447,150 +651,187 @@ async function captureOverlays(page, route, state) {
 // ---------------------------------------------------------------------------
 // Page recipes
 
-/** A plain page: base (with scroll windows), then its overlays. */
-async function capturePage(page, route, { overlays = true, state = "page" } = {}) {
+/** A plain page: the page, then its switchables' other positions, then its sheets. */
+async function capturePage(page, route, { states = true, kind = "page", path: crumbs = [] } = {}) {
   await goto(page, route);
-  await shootWindows(page, { route, state });
-  if (overlays) await captureOverlays(page, route, state);
-}
-
-/** Click a radio's label only if it isn't already the selection (a second click deselects). */
-async function choose(page, name, value) {
-  const input = page.locator(`input[type="radio"][name="${name}"][value="${value}"]`);
-  if (await input.isChecked()) return;
-  await page.locator(`label:has(input[name="${name}"][value="${value}"])`).click();
-  await neutralise(page);
-  await settle(page);
-}
-
-async function submit(page, nextRoute) {
-  await page.getByRole("button", { name: "Submit inputs", exact: true }).click();
-  await page.waitForURL(`**${nextRoute}`);
-  await assertPath(page, nextRoute);
-  await settle(page);
-  await neutralise(page);
-  await settle(page);
-}
-
-async function railNext(page, nextRoute) {
-  await page.getByRole("button", { name: "Next", exact: true }).click();
-  await page.waitForURL(`**${nextRoute}`);
-  await assertPath(page, nextRoute);
-  await settle(page);
-  await neutralise(page);
-  await settle(page);
-}
-
-/** /wizard/therapies: base (Considerations open), its drug sheets, then the Strategies pane. */
-async function captureLeaf(page, state) {
-  const route = "/wizard/therapies";
-  await shootWindows(page, { route, state });
-  await captureOverlays(page, route, state);
-  const closedPanes = page.locator('button[aria-expanded="false"][aria-controls]');
-  const n = await closedPanes.count();
-  for (let i = 0; i < n; i++) {
-    const pane = page.locator('button[aria-expanded="false"][aria-controls]').first();
-    const label = (await pane.textContent())?.trim() ?? `pane ${i + 1}`;
-    await pane.click();
-    await neutralise(page);
-    await settle(page);
-    await shoot(page, { route, state: `${state} · ${label}` });
+  const name = await headingOf(page);
+  await shoot(page, { name, path: crumbs, kind });
+  if (states) {
+    await captureSwitchables(page, [...crumbs, name]);
+    await captureOverlays(page, [...crumbs, name]);
   }
+  return name;
 }
+
+/**
+ * Pick a radio by its group name and value (a second click would deselect, so only when it
+ * isn't the selection). Returns the outline segment the standard names the choice by:
+ * "<option> — <prompt>", the pill's label and its fieldset's legend.
+ */
+async function pick(page, name, value) {
+  const input = page.locator(`input[type="radio"][name="${name}"][value="${value}"]`);
+  if (!(await input.isChecked())) {
+    await click(page, page.locator(`label:has(input[name="${name}"][value="${value}"])`));
+  }
+  const { label, legend } = await page.evaluate(
+    ({ name, value }) => {
+      const input = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+      const label = input?.closest("label")?.textContent ?? "";
+      const legend = input?.closest("fieldset")?.querySelector("legend")?.textContent ?? "";
+      return {
+        label: label.replace(/\s+/g, " ").trim(),
+        legend: legend.replace(/\s+/g, " ").trim(),
+      };
+    },
+    { name, value },
+  );
+  if (!label || !legend) throw new Error(`radio ${name}=${value}: no label or legend`);
+  return `${label} — ${legend}`;
+}
+
+async function advance(page, buttonName, nextRoute) {
+  await page.getByRole("button", { name: buttonName, exact: true }).click();
+  await page.waitForURL(`**${nextRoute}`);
+  await assertPath(page, nextRoute);
+  await settle(page);
+  await neutralise(page);
+  await settle(page);
+}
+
+const submit = (page, next) => advance(page, "Submit inputs", next);
+const railNext = (page, next) => advance(page, "Next", next);
 
 /** The whole wizard, depth-first, driven through the real UI. */
 async function captureWizard(page) {
   await goto(page, "/wizard");
-  await shootWindows(page, { route: "/wizard", state: "unselected" });
+  const root = await headingOf(page);
+  await shoot(page, { name: root, path: [], kind: "wizard" });
 
-  let reasonPageShown = false;
   for (const type of TYPES) {
+    await goto(page, "/wizard");
+    const typeSeg = await pick(page, "hemophilia-type", type);
+    const typePath = [root, typeSeg];
+    await shoot(page, { name: root, path: typePath, kind: "wizard" });
+
     for (const inhibitors of INHIBITORS) {
-      const scenario = `${type}-${inhibitors === "yes" ? "with" : "without"}-inhibitors`;
       await goto(page, "/wizard");
-      await choose(page, "hemophilia-type", type);
-      await choose(page, "inhibitors", inhibitors);
-      await shootWindows(page, { route: "/wizard", state: `selected ${scenario}` });
+      await pick(page, "hemophilia-type", type);
+      const inhibitorsSeg = await pick(page, "inhibitors", inhibitors);
+      const scenarioPath = [...typePath, inhibitorsSeg];
+      await shoot(page, { name: root, path: scenarioPath, kind: "wizard" });
 
       await submit(page, "/wizard/scenario");
-      await shootWindows(page, { route: "/wizard/scenario", state: scenario });
-      await captureOverlays(page, "/wizard/scenario", scenario);
+      const scenario = await headingOf(page);
+      await shoot(page, { name: scenario, path: scenarioPath, kind: "wizard" });
+      await captureSwitchables(page, [...scenarioPath, scenario]);
+      await captureOverlays(page, [...scenarioPath, scenario]);
 
       await railNext(page, "/wizard/reason");
-      if (!reasonPageShown) {
-        const anyChecked = await page.locator('input[name="switch-reason"]:checked').count();
-        if (anyChecked) warn("/wizard/reason had a pre-selected reason on first visit");
-        await shootWindows(page, { route: "/wizard/reason", state: "unselected" });
-        reasonPageShown = true;
-      }
-
       for (const reason of REASONS) {
         await goto(page, "/wizard/reason");
-        await choose(page, "switch-reason", reason);
-        await shootWindows(page, {
-          route: "/wizard/reason",
-          state: `${scenario} · selected ${reason}`,
-        });
+        const reasonSeg = await pick(page, "switch-reason", reason);
+        const leafPath = [...scenarioPath, reasonSeg];
+        await shoot(page, { name: await headingOf(page), path: leafPath, kind: "wizard" });
+
         await submit(page, "/wizard/therapies");
-        await captureLeaf(page, `${scenario} · ${reason}`);
+        const leaf = await headingOf(page);
+        await shoot(page, { name: leaf, path: leafPath, kind: "wizard" });
+        await captureSwitchables(page, [...leafPath, leaf]);
+        await captureOverlays(page, [...leafPath, leaf]);
       }
     }
   }
 }
 
+/** The survey form, then the thank-you it turns into — a state of the page. */
 async function captureSurvey(page) {
-  await capturePage(page, "/survey", { overlays: false, state: "form" });
+  const name = await capturePage(page, "/survey", { states: false });
   await page.evaluate((key) => sessionStorage.setItem(key, "true"), SURVEY_SUBMITTED_KEY);
   await goto(page, "/survey");
-  await shootWindows(page, { route: "/survey", state: "thank-you" });
+  await shoot(page, { name: "Thank you (submitted)", path: [name], kind: "state" });
   await page.evaluate((key) => sessionStorage.removeItem(key), SURVEY_SUBMITTED_KEY);
 }
 
 // ---------------------------------------------------------------------------
-// PDF + manifest
+// The deck
 
-async function writePdf() {
-  const pdf = await PDFDocument.create();
-  pdf.setTitle("Hemophilia Treatment Wizard");
-  pdf.setProducer("scripts/export-pdf.mjs");
-  for (const jpeg of jpegs) {
-    const image = await pdf.embedJpg(jpeg);
-    const slide = pdf.addPage([VIEWPORT.width, VIEWPORT.height]);
-    slide.drawImage(image, { x: 0, y: 0, width: VIEWPORT.width, height: VIEWPORT.height });
+async function writeDeck(startedAt) {
+  const manifest = validateManifest({ ...META, slides });
+
+  // the image folder holds this run's pages alone
+  mkdirSync(OUT_DIR, { recursive: true });
+  for (const file of readdirSync(OUT_DIR)) {
+    if (/^\d{3}-.*\.jpg$/.test(file) || file === "deck.json" || file === "report.json") {
+      rmSync(path.join(OUT_DIR, file));
+    }
   }
-  const bytes = await pdf.save();
-  mkdirSync(path.dirname(OUT_PDF), { recursive: true });
-  writeFileSync(OUT_PDF, bytes);
-  return bytes.byteLength;
-}
+  manifest.slides.forEach((slide, i) => writeFileSync(path.join(OUT_DIR, slide.image), images[i]));
+  writeFileSync(path.join(OUT_DIR, "deck.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 
-function writeManifest() {
-  const manifest = {
+  const { slides: _slides, ...meta } = manifest;
+  // The map-only deck is drawn from the thumbnail copies: its pages share their image
+  // objects with the slides they are cut from, so full-size slides would stay in the file.
+  const sources = PAGES === "map" ? thumbs : images;
+  const pdf = await ReviewPdf.create(meta);
+  for (const slide of manifest.slides) {
+    await pdf.add(slide, { kind: "jpeg", bytes: sources[slide.page - 1] });
+  }
+  let bytes = await pdf.finish({ map: PAGES !== "slides" });
+  if (PAGES === "map") bytes = await mapPagesOnly(bytes, pdf.mapCount);
+  writeFileSync(OUT_PDF, bytes);
+
+  const report = {
     generatedAt: new Date().toISOString(),
     baseUrl: BASE_URL,
     viewport: VIEWPORT,
     scale: SCALE,
     jpegQuality: QUALITY,
+    seconds: Math.round((performance.now() - startedAt) / 100) / 10,
     pdf: path.relative(ROOT, OUT_PDF),
-    slides: frames.length,
-    frames,
-    overlayLedger: Array.from(ledger.values()),
-    skippedOverlays,
+    slides: slides.length,
+    mapPages: pdf.mapCount,
+    statesShownOnce: Array.from(ledger.values()),
+    skippedRepeats: skipped,
     blockedRequests,
     warnings,
   };
-  writeFileSync(path.join(EXPORT_DIR, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
+  writeFileSync(path.join(OUT_DIR, "report.json"), `${JSON.stringify(report, null, 2)}\n`);
+  const pages =
+    PAGES === "map"
+      ? pdf.mapCount
+      : PAGES === "slides"
+        ? slides.length
+        : slides.length + pdf.mapCount;
+  return { bytes: bytes.byteLength, mapPages: pdf.mapCount, pages };
+}
+
+/**
+ * The first `count` pages of a finished deck — the overview and the branch pages — as a PDF
+ * of their own. The core draws the map only in front of the slides its thumbnails link to,
+ * so the map alone is cut from a deck built on the thumbnail copies: the link annotations go
+ * (their targets are not in the file), the "p.N" captions stay and name the slide in the
+ * full deck.
+ */
+async function mapPagesOnly(bytes, count) {
+  const full = await PDFDocument.load(bytes);
+  const out = await PDFDocument.create();
+  out.setTitle(full.getTitle() ?? META.title);
+  out.setSubject(full.getSubject() ?? "");
+  out.setCreator(full.getCreator() ?? META.creator);
+  out.setProducer("pdf-lib");
+  const indices = Array.from({ length: count }, (_, i) => i);
+  for (const i of indices) full.getPage(i).node.delete(PDFName.of("Annots"));
+  for (const page of await out.copyPages(full, indices)) out.addPage(page);
+  return out.save();
 }
 
 // ---------------------------------------------------------------------------
 // Main
 
 async function main() {
+  const startedAt = performance.now();
   build();
   assertNoAnalyticsInBundle();
-
-  rmSync(FRAMES_DIR, { recursive: true, force: true });
-  mkdirSync(FRAMES_DIR, { recursive: true });
 
   const server = await serve();
   const browser = await chromium.launch();
@@ -614,8 +855,7 @@ async function main() {
     await captureWizard(page);
     for (const route of SPINE_AFTER_WIZARD) await capturePage(page, route);
     await captureSurvey(page);
-    await capturePage(page, "/how-to", { overlays: false });
-    for (const route of APPENDIX) await capturePage(page, route);
+    for (const route of RAIL) await capturePage(page, route, { states: route !== "/how-to" });
 
     await context.close();
   } finally {
@@ -623,27 +863,20 @@ async function main() {
     server.kill();
   }
 
-  const bytes = await writePdf();
-  writeManifest();
+  const { bytes, mapPages, pages } = await writeDeck(startedAt);
 
   console.log("");
   console.log(
-    `✔ ${frames.length} slides → ${path.relative(ROOT, OUT_PDF)} (${(bytes / 1e6).toFixed(1)} MB)`,
+    `✔ ${pages} pages (${PAGES === "map" ? `the map alone, ${mapPages} pages` : PAGES === "slides" ? `${slides.length} slides, no map` : `${slides.length} slides + ${mapPages} map`}) → ${path.relative(ROOT, OUT_PDF)} (${(bytes / 1e6).toFixed(1)} MB)`,
   );
-  console.log(`  frames: ${path.relative(ROOT, FRAMES_DIR)}/  ·  manifest: export/manifest.json`);
-  console.log(
-    `  overlays shown once: ${ledger.size}  ·  repeat openings skipped: ${skippedOverlays.length}`,
-  );
+  console.log(`  page images + deck.json + report.json → ${path.relative(ROOT, OUT_DIR)}/`);
+  console.log(`  states shown once: ${ledger.size}  ·  repeat openings skipped: ${skipped.length}`);
   if (blockedRequests.length) {
     warn(
-      `${blockedRequests.length} external request(s) were attempted and blocked — see manifest.blockedRequests`,
+      `${blockedRequests.length} external request(s) were attempted and blocked — see report.json`,
     );
-  } else {
-    console.log("  external requests: none attempted");
   }
-  if (warnings.length) {
-    console.log(`  ${warnings.length} warning(s) — see manifest.warnings`);
-  }
+  if (warnings.length) console.log(`  warnings: ${warnings.length}`);
 }
 
 main().catch((err) => {

@@ -33,5 +33,6 @@ treatment-wizard-demo.html
 # recipe that produces them from this file is in docs/styling.md §7.
 src/assets/landing-video.mp4
 
-# PDF slide-deck export (scripts/export-pdf.mjs) — regenerate with `npm run export:pdf`
+# The review deck (scripts/export-pdf.mjs) lands in documents/export/, ignored above;
+# export/ was its home until 2026-09-09.
 export/

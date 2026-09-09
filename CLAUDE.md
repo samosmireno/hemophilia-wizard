@@ -47,18 +47,27 @@ Bump dependencies deliberately with `npm run upgrade` (npm-check-updates), never
 
 ## PDF export
 
-`npm run export:pdf` (`scripts/export-pdf.mjs`, Playwright + pdf-lib) builds the app with
-`VITE_GA_MEASUREMENT_ID` forced empty, serves `dist/` on a local `vite preview`, and drives a
-1440×800 Chromium through every screen in spine order: each page, every `<dialog>` overlay on its
-first occurrence (keyed by title + body), every wizard branch via the real radios/Submit/Next with
-the selection shown before each descent, both result-page panes per leaf, and 800 px scroll windows
-for the pages that scroll. Output: `export/hemophilia-wizard-<date>.pdf` (one 1440×800 pt slide per
-screen, 2× JPEG), `export/frames/NNN.png`, `export/manifest.json` (per-slide route/state/overlay,
-the overlay ledger, skipped repeats, blocked external requests). Flags: `--scale 1`, `--quality N`,
-`--out`, `--skip-build`. The browser context aborts every non-localhost request, so no GA hit or
-survey POST can escape. Triggers are discovered generically (`button[aria-haspopup="dialog"]`,
-nested `Expand …` lightboxes, the "View mechanism" step), so new popups are picked up without
-touching the script; `/how-to`'s demo popups and drawers are deliberately not opened.
+`npm run export:pdf` (`scripts/export-pdf.mjs`, Playwright + mlg-review-deck's core) is the
+client review deck: builds the app with `VITE_GA_MEASUREMENT_ID` forced empty, serves `dist/`
+on a local `vite preview`, drives a 1440×800 Chromium through every screen and hands the
+manifest to review-deck's core, which draws the birds-eye map in front (the overview, then a
+page per wizard branch, every thumbnail a link), the bookmark outline and the link annotations.
+The walk is this app's, planned in the script — the generic `review-deck` crawl misreads the
+accordion, the leaf notes and the Explore page (2026-09-09), so don't run it here: spine order
+(`src/data/sectionOrder.ts`), then How to Use (demo popups never opened), Glossary, Acronyms,
+References at the end; on each page first every other position of a switchable (a drawer, a
+tab) beside the page, then every sheet it opens (lightboxes and "View mechanism" one level
+down); a sheet seen again (title + body hash) is skipped, drawers and wizard screens never are;
+the wizard depth-first through the real radios, Submit and Next, with the type-only and
+both-picked input screens, the scenario page and its class sheets, the reason picked, the leaf
+with Considerations then Strategies open, then its drug sheets; a page taller than 800 px is
+one taller slide, the viewport-fixed page background stretched to its foot for the shot. Output (review-deck's standard §8): `documents/export/<name>-<date>-<sha7>.pdf`
+plus a folder of the same name with the page JPEGs, `deck.json` (the manifest) and
+`report.json` (ledger, skipped repeats, blocked external requests, warnings). Flags: `--scale 1`,
+`--quality N`, `--out`, `--skip-build`, `--pages map|slides|both` (the map and branch pages alone, suffixed `-map` and unlinked; the slides alone, `-slides`; or the deck). The core is imported from a checkout of
+`mlg-review-deck` beside this repo (or `REVIEW_DECK_DIR`) — its git-pinned package ships only
+the crawl's bin. The browser context aborts every non-localhost request, so no GA hit or
+survey POST can escape.
 
 ## Deploy
 
