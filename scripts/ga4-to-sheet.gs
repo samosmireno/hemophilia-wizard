@@ -7,26 +7,26 @@
  * names and the seconds ÷ views rule: docs/analytics.md.
  *
  * What a run produces:
- *  - Five client tabs, rebuilt from scratch every run (edits to them are lost — keep
+ *  - Five client tabs, rebuilt from scratch every run (edits to them are lost - keep
  *    notes in a tab of your own): Overview (key figures + how to read), Screens (views
  *    and time per screen in app order), Wizard (answers, recommendations, repeat runs),
  *    Engagement (drug sheets, outbound links), Audience (geography, devices, channels).
- *  - "Survey responses" is untouched — the survey endpoint (scripts/survey-endpoint.gs)
- *    owns it — and is kept right after the client tabs.
+ *  - "Survey responses" is untouched - the survey endpoint (scripts/survey-endpoint.gs)
+ *    owns it - and is kept right after the client tabs.
  *  - One hidden "Raw - …" tab per API query, at the end, for anyone who wants to pivot.
  *  - Three charts (Screens, Wizard ×2), inserted only when no chart with that title
  *    exists, so they survive the daily rebuild. Delete a chart to have it recreated.
  *
  * Setup. The feed runs as the ONE account that presses Run and creates the trigger, so
  * that account needs both: edit access to the Sheet (and permission to run Apps Script
- * on it — an org can block external editors) and at least Viewer on the GA property.
- * Who owns the Sheet does not matter — 1737 is an Impetus-owned Sheet in a Shared Drive,
+ * on it - an org can block external editors) and at least Viewer on the GA property.
+ * Who owns the Sheet does not matter - 1737 is an Impetus-owned Sheet in a Shared Drive,
  * run by an external Gmail that was given Viewer on the property. Check the avatar in
  * the Apps Script editor: a multi-account browser often opens it under the wrong one.
- * Never use Deploy — nothing here is a web app; Run once + a trigger is the whole install,
+ * Never use Deploy - nothing here is a web app; Run once + a trigger is the whole install,
  * and the trigger's "Head" deployment runs whatever is saved, so edits need no redeploy.
  *  1. GA4 → Admin → Property settings → Property details → copy the numeric Property ID
- *     (nine digits — NOT the G-… measurement ID).
+ *     (nine digits - NOT the G-… measurement ID).
  *  2. Open the Sheet → Extensions → Apps Script.
  *  3. Left sidebar → Services (+) → "Google Analytics Data API" → Add (it appears as
  *     `AnalyticsData`; no API keys or OAuth config needed).
@@ -43,7 +43,7 @@
  * earlier hits show "(not set)".
  */
 
-const PROPERTY_ID = "123456789"; // step 1 — numeric property ID
+const PROPERTY_ID = "123456789"; // step 1 - numeric property ID
 const START_DATE = "2026-09-01"; // launch date (YYYY-MM-DD)
 const ROW_LIMIT = 10000;
 const APP_NAME = "Hemophilia Treatment Wizard";
@@ -183,7 +183,7 @@ const AI_HOSTS = new Set([
   "you.com",
 ]);
 
-/** Distribution channel from the UTM pair — see docs/analytics.md → Campaign links. */
+/** Distribution channel from the UTM pair - see docs/analytics.md → Campaign links. */
 function channelLabel(source, medium) {
   if (source === "qr" || medium === "print") return "Printed QR code";
   if (medium === "email") return "Email";
@@ -194,16 +194,16 @@ function channelLabel(source, medium) {
 }
 
 /**
- * GA4 fills the campaign with a parenthesised placeholder — `(direct)`, `(referral)`,
- * `(ai-assistant)`, `(not set)` — whenever no `utm_campaign` arrived. Our own waves are never
+ * GA4 fills the campaign with a parenthesised placeholder - `(direct)`, `(referral)`,
+ * `(ai-assistant)`, `(not set)` - whenever no `utm_campaign` arrived. Our own waves are never
  * written that way, so anything parenthesised means untagged.
  */
 function campaignLabel(campaign) {
-  return campaign.startsWith("(") && campaign.endsWith(")") ? "—" : campaign;
+  return campaign.startsWith("(") && campaign.endsWith(")") ? "-" : campaign;
 }
 
 // ---------------------------------------------------------------------------------------
-// Entry point — run by hand once, then by the daily trigger.
+// Entry point - run by hand once, then by the daily trigger.
 // ---------------------------------------------------------------------------------------
 
 function pullReports() {
@@ -262,7 +262,7 @@ function buildOverview(ss, raw) {
     [
       "Sessions that ran the wizard again",
       reached(2),
-      "Sessions with a second submission — a changed answer or a reset. Detail on the Wizard tab.",
+      "Sessions with a second submission - a changed answer or a reset. Detail on the Wizard tab.",
       "0",
     ],
     [
@@ -286,14 +286,14 @@ function buildOverview(ss, raw) {
     [
       "Survey responses",
       surveyRows,
-      `Completed surveys — the rows on the "${SURVEY_TAB}" tab.`,
+      `Completed surveys - the rows on the "${SURVEY_TAB}" tab.`,
       "0",
     ],
   ];
 
   const sh = freshTab(ss, "Overview");
   setWidths(sh, [300, 110, 620]); // metric · value · meaning
-  sh.getRange(1, 1).setValue(`${APP_NAME} — usage report`).setFontSize(14).setFontWeight("bold");
+  sh.getRange(1, 1).setValue(`${APP_NAME} - usage report`).setFontSize(14).setFontWeight("bold");
   sh.getRange(2, 1)
     .setValue(
       `Data from ${START_DATE} to ${isoDate(-1)} · refreshed daily · last refresh ${isoDate(0)}`,
@@ -438,7 +438,7 @@ function buildWizard(ss, raw) {
     sh,
     9,
     1,
-    "Recommendations reached — scenario × reason for switching",
+    "Recommendations reached - scenario × reason for switching",
     ["Scenario", ...REASON_ORDER.map((r) => LABELS.reason[r]), "Total"],
     [...gridRows, totals],
     [null, "0", "0", "0", "0", "0"],
@@ -507,13 +507,13 @@ function buildEngagement(ss, raw) {
     sh,
     1,
     1,
-    "Drug sheets opened — by agent and the screen it was opened from",
+    "Drug sheets opened - by agent and the screen it was opened from",
     ["Agent", ...pages.map(screenName), "Total"],
     rows,
     [null, ...pages.map(() => "0"), "0"],
   );
   const links = raw.links.map(([url, n]) => [url, n]).sort((a, b) => b[1] - a[1]);
-  block(sh, row, 1, "Outbound link clicks — references and resources", ["Link", "Clicks"], links, [
+  block(sh, row, 1, "Outbound link clicks - references and resources", ["Link", "Clicks"], links, [
     null,
     "0",
   ]);
@@ -531,7 +531,7 @@ function buildAudience(ss, raw) {
   const deviceRows = raw.devices
     .map(([d, u, s]) => [labelOf(LABELS.device, d), u, s, share(s)])
     .sort((a, b) => b[2] - a[2]);
-  // Sessions add up across the grouped rows; users do not — a person GA4 split over two
+  // Sessions add up across the grouped rows; users do not - a person GA4 split over two
   // source/medium pairs is counted once in each, as in the country block above.
   const channels = group(
     raw.channels,
@@ -547,7 +547,7 @@ function buildAudience(ss, raw) {
 
   const sh = freshTab(ss, "Audience");
   // A-D countries and regions, E-F gutter, G-K devices above channels. G holds the longest
-  // string on the tab — "AI assistant (copilot.microsoft.com)".
+  // string on the tab - "AI assistant (copilot.microsoft.com)".
   setWidths(sh, [130, 130, 90, 110, 20, 20, 270, 110, 90, 110, 110]);
   let left = block(
     sh,
@@ -640,8 +640,8 @@ function setWidths(sh, widths, col) {
 
 /**
  * Row height for wrapped text in a merged range. Sheets grows a merged row only
- * sometimes, so a long note renders clipped — and always does once exported to xlsx.
- * Estimated from the merged width at 6 px per character of 10 pt Arial — deliberately
+ * sometimes, so a long note renders clipped - and always does once exported to xlsx.
+ * Estimated from the merged width at 6 px per character of 10 pt Arial - deliberately
  * pessimistic, since a row one line too tall is invisible and one line too short clips.
  */
 function fitRowHeight(sh, row, col, span, text) {
@@ -698,7 +698,7 @@ function removeLegacyTabs(ss) {
   if (s1 && s1.getLastRow() === 0 && ss.getSheets().length > 1) ss.deleteSheet(s1);
 }
 
-/** Client tabs first, then the survey tab, then the raw tabs — hidden. */
+/** Client tabs first, then the survey tab, then the raw tabs - hidden. */
 function arrangeTabs(ss) {
   const order = [...CLIENT_TABS, SURVEY_TAB, ...RAW.map(([, title]) => rawTabName(title))];
   let pos = 1;
@@ -716,7 +716,7 @@ function arrangeTabs(ss) {
   ss.setActiveSheet(ss.getSheetByName(CLIENT_TABS[0]));
 }
 
-/** Rows on the survey tab with a timestamp — the endpoint may leave gaps above row 7. */
+/** Rows on the survey tab with a timestamp - the endpoint may leave gaps above row 7. */
 function surveyRowCount(ss) {
   const sh = ss.getSheetByName(SURVEY_TAB);
   if (!sh || sh.getLastRow() < 2) return 0;
