@@ -271,11 +271,11 @@ unblocks it (designer / browser / code), and where it bites.
 
 **Invention ledger (summary)** — shipped values that are not straight transcriptions:
 
-| Kind                                | Values                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Transcribed-literal (off-scale)** | `#939393` press fg (§4.1/4.2); `#f73150`, `#bff5ff` (item 3); `#d2d5d4` (§4.3); §6 gradient stop (7); chapter `text-black` (§11); `--color-agent-mab` (14); `--color-agents-panel` (`#00d8ff`, §11); emerging-panel mint (19); `#747474` (21)                                                                                                                                                                                                                                                                                                                                                                               |
-| **Inferred (never exported)**       | navbar tooltip (5); sidebar `teal-100` (§4.5); pop-up scrim (12); table hairlines `black/30` (§11)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| **Invented (no artboard)**          | below-`sm`/`sm` gutters + `lg` bottom padding (§12); every below-`lg` type step (§2); `DisclosureBand` `md` row, `ArchBand` 150px radius, panel 60px radius, `treatment-landscape` `sm` step (§11); `Popup` band floor + ✕ base/`sm` steps (§13); `wide` 1360 (27); hover/press derivations (§4.2, §14, §15) and the agent-box states incl. the crimson focus swap (16); `px-7.5` (51); gate pulse (52); scrollbars (§21); the §19 ladder incl. its 0.875× down-rung (56); `/acronyms`' crimson terms and its own `lg:pb-16` (§22); `/references`' lagoon link colour and hanging indent (§24); `/wizard`'s Reset row (§29) |
+| Kind                                | Values                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Transcribed-literal (off-scale)** | `#939393` press fg (§4.1/4.2); `#f73150`, `#bff5ff` (item 3); `#d2d5d4` (§4.3); §6 gradient stop (7); chapter `text-black` (§11); `--color-agent-mab` (14); `--color-agents-panel` (`#00d8ff`, §11); emerging-panel mint (19); `#747474` (21)                                                                                                                                                                                                                                                                                                                                                                                                                |
+| **Inferred (never exported)**       | navbar tooltip (5); sidebar `teal-100` (§4.5); pop-up scrim (12); table hairlines `black/30` (§11)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **Invented (no artboard)**          | below-`sm`/`sm` gutters + `lg` bottom padding (§12); every below-`lg` type step (§2); `DisclosureBand` `md` row, `ArchBand` 150px radius, panel 60px radius, `treatment-landscape` `sm` step (§11); `Popup` band floor + ✕ base/`sm` steps + the title's `max-[360px]` step (§13); `wide` 1360 (27); hover/press derivations (§4.2, §14, §15) and the agent-box states incl. the crimson focus swap (16); `px-7.5` (51); gate pulse (52); scrollbars (§21); the §19 ladder incl. its 0.875× down-rung (56); `/acronyms`' crimson terms and its own `lg:pb-16` (§22); `/references`' lagoon link colour and hanging indent (§24); `/wizard`'s Reset row (§29) |
 
 ## 10. Page top rule
 
@@ -450,12 +450,27 @@ button clips against the rounded corner. **The ✕ ramps, and three numbers ramp
 
 44 is the touch-target floor; the `lg` inset is the drawn 100 (smaller steps = ✕ + the fixed drawn
 22); `lg:size-16.25` restates the package's own value because a caller `className` merges last
-(test-pinned — a lost `lg:` ships a 56px button silently). The title ramps `text-2xl sm:text-3xl
-lg:text-5xl` — two steps against the chapters' one: its box is narrower than any content column and
-it is uppercase display type. `CLOSE_BUTTON_SIZE` is shared with `Lightbox`. Deliberate deviations:
-the design's 20px title nudge off-centre is not reproduced; the band opts `FVIIIa`/`BsAbs`/`FIXa`/
-`FXa` out of its own `uppercase` (`preserveCase`) — painted glyphs only, with an `aria-label` of the
-raw title so the accessible name is not "FIX/ FIXa".
+(test-pinned — a lost `lg:` ships a 56px button silently). The title ramps `max-[360px]:text-xl
+text-2xl sm:text-3xl lg:text-5xl` — three steps against the chapters' one: its box is narrower than
+any content column and it is uppercase display type. `CLOSE_BUTTON_SIZE` is shared with `Lightbox`.
+Deliberate deviations: the design's 20px title nudge off-centre is not reproduced; the band opts
+`FVIIIa`/`BsAbs`/`FIXa`/`FXa` out of its own `uppercase` (`preserveCase`) — painted glyphs only,
+with an `aria-label` of the raw title so the accessible name is not "FIX/ FIXa".
+
+**The band breaks its own lines, and steps its type once more to do it** (2026-09-10). No UA breaks
+a line at a solidus, so "(emerging/investigational)" was a single 276px word against the 203px line
+the insets leave at 375: Denecimig's title left the inset entirely, ran under the ✕ and was clipped
+at the card's edge. Two rules, because either alone is half a fix — `break-words` on the title and
+the subtitle is the floor (no title of any length can leave the inset again), and a `<wbr>` after
+every "/" (`withSlashBreaks`, mapped over `preserveCase`'s output) is what puts the break at the
+slash rather than mid-word. `<wbr>` paints no glyph, so the `aria-label` rule above still holds.
+The narrowest type step is the same arithmetic and is **invented, not drawn**: under 360px the line
+is 152px and "INVESTIGATIONAL)" is 167px at the 24px step — enough to orphan its last two glyphs —
+where at 20px it is 139px and the title sets three whole lines. `max-*` is an exclusive range in
+Tailwind v4 (`width < 360px`), so a 360px phone, the narrowest in common use, keeps the 24px step.
+Browser-verified at 320/359/360/375/414/640/1024/1440: zero overflow, painted text clear of the ✕ at
+every one. Other slashed titles (`HA/HB`, `FVIII/IX`) are unmoved — a break opportunity is only
+spent when the line will not fit.
 
 `ModalLayer` is the `<dialog>`; `Popup` dresses it as a destination, `Lightbox` as an enlargement
 (its `w-fit` column means prose inside must carry `w-0 min-w-full`); `ExpandableFigure` picks with

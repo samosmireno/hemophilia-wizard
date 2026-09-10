@@ -13,6 +13,33 @@ import ModalLayer, { MODAL_EXIT_MS } from "./ModalLayer";
  */
 const BAND_INSET = "px-16.5 sm:px-19.5 lg:px-25";
 
+/**
+ * `nodes` with a break opportunity after every "/".
+ *
+ * No UA breaks at a solidus on its own, so "(emerging/investigational)" is a
+ * single 276px word at the phone type step — 73px wider than the 203px the band
+ * leaves between its insets on a 375px screen. It spilled out of the inset and
+ * ran under the ✕ (2026-09-10); `break-words` below is the floor under that, and
+ * this is what puts the break where a reader would.
+ *
+ * It takes `preserveCase`'s output rather than the raw string because the cased
+ * terms come back as elements — none of which contains a slash — and `<wbr>`
+ * adds no glyph, so the `aria-label` rule below is untouched.
+ */
+function withSlashBreaks(nodes: ReactNode[]): ReactNode[] {
+  return nodes.flatMap((node, index) =>
+    typeof node === "string"
+      ? node
+          .split("/")
+          .flatMap((part, partIndex, parts) =>
+            partIndex === parts.length - 1
+              ? part
+              : [`${part}/`, <wbr key={`${index}-${partIndex}`} />],
+          )
+      : node,
+  );
+}
+
 export type PopupWidth = "narrow" | "default" | "wide";
 
 /* The drawn widths are `rem` so the card scales with the board above 1440; the
@@ -100,10 +127,18 @@ export default function Popup({
               aria-label={shown.title}
               className={cn(
                 BAND_INSET,
-                "text-center font-display text-2xl leading-[1.0278] font-bold tracking-[0.0289em] text-white uppercase sm:text-3xl lg:text-5xl",
+                // `max-[359px]:text-xl` is the bottom of the ramp and the only step in
+                // it set by arithmetic rather than by the design: under 360px the band's
+                // insets leave a 152px line, and "INVESTIGATIONAL)" is 167px at the 24px
+                // step — wide enough to orphan its last glyphs onto a line of their own.
+                // At 20px it is 139px and that title wraps in three whole pieces. 360 is
+                // the narrowest width in common use, and v4's `max-*` is an exclusive
+                // range (`width < 360px`), so a 360px phone keeps the 24px step and
+                // nothing anyone holds is stepped down needlessly.
+                "text-center font-display text-2xl leading-[1.0278] font-bold tracking-[0.0289em] break-words text-white uppercase max-[360px]:text-xl sm:text-3xl lg:text-5xl",
               )}
             >
-              {preserveCase(shown.title)}
+              {withSlashBreaks(preserveCase(shown.title))}
             </h2>
 
             {shown.subtitle && (
@@ -114,10 +149,10 @@ export default function Popup({
                 aria-label={shown.subtitle}
                 className={cn(
                   BAND_INSET,
-                  "mt-1 text-center font-display text-xl font-medium tracking-wide text-white uppercase",
+                  "mt-1 text-center font-display text-xl font-medium tracking-wide break-words text-white uppercase",
                 )}
               >
-                {preserveCase(shown.subtitle)}
+                {withSlashBreaks(preserveCase(shown.subtitle))}
               </p>
             )}
 

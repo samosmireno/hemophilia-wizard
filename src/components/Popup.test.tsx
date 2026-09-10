@@ -156,6 +156,23 @@ describe("Popup", () => {
   });
 
   /**
+   * The same kind of class assertion, for the same reason: the band's narrowest
+   * step is a variant sitting in the same string as the step it overrides, and a
+   * reorder that let tailwind-merge collapse the two would show up nowhere else —
+   * jsdom evaluates no media query, so the title would keep rendering at one size
+   * with the suite green. What it guards is that both steps survive `cn()`; where
+   * 360px falls is the browser's business (`Popup.tsx`).
+   */
+  it("keeps both of the title's phone-width font steps", () => {
+    render(<Popup card={{ title: TITLE, content: <p>body</p> }} onClose={vi.fn()} />);
+
+    expect(screen.getByRole("heading", { name: TITLE })).toHaveClass(
+      "text-2xl",
+      "max-[360px]:text-xl",
+    );
+  });
+
+  /**
    * The band is `uppercase`, and a plain transform destroys the abbreviations it
    * is often made of: `FVIIIa` is factor VIII *activated* and `FIXa` is factor
    * IX activated, neither of which survives being shouted — the caption below
@@ -185,6 +202,29 @@ describe("Popup", () => {
 
     expect(screen.getByRole("heading", { name: TITLE })).toHaveTextContent(TITLE);
     expect(dialog()).toHaveAccessibleName(TITLE);
+  });
+
+  /**
+   * The band reserves its inset for the ✕, but no UA breaks a line at a solidus,
+   * so "(emerging/investigational)" was one word 73px wider than the 375px inset
+   * leaves and spilled out under the button (2026-09-10). `break-words` in the
+   * band is what makes the spill impossible; the `<wbr>` is what makes the break
+   * land at the slash rather than mid-word, and it is the half a test can see —
+   * jsdom lays nothing out.
+   *
+   * Text content and accessible name are asserted beside it for the reason the
+   * cased-terms test asserts its name: `<wbr>` splits the text node, which is
+   * the shape that would corrupt either.
+   */
+  it("offers a break after a slash without changing the title's text or name", () => {
+    const slashed = "Denecimig (emerging/investigational)";
+    render(<Popup card={{ title: slashed, content: <p>body</p> }} onClose={vi.fn()} />);
+
+    const heading = screen.getByRole("heading", { name: slashed });
+    expect(heading.querySelectorAll("wbr")).toHaveLength(1);
+    expect(heading.innerHTML).toContain("/<wbr>");
+    expect(heading).toHaveTextContent(slashed);
+    expect(dialog()).toHaveAccessibleName(slashed);
   });
 
   /**
