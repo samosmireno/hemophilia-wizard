@@ -71,9 +71,11 @@ survey POST can escape.
 
 ## Deploy
 
-Static SPA. `npm run build` emits `dist/`, which works on any static host.
-`vercel.json` ships a catch-all rewrite (`/(.*)` → `/index.html`) so client-side
-routes resolve to the app instead of 404ing — keep it if you add a router.
+Static SPA. `npm run build` emits `dist/`, which works on any static host, from any
+subdirectory, and inside an iframe: assets are relative (`base: "./"` in `vite.config.ts`)
+and routing is hash-based (`createHashRouter` in `src/main.tsx`) — a matched pair, see the
+comments there. `vercel.json` keeps a catch-all rewrite (`/(.*)` → `/index.html`) so old
+pre-hash links to inner paths still land on the app.
 
 ## Notes
 

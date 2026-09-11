@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { RouterProvider, createBrowserRouter } from "react-router";
+import { RouterProvider, createHashRouter } from "react-router";
 import { initAnalytics } from "./lib/analytics";
 import { sanitizeLocation } from "./lib/sanitizeLocation";
 import { routes } from "./routes/router.tsx";
@@ -20,7 +20,17 @@ sanitizeLocation();
 
 // Built here rather than in `router.tsx` so the sanitized URL is what it captures —
 // module imports are hoisted, so a `router` export would have read the raw one.
-const router = createBrowserRouter(routes);
+//
+// Hash-based, because the build also ships as a folder the client serves from
+// their own site, in an iframe: a history route has to survive a server round
+// trip on reload, and that server is theirs, with no rewrite to `index.html`.
+// Behind the hash a route never leaves the browser, and the document URL stays
+// at the install root, which is what lets `base: "./"` (vite.config.ts) resolve
+// assets from any subdirectory. On Vercel the catch-all rewrite is harmless.
+// Analytics is unaffected: `useLocation().pathname` still reads `/wizard`, and
+// that is what `AppShell` sends as the page path. Campaign params sit before the
+// hash, where `sanitizeLocation` and gtag read them.
+const router = createHashRouter(routes);
 
 // The env reads live here, not in the module, so `analytics.ts` stays testable.
 // Production-only: a dev session must not send hits to the client-facing

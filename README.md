@@ -48,5 +48,7 @@ npm run upgrade       # bump every dep to latest, then reinstall
 
 ## Deploying
 
-Static SPA. `vercel.json` ships an SPA rewrite for client routing. Any static host
-works — point it at `npm run build`'s `dist/`.
+Static SPA with hash routing and relative asset URLs, so `npm run build`'s `dist/`
+works from any static host, any subdirectory, and inside an iframe — no server
+rewrite needed. `vercel.json` keeps a catch-all rewrite so pre-hash links to
+inner paths still land on the app.

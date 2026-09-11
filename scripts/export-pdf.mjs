@@ -303,15 +303,20 @@ async function click(page, locator) {
   await settle(page);
 }
 
+/** The app's route is the URL fragment (hash router, see main.tsx): `/#/wizard`. */
+function hashUrl(route) {
+  return `${BASE_URL}/#${route}`;
+}
+
 async function assertPath(page, expected) {
-  const actual = new URL(page.url()).pathname;
+  const actual = new URL(page.url()).hash.replace(/^#/, "") || "/";
   if (actual !== expected) {
     throw new Error(`expected to be on ${expected}, but the app is on ${actual}`);
   }
 }
 
 async function goto(page, route) {
-  await page.goto(BASE_URL + route, { waitUntil: "load" });
+  await page.goto(hashUrl(route), { waitUntil: "load" });
   await assertPath(page, route);
   await settle(page);
   await neutralise(page);

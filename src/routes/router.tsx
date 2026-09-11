@@ -25,7 +25,7 @@ import Therapies from "./wizard/Therapies";
 /** Where bare `/education` and its unmatched sections land: the first chapter. */
 const EDUCATION_DEFAULT = "/education/disease-background";
 
-/** Built into a browser router by `main.tsx` (after the URL is sanitized) and into
+/** Built into a hash router by `main.tsx` (after the URL is sanitized) and into
  *  memory routers by tests — never here, where a hoisted import would read the raw URL. */
 export const routes: RouteObject[] = [
   {

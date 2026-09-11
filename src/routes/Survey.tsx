@@ -13,14 +13,31 @@ import { submitSurvey } from "../lib/submitSurvey";
  * Per-tab, survives refresh: `sessionStorage`, deliberately NOT the wizard
  * answers' in-memory session scope (ADR 0003) — a reload must not re-open a
  * survey this tab already answered, or GA-style double counting moves into the
- * Sheet instead.
+ * Sheet instead. Both accesses are guarded: in a cross-site iframe, or a
+ * sandboxed one, `sessionStorage` can throw, and the survey must still render.
  */
 const SUBMITTED_KEY = "survey-submitted";
+
+function readSubmitted(): boolean {
+  try {
+    return sessionStorage.getItem(SUBMITTED_KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
+function writeSubmitted() {
+  try {
+    sessionStorage.setItem(SUBMITTED_KEY, "true");
+  } catch {
+    /* Blocked storage: the in-memory `submitted` state still holds for this page load. */
+  }
+}
 
 export default function Survey() {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState<Partial<SurveyResponses>>({});
-  const [submitted, setSubmitted] = useState(() => sessionStorage.getItem(SUBMITTED_KEY) !== null);
+  const [submitted, setSubmitted] = useState(readSubmitted);
 
   const setAnswer = (id: SurveyQuestionId, option: string) =>
     setAnswers((prev) => ({ ...prev, [id]: option }));
@@ -66,7 +83,7 @@ export default function Survey() {
             // Same optimism, and the only submission signal anywhere — the
             // Form's opaque response means GA alone records that these happen.
             trackSurveySubmit();
-            sessionStorage.setItem(SUBMITTED_KEY, "true");
+            writeSubmitted();
             setSubmitted(true);
           }}
         >
