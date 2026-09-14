@@ -1,5 +1,6 @@
-import { classFilterFor } from "../data/explore";
+import { classFilterFor, servesType } from "../data/explore";
 import { TREATMENTS } from "../data/treatments";
+import type { WizardHemophiliaType } from "../data/wizard";
 import { TreatmentGrid } from "./ExploreTable";
 import Popup from "./Popup";
 
@@ -10,6 +11,16 @@ import Popup from "./Popup";
  * label as the title. Deliberately NO `FilterSelect`s: the box already chose
  * the class, and the other two filters would let the fixed view contradict its
  * own title. The full filterable table stays `/explore`'s.
+ *
+ * The screen's own hemophilia type cuts the rows a second time (client,
+ * 2026-09-14), for the same reason the dropdowns are absent: a row the
+ * scenario's patient cannot take contradicts the title above it. The client
+ * asked on the one case it shows up in — Efanesoctocog alfa, a FVIII product
+ * sharing the "Clotting factor replacement" bucket, painted into hemophilia B's
+ * "FIX prophylaxis" table — and the predicate is `/explore`'s own `servesType`,
+ * so `A + B` rows stay on both types. The inhibitor column is deliberately NOT
+ * cut with it: the client asked for the type, and what "indicated with
+ * inhibitors" selects is a §5.2 question this pop-up should not re-answer.
  *
  * Same contract as `DrugSheetPopup`, for the same ADR 0006 reason: the page
  * owns which label is open; this resolves and paints it. `null` is closed.
@@ -24,10 +35,13 @@ import Popup from "./Popup";
  */
 export default function ClassTablePopup({
   classLabel,
+  hemophiliaType,
   onClose,
 }: {
   /** The verbatim class label from `classesFor`, or `null` while closed. */
   classLabel: string | null;
+  /** The scenario's answered type; rows that do not serve it are cut. */
+  hemophiliaType: WizardHemophiliaType;
   onClose: () => void;
 }) {
   const bucket = classLabel === null ? undefined : classFilterFor(classLabel);
@@ -42,7 +56,11 @@ export default function ClassTablePopup({
               content: (
                 <div className="overflow-x-auto py-4">
                   <TreatmentGrid
-                    rows={TREATMENTS.filter((t) => bucket.classes.includes(t.treatmentClass))}
+                    rows={TREATMENTS.filter(
+                      (t) =>
+                        bucket.classes.includes(t.treatmentClass) &&
+                        servesType(t.hemophiliaType, hemophiliaType),
+                    )}
                   />
                 </div>
               ),
