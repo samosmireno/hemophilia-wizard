@@ -24,7 +24,7 @@ interface BoxArt {
 const FVIII_CONCENTRATES: BoxArt = { src: factorConcentratesUrl, width: 584, height: 652 };
 const FIX_CONCENTRATES: BoxArt = { src: factorFixConcentratesUrl, width: 584, height: 652 };
 const MIMETIC: BoxArt = { src: mimeticUrl, width: 624, height: 708 };
-const REBALANCING: BoxArt = { src: rebalancingUrl, width: 848, height: 716 };
+const REBALANCING: BoxArt = { src: rebalancingUrl, width: 850, height: 718 };
 const GENE: BoxArt = { src: geneTherapyUrl, width: 403, height: 480 };
 
 /**
