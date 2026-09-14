@@ -362,7 +362,7 @@ export const TREATMENT_OPTIONS_MATRIX: readonly TreatmentOptionRow[] = [
     footnote: "b",
   },
   {
-    option: "Rebalancing: siRNA",
+    option: "Hemostatic rebalancing agent: siRNA",
     moa: "↓ antithrombin; ↑ thrombin generation",
     population: "HA/HB with/without inhibitors",
     indication: ["Prophylaxis"],
@@ -370,7 +370,7 @@ export const TREATMENT_OPTIONS_MATRIX: readonly TreatmentOptionRow[] = [
     footnote: "b",
   },
   {
-    option: "Rebalancing: anti-TFPI",
+    option: "Hemostatic rebalancing agent: anti-TFPI",
     moa: "Inhibits TFPI; ↑ thrombin generation",
     population: "HA/HB with/without inhibitors",
     indication: ["Prophylaxis"],
