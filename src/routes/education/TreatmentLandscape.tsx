@@ -74,7 +74,7 @@ const ROWS: readonly [Row, Row, Row] = [
       src: benefitsChallengesUrl,
       width: 1232,
       height: 1040,
-      alt: "Factor FVIII mimetic bispecific antibody, hemostatic rebalancing agents (anti-TFPI mAB, AT siRNA), and gene therapy",
+      alt: "Factor FVIII mimetic bispecific antibody, hemostatic rebalancing agents (anti-TFPI mAb, AT siRNA), and gene therapy",
       size: "h-64 w-80",
     },
     label: "Benefits and challenges of NFTs",

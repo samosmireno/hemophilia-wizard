@@ -107,7 +107,7 @@ describe("treatment-landscape chapter", () => {
     expect(figures.map((img) => img.getAttribute("alt"))).toEqual([
       "Factor FVIII concentrates",
       "Factor FVIII mimetic bispecific antibody, hemostatic rebalancing agents " +
-        "(anti-TFPI mAB, AT siRNA), and gene therapy",
+        "(anti-TFPI mAb, AT siRNA), and gene therapy",
     ]);
     // The three `+` triggers, and nothing else.
     expect(screen.queryAllByRole("button")).toHaveLength(3);

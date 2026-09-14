@@ -551,6 +551,13 @@ strategy bullet, `drug-sheets.ts`'s two Class/Target lines, and `education.ts`'s
 drawn**: their job is to record what the source says so it can be re-verified, which is the one
 thing a silent correction would destroy.
 
+The two figures that carried the acronym in their pixels held out until the client's 2026-09-14 art
+drop set both to `mAb` (`benefits_challenges.webp`, whose relayout also moved "AT siRNA" onto its
+own line, and `hemostatic_rebalancing_agents.webp`) — the client asked for exactly that on the
+2026-09-09 review deck, on all five pages the two files appear. `TreatmentLandscape.tsx`'s alt text
+transcribes the first figure, so it followed the art to `mAb`; the class boxes name themselves from
+their labels and never spelled it.
+
 ### 5.2 Filter logic `[BUILD]`
 
 **The eligibility engine was deleted 2026-08-10.** `src/data/treatments.ts` carried
