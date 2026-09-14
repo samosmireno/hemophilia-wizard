@@ -135,6 +135,21 @@ export function minAge(age: string): number {
 }
 
 /**
+ * Whether a roster row serves a patient of this hemophilia type, read off the
+ * row's verbatim S1 `hemophiliaType` cell: `A + B` serves both, which is the
+ * "serves" reading that makes type a PATIENT filter rather than a cell match
+ * (ruled 2026-08-11; CONTEXT.md §5.2 carries the domain ground). Takes the cell
+ * rather than the row, like `minAge` above — the predicate is one column's.
+ *
+ * Two callers, deliberately one function: `/explore`'s type dropdown and the
+ * `/wizard/scenario` class pop-up, which applies it with the scenario's own
+ * answered type (client, 2026-09-14).
+ */
+export function servesType(hemophiliaType: string, type: string): boolean {
+  return hemophiliaType === type || hemophiliaType === "A + B";
+}
+
+/**
  * Which filter bucket each `/wizard/scenario` illustration box opens, keyed by
  * the verbatim class labels `classesFor` lists — the same join key `Scenario`'s
  * own `BOX_ART` uses, since those labels are plain strings. The boxes open the
@@ -144,6 +159,14 @@ export function minAge(age: string): number {
  * the "Clotting factor replacement" bucket — which covers all three factor
  * rows, FIX products included, so the "FIX prophylaxis" box is not a dead end.
  * `content.test.ts` pins coverage.
+ *
+ * The bucket is only half the cut. `ClassTablePopup` drops what does not serve
+ * the scenario's own hemophilia type as well (`servesType`, client 2026-09-14),
+ * which is what this shared factor bucket needs to be right: Efanesoctocog alfa
+ * is a FVIII product (cell `A`) in the factor class, so bucket alone painted it
+ * into hemophilia B's "FIX prophylaxis" table. Cut by type it stays in
+ * hemophilia A's "FVIII concentrates" table and leaves B's, which is the client
+ * edit verbatim. `content.test.ts` pins that no box empties under both cuts.
  */
 const CLASS_BOX_FILTERS: ReadonlyMap<string, string> = new Map([
   ["FVIII concentrates", "Clotting factor replacement"],

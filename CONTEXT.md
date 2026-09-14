@@ -320,6 +320,21 @@ account of why it went).
 > both factor-replacement labels ("FVIII concentrates", "FIX prophylaxis") share
 > the "Clotting factor replacement" bucket, whose three rows include the FIX products, and
 > both mimetic wordings share the FVIII bucket. `content.test.ts` pins that every label `classesFor` lists resolves.
+>
+> **The screen's own hemophilia type cuts the bucket a second time** (client edit, 2026-09-14).
+> The shared factor bucket needs it: Efanesoctocog alfa is a FVIII product (S1 type cell `A`,
+> [§5.1](#51-treatment-roster-9-rows-s1-verbatim-xlsx)), so class alone painted it as a third
+> row of hemophilia B's "FIX prophylaxis" table, under a title it contradicts — which is how
+> the client found it, asking for that row and only that row to go. Cut by type it leaves B's
+> table (SHL and EHL remain, both cells `A + B`) and stays in hemophilia A's "FVIII
+> concentrates" one. The predicate is `/explore`'s own `servesType`
+> ([§5.2](#52-filter-logic-build)), so `A + B` serves either type; the pop-up applies it with
+> the answered type instead of a dropdown, which is the same reasoning that keeps the
+> dropdowns out. **The inhibitor column is deliberately not cut with it** — the client asked
+> for the type, and what "indicated with inhibitors" selects is a §5.2 question this pop-up
+> should not re-answer. `content.test.ts` pins that no box empties under both cuts (the
+> tightest is Gene therapy on HB −inhib: one row), and `scenario.test.tsx` names Efanesoctocog
+> alfa on both sides of the edit.
 
 `[BUILD]` **Known drift:** `treatment-wizard-demo.html` mirrors `CLASSES_TO_CONSIDER` and still
 carries the singular "Hemostatic rebalancing agent", plus none of the three new fields. The demo
@@ -571,7 +586,10 @@ each defaulting to All, resetting when the card closes; a fourth, Patient age, j
   both types), not a type a patient can have — so an "A + B" option could only mean "everything
   serving either", which is what All already means, and the redundancy read as confusing. The
   dropdown is therefore All / A / B, **a deliberate departure from the drawn three-value set**
-  (the artboard draws A / B / A + B); the table's cells still carry `A + B` verbatim. This
+  (the artboard draws A / B / A + B); the table's cells still carry `A + B` verbatim. The
+  predicate is `servesType` in `src/data/explore.ts`, shared since 2026-09-14 with the
+  `/wizard/scenario` class pop-up, which applies it with the scenario's answered type (§4) —
+  one function, so the two surfaces cannot drift on what `A + B` means. This
   reversed the same day's first ruling (exact cell match, a 3/1/5 partition), which survived
   one session: it read the dropdown as a column filter where a clinician reads it as their
   patient. Either way back is a small predicate-and-options swap if the client overrules.

@@ -15,6 +15,7 @@ import {
   EXPLORE_CLASS_FILTERS,
   EXPLORE_SEGMENTS,
   minAge,
+  servesType,
 } from "./explore";
 import { ACRONYMS, GLOSSARY } from "./glossary";
 import { REFERENCES, RESOURCES } from "./references";
@@ -240,6 +241,28 @@ describe("explore class filters", () => {
     for (const scenario of ALL_SCENARIOS) {
       for (const label of classesFor(scenario).classes) {
         expect(classFilterFor(label), `"${label}" resolves to no filter bucket`).toBeDefined();
+      }
+    }
+  });
+
+  /*
+    The pop-up cuts the bucket again by the screen's own hemophilia type
+    (client, 2026-09-14), so resolving is no longer enough to keep a box alive:
+    a bucket holding no row that serves its screen's type opens an empty table.
+    Nothing states that the two cuts can both be non-empty — this does.
+  */
+  it("leave every scenario box a row once its screen's type cuts the bucket", () => {
+    for (const scenario of ALL_SCENARIOS) {
+      for (const label of classesFor(scenario).classes) {
+        const bucket = classFilterFor(label)!;
+        const rows = TREATMENTS.filter(
+          (t) =>
+            bucket.classes.includes(t.treatmentClass) &&
+            servesType(t.hemophiliaType, scenario.type),
+        );
+        expect(rows, `"${label}" opens an empty table for hemophilia ${scenario.type}`).not.toEqual(
+          [],
+        );
       }
     }
   });

@@ -43,7 +43,10 @@ const BOX_ART: ReadonlyMap<string, BoxArt> = new Map([
 ]);
 
 export default function Scenario() {
-  const screen = classesFor(useScenarioWizardAnswers());
+  // The answers whole, not just the screen they resolve to: the class pop-up
+  // cuts its rows to the patient's own hemophilia type (client, 2026-09-14).
+  const answers = useScenarioWizardAnswers();
+  const screen = classesFor(answers);
 
   const [openClass, setOpenClass] = useState<string | null>(null);
 
@@ -95,7 +98,11 @@ export default function Scenario() {
         {boxes}
       </div>
 
-      <ClassTablePopup classLabel={openClass} onClose={() => setOpenClass(null)} />
+      <ClassTablePopup
+        classLabel={openClass}
+        hemophiliaType={answers.type}
+        onClose={() => setOpenClass(null)}
+      />
     </PageSection>
   );
 }

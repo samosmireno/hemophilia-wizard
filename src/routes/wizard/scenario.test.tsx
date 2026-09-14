@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
-import { classFilterFor } from "../../data/explore";
+import { classFilterFor, servesType } from "../../data/explore";
 import { TREATMENTS } from "../../data/treatments";
 import { ALL_SCENARIOS, classesFor, type WizardHemophiliaType } from "../../data/wizard";
 import { seedWizardAnswers } from "../../test/setup";
@@ -36,6 +36,17 @@ const BRANCHES: [WizardHemophiliaType, boolean][] = ALL_SCENARIOS.map(({ type, h
   type,
   hasInhibitors,
 ]);
+
+/**
+ * The agent cell of every body row of an open class table, in render order —
+ * column 2 of the nine, `ExploreTable`'s `COLUMNS[1]`.
+ */
+function agentsShown(dialog: HTMLElement) {
+  return within(dialog)
+    .getAllByRole("row")
+    .slice(1) // the header row
+    .map((row) => within(row).getAllByRole("cell")[1].textContent);
+}
 
 /** The lead as a reader sees it: the delimiters are markup, not text. */
 function stripMarkup(text: string) {
@@ -190,22 +201,49 @@ describe("wizard scenario — the class table pop-ups", () => {
       expect(dialog).toHaveAccessibleName(label);
 
       /*
-        The rows are exactly the bucket's, in S1 row order — computed from the
-        same join the component uses, so what this pins is the render, while
-        `content.test.ts` pins that the join resolves for every label at all.
+        The rows are exactly the bucket's cut to the screen's own hemophilia
+        type, in S1 row order — computed from the same two joins the component
+        uses, so what this pins is the render, while `content.test.ts` pins that
+        the class join resolves for every label at all and that neither cut
+        empties a box. The named-agent case the type cut was asked for is the
+        test below.
       */
       const bucket = classFilterFor(label)!;
-      const agents = within(dialog)
-        .getAllByRole("row")
-        .slice(1) // the header row
-        .map((row) => within(row).getAllByRole("cell")[1].textContent);
-      expect(agents).toEqual(
-        TREATMENTS.filter((t) => bucket.classes.includes(t.treatmentClass)).map((t) => t.agent),
+      expect(agentsShown(dialog)).toEqual(
+        TREATMENTS.filter(
+          (t) => bucket.classes.includes(t.treatmentClass) && servesType(t.hemophiliaType, type),
+        ).map((t) => t.agent),
       );
 
       await user.click(within(dialog).getByRole("button", { name: `Close ${label}` }));
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     }
+  });
+
+  /**
+   * The client's 2026-09-14 edit, which is what the type cut is for.
+   * Efanesoctocog alfa is a FVIII product — S1 type cell `A` — sitting in the
+   * "Clotting factor replacement" bucket that BOTH factor boxes open, so cut by
+   * class alone it painted a third row into hemophilia B's "FIX prophylaxis"
+   * table. Named on both sides rather than computed, because the ask was this
+   * agent gone from this table, and it has to stay in hemophilia A's.
+   */
+  it("drops Efanesoctocog alfa from hemophilia B's FIX prophylaxis table", async () => {
+    const user = userEvent.setup();
+    const region = renderScenario("B", false);
+
+    await user.click(within(region).getByRole("button", { name: "Expand FIX prophylaxis" }));
+
+    expect(agentsShown(screen.getByRole("dialog"))).toEqual(["SHL", "EHL"]);
+  });
+
+  it("keeps Efanesoctocog alfa in hemophilia A's FVIII concentrates table", async () => {
+    const user = userEvent.setup();
+    const region = renderScenario("A", false);
+
+    await user.click(within(region).getByRole("button", { name: "Expand FVIII concentrates" }));
+
+    expect(agentsShown(screen.getByRole("dialog"))).toEqual(["SHL", "EHL", "Efanesoctocog alfa"]);
   });
 
   /**

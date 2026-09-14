@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import { Button } from "mlg-components";
 
-import { EXPLORE_AGE_FILTERS, EXPLORE_CLASS_FILTERS, minAge } from "../data/explore";
+import { EXPLORE_AGE_FILTERS, EXPLORE_CLASS_FILTERS, minAge, servesType } from "../data/explore";
 import { TREATMENTS, type Treatment } from "../data/treatments";
 import { cn } from "../lib/cn";
 import FilterSelect from "./FilterSelect";
@@ -106,7 +106,7 @@ export default function ExploreTable() {
   const rows = TREATMENTS.filter(
     (t) =>
       (!bucket || bucket.classes.includes(t.treatmentClass)) &&
-      (type === "" || t.hemophiliaType === type || t.hemophiliaType === "A + B") &&
+      (type === "" || servesType(t.hemophiliaType, type)) &&
       (inhibitors === "" || t.inhibitors === (inhibitors === INHIBITOR_YES ? "Yes" : "No")) &&
       (!band || minAge(t.age) <= band.floor),
   );
