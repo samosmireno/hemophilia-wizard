@@ -28,6 +28,14 @@ export function initAnalytics(measurementId: string | undefined, isProduction: b
  *  links love identifying query params, and this app promises anonymity. */
 export function trackPageview(pathname: string) {
   if (!enabled) return;
+  // `set` first, so the route sticks to every *later* hit as well. Routing is
+  // hash-based (`createHashRouter`, main.tsx) and gtag drops the fragment from
+  // `page_location`, so without this every event but the pageview files itself
+  // under the install root. Our own events carry a `page` param already; the ones
+  // GA4 generates are why this matters — Enhanced Measurement's outbound clicks on
+  // `/references` and `/resources`, and scroll. `set` is a default for what comes
+  // after, not a substitute for the pageview below, which still sends the path.
+  ReactGA.gtag("set", { page_path: pathname });
   ReactGA.send({ hitType: "pageview", page: pathname });
 }
 

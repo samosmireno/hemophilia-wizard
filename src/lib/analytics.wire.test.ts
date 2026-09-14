@@ -38,6 +38,16 @@ describe("analytics on the wire", () => {
     expect(events()).toContainEqual(["event", "page_view", { page_path: "/wizard" }]);
   });
 
+  /** Routing is hash-based, and gtag drops the fragment from `page_location`: without
+   *  this `set`, every hit GA4 generates itself (Enhanced Measurement's outbound
+   *  clicks, scroll) is filed under the install root rather than the route it
+   *  happened on. Verified against real gtag.js — the route reaches the wire as `dp`. */
+  it("pins the route as the default page for the hits that follow", async () => {
+    const analytics = await loadInitialized();
+    analytics.trackPageview("/wizard/therapies");
+    expect(pushed()).toContainEqual(["set", { page_path: "/wizard/therapies" }]);
+  });
+
   it("delivers event params exactly as written — `page` stays `page`", async () => {
     const analytics = await loadInitialized();
     analytics.trackDrugSheetOpen("Emicizumab", "/explore");

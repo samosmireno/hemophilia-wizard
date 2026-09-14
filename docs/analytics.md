@@ -11,7 +11,9 @@ Only when **both** hold (`initAnalytics` in `src/main.tsx`):
 
 - `VITE_GA_MEASUREMENT_ID` is set — locally via `.env`, on Vercel via the project's
   environment variables (the `.env` file is gitignored, so a deploy without the Vercel
-  var ships with analytics silently off).
+  var ships with analytics silently off). The ID is read at **build** time and baked
+  into the bundle, which is what makes it the first thing to check on a hand-off build
+  — see "Hosted bundle" below.
 - The build is production (`import.meta.env.PROD`) — dev sessions never send hits, even
   with an ID present.
 
@@ -23,6 +25,15 @@ Path only, never query strings — and the address bar itself is reduced to `utm
 boot, see "Campaign links" below. The 15-step `SECTION_ORDER` spine means the funnel is
 built in GA4 reporting straight from page paths — including the intake→scenario drop-off,
 since `/wizard`'s Submit fires no event (see the table).
+
+The route reaches GA4 as the page path even though routing is hash-based: react-ga4
+sends it as `page_path`, which gtag puts on the wire as `dp`, the document-path
+parameter GA4's page dimensions read. What it does **not** reach is `page_location` —
+gtag drops the fragment, so that field is the install root on every hit, whatever the
+route. `trackPageview` therefore also calls `gtag("set", { page_path })`, which pins the
+route as the default for the hits that follow: our own events carry a `page` param
+already, but the ones GA4 generates itself — Enhanced Measurement's outbound clicks and
+scroll — have nothing else to go on and would otherwise all file under the install root.
 
 **Use time** — `step_duration` carries the foreground seconds spent on each route. GA4's
 own _Average engagement time_ is unreliable for this SPA: gtag credits engaged time to the
@@ -88,7 +99,9 @@ Channel attribution — did this visit come from the printed QR code, the client
 the email? — comes from GA4's automatic UTM handling, not from code. Without UTMs a QR
 scan and an email click both arrive with no referrer and both report as `(direct)`;
 only the website link is distinguishable, as a `referral`. So every distribution channel
-gets its own tagged URL, all pointing at `/`:
+gets its own tagged URL, all pointing at the app's root — `/` below, which on a hosted
+bundle means wherever the client installed the folder (`/tools/hemophilia-wizard/`, say),
+never the domain root:
 
 | Channel     | Link                                                                 |
 | ----------- | -------------------------------------------------------------------- |
@@ -126,6 +139,37 @@ itself is parenthesised (`(direct)`, `(referral)`, `(ai-assistant)`, `(not set)`
 waves never are, so `campaignLabel` renders every one of them as "—": untagged. The
 assistants' desktop apps send no referrer at all, so those clicks are indistinguishable from
 a QR scan and count as direct — one more reason the tagged links matter.
+
+## Hosted bundle (the zip the client deploys)
+
+The app also ships as a folder — `npm run build`'s `dist/`, zipped — that the client
+serves from a path on their own site, top level, not in an iframe (2026-09-14). Nothing
+in the event schema changes, but three things about a build that leaves our hosting are
+worth knowing before the zip goes out.
+
+**The measurement ID is baked in at build time.** On Vercel it comes from the project's
+environment variables; a zip carries whatever the building machine's `.env` held, and
+`.env` is gitignored, so a build from a fresh clone or a CI runner ships with analytics
+silently off and no error anywhere. Check the artefact, not the intent:
+`grep -rl G-C1HHCMQZNG dist/` must hit before the folder is zipped.
+
+**Page paths report normally; `page_location` does not.** Routing is hash-based and the
+assets are relative (`base: "./"`, see the Deploy section of CLAUDE.md), so the folder
+runs from any subdirectory — and gtag drops the fragment from `page_location`, leaving it
+at the install root for every hit. Page paths are unaffected, which is what the funnel and
+every report here are built on; it is `page_location` that stops being useful, and the
+`gtag("set", { page_path })` in `trackPageview` is what keeps GA4's own events (outbound
+clicks, scroll) attributed to the route rather than the root.
+
+**Campaign links have to carry the install path**, since `/` is now the client's site
+root — see the table above.
+
+Both installs report to the same property, so if the Vercel copy stays up alongside the
+client's, the two mix; GA4's **Hostname** dimension is what separates them, and it is the
+one dimension `page_location` still carries reliably. And if the app is ever put in a
+cross-site iframe after all, it needs a code change first: gtag writes no cookie and sends
+no hits at all from a third-party frame unless `initAnalytics` passes
+`cookie_flags: "SameSite=None;Secure"` (verified against real gtag.js, 2026-09-14).
 
 ## GA4 console checklist (one-time, property `G-C1HHCMQZNG`)
 
@@ -275,7 +319,10 @@ npm run preview` (the local `.env` supplies the ID; the dev server never sends).
 ### Enhanced Measurement (no code — verifies console step 2)
 
 - [ ] Click an outbound link on `/references` or `/resources`: a `click` event with
-      `outbound: true` and the `link_url`/`link_domain` params.
+      `outbound: true` and the `link_url`/`link_domain` params — and a page path of
+      `/references` or `/resources`, not the install root. GA4 fills that one in itself
+      from the `gtag("set", { page_path })` in `trackPageview`; the root instead means
+      the `set` is gone and every GA4-generated event has lost its route.
 - [ ] `scroll` and `user_engagement` events appear on long pages — expected, ignore.
 - [ ] Every navigation still produces exactly **one** `page_view` — confirms the
       history-based auto pageview is off.

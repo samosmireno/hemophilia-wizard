@@ -71,6 +71,12 @@ describe("tracking after init", () => {
     expect(send).toHaveBeenCalledExactlyOnceWith({ hitType: "pageview", page: "/wizard" });
   });
 
+  it("pins the route as the default page for the events that follow", async () => {
+    const analytics = await loadInitialized();
+    analytics.trackPageview("/wizard/therapies");
+    expect(gtag).toHaveBeenCalledWith("set", { page_path: "/wizard/therapies" });
+  });
+
   it("maps the wizard answers onto three separate params, plus the run ordinal", async () => {
     const analytics = await loadInitialized();
     analytics.trackWizardSubmit({ type: "B", hasInhibitors: true, reason: "monitoring" }, 2);
