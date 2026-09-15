@@ -296,6 +296,10 @@ npm run preview` (the local `.env` supplies the ID; the dev server never sends).
 - [ ] Open an agent sheet on `/wizard/therapies`: one event, `agent` = roster name,
       `page` = `/wizard/therapies`.
 - [ ] Same on `/explore` and `/education/rebalancing-agents`: `page` follows the route.
+      The install root instead (`/` on Vercel, `/hemophilia-wizard/` on the client's
+      site) means the popup is reading `location.pathname` again rather than the hash
+      — it did from the hash-router switch until 2026-09-15, and the `/how-to`
+      exclusion below silently stopped matching with it.
 - [ ] Close via ✕, Escape, and backdrop, reopening in between: exactly one event per
       open, nothing on close.
 - [ ] The `/how-to` demo sheet (Fitusiran): **no** event.

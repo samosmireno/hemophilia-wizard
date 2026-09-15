@@ -21,7 +21,7 @@ export default function DrugSheetPopup({
   // hook would make a router context part of this component's contract. By the
   // time an effect fires the router has long since written the URL.
   useEffect(() => {
-    if (sheet) trackDrugSheetOpen(sheet.agent, window.location.pathname);
+    if (sheet) trackDrugSheetOpen(sheet.agent, currentRoute());
   }, [sheet]);
 
   return (
@@ -35,6 +35,18 @@ export default function DrugSheetPopup({
       onClose={onClose}
     />
   );
+}
+
+/**
+ * The app's route, read the way `createHashRouter` (main.tsx) writes it: the
+ * fragment, not `pathname`. Under hash routing `pathname` is the install root
+ * for every page — `/` on Vercel, `/hemophilia-wizard/` on the client's site —
+ * which is what every `drug_sheet_open` reported until 2026-09-15. Any query in
+ * the fragment is dropped, as `trackPageview` drops `location.search`.
+ */
+function currentRoute(): string {
+  const route = window.location.hash.replace(/^#/, "").split("?")[0];
+  return route === "" ? "/" : route;
 }
 
 function DrugSheetBody({ sheet }: { sheet: DrugSheet }) {

@@ -1,9 +1,12 @@
-import { render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DRUG_SHEETS, type DrugSheet } from "../data/drug-sheets";
+import { trackDrugSheetOpen } from "../lib/analytics";
 import DrugSheetPopup from "./DrugSheetPopup";
+
+vi.mock("../lib/analytics", () => ({ trackDrugSheetOpen: vi.fn() }));
 
 /**
  * The card's five sections, in the order it stacks them, as a function of the
@@ -183,5 +186,50 @@ describe("DrugSheetPopup — what opens and what does not", () => {
     await user.click(screen.getByRole("button", { name: "Close Fitusiran" }));
 
     expect(closed).toBe(1);
+  });
+});
+
+describe("DrugSheetPopup — the analytics tag", () => {
+  /* Every sheet render above tags too, so the mock is cleared going in, not out. */
+  beforeEach(() => vi.mocked(trackDrugSheetOpen).mockClear());
+  afterEach(() => {
+    window.location.hash = "";
+  });
+
+  it("tags the open with the hash route, not the install pathname", () => {
+    /*
+      Routing is hash-based (`createHashRouter`, main.tsx), so the page the
+      sheet opened from lives in the fragment; `pathname` is the install root
+      wherever the build is served. Read the wrong one and every sheet reports
+      the same page — which is what happened, unnoticed, from the hash-router
+      switch until the live site showed `/hemophilia-wizard/` on 2026-09-15.
+    */
+    window.location.hash = "#/education/rebalancing-agents";
+
+    openCard("Fitusiran");
+
+    expect(trackDrugSheetOpen).toHaveBeenCalledExactlyOnceWith(
+      "Fitusiran",
+      "/education/rebalancing-agents",
+    );
+  });
+
+  it("drops any query from the route and reports the bare root as /", () => {
+    window.location.hash = "#/wizard/therapies?utm_source=x";
+    openCard("Emicizumab");
+    expect(trackDrugSheetOpen).toHaveBeenLastCalledWith("Emicizumab", "/wizard/therapies");
+
+    cleanup();
+    window.location.hash = "";
+    openCard("Marstacimab");
+    expect(trackDrugSheetOpen).toHaveBeenLastCalledWith("Marstacimab", "/");
+  });
+
+  it("hands /how-to through, so the wrapper's legend exclusion can fire", () => {
+    /* The exclusion lives in `trackDrugSheetOpen`; this pins that the route it
+       compares against is the one the legend page actually has. */
+    window.location.hash = "#/how-to";
+    openCard("Fitusiran");
+    expect(trackDrugSheetOpen).toHaveBeenLastCalledWith("Fitusiran", "/how-to");
   });
 });
