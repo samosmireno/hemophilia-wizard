@@ -30,7 +30,7 @@
  *  2. Open the Sheet → Extensions → Apps Script.
  *  3. Left sidebar → Services (+) → "Google Analytics Data API" → Add (it appears as
  *     `AnalyticsData`; no API keys or OAuth config needed).
- *  4. Paste this file over Code.gs; set PROPERTY_ID and START_DATE; save.
+ *  4. Paste this file over Code.gs; set PROPERTY_ID, START_DATE and HOSTNAME; save.
  *  5. Toolbar → select `pullReports` → Run → Review permissions → Allow. Tabs appear.
  *  6. Left sidebar → Triggers (clock) → Add Trigger → function `pullReports`,
  *     Time-driven, Day timer, 6–7am → Save.
@@ -44,7 +44,10 @@
  */
 
 const PROPERTY_ID = "123456789"; // step 1 - numeric property ID
-const START_DATE = "2026-09-01"; // launch date (YYYY-MM-DD)
+const START_DATE = "2026-09-14"; // go-live on the client's site (YYYY-MM-DD)
+/** Only hits from the client's install count; the Vercel copy and local previews report to
+ *  the same property and would otherwise leak into every tab. */
+const HOSTNAME = "medlearninggroup.com";
 const ROW_LIMIT = 10000;
 const APP_NAME = "Hemophilia Treatment Wizard";
 
@@ -738,11 +741,15 @@ function runReport(dims, mets, eventName) {
     metrics: mets.map((name) => ({ name })),
     limit: ROW_LIMIT,
   };
+  const filters = [
+    { filter: { fieldName: "hostName", stringFilter: { matchType: "EXACT", value: HOSTNAME } } },
+  ];
   if (eventName) {
-    request.dimensionFilter = {
+    filters.push({
       filter: { fieldName: "eventName", stringFilter: { matchType: "EXACT", value: eventName } },
-    };
+    });
   }
+  request.dimensionFilter = { andGroup: { expressions: filters } };
   const res = AnalyticsData.Properties.runReport(request, `properties/${PROPERTY_ID}`);
   return (res.rows || []).map((r) => [
     ...(r.dimensionValues || []).map((d) => d.value),

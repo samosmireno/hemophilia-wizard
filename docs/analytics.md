@@ -166,7 +166,10 @@ root — see the table above.
 
 Both installs report to the same property, so if the Vercel copy stays up alongside the
 client's, the two mix; GA4's **Hostname** dimension is what separates them, and it is the
-one dimension `page_location` still carries reliably. And if the app is ever put in a
+one dimension `page_location` still carries reliably. The client Sheet is already cut to
+it: every pull in `scripts/ga4-to-sheet.gs` filters on `hostName` = `HOSTNAME`
+(`medlearninggroup.com`) and starts at `START_DATE` (2026-09-14, the go-live), so Vercel
+and local-preview hits stay in the property but never reach a client tab (2026-09-15). And if the app is ever put in a
 cross-site iframe after all, it needs a code change first: gtag writes no cookie and sends
 no hits at all from a third-party frame unless `initAnalytics` passes
 `cookie_flags: "SameSite=None;Secure"` (verified against real gtag.js, 2026-09-14).
